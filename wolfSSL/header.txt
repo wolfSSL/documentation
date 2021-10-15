@@ -1,0 +1,20 @@
+% wolfSSL Documentation
+
+---
+header-includes:
+    # Blank pages on new sections
+    - \usepackage{titlesec}
+    - \newcommand{\sectionbreak}{\clearpage}
+    # Fancy page headers
+    - \usepackage{fancyhdr}
+    - \pagestyle{fancy}
+    # Wrap long syntax highlighting code blocks
+    - \usepackage{fvextra}
+    - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+    # Wrap long non-sytax highlighted code blocks
+    - \usepackage{listings}
+    - \let\verbatim\undefined
+    - \let\verbatimend\undefined
+    - \lstnewenvironment{verbatim}{\lstset{breaklines,basicstyle=\ttfamily}}{}
+subparagraph: yes
+---
