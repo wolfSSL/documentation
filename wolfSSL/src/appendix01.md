@@ -5,7 +5,7 @@
 
 The wolfSSL (formerly CyaSSL) embedded SSL library implements SSL 3.0, TLS 1.0, TLS 1.1, TLS 1.2, and TLS 1.3 protocols. TLS 1.3 is currently the most secure and up to date version of the standard. wolfSSL does not support SSL 2.0 due to the fact that it has been insecure for several years.
 
-The TLS protocol in wolfSSL is implemented as defined in [RFC 5246 (http://tools.ietf.org/html/rfc5246).](http://tools.ietf.org/html/rfc5246) Two record layer protocols exist within SSL - the message layer and the handshake layer. Handshake messages are used to negotiate a common cipher suite, create secrets, and enable a secure connection. The message layer encapsulates the handshake layer while also supporting alert processing and application data transfer.
+The TLS protocol in wolfSSL is implemented as defined in [RFC 5246 (https://tools.ietf.org/html/rfc5246).](https://tools.ietf.org/html/rfc5246) Two record layer protocols exist within SSL - the message layer and the handshake layer. Handshake messages are used to negotiate a common cipher suite, create secrets, and enable a secure connection. The message layer encapsulates the handshake layer while also supporting alert processing and application data transfer.
 
 A general diagram of how the SSL protocol fits into existing protocols can be seen in **Figure 1**. SSL sits in between the Transport and Application layers of the OSI model, where any number of protocols (including TCP/IP, Bluetooth, etc.) may act as the transport medium.  Application protocols are layered on top of SSL (such as HTTP, FTP, and SMTP).
 
@@ -70,7 +70,7 @@ This protocol was defined in RFC 5246 in August of 2008.  Based on TLS 1.1, TLS 
 
 ### TLS 1.3
 
-This protocol was defined in an Internet Draft in April of 2017. TLS 1.3 contains improved security and speed. The major differences include:
+This protocol was defined in RFC 8446 in August of 2018. TLS 1.3 contains improved security and speed. The major differences include:
 
 * The list of supported symmetric algorithms has been pruned of all legacy algorithms. The remaining algorithms all use Authenticated Encryption with Associated Data (AEAD) algorithms.
 * A zero-RTT (0-RTT) mode was added, saving a round-trip at connection setup for some application data at the cost of certain security properties.

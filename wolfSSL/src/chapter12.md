@@ -37,4 +37,4 @@ Benefits to enabling digital signatures on your device include:
 
 General information on code signing:
 
-<http://en.wikipedia.org/wiki/Code_signing>
+<https://en.wikipedia.org/wiki/Code_signing>

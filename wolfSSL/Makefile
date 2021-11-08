@@ -28,7 +28,8 @@ HTML = html/
 # Need an index.md, so let's make it chapter01.
 html: builddir $(SOURCES) $(APPENDIX)
 	@cp src/*.png build/html/
-	@mv build/html/chapter01.md build/html/index.md
+	@cp src/*.css build/html/
+	@mv build/html/chapter01.md build/html/index.md 
 	@mkdir html
 	@mkdocs build
 
@@ -45,7 +46,8 @@ pdf: builddir $(SOURCES) $(APPENDIX)
 	@cp src/*.png build/pdf/
 	@cd build/pdf && pandoc \
 		-N \
-		--metadata date="`date -I`" \
+        -s \
+        --metadata date="`date -I`" \
 		--variable mainfont="Noto Sans" \
 		--variable sansfont="Noto Sans" \
 		--variable monofont="Noto Sans Mono" \

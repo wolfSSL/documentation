@@ -4,7 +4,7 @@
 
 The wolfSSL (formerly CyaSSL) embedded SSL library can easily be integrated into your existing application or device to provide enhanced communication security through the addition of SSL and TLS. wolfSSL has been targeted at embedded and RTOS environments, and as such, offers a minimal footprint while maintaining excellent performance. Minimum build sizes for wolfSSL range between 20-100kB depending on the selected build options and platform being used.
 
-The goal of this tutorial is to walk through the integration of SSL and TLS into a simple application. Hopefully the process of going through this tutorial will also lead to a better understanding of SSL in general. This tutorial uses wolfSSL in conjunction with simple echoserver and echoclient examples to keep things as simple as possible while still demonstrating the general procedure of adding SSL support to an application. The echoserver and echoclient examples have been taken from the popular book titled [Unix Network Programming, Volume 1, 3rd Edition](http://www.unpbook.com/) by Richard Stevens, Bill Fenner, and Andrew Rudoff.
+The goal of this tutorial is to walk through the integration of SSL and TLS into a simple application. Hopefully the process of going through this tutorial will also lead to a better understanding of SSL in general. This tutorial uses wolfSSL in conjunction with simple echoserver and echoclient examples to keep things as simple as possible while still demonstrating the general procedure of adding SSL support to an application. The echoserver and echoclient examples have been taken from the popular book titled [Unix Network Programming, Volume 1, 3rd Edition](https://www.unpbook.com/) by Richard Stevens, Bill Fenner, and Andrew Rudoff.
 
 This tutorial assumes that the reader is comfortable with editing and compiling C code using the GNU GCC compiler as well as familiar with the concepts of public key encryption. Please note that access to the Unix Network Programming book is not required for this tutorial.
 
@@ -23,7 +23,7 @@ SSL and TLS sit between the Transport and Application layers of the OSI model, w
 
 All of the source code used in this tutorial can be downloaded from the wolfSSL website, specifically from the following location. The download contains both the original and completed source code for both the echoserver and echoclient used in this tutorial. Specific contents are listed below the link.
 
-<http://www.wolfssl.com/documentation/ssl-tutorial-2.3.zip>
+<https://www.wolfssl.com/documentation/ssl-tutorial-2.3.zip>
 
 The downloaded ZIP file has the following structure:
 
@@ -77,9 +77,9 @@ Please note that in these source code examples, certain functions will be capita
 
 Before we begin, download the example code (`echoserver` and `echoclient`) from the [Getting the Source Code](chapter03.md#getting-the-source-code) section, above. This section will explain how to download, configure, and install the wolfSSL embedded SSL library on your system.
 
-You will need to download and install the most recent version of wolfSSL from the wolfSSL [download page](http://wolfssl.com/yaSSL/download/downloadForm.php).
+You will need to download and install the most recent version of wolfSSL from the wolfSSL [download page](https://wolfssl.com/yaSSL/download/downloadForm.php).
 
-For a full list of available build options, see the [Building wolfSSL](http://www.yassl.com/yaSSL/Docs-cyassl-manual-2-building-cyassl.html) guide. wolfSSL was written with portability in mind, and should generally be easy to build on most systems. If you have difficulty building wolfSSL, please feel free to ask for support on the wolfSSL[ product support forums](http://www.wolfssl.com/forums).
+For a full list of available build options, see the [Building wolfSSL](https://www.yassl.com/yaSSL/Docs-cyassl-manual-2-building-cyassl.html) guide. wolfSSL was written with portability in mind, and should generally be easy to build on most systems. If you have difficulty building wolfSSL, please feel free to ask for support on the wolfSSL[ product support forums](https://www.wolfssl.com/forums).
 
 When building wolfSSL on Linux, *BSD, OS X, Solaris, or other *nix like systems, you can use the autoconf system. For Windows-specific instructions, please refer to the [Building wolfSSL](chapter02.md#building-wolfssl) section of the wolfSSL Manual. To configure and build wolfSSL, run the following two commands from the terminal. Any desired build options may be appended to `./configure` (ex: `./configure -–enable-opensslextra`):
 
