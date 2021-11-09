@@ -1,12 +1,12 @@
 # Features
 
-wolfSSL (formerly CyaSSL) supports the C programming language as a primary interface, but also supports several other host languages, including Java, PHP, Perl, and Python (through a [SWIG](http://swig.org/) interface). If you have interest in hosting wolfSSL in another programming language that is not currently supported, please contact us.
+wolfSSL (formerly CyaSSL) supports the C programming language as a primary interface, but also supports several other host languages, including Java, PHP, Perl, and Python (through a [SWIG](https://swig.org/) interface). If you have interest in hosting wolfSSL in another programming language that is not currently supported, please contact us.
 
 This chapter covers some of the features of wolfSSL in more depth, including Stream Ciphers, AES-NI, IPv6 support, SSL Inspection (Sniffer) support, and more.
 
 ## Features Overview
 
-For an overview of wolfSSL features, please reference the wolfSSL product webpage: [https://wolfssl.com/wolfSSL/Products-wolfssl.html](https://wolfssl.com/wolfSSL/Products-wolfssl.html)
+For an overview of wolfSSL features, please reference the wolfSSL product webpage: [https://www.wolfssl.com/products/wolfssl](https://www.wolfssl.com/products/wolfssl)
 
 ## Protocol Support
 
@@ -56,7 +56,7 @@ wolfSSL was designed as IP neutral, and will work with both IPv4 and IPv6, but t
 
 Further information on IPv6 can be found here:
 
-[http://en.wikipedia.org/wiki/IPv6](http://en.wikipedia.org/wiki/IPv6).
+[https://en.wikipedia.org/wiki/IPv6](https://en.wikipedia.org/wiki/IPv6).
 
 ### DTLS
 
@@ -95,13 +95,13 @@ A list of TLS extensions supported by wolfSSL and note of which RFC can be refer
 | [Draft](https://tools.ietf.org/html/draft-whyte-qsh-tls12-00) | Quantum-Safe Hybrid Key Exchange | `TLSX_QUANTUM_SAFE_HYBRID` |
 | [5077](https://datatracker.ietf.org/doc/html/rfc5077) | Session Ticket | `TLSX_SESSION_TICKET` |
 | [5746](https://datatracker.ietf.org/doc/html/rfc5746) | Renegotiation Indication | `TLSX_RENEGOTIATION_INFO` |
-| [Draft](https://tools.ietf.org/html/draft-ietf-tls-tls13-22) | Key Share | `TLSX_KEY_SHARE` |
-| [Draft](https://tools.ietf.org/html/draft-ietf-tls-tls13-22) | Pre Shared Key | `TLSX_PRE_SHARED_KEY` |
-| [Draft](https://tools.ietf.org/html/draft-ietf-tls-tls13-22) | PSK Key Exchange Modes | `TLSX_PSK_KEY_EXCHANGE_MODES` |
-| [Draft](https://tools.ietf.org/html/draft-ietf-tls-tls13-22) | Early Data | `TLSX_EARLY_DATA` |
-| [Draft](https://tools.ietf.org/html/draft-ietf-tls-tls13-22) | Cookie | `TLSX_COOKIE` |
-| [Draft](https://tools.ietf.org/html/draft-ietf-tls-tls13-22) | Supported Versions | `TLSX_SUPPORTED_VERSIONS` |
-| [Draft](https://tools.ietf.org/html/draft-ietf-tls-tls13-22) | Post Handshake Authorization | `TLSX_POST_HANDSHAKE_AUTH` |
+| [8446](https://datatracker.ietf.org/doc/html/rfc8446) | Key Share | `TLSX_KEY_SHARE` |
+| [8446](https://datatracker.ietf.org/doc/html/rfc8446) | Pre Shared Key | `TLSX_PRE_SHARED_KEY` |
+| [8446](https://datatracker.ietf.org/doc/html/rfc8446) | PSK Key Exchange Modes | `TLSX_PSK_KEY_EXCHANGE_MODES` |
+| [8446](https://datatracker.ietf.org/doc/html/rfc8446) | Early Data | `TLSX_EARLY_DATA` |
+| [8446](https://datatracker.ietf.org/doc/html/rfc8446) | Cookie | `TLSX_COOKIE` |
+| [8446](https://datatracker.ietf.org/doc/html/rfc8446) | Supported Versions | `TLSX_SUPPORTED_VERSIONS` |
+| [8446](https://datatracker.ietf.org/doc/html/rfc8446) | Post Handshake Authorization | `TLSX_POST_HANDSHAKE_AUTH` |
 
 ## Cipher Support
 
@@ -312,7 +312,7 @@ wolfSSL supports the **AES**, **DES**, **3DES**, and **Camellia** block ciphers 
 
 While SSL uses RC4 as the default stream cipher, it has been obsoleted due to compromise. wolfSSL has added two ciphers from the eStream project into the code base, RABBIT and HC-128. RABBIT is nearly twice as fast as RC4 and HC-128 is about 5 times as fast! So if you've ever decided not to use SSL because of speed concerns, using wolfSSL's stream ciphers should lessen or eliminate that performance doubt. Recently wolfSSL also added ChaCha20. While RC4 is about 11% more performant than ChaCha, RC4 is generally considered less secure than ChaCha. ChaCha can put up very nice times of it’s own with added security as a tradeoff.
 
-To see a comparison of cipher performance, visit the wolfSSL Benchmark web page, located here: <http://wolfssl.com/yaSSL/benchmarks-wolfssl.html>.
+To see a comparison of cipher performance, visit the wolfSSL Benchmark web page, located here: <https://www.wolfssl.com/docs/benchmarks>.
 
 #### What’s the Difference?
 
@@ -397,7 +397,7 @@ If you are using `./configure` to build wolfssl, the way to enable this function
 
 A full example can be found in `<wolfSSL Root>/wolfcrypt/test.c`. More information can be found on PKCS #5, PBKDF1, and PBKDF2 from the following specifications:
 
-PKCS#5, PBKDF1, PBKDF2: [http://tools.ietf.org/html/rfc2898](http://tools.ietf.org/html/rfc2898)
+PKCS#5, PBKDF1, PBKDF2: [https://tools.ietf.org/html/rfc2898](https://tools.ietf.org/html/rfc2898)
 
 #### PKCS #8
 
@@ -405,7 +405,7 @@ PKCS #8 is designed as the Private-Key Information Syntax Standard, which is use
 
 The PKCS #8 standard has two versions which describe the syntax to store both encrypted private keys and non-encrypted keys. wolfSSL supports both unencrypted and encrypted PKCS #8. Supported formats include PKCS #5 version 1 - version 2, and PKCS#12. Types of encryption available include DES, 3DES, RC4, and AES.
 
-PKCS#8:  [http://tools.ietf.org/html/rfc5208](http://tools.ietf.org/html/rfc5208)
+PKCS#8:  [https://tools.ietf.org/html/rfc5208](https://tools.ietf.org/html/rfc5208)
 
 #### PKCS #7
 
@@ -486,7 +486,7 @@ AES is a key encryption standard used by governments worldwide, which wolfSSL ha
 
 Essentially, Intel and AMD have added AES instructions at the chip level that perform the computationally-intensive parts of the AES algorithm, boosting performance.  For a list of Intel’s chips that currently have support for AES-NI, you can look here:
 
-[http://ark.intel.com/search/advanced/?s=t&AESTech=true](http://ark.intel.com/search/advanced/?s=t&AESTech=true)
+[https://ark.intel.com/search/advanced/?s=t&AESTech=true](https://ark.intel.com/search/advanced/?s=t&AESTech=true)
 
 We have added the functionality to wolfSSL to allow it to call  the instructions directly from the chip, instead of running the algorithm in software. This means that when you’re running wolfSSL on a chipset that supports AES-NI, you can run your AES crypto 5-10 times faster!
 
@@ -494,9 +494,9 @@ If you are running on an AES-NI supported chipset, enable AES-NI with the [`--en
 
 References and further reading on AES-NI, ordered from general to specific, are listed below.  For information about performance gains with AES-NI, please see the third link to the Intel Software Network page.
 
-* [AES (Wikipedia)](http://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
-* [AES-NI (Wikipedia)](http://en.wikipedia.org/wiki/AES_instruction_set)
-* [AES-NI (Intel Software Network page)](http://software.intel.com/en-us/articles/intel-advanced-encryption-standard-instructions-aes-ni/)
+* [AES (Wikipedia)](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+* [AES-NI (Wikipedia)](https://en.wikipedia.org/wiki/AES_instruction_set)
+* [AES-NI (Intel Software Network page)](https://software.intel.com/en-us/articles/intel-advanced-encryption-standard-instructions-aes-ni/)
 
 AES-NI will accelerate the following AES cipher modes: AES-CBC, AES-GCM, AES-CCM-8, AES-CCM, and AES-CTR. AES-GCM is further accelerated with the use of the 128-bit multiply function added to the Intel chips for the GHASH authentication.
 
@@ -506,11 +506,11 @@ wolfSSL is able to use the STM32F2 hardware-based cryptography and random number
 
 For necessary defines, see the `WOLFSSL_STM32F2` define in `settings.h`. The `WOLFSSL_STM32F2` define enables STM32F2 hardware crypto and RNG support by default.  The defines for enabling these individually are `STM32F2_CRYPTO` (for hardware crypto support) and `STM32F2_RNG` (for hardware RNG support).
 
-Documentation for the STM32F2 Standard Peripheral Library can be found in the following document: <http://www.st.com/internet/com/TECHNICAL_RESOURCES/TECHNICAL_LITERATURE/USER_MANUAL/DM00023896.pdf>
+Documentation for the STM32F2 Standard Peripheral Library can be found in the following document: <https://www.st.com/internet/com/TECHNICAL_RESOURCES/TECHNICAL_LITERATURE/USER_MANUAL/DM00023896.pdf>
 
 ### Cavium NITROX
 
-wolfSSL has support for Cavium NITROX (<http://www.cavium.com/processor_security.html>). To enable Cavium NITROX support when building wolfSSL use the following configure option:
+wolfSSL has support for Cavium NITROX (<https://www.cavium.com/processor_security.html>). To enable Cavium NITROX support when building wolfSSL use the following configure option:
 
 ```sh
 ./configure --with-cavium=/home/user/cavium/software

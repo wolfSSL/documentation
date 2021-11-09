@@ -406,7 +406,7 @@ Benchmark complete
 
 This is especially useful for comparing the public key speed before and after changing the math library. You can test the results using the normal math library (`./configure`), the fastmath library (`./configure --enable-fastmath`), and the fasthugemath library (`./configure --enable-fasthugemath`).
 
-For more details and benchmark results, please refer to the wolfSSL Benchmarks page: <https://wolfssl.com/wolfSSL/benchmarks-wolfssl.html>
+For more details and benchmark results, please refer to the wolfSSL Benchmarks page: <https://www.wolfssl.com/docs/benchmarks>
 
 ### Relative Performance
 

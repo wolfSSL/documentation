@@ -1,6 +1,6 @@
 # Building wolfSSL
 
-wolfSSL was written with portability in mind and should generally be easy to build on most systems. If you have difficulty building wolfSSL, please don’t hesitate to seek support through our support forums (<http://www.wolfssl.com/forums>) or contact us directly at [support@wolfssl.com](mailto:support@wolfssl.com).
+wolfSSL was written with portability in mind and should generally be easy to build on most systems. If you have difficulty building wolfSSL, please don’t hesitate to seek support through our support forums (<https://www.wolfssl.com/forums>) or contact us directly at [support@wolfssl.com](mailto:support@wolfssl.com).
 
 This chapter explains how to build wolfSSL on Unix and Windows, and provides guidance for building wolfSSL in a non-standard environment. You will find the “getting started” guide in [Chapter 3](chapter03.md#getting-started) and an SSL tutorial in [Chapter 11](chapter11.md#ssl-tutorial).
 
@@ -10,7 +10,7 @@ When using the autoconf / automake system to build wolfSSL, wolfSSL uses a singl
 
 The most recent version of wolfSSL can be downloaded from the wolfSSL website as a ZIP file:
 
-<http://wolfssl.com/wolfSSL/download/downloadForm.php>
+<https://www.wolfssl.com/download>
 
 After downloading the ZIP file, unzip the file using the `unzip` command. To use native line endings, enable the `-a` modifier when using unzip. From the unzip man page, the `-a` modifier functionality is described:
 
@@ -831,7 +831,7 @@ Can be defined when using EBSnet products and RTIP.
 
 #### WOLFSSL_LWIP
 
-Can be defined when using wolfSSL with the LwIP TCP/IP stack (<http://savannah.nongnu.org/projects/lwip/>).
+Can be defined when using wolfSSL with the LwIP TCP/IP stack (<https://savannah.nongnu.org/projects/lwip/>).
 
 #### WOLFSSL_GAME_BUILD
 
@@ -847,7 +847,7 @@ Can be defined when building for Freescale MQX/RTCS/MFS (<https://www.freescale.
 
 #### WOLFSSL_STM32F2
 
-Can be defined when building for STM32F2. This define also enables STM32F2 hardware crypto and hardware RNG support in wolfSSL (<http://www.st.com/internet/mcu/subclass/1520.jsp>).
+Can be defined when building for STM32F2. This define also enables STM32F2 hardware crypto and hardware RNG support in wolfSSL (<https://www.st.com/internet/mcu/subclass/1520.jsp>).
 
 #### COMVERGE
 

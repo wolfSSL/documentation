@@ -8,15 +8,15 @@
 * ~~Replace worded "chapter" and "section" references with internal crosslinks~~
 * Make a pass at updating the content
 * Unifi coding standards across the examples in the documentation
-* Update wolfSSL URLs to the redirected locations
-* Update all links to HTTPS where possible
-* Some of the draft RFCs must be real now, check up
+* ~~Update wolfSSL URLs to the redirected locations~~
+* ~~Update all links to HTTPS where possible~~
+* ~~Some of the draft RFCs must be real now, check up~~
 * ~~Appendix handling incorrect~~
 
 ## PDF Output
 
-* Add copyright footer
-* Add logo to first page
+* ~~Add copyright footer~~
+* ~~Add logo to first page~~
 * ~~Shrink margins~~
 * ~~Make sure output is Letter format~~
 
