@@ -1,5 +1,6 @@
 all: pdf html
 
+
 SOURCES = chapter01.md \
 		  chapter02.md \
 		  chapter03.md \
@@ -26,41 +27,46 @@ APPENDIX= appendix01.md \
 PDF = wolfssl.pdf
 HTML = html/
 
-api:
+wolfssl:
+	@git clone --depth 1 https://github.com/wolfSSL/wolfssl
+
+.PHONY: wolfssl-update
+wolfssl-update: wolfssl
+	@cd wolfssl && git pull --ff-only
+
+.PHONY: api
+api: wolfssl-update
 	@mkdir -p api/md
-	@git clone https://github.com/wolfSSL/wolfssl api/wolfssl
-	@cp Doxyfile api/wolfssl/doc
-	@cd api/wolfssl/doc && doxygen Doxyfile
-	@doxybook2 --input api/wolfssl/doc/xml --output api/md --config doxybook.cfg
+	@cp Doxyfile wolfssl/doc
+	@cd wolfssl/doc && doxygen Doxyfile
+	@PATH=${DOXYBOOK_PATH}:${PATH} doxybook2 --input wolfssl/doc/xml --output api/md --config doxybook.cfg
 
 # Need an index.md, so let's make it chapter01.
 # Perl regex to fix two things:
 # 1. Doxybook2 replaces underscores with dashes in anchor tags (which breaks them)
 # 2. Remove leading slash on links so that mkdocs can parse them
 # 3. Fix the titles of the header files markdown
-html: api builddir $(SOURCES) $(APPENDIX)
+.PHONY: html-setup
+html-setup: api builddir $(SOURCES) $(APPENDIX)
 	@cp src/*.png build/html/
 	@cp src/*.css build/html/
 	@cp -a api/md/group* build/html/
 	@cp -a api/md/*8h* build/html/
+	@rm -f build/html/chapter17.md build/html/chapter18.md build/html/chapter19.md
 	@perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
 	@perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
 	@perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*
 	@mv build/html/chapter01.md build/html/index.md
+
+html: html-setup
 	@mkdir html
 	@mkdocs build
 
-serve: api builddir $(SOURCES) $(APPENDIX)
-	@cp src/*.png build/html/
-	@cp src/*.css build/html/
-	@cp -a api/md/group* build/html/
-	@cp -a api/md/*8h* build/html/
-	@perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
-	@perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
-	@perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*
-	@mv build/html/chapter01.md build/html/index.md
+.PHONY: serve
+serve: html-setup
 	@mkdocs serve
 
+.PHONY: builddir
 builddir:
 	@mkdir -p build/pdf
 	@mkdir -p build/html
@@ -73,6 +79,7 @@ builddir:
 # 4. Three regexes to remove metadata which outputs in the PDF text
 # 5. Fix titles of the header files Markdown
 # 6. Two regexes to handle bad Doxygen that didn't convert and the LaTeX processor thinks is LaTeX commands
+.PHONY: pdf
 pdf: api builddir $(SOURCES) $(APPENDIX)
 	@cp src/*.png build/pdf/
 	@cp -a api/md/group* build/pdf/
@@ -117,3 +124,4 @@ clean:
 	rm -rf build
 	rm -rf $(HTML)
 	rm -rf api
+	rm -rf wolfssl
