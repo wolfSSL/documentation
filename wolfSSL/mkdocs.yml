@@ -20,8 +20,66 @@ nav:
     - "14. Licensing": chapter14.md
     - "15. Support and Consulting": chapter15.md
     - "16. wolfSSL Updates": chapter16.md
-    - "17. wolfSSL API Reference": chapter17.md
-    - "18. wolfCrypt API Reference": chapter18.md
+    - "17. wolfSSL API Reference":
+      - "CertManager API": group__CertManager.md
+      - "Memory Handling": group__Memory.md
+      - "OpenSSL API": group__openSSL.md
+      - "wolfSSL Certificates and Keys": group__CertsKeys.md
+      - "wolfSSL Connection, Session, and I/O": group__IO.md
+      - "wolfSSL Context and Session Set Up": group__Setup.md
+      - "wolfSSL Error Handling and Reporting": group__Debug.md
+      - "wolfSSL Initialization/Shutdown": group__TLS.md
+    - "18. wolfCrypt API Reference":
+      - "ASN.1": group__ASN.md
+      - "Base Encoding": group__Base__Encoding.md
+      - "Compression": group__Compression.md
+      - "Error Reporting": group__Error.md
+      - "IoT-Safe Module": group__IoTSafe.md
+      - "Key and Cert Conversion": group__Keys.md
+      - "Logging": group__Logging.md
+      - "Math API": group__Math.md
+      - "Random Number Generation": group__Random.md
+      - "Signature API": group__Signature.md
+      - "wolfCrypt Init and Cleanup": group__wolfCrypt.md
+      - "Algorithms - 3DES": group__DES.md
+      - "Algorithms - AES": group__AES.md
+      - "Algorithms - ARC4": group__ARC4.md
+      - "Algorithms - BLAKE2": group__BLAKE2.md
+      - "Algorithms - Camellia": group__Camellia.md
+      - "Algorithms - ChaCha": group__ChaCha.md
+      - "Algorithms - ChaCha20_Poly1305": group__ChaCha20Poly1305.md
+      - "Callbacks - CryptoCb": group__Crypto.md
+      - "Algorithms - Curve25519": group__Curve25519.md
+      - "Algorithms - Curve448": group__Curve448.md
+      - "Algorithms - DSA": group__DSA.md
+      - "Algorithms - Diffie-Hellman": group__Diffie-Hellman.md
+      - "Algorithms - ECC": group__ECC.md
+      - "Algorithms - ED25519": group__ED25519.md
+      - "Algorithms - ED448": group__ED448.md
+      - "ECCSI API Reference":
+        - "Overview of ECCSI": group__ECCSI__Overview.md
+        - "Setup ECCSI Key": group__ECCSI__Setup.md
+        - "Operations for Signing and Verifying with ECCSI Key": group__ECCSI__Operations.md
+      - "SAKKE API Reference":
+        - "Overview of SAKKE Key": group__SAKKE__Overview.md
+        - "Setup SAKKE Key": group__SAKKE__Setup.md
+        - "Operations on/with SAKKE RSK": group__SAKKE__RSK.md
+        - "Operations using SAKKE Key": group__SAKKE__Operations.md
+      - "Algorithms - HC-128": group__HC128.md
+      - "Algorithms - HMAC": group__HMAC.md
+      - "Algorithms - IDEA": group__IDEA.md
+      - "Algorithms - MD2": group__MD2.md
+      - "Algorithms - MD4": group__MD4.md
+      - "Algorithms - MD5": group__MD5.md
+      - "Algorithms - Password Based": group__Password.md
+      - "Algorithms - PKCS7": group__PKCS7.md
+      - "Algorithms - PKCS11": group__PKCS11.md
+      - "Algorithms - Poly1305": group__Poly1305.md
+      - "Algorithms - Rabbit": group__Rabbit.md
+      - "Algorithms - RIPEMD": group__RIPEMD.md
+      - "Algorithms - RSA": group__RSA.md
+      - "Algorithms - SHA 128/224/256/384/512": group__SHA.md
+      - "Algorithms - SRP": group__SRP.md
     - "A. SSL/TLS Overview": appendix01.md
     - "B. RFCs, Specifications, and Reference": appendix02.md
     - "C. Error Codes": appendix03.md

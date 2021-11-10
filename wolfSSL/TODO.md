@@ -31,9 +31,8 @@
 
 * ~~HTML output~~
 * Skin HTML output
-* Convert Doxygen for API chapters
-  * Possibly Doxygen -> HTML -> pandoc
-  * Doxybook2?
+* ~~Convert Doxygen for API chapters~~
+  * Add this content to the PDF build too
 
 ## CI
 
