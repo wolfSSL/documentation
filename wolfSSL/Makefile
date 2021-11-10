@@ -59,11 +59,27 @@ builddir:
 	@mkdir -p build/pdf
 	@mkdir -p build/html
 
-pdf: builddir $(SOURCES) $(APPENDIX)
+# Set input format to gfm to fix issues with converted API docs
+# Regexes:
+# 1. Indent all headings by one #
+# 2. Fix broken anchors from Doxybook2
+# 3. Remove file references from links
+# 4. Three regexes to remove metadata which outputs in the PDF text
+pdf: api builddir $(SOURCES) $(APPENDIX)
 	@cp src/*.png build/pdf/
+	@cp -a api/md/group* build/pdf/
+	@perl -i -pe "s/^(#+ )/#\$$1/g" build/pdf/group*
+	@perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/group*
+	@perl -i -pe "s/\/group_.*\.md//g" build/pdf/group*
+	@perl -i -pe "s/^-(-)+$$//" build/pdf/group*
+	@perl -i -pe "s/^title:.*//" build/pdf/group*
+	@perl -i -pe "s/^Updated on.*//" build/pdf/group*
+	@cat build/pdf/group__CertManager.md build/pdf/group__Memory.md build/pdf/group__openSSL.md build/pdf/group__CertsKeys.md build/pdf/group__IO.md build/pdf/group__Setup.md build/pdf/group__Debug.md build/pdf/group__TLS.md >> build/pdf/chapter17.md
+	@cat build/pdf/group__ASN.md build/pdf/group__Base__Encoding.md build/pdf/group__Compression.md build/pdf/group__Error.md build/pdf/group__IoTSafe.md build/pdf/group__Keys.md build/pdf/group__Logging.md build/pdf/group__Math.md build/pdf/group__Random.md build/pdf/group__Signature.md build/pdf/group__wolfCrypt.md build/pdf/group__DES.md build/pdf/group__AES.md build/pdf/group__ARC4.md build/pdf/group__BLAKE2.md build/pdf/group__Camellia.md build/pdf/group__ChaCha.md build/pdf/group__ChaCha20Poly1305.md build/pdf/group__Crypto.md build/pdf/group__Curve25519.md build/pdf/group__Curve448.md build/pdf/group__DSA.md build/pdf/group__Diffie-Hellman.md build/pdf/group__ECC.md build/pdf/group__ED25519.md build/pdf/group__ED448.md >> build/pdf/chapter18.md
 	@cd build/pdf && pandoc \
 		-N \
         -s \
+		-f gfm \
         --metadata date="`date -I`" \
 		--variable mainfont="Noto Sans" \
 		--variable sansfont="Noto Sans" \

@@ -32,7 +32,7 @@
 * ~~HTML output~~
 * Skin HTML output
 * ~~Convert Doxygen for API chapters~~
-  * Add this content to the PDF build too
+  * ~~Add this content to the PDF build too~~
 
 ## CI
 
