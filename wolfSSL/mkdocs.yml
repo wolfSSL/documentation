@@ -140,6 +140,7 @@ nav:
     - "A. SSL/TLS Overview": appendix01.md
     - "B. RFCs, Specifications, and Reference": appendix02.md
     - "C. Error Codes": appendix03.md
+    - "D. Experimenting with Post-Quantum Cryptography": appendix04.md
 theme: readthedocs
 extra_css: [skin.css]
 use_directory_urls: false

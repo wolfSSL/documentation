@@ -22,7 +22,8 @@ SOURCES = chapter01.md \
 		  chapter19.md
 APPENDIX= appendix01.md \
 		  appendix02.md \
-		  appendix03.md
+		  appendix03.md \
+		  appendix04.md
 
 PDF = wolfssl.pdf
 HTML = html/
