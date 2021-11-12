@@ -6,7 +6,7 @@ This appendix is intended for anyone that wants to start learning about and expe
 
 **Note**: The post-quantum algorithms provided by liboqs are not standardized and experimental. It is highly advised that they NOT be used in production environments. All OIDs, codepoints and artifact formats are temporary and expected to change in the future. You should have no expectation of backwards compatibility.
 
-**Note**: These experimental algorithms are not enabled and completely inaccessable if wolfSSL is not configured with the `--with-liboqs` flag.
+**Note**: These experimental algorithms are not enabled and completely inaccessible if wolfSSL is not configured with the `--with-liboqs` flag.
 
 ## A Gentle Introduction to Post-Quantum Cryptography
 
