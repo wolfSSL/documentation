@@ -485,3 +485,8 @@ client     heap total: 2768827  heap peak: 2540497
 Technical documentation and other resources such as known answer tests can be found at the NIST PQC website: 
 
 <https://csrc.nist.gov/projects/post-quantum-cryptography/round-3-submissions>.
+
+For more algorithm-specific benchmarking information, the OQS Project has benchmarking information at their website:
+
+<https://openquantumsafe.org/benchmarking/>
+
