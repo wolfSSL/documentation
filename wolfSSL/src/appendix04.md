@@ -248,6 +248,7 @@ The following statistics and benchmarks were taken on an 11th GenIntel Core i7-1
             --enable-aesni \
             --enable-sp-math-all \
             --enable-sp-asm \
+            --disable-shared \
             CFLAGS="-O3"
 ```
 
@@ -255,9 +256,11 @@ The following statistics and benchmarks were taken on an 11th GenIntel Core i7-1
 
 ### Runtime Binary Sizes
 
-The wolfssl dynamic library (.so) file is 13770472 bytes (Approximately 14Mb).  Without the `--with-liboqs` it is 3083616 bytes (Approximately 3.0Mb).
+The `tls_bench` example application binary file is 12533216 bytes after being built then stripped (Approximately 12Mb).  Without the `--with-liboqs` it is 2592504 bytes after being built then stripped (Approximately 2.5Mb). This is a difference of 9940712 bytes (Approximately 10Mb).
 
 ### Benchmarks for KEM Groups
+
+**NOTE**: Only two cores are used.
 
 ```
 Side   Cipher                  Group              Total Bytes  # Cons   Rx ms  Tx ms  Rx MB/s  Tx MB/s Con Total ms Con Avg ms
@@ -331,6 +334,7 @@ Client TLS13-AES256-GCM-SHA384 FFDHE_3072            30146560     116  43.340 11
 
 ### Benchmarks for Signature Schemes
 
+**NOTE**: Only a single core is used.
 ```
 FALCON                    1 sign   5500 ops took 1.005 sec, avg 0.183 ms, 5471.037 ops/sec
 FALCON                    1 verify 29100 ops took 1.002 sec, avg 0.034 ms, 29049.807 ops/sec
