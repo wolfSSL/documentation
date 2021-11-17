@@ -45,7 +45,7 @@ The following instructions will get you started from a clean Linux development e
 
 ### Building Open Quantum Safe
 
-In order be able to use liboqs, you must have it built and installed on your system. We support the 0.7.0 release of liboqs. You can download it from the following link:
+In order be able to use liboqs, you must have it built and installed on your system. We support the `0.7.0` release of liboqs. You can download it from the following link:
 
 <https://github.com/open-quantum-safe/liboqs/archive/refs/tags/0.7.0.tar.gz>
 
@@ -238,247 +238,1003 @@ SABER_LEVEL5         | 1312            | 3040             | 1472            | 32
 
 ## Statistics
 
-The following statistics and benchmarks were taken on an 11th GenIntel Core i7-1165G7@3-GHz with 8 cores running Ubuntu 21.10. The following configuration was used:
+The following statistics and benchmarks were taken on an 11th GenIntel Core i7-1165G7@3-GHz with 8 cores running Ubuntu 21.10. liboqs was upgraded to `ba5b61a779a0db364f0e691a0a0bc8ac42e73f1b` on their main branch due to compiler incompatibilities with the older code in `0.7.0`. The following configurations were used:
 
+liboqs:
+```
+CFLAGS="-Os" cmake -DOQS_USE_OPENSSL=0 -DOQS_MINIMAL_BUILD="OQS_ENABLE_KEM_saber_saber;OQS_ENABLE_KEM_saber_lightsaber;OQS_ENABLE_KEM_saber_firesaber;OQS_ENABLE_KEM_kyber_1024;OQS_ENABLE_KEM_kyber_1024_90s;OQS_ENABLE_KEM_kyber_768;OQS_ENABLE_KEM_kyber_768_90s;OQS_ENABLE_KEM_kyber_512;OQS_ENABLE_KEM_kyber_512_90s;OQS_ENABLE_KEM_ntru_hps2048509;OQS_ENABLE_KEM_ntru_hps2048677;OQS_ENABLE_KEM_ntru_hps4096821;OQS_ENABLE_KEM_ntru_hrss701;OQS_ENABLE_SIG_falcon_1024;OQS_ENABLE_SIG_falcon_512" ..
+```
+
+wolfSSL:
 ```
 ./configure --with-liboqs \
-            --enable-all \
             --disable-psk \
+            --disable-shared \
             --enable-intelasm \
             --enable-aesni \
             --enable-sp-math-all \
             --enable-sp-asm \
-            --disable-shared \
-            CFLAGS="-O3"
+            CFLAGS="-Os"
 ```
 
-**NOTE**: that we are primarily benchmarking the post-quantum algorithms, but leave some conventonal algorithms for comparisson purposes.
+**Note**: that we are primarily benchmarking the post-quantum algorithms, but leave some conventional algorithms for comparisson purposes.
 
 ### Runtime Binary Sizes
 
-The `tls_bench` example application binary file is 12533216 bytes after being built then stripped (Approximately 12Mb).  Without the `--with-liboqs` it is 2592504 bytes after being built then stripped (Approximately 2.5Mb). This is a difference of 9940712 bytes (Approximately 10Mb).
+The `tls_bench` example application binary file is 2479992 bytes after being built then stripped (Approximately 2.4M).  Without the `--with-liboqs` it is 571832 bytes after being built then stripped (Approximately 559K). This is a difference of 1908160 bytes (Approximately 1.9Mb).
 
 ### Benchmarks for KEM Groups
 
-**NOTE**: Only two cores are used.
+**Note**: Only two cores are used.
 
 ```
-Side   Cipher                  Group              Total Bytes  # Cons   Rx ms  Tx ms  Rx MB/s  Tx MB/s Con Total ms Con Avg ms
-Server TLS13-AES256-GCM-SHA384 NTRU_HPS_LEVEL1       94109696     360 116.876 34.657  383.954 1294.841      817.056      2.270
-Client TLS13-AES256-GCM-SHA384 NTRU_HPS_LEVEL1       94109696     360 131.154 35.160  342.155 1276.323      788.418      2.190
-Server TLS13-AES256-GCM-SHA384 NTRU_HPS_LEVEL3       93061120     356 115.693 33.436  383.559 1327.160      821.014      2.306
-Client TLS13-AES256-GCM-SHA384 NTRU_HPS_LEVEL3       93061120     356 128.384 35.466  345.642 1251.191      782.233      2.197
-Server TLS13-AES256-GCM-SHA384 NTRU_HPS_LEVEL5       90439680     346 111.384 33.741  387.174 1278.110      824.229      2.382
-Client TLS13-AES256-GCM-SHA384 NTRU_HPS_LEVEL5       90439680     346 125.771 33.862  342.884 1273.565      775.349      2.241
-Server TLS13-AES256-GCM-SHA384 NTRU_HRSS_LEVEL3      94371840     361 117.989 34.373  381.391 1309.184      817.547      2.265
-Client TLS13-AES256-GCM-SHA384 NTRU_HRSS_LEVEL3      94371840     361 131.532 35.736  342.122 1259.240      786.960      2.180
-Server TLS13-AES256-GCM-SHA384 SABER_LEVEL1         102498304     392  59.561 24.098  820.594 2028.163      886.410      2.261
-Client TLS13-AES256-GCM-SHA384 SABER_LEVEL1         102498304     392  68.141 25.480  717.260 1918.205      876.183      2.235
-Server TLS13-AES256-GCM-SHA384 SABER_LEVEL3          94896128     363 119.808 35.041  377.687 1291.359      812.975      2.240
-Client TLS13-AES256-GCM-SHA384 SABER_LEVEL3          94896128     363 133.942 36.115  337.832 1252.953      801.405      2.208
-Server TLS13-AES256-GCM-SHA384 SABER_LEVEL5          95420416     365 118.562 35.462  383.767 1283.067      816.716      2.238
-Client TLS13-AES256-GCM-SHA384 SABER_LEVEL5          95420416     365 133.489 35.353  340.851 1287.030      802.679      2.199
-Server TLS13-AES256-GCM-SHA384 KYBER_LEVEL1          96206848     368 121.553 35.806  377.408 1281.203      811.458      2.205
-Client TLS13-AES256-GCM-SHA384 KYBER_LEVEL1          96206848     368 136.426 36.592  336.262 1253.697      803.225      2.183
-Server TLS13-AES256-GCM-SHA384 KYBER_LEVEL3          95420416     365 120.274 34.591  378.302 1315.382      814.565      2.232
-Client TLS13-AES256-GCM-SHA384 KYBER_LEVEL3          95420416     365 133.376 36.390  341.142 1250.349      805.180      2.206
-Server TLS13-AES256-GCM-SHA384 KYBER_LEVEL5         103284736     395  42.482 20.276 1159.324 2429.029      908.970      2.301
-Client TLS13-AES256-GCM-SHA384 KYBER_LEVEL5         103284736     395  49.772 21.487  989.521 2292.058      896.947      2.271
-Server TLS13-AES256-GCM-SHA384 KYBER_90S_LEVEL1      96993280     371 120.944 35.366  382.408 1307.751      812.404      2.190
-Client TLS13-AES256-GCM-SHA384 KYBER_90S_LEVEL1      96993280     371 136.143 35.860  339.715 1289.753      804.651      2.169
-Server TLS13-AES256-GCM-SHA384 KYBER_90S_LEVEL3     105381888     403  44.744 21.192 1123.055 2371.223      906.669      2.250
-Client TLS13-AES256-GCM-SHA384 KYBER_90S_LEVEL3     105381888     403  52.139 22.585  963.778 2224.936      897.175      2.226
-Server TLS13-AES256-GCM-SHA384 KYBER_90S_LEVEL5      94371840     361 119.703 35.377  375.930 1272.003      814.267      2.256
-Client TLS13-AES256-GCM-SHA384 KYBER_90S_LEVEL5      94371840     361 134.287 35.772  335.103 1257.981      805.325      2.231
-Server TLS13-AES256-GCM-SHA384 P256_NTRU_HPS_LEVEL1  60817408     233  76.671 22.750  378.238 1274.731      879.020      3.773
-Client TLS13-AES256-GCM-SHA384 P256_NTRU_HPS_LEVEL1  60817408     233  86.820 22.524  334.025 1287.495      738.097      3.168
-Server TLS13-AES256-GCM-SHA384 P384_NTRU_HPS_LEVEL3  44040192     169  54.520 16.256  385.181 1291.823      916.406      5.423
-Client TLS13-AES256-GCM-SHA384 P384_NTRU_HPS_LEVEL3  44040192     169  61.869 16.285  339.425 1289.535      712.385      4.215
-Server TLS13-AES256-GCM-SHA384 P521_NTRU_HPS_LEVEL5  19660800      76  29.085  7.474  322.332 1254.278      957.413     12.598
-Client TLS13-AES256-GCM-SHA384 P521_NTRU_HPS_LEVEL5  19660800      76  33.677  7.209  278.379 1300.403      691.634      9.100
-Server TLS13-AES256-GCM-SHA384 P384_NTRU_HRSS_LEVEL3 44302336     170  57.043 16.498  370.334 1280.433      910.827      5.358
-Client TLS13-AES256-GCM-SHA384 P384_NTRU_HRSS_LEVEL3 44302336     170  63.837 16.978  330.922 1244.290      708.998      4.171
-Server TLS13-AES256-GCM-SHA384 P256_SABER_LEVEL1     63700992     244  80.349 23.606  378.040 1286.733      874.786      3.585
-Client TLS13-AES256-GCM-SHA384 P256_SABER_LEVEL1     63700992     244  90.496 23.652  335.651 1284.268      744.870      3.053
-Server TLS13-AES256-GCM-SHA384 P384_SABER_LEVEL3     43778048     168  57.115 16.670  365.490 1252.215      911.031      5.423
-Client TLS13-AES256-GCM-SHA384 P384_SABER_LEVEL3     43778048     168  64.237 16.679  324.967 1251.606      715.602      4.260
-Server TLS13-AES256-GCM-SHA384 P521_SABER_LEVEL5     19922944      77  28.219  7.415  336.650 1281.136      960.078     12.469
-Client TLS13-AES256-GCM-SHA384 P521_SABER_LEVEL5     19922944      77  32.301  7.546  294.109 1258.954      699.756      9.088
-Server TLS13-AES256-GCM-SHA384 P256_KYBER_LEVEL1     63963136     245  76.158 22.451  400.484 1358.504      882.070      3.600
-Client TLS13-AES256-GCM-SHA384 P256_KYBER_LEVEL1     63963136     245  85.451 23.111  356.928 1319.726      755.673      3.084
-Server TLS13-AES256-GCM-SHA384 P384_KYBER_LEVEL3     44826624     172  56.518 16.446  378.198 1299.699      913.542      5.311
-Client TLS13-AES256-GCM-SHA384 P384_KYBER_LEVEL3     44826624     172  63.516 16.811  336.531 1271.461      722.291      4.199
-Server TLS13-AES256-GCM-SHA384 P521_KYBER_LEVEL5     20185088      78  29.065  7.660  331.153 1256.542      964.071     12.360
-Client TLS13-AES256-GCM-SHA384 P521_KYBER_LEVEL5     20185088      78  33.797  7.504  284.790 1282.652      709.853      9.101
-Server TLS13-AES256-GCM-SHA384 P256_KYBER_90S_LEVEL1 63700992     244  80.024 23.131  379.576 1313.165      876.429      3.592
-Client TLS13-AES256-GCM-SHA384 P256_KYBER_90S_LEVEL1 63700992     244  89.563 23.826  339.146 1274.874      750.150      3.074
-Server TLS13-AES256-GCM-SHA384 P384_KYBER_90S_LEVEL3 45088768     173  56.515 16.961  380.427 1267.642      910.839      5.265
-Client TLS13-AES256-GCM-SHA384 P384_KYBER_90S_LEVEL3 45088768     173  64.275 16.516  334.500 1301.789      717.551      4.148
-Server TLS13-AES256-GCM-SHA384 P521_KYBER_90S_LEVEL5 20185088      78  27.928  7.776  344.641 1237.779      966.315     12.389
-Client TLS13-AES256-GCM-SHA384 P521_KYBER_90S_LEVEL5 20185088      78  32.654  7.547  294.757 1275.358      704.159      9.028
-Server TLS13-AES256-GCM-SHA384 ECC_SECP256R1         74186752     284  92.216 26.950  383.610 1312.610      718.210      2.529
-Client TLS13-AES256-GCM-SHA384 ECC_SECP256R1         74186752     284 103.709 27.326  341.098 1294.538      715.137      2.518
-Server TLS13-AES256-GCM-SHA384 ECC_SECP384R1         56360960     216  69.969 20.583  384.099 1305.679      659.206      3.052
-Client TLS13-AES256-GCM-SHA384 ECC_SECP384R1         56360960     216  78.755 20.905  341.247 1285.562      657.209      3.043
-Server TLS13-AES256-GCM-SHA384 ECC_SECP521R1         30408704     117  37.973 11.407  381.849 1271.107      579.722      4.955
-Client TLS13-AES256-GCM-SHA384 ECC_SECP521R1         30408704     117  42.993 11.258  337.264 1287.986      578.255      4.942
-Server TLS13-AES256-GCM-SHA384 ECC_X25519            96206848     368 119.481 34.674  383.951 1323.022      804.787      2.187
-Client TLS13-AES256-GCM-SHA384 ECC_X25519            96206848     368 132.489 36.774  346.254 1247.495      799.288      2.172
-Server TLS13-AES256-GCM-SHA384 ECC_X448              88080384     337 108.965 32.332  385.444 1299.015      775.730      2.302
-Client TLS13-AES256-GCM-SHA384 ECC_X448              88080384     337 123.017 32.864  341.417 1278.000      770.812      2.287
-Server TLS13-AES256-GCM-SHA384 FFDHE_2048            54263808     208  67.686 19.861  382.282 1302.774      746.248      3.588
-Client TLS13-AES256-GCM-SHA384 FFDHE_2048            54263808     208  75.651 20.568  342.033 1258.043      742.362      3.569
-Server TLS13-AES256-GCM-SHA384 FFDHE_3072            30146560     116  39.867 10.760  360.577 1335.958      710.457      6.125
-Client TLS13-AES256-GCM-SHA384 FFDHE_3072            30146560     116  43.340 11.924  331.678 1205.573      708.111      6.104
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group NTRU_HPS_LEVEL1:
+	Total       :  81526784 bytes
+	Num Conns   :       312
+	Rx Total    :   104.738 ms
+	Tx Total    :    33.224 ms
+	Rx          :   371.165 MB/s
+	Tx          :  1170.076 MB/s
+	Connect     :   836.402 ms
+	Connect Avg :     2.681 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group NTRU_HPS_LEVEL1:
+	Total       :  81526784 bytes
+	Num Conns   :       312
+	Rx Total    :   115.019 ms
+	Tx Total    :    32.250 ms
+	Rx          :   337.988 MB/s
+	Tx          :  1205.411 MB/s
+	Connect     :   814.897 ms
+	Connect Avg :     2.612 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group NTRU_HPS_LEVEL3:
+	Total       :  80478208 bytes
+	Num Conns   :       308
+	Rx Total    :   102.574 ms
+	Tx Total    :    32.463 ms
+	Rx          :   374.119 MB/s
+	Tx          :  1182.112 MB/s
+	Connect     :   837.583 ms
+	Connect Avg :     2.719 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group NTRU_HPS_LEVEL3:
+	Total       :  80478208 bytes
+	Num Conns   :       308
+	Rx Total    :   112.774 ms
+	Tx Total    :    31.413 ms
+	Rx          :   340.283 MB/s
+	Tx          :  1221.643 MB/s
+	Connect     :   806.966 ms
+	Connect Avg :     2.620 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group NTRU_HPS_LEVEL5:
+	Total       :  79953920 bytes
+	Num Conns   :       306
+	Rx Total    :   101.202 ms
+	Tx Total    :    32.180 ms
+	Rx          :   376.724 MB/s
+	Tx          :  1184.748 MB/s
+	Connect     :   841.708 ms
+	Connect Avg :     2.751 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group NTRU_HPS_LEVEL5:
+	Total       :  79953920 bytes
+	Num Conns   :       306
+	Rx Total    :   110.684 ms
+	Tx Total    :    31.854 ms
+	Rx          :   344.449 MB/s
+	Tx          :  1196.870 MB/s
+	Connect     :   801.366 ms
+	Connect Avg :     2.619 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group NTRU_HRSS_LEVEL3:
+	Total       :  82313216 bytes
+	Num Conns   :       315
+	Rx Total    :   104.672 ms
+	Tx Total    :    33.355 ms
+	Rx          :   374.982 MB/s
+	Tx          :  1176.727 MB/s
+	Connect     :   835.610 ms
+	Connect Avg :     2.653 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group NTRU_HRSS_LEVEL3:
+	Total       :  82313216 bytes
+	Num Conns   :       315
+	Rx Total    :   115.212 ms
+	Tx Total    :    32.244 ms
+	Rx          :   340.676 MB/s
+	Tx          :  1217.282 MB/s
+	Connect     :   811.924 ms
+	Connect Avg :     2.578 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group SABER_LEVEL1:
+	Total       :  83361792 bytes
+	Num Conns   :       319
+	Rx Total    :   106.528 ms
+	Tx Total    :    34.231 ms
+	Rx          :   373.141 MB/s
+	Tx          :  1161.230 MB/s
+	Connect     :   831.525 ms
+	Connect Avg :     2.607 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group SABER_LEVEL1:
+	Total       :  83361792 bytes
+	Num Conns   :       319
+	Rx Total    :   117.493 ms
+	Tx Total    :    32.928 ms
+	Rx          :   338.317 MB/s
+	Tx          :  1207.162 MB/s
+	Connect     :   827.114 ms
+	Connect Avg :     2.593 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group SABER_LEVEL3:
+	Total       :  83099648 bytes
+	Num Conns   :       318
+	Rx Total    :   103.526 ms
+	Tx Total    :    34.228 ms
+	Rx          :   382.753 MB/s
+	Tx          :  1157.667 MB/s
+	Connect     :   835.111 ms
+	Connect Avg :     2.626 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group SABER_LEVEL3:
+	Total       :  83099648 bytes
+	Num Conns   :       318
+	Rx Total    :   115.529 ms
+	Tx Total    :    31.724 ms
+	Rx          :   342.988 MB/s
+	Tx          :  1249.046 MB/s
+	Connect     :   828.796 ms
+	Connect Avg :     2.606 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group SABER_LEVEL5:
+	Total       :  83361792 bytes
+	Num Conns   :       319
+	Rx Total    :   106.236 ms
+	Tx Total    :    33.545 ms
+	Rx          :   374.166 MB/s
+	Tx          :  1184.958 MB/s
+	Connect     :   835.147 ms
+	Connect Avg :     2.618 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group SABER_LEVEL5:
+	Total       :  83361792 bytes
+	Num Conns   :       319
+	Rx Total    :   116.151 ms
+	Tx Total    :    33.222 ms
+	Rx          :   342.227 MB/s
+	Tx          :  1196.489 MB/s
+	Connect     :   826.073 ms
+	Connect Avg :     2.590 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_LEVEL1:
+	Total       :  83886080 bytes
+	Num Conns   :       321
+	Rx Total    :   106.112 ms
+	Tx Total    :    33.832 ms
+	Rx          :   376.961 MB/s
+	Tx          :  1182.302 MB/s
+	Connect     :   833.762 ms
+	Connect Avg :     2.597 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_LEVEL1:
+	Total       :  83886080 bytes
+	Num Conns   :       321
+	Rx Total    :   115.532 ms
+	Tx Total    :    33.819 ms
+	Rx          :   346.223 MB/s
+	Tx          :  1182.760 MB/s
+	Connect     :   830.659 ms
+	Connect Avg :     2.588 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_LEVEL3:
+	Total       :  82837504 bytes
+	Num Conns   :       317
+	Rx Total    :   104.853 ms
+	Tx Total    :    33.958 ms
+	Rx          :   376.717 MB/s
+	Tx          :  1163.195 MB/s
+	Connect     :   834.753 ms
+	Connect Avg :     2.633 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_LEVEL3:
+	Total       :  82837504 bytes
+	Num Conns   :       317
+	Rx Total    :   116.104 ms
+	Tx Total    :    32.361 ms
+	Rx          :   340.213 MB/s
+	Tx          :  1220.613 MB/s
+	Connect     :   830.492 ms
+	Connect Avg :     2.620 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_LEVEL5:
+	Total       :  90963968 bytes
+	Num Conns   :       348
+	Rx Total    :    52.821 ms
+	Tx Total    :    21.809 ms
+	Rx          :   821.171 MB/s
+	Tx          :  1988.827 MB/s
+	Connect     :   900.283 ms
+	Connect Avg :     2.587 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_LEVEL5:
+	Total       :  90963968 bytes
+	Num Conns   :       348
+	Rx Total    :    56.213 ms
+	Tx Total    :    23.134 ms
+	Rx          :   771.623 MB/s
+	Tx          :  1874.985 MB/s
+	Connect     :   893.851 ms
+	Connect Avg :     2.569 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_90S_LEVEL1:
+	Total       :  84148224 bytes
+	Num Conns   :       322
+	Rx Total    :   106.540 ms
+	Tx Total    :    34.535 ms
+	Rx          :   376.620 MB/s
+	Tx          :  1161.859 MB/s
+	Connect     :   832.680 ms
+	Connect Avg :     2.586 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_90S_LEVEL1:
+	Total       :  84148224 bytes
+	Num Conns   :       322
+	Rx Total    :   117.951 ms
+	Tx Total    :    32.999 ms
+	Rx          :   340.183 MB/s
+	Tx          :  1215.936 MB/s
+	Connect     :   829.895 ms
+	Connect Avg :     2.577 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_90S_LEVEL3:
+	Total       :  83099648 bytes
+	Num Conns   :       318
+	Rx Total    :   104.203 ms
+	Tx Total    :    33.231 ms
+	Rx          :   380.269 MB/s
+	Tx          :  1192.401 MB/s
+	Connect     :   837.349 ms
+	Connect Avg :     2.633 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_90S_LEVEL3:
+	Total       :  83099648 bytes
+	Num Conns   :       318
+	Rx Total    :   114.545 ms
+	Tx Total    :    32.522 ms
+	Rx          :   345.935 MB/s
+	Tx          :  1218.407 MB/s
+	Connect     :   833.651 ms
+	Connect Avg :     2.622 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_90S_LEVEL5:
+	Total       :  83099648 bytes
+	Num Conns   :       318
+	Rx Total    :   106.045 ms
+	Tx Total    :    34.000 ms
+	Rx          :   373.660 MB/s
+	Tx          :  1165.452 MB/s
+	Connect     :   833.861 ms
+	Connect Avg :     2.622 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group KYBER_90S_LEVEL5:
+	Total       :  83099648 bytes
+	Num Conns   :       318
+	Rx Total    :   117.970 ms
+	Tx Total    :    32.122 ms
+	Rx          :   335.889 MB/s
+	Tx          :  1233.564 MB/s
+	Connect     :   829.933 ms
+	Connect Avg :     2.610 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P256_NTRU_HPS_LEVEL1:
+	Total       :  45350912 bytes
+	Num Conns   :       174
+	Rx Total    :    60.496 ms
+	Tx Total    :    18.177 ms
+	Rx          :   357.464 MB/s
+	Tx          :  1189.719 MB/s
+	Connect     :   905.095 ms
+	Connect Avg :     5.202 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P256_NTRU_HPS_LEVEL1:
+	Total       :  45350912 bytes
+	Num Conns   :       174
+	Rx Total    :    64.987 ms
+	Tx Total    :    18.708 ms
+	Rx          :   332.758 MB/s
+	Tx          :  1155.953 MB/s
+	Connect     :   716.255 ms
+	Connect Avg :     4.116 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P384_NTRU_HPS_LEVEL3:
+	Total       :  29097984 bytes
+	Num Conns   :       112
+	Rx Total    :    21.880 ms
+	Tx Total    :     7.735 ms
+	Rx          :   634.136 MB/s
+	Tx          :  1793.791 MB/s
+	Connect     :   967.733 ms
+	Connect Avg :     8.640 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P384_NTRU_HPS_LEVEL3:
+	Total       :  29097984 bytes
+	Num Conns   :       112
+	Rx Total    :    23.002 ms
+	Tx Total    :     8.142 ms
+	Rx          :   603.198 MB/s
+	Tx          :  1704.078 MB/s
+	Connect     :   710.929 ms
+	Connect Avg :     6.348 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P521_NTRU_HPS_LEVEL5:
+	Total       :  13631488 bytes
+	Num Conns   :        53
+	Rx Total    :    25.211 ms
+	Tx Total    :     5.444 ms
+	Rx          :   257.821 MB/s
+	Tx          :  1194.069 MB/s
+	Connect     :   965.004 ms
+	Connect Avg :    18.208 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P521_NTRU_HPS_LEVEL5:
+	Total       :  13631488 bytes
+	Num Conns   :        53
+	Rx Total    :    27.384 ms
+	Tx Total    :     5.740 ms
+	Rx          :   237.365 MB/s
+	Tx          :  1132.371 MB/s
+	Connect     :   648.859 ms
+	Connect Avg :    12.243 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P384_NTRU_HRSS_LEVEL3:
+	Total       :  28835840 bytes
+	Num Conns   :       111
+	Rx Total    :    30.122 ms
+	Tx Total    :     9.003 ms
+	Rx          :   456.476 MB/s
+	Tx          :  1527.322 MB/s
+	Connect     :   952.431 ms
+	Connect Avg :     8.580 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P384_NTRU_HRSS_LEVEL3:
+	Total       :  28835840 bytes
+	Num Conns   :       111
+	Rx Total    :    31.482 ms
+	Tx Total    :     9.869 ms
+	Rx          :   436.761 MB/s
+	Tx          :  1393.204 MB/s
+	Connect     :   693.809 ms
+	Connect Avg :     6.251 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P256_SABER_LEVEL1:
+	Total       :  46923776 bytes
+	Num Conns   :       180
+	Rx Total    :    28.412 ms
+	Tx Total    :    11.682 ms
+	Rx          :   787.516 MB/s
+	Tx          :  1915.295 MB/s
+	Connect     :   948.409 ms
+	Connect Avg :     5.269 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P256_SABER_LEVEL1:
+	Total       :  46923776 bytes
+	Num Conns   :       180
+	Rx Total    :    30.442 ms
+	Tx Total    :    11.885 ms
+	Rx          :   735.010 MB/s
+	Tx          :  1882.674 MB/s
+	Connect     :   773.063 ms
+	Connect Avg :     4.295 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P384_SABER_LEVEL3:
+	Total       :  29360128 bytes
+	Num Conns   :       113
+	Rx Total    :    41.268 ms
+	Tx Total    :    10.902 ms
+	Rx          :   339.243 MB/s
+	Tx          :  1284.148 MB/s
+	Connect     :   936.217 ms
+	Connect Avg :     8.285 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P384_SABER_LEVEL3:
+	Total       :  29360128 bytes
+	Num Conns   :       113
+	Rx Total    :    43.123 ms
+	Tx Total    :    12.233 ms
+	Rx          :   324.654 MB/s
+	Tx          :  1144.466 MB/s
+	Connect     :   673.655 ms
+	Connect Avg :     5.962 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P521_SABER_LEVEL5:
+	Total       :  13631488 bytes
+	Num Conns   :        53
+	Rx Total    :    25.002 ms
+	Tx Total    :     5.541 ms
+	Rx          :   259.974 MB/s
+	Tx          :  1173.055 MB/s
+	Connect     :   981.157 ms
+	Connect Avg :    18.512 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P521_SABER_LEVEL5:
+	Total       :  13631488 bytes
+	Num Conns   :        53
+	Rx Total    :    27.128 ms
+	Tx Total    :     5.685 ms
+	Rx          :   239.605 MB/s
+	Tx          :  1143.293 MB/s
+	Connect     :   666.796 ms
+	Connect Avg :    12.581 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P256_KYBER_LEVEL1:
+	Total       :  46923776 bytes
+	Num Conns   :       180
+	Rx Total    :    61.094 ms
+	Tx Total    :    18.091 ms
+	Rx          :   366.237 MB/s
+	Tx          :  1236.822 MB/s
+	Connect     :   904.377 ms
+	Connect Avg :     5.024 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P256_KYBER_LEVEL1:
+	Total       :  46923776 bytes
+	Num Conns   :       180
+	Rx Total    :    65.539 ms
+	Tx Total    :    18.878 ms
+	Rx          :   341.400 MB/s
+	Tx          :  1185.258 MB/s
+	Connect     :   726.876 ms
+	Connect Avg :     4.038 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P384_KYBER_LEVEL3:
+	Total       :  29360128 bytes
+	Num Conns   :       113
+	Rx Total    :    41.608 ms
+	Tx Total    :    11.377 ms
+	Rx          :   336.473 MB/s
+	Tx          :  1230.568 MB/s
+	Connect     :   937.189 ms
+	Connect Avg :     8.294 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P384_KYBER_LEVEL3:
+	Total       :  29360128 bytes
+	Num Conns   :       113
+	Rx Total    :    43.823 ms
+	Tx Total    :    12.194 ms
+	Rx          :   319.465 MB/s
+	Tx          :  1148.068 MB/s
+	Connect     :   679.081 ms
+	Connect Avg :     6.010 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P521_KYBER_LEVEL5:
+	Total       :  13631488 bytes
+	Num Conns   :        53
+	Rx Total    :    26.556 ms
+	Tx Total    :     6.155 ms
+	Rx          :   244.763 MB/s
+	Tx          :  1055.968 MB/s
+	Connect     :   963.644 ms
+	Connect Avg :    18.182 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P521_KYBER_LEVEL5:
+	Total       :  13631488 bytes
+	Num Conns   :        53
+	Rx Total    :    29.747 ms
+	Tx Total    :     5.286 ms
+	Rx          :   218.506 MB/s
+	Tx          :  1229.724 MB/s
+	Connect     :   653.181 ms
+	Connect Avg :    12.324 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P256_KYBER_90S_LEVEL1:
+	Total       :  46923776 bytes
+	Num Conns   :       180
+	Rx Total    :    61.892 ms
+	Tx Total    :    18.407 ms
+	Rx          :   361.517 MB/s
+	Tx          :  1215.595 MB/s
+	Connect     :   907.580 ms
+	Connect Avg :     5.042 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P256_KYBER_90S_LEVEL1:
+	Total       :  46923776 bytes
+	Num Conns   :       180
+	Rx Total    :    66.700 ms
+	Tx Total    :    18.819 ms
+	Rx          :   335.456 MB/s
+	Tx          :  1188.967 MB/s
+	Connect     :   727.746 ms
+	Connect Avg :     4.043 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P384_KYBER_90S_LEVEL3:
+	Total       :  29360128 bytes
+	Num Conns   :       113
+	Rx Total    :    41.884 ms
+	Tx Total    :    11.245 ms
+	Rx          :   334.257 MB/s
+	Tx          :  1245.049 MB/s
+	Connect     :   938.972 ms
+	Connect Avg :     8.309 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P384_KYBER_90S_LEVEL3:
+	Total       :  29360128 bytes
+	Num Conns   :       113
+	Rx Total    :    44.288 ms
+	Tx Total    :    12.573 ms
+	Rx          :   316.110 MB/s
+	Tx          :  1113.476 MB/s
+	Connect     :   681.701 ms
+	Connect Avg :     6.033 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group P521_KYBER_90S_LEVEL5:
+	Total       :  13631488 bytes
+	Num Conns   :        53
+	Rx Total    :    27.950 ms
+	Tx Total    :     5.953 ms
+	Rx          :   232.558 MB/s
+	Tx          :  1091.917 MB/s
+	Connect     :   961.226 ms
+	Connect Avg :    18.136 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P521_KYBER_90S_LEVEL5:
+	Total       :  13631488 bytes
+	Num Conns   :        53
+	Rx Total    :    30.836 ms
+	Tx Total    :     5.800 ms
+	Rx          :   210.793 MB/s
+	Tx          :  1120.596 MB/s
+	Connect     :   649.261 ms
+	Connect Avg :    12.250 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group ECC_SECP256R1:
+	Total       :  57409536 bytes
+	Num Conns   :       220
+	Rx Total    :    71.891 ms
+	Tx Total    :    23.104 ms
+	Rx          :   380.783 MB/s
+	Tx          :  1184.838 MB/s
+	Connect     :   668.705 ms
+	Connect Avg :     3.040 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group ECC_SECP256R1:
+	Total       :  57409536 bytes
+	Num Conns   :       220
+	Rx Total    :    79.276 ms
+	Tx Total    :    22.119 ms
+	Rx          :   345.314 MB/s
+	Tx          :  1237.621 MB/s
+	Connect     :   664.370 ms
+	Connect Avg :     3.020 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group ECC_SECP384R1:
+	Total       :  40108032 bytes
+	Num Conns   :       154
+	Rx Total    :    49.248 ms
+	Tx Total    :    16.372 ms
+	Rx          :   388.345 MB/s
+	Tx          :  1168.172 MB/s
+	Connect     :   576.246 ms
+	Connect Avg :     3.742 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group ECC_SECP384R1:
+	Total       :  40108032 bytes
+	Num Conns   :       154
+	Rx Total    :    54.535 ms
+	Tx Total    :    15.492 ms
+	Rx          :   350.693 MB/s
+	Tx          :  1234.511 MB/s
+	Connect     :   569.802 ms
+	Connect Avg :     3.700 ms
+wolfSSL Server Benchmark on TLS13-AES256-GCM-SHA384 with group ECC_SECP521R1:
+	Total       :  21757952 bytes
+	Num Conns   :        84
+	Rx Total    :    26.961 ms
+	Tx Total    :     8.916 ms
+	Rx          :   384.810 MB/s
+	Tx          :  1163.589 MB/s
+	Connect     :   471.549 ms
+	Connect Avg :     5.614 ms
+wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group ECC_SECP521R1:
+	Total       :  21757952 bytes
+	Num Conns   :        84
+	Rx Total    :    29.946 ms
+	Tx Total    :     8.431 ms
+	Rx          :   346.456 MB/s
+	Tx          :  1230.514 MB/s
+	Connect     :   457.454 ms
+	Connect Avg :     5.446 ms
 ```
 
 ### Benchmarks for Signature Schemes
 
-**NOTE**: Only a single core is used.
+**Note**: Only a single core is used.
 ```
-FALCON                    1 sign   5500 ops took 1.005 sec, avg 0.183 ms, 5471.037 ops/sec
-FALCON                    1 verify 29100 ops took 1.002 sec, avg 0.034 ms, 29049.807 ops/sec
-FALCON                    5 sign   2800 ops took 1.001 sec, avg 0.358 ms, 2796.496 ops/sec
-FALCON                    5 verify 15200 ops took 1.002 sec, avg 0.066 ms, 15168.616 ops/sec
-ECDSA BRAINPOOLP256R1   256 sign   14600 ops took 1.004 sec, avg 0.069 ms, 14544.887 ops/sec
-ECDSA BRAINPOOLP256R1   256 verify 13300 ops took 1.004 sec, avg 0.075 ms, 13245.692 ops/sec
-ECDSA       SECP256R1   256 sign   15700 ops took 1.005 sec, avg 0.064 ms, 15628.247 ops/sec
-ECDSA       SECP256R1   256 verify 13500 ops took 1.006 sec, avg 0.075 ms, 13416.990 ops/sec
-ED                    25519 sign   91300 ops took 1.000 sec, avg 0.011 ms, 91288.116 ops/sec
-ED                    25519 verify 29100 ops took 1.001 sec, avg 0.034 ms, 29065.441 ops/sec
-ED                      448 sign   14200 ops took 1.006 sec, avg 0.071 ms, 14108.941 ops/sec
-ED                      448 verify 4900 ops took 1.008 sec, avg 0.206 ms, 4862.611 ops/sec
-ECCSI                   256 sign   2159 ops took 1.000 sec, avg 0.463 ms, 2158.482 ops/sec
-ECCSI                   256 verify 805 ops took 1.000 sec, avg 1.243 ms, 804.603 ops/sec
+FALCON         1 sign    5600 ops took 1.017 sec, avg 0.182 ms, 5507.545 ops/sec
+FALCON         1 verify 28100 ops took 1.001 sec, avg 0.036 ms, 28058.444 ops/sec
+FALCON         5 sign    2700 ops took 1.018 sec, avg 0.377 ms, 2652.544 ops/sec
+FALCON         5 verify 15000 ops took 1.002 sec, avg 0.067 ms, 14968.912 ops/sec
+ECDSA  SECP256R1 sign    2100 ops took 1.044 sec, avg 0.497 ms, 2010.741 ops/sec
+ECDSA  SECP256R1 verify  3100 ops took 1.022 sec, avg 0.330 ms, 3034.340 ops/sec
 ```
 
 ### Heap and Stack Usage
 
-Memory use for server sign and client verify. TLS13-AES256-GCM-SHA384 ciphersuite and ECC SECP256R1 for key exchange.
+These statistics were obtained by adding the following configuration flags: `--enable-trackmemory --enable-stacksize`. 
+
+Memory use for server sign and client verify without server authentication of the client, TLS13-AES256-GCM-SHA384 ciphersuite and ECC SECP256R1 for key exchange.
 
 ```
-falcon 1    server   heap total: 2920414  heap peak: 2579713  stack: 111584
-falcon 1    client   heap total: 2720797  heap peak: 2556718  stack: 100872
-falcon 5    server   heap total: 2947287  heap peak: 2586482  stack: 137952
-falcon 5    client   heap total: 2737315  heap peak: 2563937  stack: 100872
-RSA    2048 server   heap total: 2899406  heap peak: 2549897  stack: 108424
-RSA    2048 client   heap total: 2768827  heap peak: 2540497  stack: 107592
+Server FALCON_LEVEL1
 
+stack used     =  48960
+total Allocs   =    250
+heap total     = 113548
+heap peak      =  40990
+
+Client FALCON_LEVEL1
+
+stack used     =  29935
+total Allocs   =    768
+heap total     = 179427
+heap peak      =  41765
+
+Server FALCON_LEVEL5
+
+stack used     =  89088
+total Allocs   =    250
+heap total     = 125232
+heap peak      =  45630
+
+Client FALCON_LEVEL5
+
+stack used     =  29935
+total Allocs   =    768
+heap total     = 191365
+heap peak      =  47469
+
+Server RSA 2048
+
+stack used     =  52896 
+total Allocs   =    253
+heap total     = 121784
+heap peak      =  39573
+
+Client RSA 2048
+
+stack used     =  54640
+total Allocs   =    897
+heap total     = 202472
+heap peak      =  41760
 ```
 
-Memory use for KEM groups. TLS13-AES256-GCM-SHA384 ciphersuite and RSA-2048 for authentication. 
+Memory use for KEM groups. TLS13-AES256-GCM-SHA384 ciphersuite and RSA-2048 for client authentication of the server and without server authentication of the client. 
 
 ```
-KYBER_LEVEL1
-server     heap total: 443171  heap peak: 137518
-client     heap total: 298130  heap peak: 128955
+Server KYBER_LEVEL1
 
-KYBER_LEVEL3
-server     heap total: 450915  heap peak: 138542
-client     heap total: 300306  heap peak: 130427
+stack used     = 52896 
+total Allocs   =   206
+heap total     = 66864
+heap peak      = 28474
 
-KYBER_LEVEL5
-server     heap total: 460419  heap peak: 139886
-client     heap total: 302802  heap peak: 132059
+Client KYBER_LEVEL1
 
-KYBER_90S_LEVEL1
-server     heap total: 443171  heap peak: 137518
-client     heap total: 298130  heap peak: 128955
+stack used     =  54640
+total Allocs   =    879
+heap total     = 147235
+heap peak      =  44538
 
-KYBER_90S_LEVEL3
-server     heap total: 450915  heap peak: 138542
-client     heap total: 300306  heap peak: 130427
+Server KYBER_LEVEL3
 
-KYBER_90S_LEVEL5
-server     heap total: 460419  heap peak: 139886
-client     heap total: 302802  heap peak: 132059
+stack used     =  52896
+total Allocs   =    206
+heap total     =  67888
+heap peak      =  28794
 
-NTRU_HPS_LEVEL1
-server     heap total: 441301  heap peak: 137279
-client     heap total: 297093  heap peak: 128088
+Client KYBER_LEVEL3
 
-NTRU_HPS_LEVEL3
-server     heap total: 446383  heap peak: 137972
-client     heap total: 298316  heap peak: 128849
+stack used     =  54640
+total Allocs   =    879
+heap total     = 149411
+heap peak      =  46010
 
-NTRU_HPS_LEVEL5
-server     heap total: 452983  heap peak: 138872
-client     heap total: 299872  heap peak: 299872
+Server KYBER_LEVEL5
 
-NTRU_HRSS_LEVEL3
-server     heap total: 450959  heap peak: 138596
-client     heap total: 299364  heap peak: 129481
+stack used     =  52896
+total Allocs   =    206
+heap total     =  69232
+heap peak      =  29274
 
-SABER_LEVEL1
-server     heap total: 441411  heap peak: 137326
-client     heap total: 297746  heap peak: 128731
+Client KYBER_LEVEL5
 
-SABER_LEVEL3
-server     heap total: 448803  heap peak: 138350
-client     heap total: 299826  heap peak: 130139
+stack used     =  54640
+total Allocs   =    879
+heap total     = 151907
+heap peak      =  47642
 
-SABER_LEVEL5
-server     heap total: 456547  heap peak: 139438
-client     heap total: 301970  heap peak: 131579
+Server KYBER_90S_LEVEL1
 
-P256_NTRU_HPS_LEVEL1
-server     heap total: 2937228  heap peak: 2580002
-client     heap total: 2791850  heap peak: 2791850
+stack used     =  52896
+total Allocs   =    206
+heap total     =  66864
+heap peak      =  28474
 
-P384_NTRU_HPS_LEVEL3
-server     heap total: 2943062  heap peak: 2580791
-client     heap total: 2793249  heap peak: 2575923
+Client KYBER_90S_LEVEL1
 
-P521_NTRU_HPS_LEVEL5
-server     heap total: 2950508  heap peak: 2581799
-client     heap total: 2795003  heap peak: 2576951
+stack used     =  54640
+total Allocs   =    879
+heap total     = 147235
+heap peak      =  44538
 
-P384_NTRU_HRSS_LEVEL3
-server     heap total: 2947638  heap peak: 2581415
-client     heap total: 2794297  heap peak: 2576555
+Server KYBER_90S_LEVEL3
 
-P256_SABER_LEVEL1
-server     heap total: 2937338  heap peak: 2580049
-client     heap total: 2792503  heap peak: 2575741
+stack used     =  52896
+total Allocs   =    206
+heap total     =  67888
+heap peak      =  28794
 
-P384_SABER_LEVEL3
-server     heap total: 2945482  heap peak: 2581169
-client     heap total: 2794759  heap peak: 2577213
+Client KYBER_90S_LEVEL3
 
-P521_SABER_LEVEL5
-server     heap total: 2954072  heap peak: 2582365
-client     heap total: 2797101  heap peak: 2578725
+stack used     =  54640
+total Allocs   =    879
+heap total     = 149411
+heap peak      =  46010
 
-P256_KYBER_LEVEL1
-server     heap total: 2939098  heap peak: 2580241
-client     heap total: 2792887  heap peak: 2575965
+Server KYBER_90S_LEVEL5
 
-P384_KYBER_LEVEL3
-server     heap total: 2947594  heap peak: 2581361
-client     heap total: 2795239  heap peak: 2577501
+stack used     =  52896
+total Allocs   =    206
+heap total     =  69232
+heap peak      =  29274
 
-P521_KYBER_LEVEL5
-server     heap total: 2957944  heap peak: 2582813
-client     heap total: 2797933  heap peak: 2579205
+Client KYBER_90S_LEVEL5
 
-P256_KYBER_90S_LEVEL1
-server     heap total: 2939098  heap peak: 2580241
-client     heap total: 2792887  heap peak: 2575965
+stack used     =  54640
+total Allocs   =    879
+heap total     = 151907
+heap peak      =  47642
 
-P384_KYBER_90S_LEVEL3
-server     heap total: 2947594  heap peak: 2581361
-client     heap total: 2795239  heap peak: 2577501
+Server NTRU_HPS_LEVEL1
 
-P521_KYBER_90S_LEVEL5
-server     heap total: 2957944  heap peak: 2582813
-client     heap total: 2797933  heap peak: 2579205
+stack used     =  52896
+total Allocs   =    206
+heap total     =  66625
+heap peak      =  28405
 
-ECDSA SECP256R1
-server     heap total: 2899406  heap peak: 2549897
-client     heap total: 2768827  heap peak: 2540497
+Client NTRU_HPS_LEVEL1
+
+stack used     =  54640
+total Allocs   =    879
+heap total     = 146198
+heap peak      =  43671
+
+Server NTRU_HPS_LEVEL3
+
+stack used     =  54400
+total Allocs   =    206
+heap total     =  67318
+heap peak      =  28636
+
+Client NTRU_HPS_LEVEL3
+
+stack used     =  56512
+total Allocs   =    879
+heap total     = 147421
+heap peak      =  44432
+
+Server NTRU_HPS_LEVEL5
+
+stack used     =  66528
+total Allocs   =    206
+heap total     =  68218
+heap peak      =  28936
+
+Client NTRU_HPS_LEVEL5
+
+stack used     =  69856
+total Allocs   =    879
+heap total     = 148977
+heap peak      =  45388
+
+Server NTRU_HRSS_LEVEL3
+
+stack used     =  52896
+total Allocs   =    206
+heap total     =  67942
+heap peak      =  28844
+
+Client NTRU_HRSS_LEVEL3
+
+stack used     =  54688
+total Allocs   =    879
+heap total     = 148469
+heap peak      =  45064
+
+Server SABER_LEVEL1
+
+stack used     =  52896
+total Allocs   =    206
+heap total     =  66672
+heap peak      =  28442
+
+Client SABER_LEVEL1
+
+stack used     =  54640
+total Allocs   =    879
+heap total     = 146851
+heap peak      =  44314
+
+Server SABER_LEVEL3
+
+stack used     =  52896
+total Allocs   =    206
+heap total     =  67696
+heap peak      =  28794
+
+Client SABER_LEVEL3
+
+stack used     =  54640
+total Allocs   =    879
+heap total     = 148931
+heap peak      =  45722
+
+Server SABER_LEVEL5
+
+stack used     =  52896
+total Allocs   =    206
+heap total     =  68784
+heap peak      =  29178
+
+Client SABER_LEVEL5
+
+stack used     =  54640
+total Allocs   =    879
+heap total     = 151075
+heap peak      =  47162
+
+Server P256_NTRU_HPS_LEVEL1
+
+stack used     =  52896
+total Allocs   =    223
+heap total     = 118701
+heap peak      =  37482
+
+Client P256_NTRU_HPS_LEVEL1
+
+stack used     =  54640
+total Allocs   =    896
+heap total     = 198339
+heap peak      =  48065
+
+Server P384_NTRU_HPS_LEVEL3
+
+stack used     =  54400
+total Allocs   =    223
+heap total     = 119538
+heap peak      =  38056
+
+Client P384_NTRU_HPS_LEVEL3
+
+stack used     =  56512
+total Allocs   =    896
+heap total     = 199738
+heap peak      =  48890
+
+Server P521_NTRU_HPS_LEVEL5
+
+stack used     =  66528
+total Allocs   =    223
+heap total     = 120600
+heap peak      =  38782
+
+Client P521_NTRU_HPS_LEVEL5
+
+stack used     =  69856
+total Allocs   =    896
+heap total     = 201492
+heap peak      =  49918
+
+Server P384_NTRU_HRSS_LEVEL3
+
+stack used     =  52896
+total Allocs   =    223
+heap total     = 120162
+heap peak      =  38472
+
+Client P384_NTRU_HRSS_LEVEL3
+
+stack used     =  54688
+total Allocs   =    896
+heap total     = 200786
+heap peak      =  49522
+
+Server P256_SABER_LEVEL1
+
+stack used     =  52896
+total Allocs   =    223
+heap total     = 118748
+heap peak      =  37492
+
+Client P256_SABER_LEVEL1
+
+stack used     =  54640
+total Allocs   =    896
+heap total     = 198992
+heap peak      =  48708
+
+Server P384_SABER_LEVEL3
+
+stack used     =  52896
+total Allocs   =    223
+heap total     = 119916
+heap peak      =  38276
+
+Client P384_SABER_LEVEL3
+
+stack used     =  54640
+total Allocs   =    896
+heap total     = 201248
+heap peak      =  50180
+
+Server P521_SABER_LEVEL5
+
+stack used     =  52896
+total Allocs   =    223
+heap total     = 121166
+heap peak      =  39106
+
+Client P521_SABER_LEVEL5
+
+stack used     =  54640
+total Allocs   =    896
+heap total     = 203590
+heap peak      =  51692
+
+Server P256_KYBER_LEVEL1
+
+stack used     =  52896
+total Allocs   =    223
+heap total     = 118940
+heap peak      =  37652
+
+Client P256_KYBER_LEVEL1
+
+stack used     =  54640
+total Allocs   =    896
+heap total     = 199376
+heap peak      =  48932
+
+Server P384_KYBER_LEVEL3
+
+stack used     =  52896
+total Allocs   =    223
+heap total     = 120108
+heap peak      =  38468
+
+Client P384_KYBER_LEVEL3
+
+stack used     =  54640
+total Allocs   =    896
+heap total     = 201728
+heap peak      =  50468
+
+Client Server P521_KYBER_LEVEL5
+
+stack used     =  52896
+total Allocs   =    223
+heap total     = 121614
+heap peak      =  39458
+
+Client P521_KYBER_LEVEL5
+
+stack used     =  54640
+total Allocs   =    896
+heap total     = 204422
+heap peak      =  52172
+
+Client Server P256_KYBER_90S_LEVEL1
+
+stack used     =  52896
+total Allocs   =    223
+heap total     = 118940
+heap peak      =  37652
+
+Client P256_KYBER_90S_LEVEL1
+
+stack used     =  54640
+total Allocs   =    896
+heap total     = 199376
+heap peak      =  48932
+
+Server P384_KYBER_90S_LEVEL3
+
+stack used     =  52896
+total Allocs   =    223
+heap total     = 120108
+heap peak      =  38468
+
+Client P384_KYBER_90S_LEVEL3
+
+stack used     =  54640
+total Allocs   =    896
+heap total     = 201728
+heap peak      =  50468
+
+Server P521_KYBER_90S_LEVEL5
+
+stack used     =  52896
+total Allocs   =    223
+heap total     = 121614
+heap peak      =  39458
+
+Client P521_KYBER_90S_LEVEL5
+
+stack used     =  54640
+total Allocs   =    896
+heap total     = 204422
+heap peak      =  52172
+
+Server ECDSA SECP256R1
+
+stack used     =  52896
+total Allocs   =    253
+heap total     = 121784
+heap peak      =  39573
+
+Client ECDSA SECP256R1
+
+stack used     =  54640
+total Allocs   =    897
+heap total     = 202472
+heap peak      =  41760
 ```
-
-**Note**: no variance in stack usage.
 
 ## Documentation
 
