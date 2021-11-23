@@ -16,9 +16,16 @@ WORKDIR /src
 COPY . wolfssl
 
 WORKDIR /src/wolfssl
+RUN git clone --depth 1 https://github.com/wolfSSL/wolfssl
 
-RUN make all
+FROM builder AS stage1
+WORKDIR /src/wolfssl
+RUN make pdf
+
+FROM builder AS stage2
+WORKDIR /src/wolfssl
+RUN make html
 
 FROM scratch AS export-stage
-COPY --from=builder /src/wolfssl/wolfssl.pdf .
-COPY --from=builder /src/wolfssl/html ./html
+COPY --from=stage1 /src/wolfssl/wolfssl.pdf .
+COPY --from=stage2 /src/wolfssl/html ./html
