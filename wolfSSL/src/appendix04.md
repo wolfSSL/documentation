@@ -236,6 +236,46 @@ SABER_LEVEL1         | 672             | 1568             | 736             | 32
 SABER_LEVEL3         | 992             | 2304             | 1088            | 32
 SABER_LEVEL5         | 1312            | 3040             | 1472            | 32
 
+## TLS 1.3 Data Transmission Sizes
+
+The following results were taken by running the example server and client and recording all information being transmitted via wireshark. This includes the TLS 1.3 handshake with mutual authentication, "hello wolfssl!" and "I hear you fa shizzle!" messages. The `tcp.len` of all packets were summed:
+
+Ciphersuite            | Authentication | Key Establishment     | Total Bytes
+---------------------- | -------------- | --------------------- | -----------
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | ECC SECP256R1         | 5455
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | KYBER_LEVEL1          | 6633
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | KYBER_LEVEL3          | 7337
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | KYBER_LEVEL5          | 8201
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | KYBER_90S_LEVEL1      | 6633
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | KYBER_90S_LEVEL3      | 7337
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | KYBER_90S_LEVEL5      | 8201
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | NTRU_HPS_LEVEL1       | 6463
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | NTRU_HPS_LEVEL3       | 6925
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | NTRU_HPS_LEVEL5       | 7525
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | NTRU_HRSS_LEVEL3      | 7341
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | SABER_LEVEL1          | 6473
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | SABER_LEVEL3          | 7145
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | SABER_LEVEL5          | 7849
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P256_KYBER_LEVEL1     | 6763
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P384_KYBER_LEVEL3     | 7531
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P521_KYBER_LEVEL5     | 8467
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P256_KYBER90S_LEVEL1  | 6763
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P384_KYBER90S_LEVEL3  | 7531
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P521_KYBER90S_LEVEL5  | 8467
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P256_NTRU_HPS_LEVEL1  | 6593
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P384_NTRU_HPS_LEVEL3  | 7119
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P521_NTRU_HPS_LEVEL5  | 7791
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P384_NTRU_HRSS_LEVEL3 | 7535
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P256_SABER_LEVEL1     | 6603
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P384_SABER_LEVEL3     | 7339
+TLS_AES_256_GCM_SHA384 | RSA 2048 bit   | P521_SABER_LEVEL5     | 8115
+TLS_AES_256_GCM_SHA384 | FALCON_LEVEL1  | ECC SECP256R1         | 6997
+TLS_AES_256_GCM_SHA384 | FALCON_LEVEL5  | ECC SECP256R1         | 11248
+TLS_AES_256_GCM_SHA384 | FALCON_LEVEL1  | KYBER_LEVEL1          | 8180
+TLS_AES_256_GCM_SHA384 | FALCON_LEVEL1  | P256_KYBER_LEVEL1     | 8308
+TLS_AES_256_GCM_SHA384 | FALCON_LEVEL5  | KYBER_LEVEL5          | 14007
+TLS_AES_256_GCM_SHA384 | FALCON_LEVEL5  | P521_KYBER_LEVEL5     | 14257
+
 ## Statistics
 
 The following statistics and benchmarks were taken on an 11th GenIntel Core i7-1165G7@3-GHz with 8 cores running Ubuntu 21.10. liboqs was upgraded to `ba5b61a779a0db364f0e691a0a0bc8ac42e73f1b` on their main branch due to compiler incompatibilities with the older code in `0.7.0`. The following configurations were used:
@@ -795,6 +835,7 @@ wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group ECC_SECP521R1:
 ### Benchmarks for Signature Schemes
 
 **Note**: Only a single core is used.
+
 ```
 FALCON         1 sign    5600 ops took 1.017 sec, avg 0.182 ms, 5507.545 ops/sec
 FALCON         1 verify 28100 ops took 1.001 sec, avg 0.036 ms, 28058.444 ops/sec
