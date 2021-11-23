@@ -60,7 +60,7 @@ html-setup: api builddir $(SOURCES) $(APPENDIX)
 	@mv build/html/chapter01.md build/html/index.md
 
 html: html-setup
-	@mkdir html
+	@mkdir -p html
 	@mkdocs build
 
 .PHONY: serve
@@ -71,6 +71,10 @@ serve: html-setup
 builddir:
 	@mkdir -p build/pdf
 	@mkdir -p build/html
+
+.PHONY: docker
+docker:
+	@DOCKER_BUILDKIT=1 docker build --target=export-stage -t doc_build --output=build .
 
 # Set input format to gfm to fix issues with converted API docs
 # Regexes:

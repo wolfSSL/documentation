@@ -9,7 +9,19 @@ This is a converted version of the wolfSSL manual which:
 
 ## Building Manual
 
-### Prerequisites
+### With Docker
+
+To build using Docker simply make sure Docker is installed and running, then do:
+
+```sh
+sudo make docker
+```
+
+The first run will take a while, after that most of the steps will be cached and will take 1-2 minutes. The PDF and HTML output will be in the `build` directory which will be owned as root.
+
+### Without Docker
+
+#### Prerequisites
 
 In Ubuntu run the following, this will be a large (3GB) download/install:
 
@@ -21,7 +33,7 @@ You also need Doxybook2 installed which can be found at: <https://github.com/mat
 
 If Doxybook2 is installed in a non-stardard path you can use the environment variable `DOXYBOOK_PATH` to set it.
 
-### Building
+#### Building
 
 To build the PDF:
 
