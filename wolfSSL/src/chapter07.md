@@ -20,7 +20,7 @@ Certificates are normally loaded using the file system (although loading from me
 
 ### Loading CA Certificates**
 
-CA certificate files can be loaded using the [`wolfSSL_CTX_load_verify_locations()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga8cd186024ebed18b23e155a19510bb8a) function:
+CA certificate files can be loaded using the [`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations) function:
 
 ```c
 int wolfSSL_CTX_load_verify_locations(WOLFSSL_CTX *ctx,
@@ -30,11 +30,11 @@ int wolfSSL_CTX_load_verify_locations(WOLFSSL_CTX *ctx,
 
 CA loading can also parse multiple CA certificates per file using the above function by passing in a `CAfile` in PEM format with as many certs as possible. This makes initialization easier, and is useful when a client needs to load several root CAs at startup.  This makes wolfSSL easier to port into tools that expect to be able to use a single file for CAs.
 
-**NOTE**: If you have to load a chain of Roots and Intermediate certificates you must load them in the order of trust. Load ROOT CA first followed by Intermediate 1 followed by Intermediate 2 and so on. You may call [`wolfSSL_CTX_load_verify_locations()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga8cd186024ebed18b23e155a19510bb8a) for each cert to be loaded or just once with a file containing the certs in order (Root at the top of the file and certs ordered by the chain of trust)
+**NOTE**: If you have to load a chain of Roots and Intermediate certificates you must load them in the order of trust. Load ROOT CA first followed by Intermediate 1 followed by Intermediate 2 and so on. You may call [`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations) for each cert to be loaded or just once with a file containing the certs in order (Root at the top of the file and certs ordered by the chain of trust)
 
 ### Loading Client or Server Certificates
 
-Loading single client or server certificates can be done with the [`wolfSSL_CTX_use_certificate_file()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga5b680f7fbb898ae5321eb751969b5c26) function.  If this function is used with a certificate chain, only the actual, or “bottom” certificate will be sent.
+Loading single client or server certificates can be done with the [`wolfSSL_CTX_use_certificate_file()`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_file) function.  If this function is used with a certificate chain, only the actual, or “bottom” certificate will be sent.
 
 ```c
 int wolfSSL_CTX_use_certificate_file(WOLFSSL_CTX *ctx,
@@ -44,7 +44,7 @@ int wolfSSL_CTX_use_certificate_file(WOLFSSL_CTX *ctx,
 
 `CAfile` is the CA certificate file, and `type` is the format of the certificate - such as `SSL_FILETYPE_PEM`.
 
-The server and client can send certificate chains using the [`wolfSSL_CTX_use_certificate_chain_file()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga5b680f7fbb898ae5321eb751969b5c26) function.  The certificate chain file must be in PEM format and must be sorted starting with the subject's certificate (the actual client or server cert), followed by any intermediate certificates and ending (optionally) at the root "top" CA.  The example server (`/examples/server/server.c`) uses this functionality.
+The server and client can send certificate chains using the [`wolfSSL_CTX_use_certificate_chain_file()`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_chain_file) function.  The certificate chain file must be in PEM format and must be sorted starting with the subject's certificate (the actual client or server cert), followed by any intermediate certificates and ending (optionally) at the root "top" CA.  The example server (`/examples/server/server.c`) uses this functionality.
 
 **NOTE**: This is the exact reverse of the order necessary when loading a certificate chain for verification! Your file contents in this scenario would be Entity cert at the top of the file followed by the next cert up the chain and so on with Root CA at the bottom of the file.
 
@@ -55,7 +55,7 @@ int wolfSSL_CTX_use_certificate_chain_file(WOLFSSL_CTX *ctx,
 
 ### Loading Private Keys
 
-Server private keys can be loaded using the [`wolfSSL_CTX_use_PrivateKey_file()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga0b3a1e99413ae72d4324fb912ca20b6c) function.
+Server private keys can be loaded using the [`wolfSSL_CTX_use_PrivateKey_file()`](group__CertsKeys.md#function-wolfssl_ctx_use_PrivateKey_file) function.
 
 ```c
 int wolfSSL_CTX_use_PrivateKey_file(WOLFSSL_CTX *ctx,
@@ -67,7 +67,7 @@ int wolfSSL_CTX_use_PrivateKey_file(WOLFSSL_CTX *ctx,
 
 ### Loading Trusted Peer Certificates
 
-Loading a trusted peer certificate to use can be done with [`wolfSSL_CTX_trust_peer_cert()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga3ccaf5cbfbd3d68d914457aa2866ecff).
+Loading a trusted peer certificate to use can be done with [`wolfSSL_CTX_trust_peer_cert()`](group__Setup.md#function-wolfssl_ctx_trust_peer_cert).
 
 ```c
 int wolfSSL_CTX_trust_peer_cert(WOLFSSL_CTX *ctx,
@@ -84,13 +84,13 @@ For example, if a server certificate chain looks like:
 
 ![Certificate Chain](certchain.png)
 
-The wolfSSL client should already have at least the root cert (A) loaded as a trusted root (with [`wolfSSL_CTX_load_verify_locations()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga8cd186024ebed18b23e155a19510bb8a)).  When the client receives the server cert chain, it uses the signature of A to verify B, and if B has not been previously loaded into wolfSSL as a trusted root, B gets stored in wolfSSL's internal cert chain (wolfSSL just stores what is necessary to verify a certificate: common name hash, public key and key type, etc.).  If B is valid, then it is used to verify C.
+The wolfSSL client should already have at least the root cert (A) loaded as a trusted root (with [`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)).  When the client receives the server cert chain, it uses the signature of A to verify B, and if B has not been previously loaded into wolfSSL as a trusted root, B gets stored in wolfSSL's internal cert chain (wolfSSL just stores what is necessary to verify a certificate: common name hash, public key and key type, etc.).  If B is valid, then it is used to verify C.
 
 Following this model, as long as root cert "A" has been loaded as a trusted root into the wolfSSL server, the server certificate chain will still be able to be verified if the server sends (A-\>B-\>C), or (B-\>C).  If the server just sends (C), and not the intermediate certificate, the chain will not be able to be verified unless the wolfSSL client has already loaded B as a trusted root.
 
 ## Domain Name Check for Server Certificates
 
-wolfSSL has an extension on the client that automatically checks the domain of the server certificate. In OpenSSL mode nearly a dozen function calls are needed to perform this. wolfSSL checks that the date of the certificate is in range, verifies the signature, and additionally verifies the domain if you call [`wolfSSL_check_domain_name(WOLFSSL* ssl, const char* dn)`](https://www.wolfssl.com/doxygen/group__Setup.html#ga72e50573073c923af27afbdac38ed003) before calling [`wolfSSL_connect()`](https://www.wolfssl.com/doxygen/group__IO.html#ga5b8f41cca120758d1860c7bc959755dd). wolfSSL will match the X.509 issuer name of peer's server certificate against `dn` (the expected domain name). If the names match [`wolfSSL_connect()`](https://www.wolfssl.com/doxygen/group__IO.html#ga5b8f41cca120758d1860c7bc959755dd) will proceed normally, however if there is a name mismatch, [`wolfSSL_connect()`](https://www.wolfssl.com/doxygen/group__IO.html#ga5b8f41cca120758d1860c7bc959755dd) will return a fatal error and [`wolfSSL_get_error()`](https://www.wolfssl.com/doxygen/group__Debug.html#gae30b3ae133f07c6b9d2b567367489b02) will return `DOMAIN_NAME_MISMATCH`.
+wolfSSL has an extension on the client that automatically checks the domain of the server certificate. In OpenSSL mode nearly a dozen function calls are needed to perform this. wolfSSL checks that the date of the certificate is in range, verifies the signature, and additionally verifies the domain if you call [`wolfSSL_check_domain_name(WOLFSSL* ssl, const char* dn)`](group__Setup.md#function-wolfssl_check_domain_name) before calling [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect). wolfSSL will match the X.509 issuer name of peer's server certificate against `dn` (the expected domain name). If the names match [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) will proceed normally, however if there is a name mismatch, [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) will return a fatal error and [`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error) will return `DOMAIN_NAME_MISMATCH`.
 
 Checking the domain name of the certificate is an important step that verifies the server is actually who it claims to be. This extension is intended to ease the burden of performing the check.
 
@@ -98,11 +98,11 @@ Checking the domain name of the certificate is an important step that verifies t
 
 Normally a file system is used to load private keys, certificates, and CAs. Since wolfSSL is sometimes used in environments without a full file system an extension to use memory buffers instead is provided. To use the extension define the constant `NO_FILESYSTEM` and the following functions will be made available:
 
-* [`int wolfSSL_CTX_load_verify_buffer(WOLFSSL_CTX* ctx, const unsigned char* in,long sz, int format);`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#gaa37539cce3388c628ac4672cf5606785)
-* [`int wolfSSL_CTX_use_certificate_buffer(WOLFSSL_CTX* ctx, const unsigned char* in, long sz, int format);`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#gabd9aed33a8dc16a8edf18d0aaefe155c)
-* [`int wolfSSL_CTX_use_PrivateKey_buffer(WOLFSSL_CTX* ctx, const unsigned char* in, long sz, int format);`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga71850887b87138b7c2d794bf6b1eafab)
-* [`int wolfSSL_CTX_use_certificate_chain_buffer(WOLFSSL_CTX* ctx, const unsigned char* in,long sz);`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#gafdb351829e721fadd77d6da7bfcae48d)
-* [`int wolfSSL_CTX_trust_peer_buffer(WOLFSSL_CTX* ctx, const unsigned char* in, Long sz, int format);`](https://www.wolfssl.com/doxygen/group__Setup.html#ga144b3c9c009a1cb5df009fa3e51d6a41)
+* [`int wolfSSL_CTX_load_verify_buffer(WOLFSSL_CTX* ctx, const unsigned char* in,long sz, int format);`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_buffer)
+* [`int wolfSSL_CTX_use_certificate_buffer(WOLFSSL_CTX* ctx, const unsigned char* in, long sz, int format);`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_buffer)
+* [`int wolfSSL_CTX_use_PrivateKey_buffer(WOLFSSL_CTX* ctx, const unsigned char* in, long sz, int format);`](group__CertsKeys.md#function-wolfssl_ctx_use_PrivateKey_buffer)
+* [`int wolfSSL_CTX_use_certificate_chain_buffer(WOLFSSL_CTX* ctx, const unsigned char* in,long sz);`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_chain_buffer)
+* [`int wolfSSL_CTX_trust_peer_buffer(WOLFSSL_CTX* ctx, const unsigned char* in, Long sz, int format);`](group__Setup.md#function-wolfssl_ctx_trust_peer_buffer)
 
 Use these functions exactly like their counterparts that are named `*_file` instead of `*_buffer`.  And instead of providing a filename provide a memory buffer.  See API documentation for usage details.
 
@@ -112,7 +112,7 @@ wolfSSL has come bundled with test certificate and key files in the past.  Now i
 
 ## Serial Number Retrieval
 
-The serial number of an X.509 certificate can be extracted from wolfSSL using [`wolfSSL_X509_get_serial_number()`](https://www.wolfssl.com/doxygen/group__openSSL.html#gab7cab5fb457bc483b933c6e49fe54083).  The serial number can be of any length.
+The serial number of an X.509 certificate can be extracted from wolfSSL using [`wolfSSL_X509_get_serial_number()`](group__openSSL.md#function-wolfssl_x509_get_serial_number).  The serial number can be of any length.
 
 ```c
 int wolfSSL_X509_get_serial_number(WOLFSSL_X509* x509,
@@ -189,7 +189,7 @@ The last argument of _DerToPem()_ takes a type parameter, usually either `PRIVAT
 
 The RSA private key contains the public key as well.  The private key can be used as both a private and public key by wolfSSL as used in test.c. The private key and the public key (in the form of a certificate) is all that is typically needed for SSL.
 
-A separate public key can be loaded into wolfSSL manually using the RsaPublicKeyDecode() function if need be. Additionally, the [`wc_RsaKeyToPublicDer()`](https://www.wolfssl.com/doxygen/group__RSA.html#gad22db98780a1d6c02f05893f7f04d82c) function can be used to export the public RSA key.
+A separate public key can be loaded into wolfSSL manually using the RsaPublicKeyDecode() function if need be. Additionally, the [`wc_RsaKeyToPublicDer()`](group__RSA.md#function-wc_rsakeytopublicder) function can be used to export the public RSA key.
 
 ## Certificate Generation
 

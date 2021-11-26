@@ -2,7 +2,7 @@
 
 ## HandShake Callback
 
-wolfSSL (formerly CyaSSL) has an extension that allows a HandShake Callback to be set for connect or accept. This can be useful in embedded systems for debugging support when another debugger isn’t available and sniffing is impractical. To use wolfSSL HandShake Callbacks, use the extended functions, [`wolfSSL_connect_ex()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a5d2408875a1fe331e30a623f646eb70a) and [`wolfSSL_accept_ex()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a523f6fed6dc20d36b5a3a879bd0c4443):
+wolfSSL (formerly CyaSSL) has an extension that allows a HandShake Callback to be set for connect or accept. This can be useful in embedded systems for debugging support when another debugger isn’t available and sniffing is impractical. To use wolfSSL HandShake Callbacks, use the extended functions, [`wolfSSL_connect_ex()`](ssl_8h.md#function_wolfssl_connect_ex) and [`wolfSSL_accept_ex()`](ssl_8h.md#function-wolfssl_accept_ex):
 
 ```c
 int wolfSSL_connect_ex(WOLFSSL*, HandShakeCallBack, TimeoutCallBack,
@@ -95,9 +95,9 @@ typedef int (*CallbackDecryptVerify)(WOLFSSL* ssl,
     unsigned int* padSz, void* ctx);
 ```
 
-The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with [`wolfSSL_CTX_SetMacEncryptCb()`](https://www.wolfssl.com/doxygen/ssl_8h.html#ab0109ef252d8aaa6431686ae02257167) and [`wolfSSL_CTX_SetDecryptVerifyCb()`](https://www.wolfssl.com/doxygen/ssl_8h.html#ac4f33720644775462b34c5e07ba2e7a8).
+The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with [`wolfSSL_CTX_SetMacEncryptCb()`](ssl_8h.md#function-wolfssl_ctx_setmacencryptcb) and [`wolfSSL_CTX_SetDecryptVerifyCb()`](ssl_8h.md#function-wolfssl_ctx_setdecryptverifycb().
 
-The user can set a context per WOLFSSL object (session) with [`wolfSSL_SetMacEncryptCtx()`](https://www.wolfssl.com/doxygen/ssl_8h.html#aa6e621ce15b642cc28a914f1e3419fa1) and [`wolfSSL_SetDecryptVerifyCtx()`](https://www.wolfssl.com/doxygen/ssl_8h.html#af82e1440ee3196e9a976e5f975392243).  This context may be a pointer to any user-specified context, which will then in turn be passed back to the MAC/encrypt and decrypt/verify callbacks through the `void* ctx` parameter.
+The user can set a context per WOLFSSL object (session) with [`wolfSSL_SetMacEncryptCtx()`](ssl_8h.md#function-wolfssl_setmacencryptctx) and [`wolfSSL_SetDecryptVerifyCtx()`](ssl_8h.md#function-wolfssl_setdecryptverifyctx).  This context may be a pointer to any user-specified context, which will then in turn be passed back to the MAC/encrypt and decrypt/verify callbacks through the `void* ctx` parameter.
 
 1. Example callbacks can be found in `wolfssl/test.h`, under `myMacEncryptCb()` and `myDecryptVerifyCb()`.  Usage can be seen in the wolfSSL example client (`examples/client/client.c`), when using the `-U` command line option.
 
@@ -162,23 +162,23 @@ typedef int (*CallbackRsaDec)(WOLFSSL* ssl, unsigned char* in,
 
 The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
 
-* [`wolfSSL_CTX_SetEccSignCb()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a9fd0345508d38eec20c19362cd95264c)
-* [`wolfSSL_CTX_SetEccVerifyCb()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a5171ed4e529ad25952da2613bdd743ed)
+* [`wolfSSL_CTX_SetEccSignCb()`](ssl_8h.md#function-wolfssl_ctx_seteccsigncb)
+* [`wolfSSL_CTX_SetEccVerifyCb()`](ssl_8h.md#function-wolfssl_ctx_seteccverifycb)
 * `wolfSSL_CTX_SetEccSharedSecretCb()`
-* [`wolfSSL_CTX_SetRsaSignCb()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a1439b43133dcee4dd9cda5ddf37d6519)
-* [`wolfSSL_CTX_SetRsaVerifyCb()`](https://www.wolfssl.com/doxygen/ssl_8h.html#acbbbe34c7b31f19c49b1dac4dd116642)
-* [`wolfSSL_CTX_SetRsaEncCb()`](https://www.wolfssl.com/doxygen/ssl_8h.html#aa1b5c0f2c0ad6fa9d89fd15a6ebad07f)
-* [`wolfSSL_CTX_SetRsaDecCb()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a45fdf8ad76687b817ce6be01636a39f5)
+* [`wolfSSL_CTX_SetRsaSignCb()`](ssl_8h.md#function-wolfssl_ctx_setrsasigncb)
+* [`wolfSSL_CTX_SetRsaVerifyCb()`](ssl_8h.md#function-wolfssl_ctx_setrsaverifycb)
+* [`wolfSSL_CTX_SetRsaEncCb()`](ssl_8h.md#function-wolfssl_ctx_setrsaenccb)
+* [`wolfSSL_CTX_SetRsaDecCb()`](ssl_8h.md#function-wolfssl_ctx_setrsadeccb)
 
 The user can set a context per `WOLFSSL` object (session) with:
 
-* [`wolfSSL_SetEccSignCtx()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a42982be436d4235d5120304df29a7d3b)
-* [`wolfSSL_SetEccVerifyCtx()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a70777d4fe3af5c93228ec5ce478e9c5e)
+* [`wolfSSL_SetEccSignCtx()`](ssl_8h.md#function-wolfssl_seteccsignctx)
+* [`wolfSSL_SetEccVerifyCtx()`](ssl_8h.md#function-wolfssl_seteccverifyctx)
 * `wolfSSL_SetEccSharedSecretCtx()`
-* [`wolfSSL_SetRsaSignCtx()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a5176742435268cac9f4af058e67e5f24)
-* [`wolfSSL_SetRsaVerifyCtx()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a0f52acf05d9e716f07f621eeef0704e1)
-* [`wolfSSL_SetRsaEncCtx()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a5023a347493a3ccdf49a2c385956ff1a)
-* [`wolfSSL_SetRsaDecCtx()`](https://www.wolfssl.com/doxygen/ssl_8h.html#ace0b2cf667bd82264ba1e61c66ce3c6d)
+* [`wolfSSL_SetRsaSignCtx()`](ssl_8h.md#function-wolfssl_setrsasignctx)
+* [`wolfSSL_SetRsaVerifyCtx()`](ssl_8h.md#function-wolfssl_setrsaverifyctx)
+* [`wolfSSL_SetRsaEncCtx()`](ssl_8h.md#function-wolfssl_setrsaencctx)
+* [`wolfSSL_SetRsaDecCtx()`](ssl_8h.md#function-wolfssl_setrsadecctx)
 
 These contexts may be pointers to any user-specified context, which will then in turn be passed back to the respective public key callback through the `void* ctx` parameter.
 

@@ -194,33 +194,33 @@ The first thing we will need to do is include the wolfSSL native API header in b
 
 ## Startup/Shutdown
 
-Before we can use wolfSSL in our code, we need to initialize the library and the `WOLFSSL_CTX`. wolfSSL is initialized by calling [`wolfSSL_Init()`](https://www.wolfssl.com/doxygen/group__TLS.html#gae2a25854de5230820a6edf16281d8fd7). This must be done first before anything else can be done with the library.
+Before we can use wolfSSL in our code, we need to initialize the library and the `WOLFSSL_CTX`. wolfSSL is initialized by calling [`wolfSSL_Init()`](group__TLS.md#function-wolfssl_init). This must be done first before anything else can be done with the library.
 
 The `WOLFSSL_CTX` structure (wolfSSL Context) contains global values for each SSL connection, including certificate information. A single `WOLFSSL_CTX` can be used with any number of `WOLFSSL` objects created. This allows us to load certain information, such as a list of trusted CA certificates only once.
 
-To create a new `WOLFSSL_CTX`, use [`wolfSSL_CTX_new()`](https://www.wolfssl.com/doxygen/group__Setup.html#gadfa552e771944a6a1102aa43f45378b5). This function requires an argument which defines the SSL or TLS protocol for the client or server to use. There are several options for selecting the desired protocol. wolfSSL currently supports SSL 3.0, TLS 1.0, TLS 1.1, TLS 1.2, DTLS 1.0, and DTLS 1.2. Each of these protocols have a corresponding function that can be used as an argument to [`wolfSSL_CTX_new()`](https://www.wolfssl.com/doxygen/group__Setup.html#gadfa552e771944a6a1102aa43f45378b5). The possible client and server protocol options are shown below. SSL 2.0 is not supported by wolfSSL because it has been insecure for several years.
+To create a new `WOLFSSL_CTX`, use [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new). This function requires an argument which defines the SSL or TLS protocol for the client or server to use. There are several options for selecting the desired protocol. wolfSSL currently supports SSL 3.0, TLS 1.0, TLS 1.1, TLS 1.2, DTLS 1.0, and DTLS 1.2. Each of these protocols have a corresponding function that can be used as an argument to [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new). The possible client and server protocol options are shown below. SSL 2.0 is not supported by wolfSSL because it has been insecure for several years.
 
 EchoClient:
 
-*  [`wolfSSLv3_client_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#ga76150354400b8a9c51d86f98b492e30c) - SSL 3.0
-*  [`wolfTLSv1_client_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#ga766c120c5ebfd425f9bad7e4104c3a03) - TLS 1.0
-*  [`wolfTLSv1_1_client_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#ga17bc479b058fc4b6fb245b7aa0676531) - TLS 1.1
-*  [`wolfTLSv1_2_client_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#gad509f76e1ac3ef1beddd6f9549740075) - TLS 1.2
-*  [`wolfSSLv23_client_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#gae5d3f13c218a012a3c8b1e018388ec49) - Use highest version possible from SSLv3 - TLS 1.2
-*  [`wolfDTLSv1_client_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#ga54ce048303a97222c9e5cc81dcb69f0a) - DTLS 1.0
-*  [`wolfDTLSv1_2_client_method_ex();`](https://www.wolfssl.com/doxygen/ssl_8h.html#a285af74c1737ba6e87306d3cefd093b8) - DTLS 1.2
+*  [`wolfSSLv3_client_method();`](group__Setup.md#function-wolfsslv3_client_method) - SSL 3.0
+*  [`wolfTLSv1_client_method();`](group__Setup.md#function-wolftlsv1_client_method) - TLS 1.0
+*  [`wolfTLSv1_1_client_method();`](group__Setup.md#function-wolftlsv1_1_client_method) - TLS 1.1
+*  [`wolfTLSv1_2_client_method();`](group__Setup.md#function-wolftlsv1_2_client_method) - TLS 1.2
+*  [`wolfSSLv23_client_method();`](group__Setup.md#function-wolfsslv23_client_method) - Use highest version possible from SSLv3 - TLS 1.2
+*  [`wolfDTLSv1_client_method();`](group__Setup.md#function-wolfdtlsv1_client_method) - DTLS 1.0
+*  [`wolfDTLSv1_2_client_method_ex();`](ssl_8h.md#function-wolfdtlsv1_2_client_method_ex) - DTLS 1.2
 
 EchoServer:
 
-*  [`wolfSSLv3_server_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#ga29cb8f4188a54ece2c5c91d13ff2fdee) - SSLv3
-*  [`wolfTLSv1_server_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#ga7f5c45e48e18fd0638da5522acff40d2) - TLSv1
-*  [`wolfTLSv1_1_server_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#gae69f7ca1c91761c2321f23e590d3ab23) - TLSv1.1
-*  [`wolfTLSv1_2_server_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#ga1eb25bb098c005afaf859ade2c8a7a06) - TLSv1.2
-*  [`wolfSSLv23_server_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#gaec510d9f1206e05e5f2046b367b1f4c0) - Allow clients to connect with TLSv1+
-*  [`wolfDTLSv1_server_method();`](https://www.wolfssl.com/doxygen/group__Setup.html#gaf418d2cdcba0b6389b6ad75eab927347) - DTLS
-*  [`wolfDTLSv1_2_server_method();`](https://www.wolfssl.com/doxygen/ssl_8h.html#aef4d07a33df7e324fed59ab8ef5dc384) - DTLS 1.2
+*  [`wolfSSLv3_server_method();`](group__Setup.md#function-wolfsslv3_server_method) - SSLv3
+*  [`wolfTLSv1_server_method();`](group__Setup.md#function-wolftlsv1_server_method) - TLSv1
+*  [`wolfTLSv1_1_server_method();`](group__Setup.md#function-wolftlsv1_1_server_method) - TLSv1.1
+*  [`wolfTLSv1_2_server_method();`](group__Setup.md#function-wolftlsv1_2_server_method) - TLSv1.2
+*  [`wolfSSLv23_server_method();`](group__Setup.md#function-wolfsslv23_server_method) - Allow clients to connect with TLSv1+
+*  [`wolfDTLSv1_server_method();`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS
+*  [`wolfDTLSv1_2_server_method();`](ssl_8h.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
 
-We need to load our CA (Certificate Authority) certificate into the `WOLFSSL_CTX` so that the when the echoclient connects to the echoserver, it is able to verify the server’s identity. To load the CA certificates into the `WOLFSSL_CTX`, use [`wolfSSL_CTX_load_verify_locations()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga8cd186024ebed18b23e155a19510bb8a). This function requires three arguments: a `WOLFSSL_CTX` pointer, a certificate file, and a path value. The path value points to a directory which should contain CA certificates in PEM format. When looking up certificates, wolfSSL will look at the certificate file value before looking in the path location. In this case, we don’t need to specify a certificate path because we will specify one CA file - as such we use the value 0 for the path argument. The [`wolfSSL_CTX_load_verify_locations`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga8cd186024ebed18b23e155a19510bb8a) function returns either `SSL_SUCCESS` or `SSL_FAILURE`:
+We need to load our CA (Certificate Authority) certificate into the `WOLFSSL_CTX` so that the when the echoclient connects to the echoserver, it is able to verify the server’s identity. To load the CA certificates into the `WOLFSSL_CTX`, use [`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations). This function requires three arguments: a `WOLFSSL_CTX` pointer, a certificate file, and a path value. The path value points to a directory which should contain CA certificates in PEM format. When looking up certificates, wolfSSL will look at the certificate file value before looking in the path location. In this case, we don’t need to specify a certificate path because we will specify one CA file - as such we use the value 0 for the path argument. The [`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations) function returns either `SSL_SUCCESS` or `SSL_FAILURE`:
 
 ```c
 wolfSSL_CTX_load_verify_locations(WOLFSSL_CTX* ctx, const char* file, const char* path)
@@ -310,7 +310,7 @@ A WOLFSSL object needs to be created after each TCP Connect and the socket file 
 Connect(sockfd, (SA *) &servaddr, sizeof(servaddr));
 ```
 
-Directly after connecting, create a new `WOLFSSL` object using the [`wolfSSL_new()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga3b1873a50ef7fcee4e2cc8968c81b6c9) function. This function returns a pointer to the `WOLFSSL` object if successful or `NULL` in the case of failure. We can then associate the socket file descriptor (`sockfd`) with the new `WOLFSSL` object (`ssl`):
+Directly after connecting, create a new `WOLFSSL` object using the [`wolfSSL_new()`](group__Setup.md#function-wolfssl_new) function. This function returns a pointer to the `WOLFSSL` object if successful or `NULL` in the case of failure. We can then associate the socket file descriptor (`sockfd`) with the new `WOLFSSL` object (`ssl`):
 
 ```c
 /* Create WOLFSSL object */
@@ -324,7 +324,7 @@ if( (ssl = wolfSSL_new(ctx)) == NULL) {
 wolfSSL_set_fd(ssl, sockfd);
 ```
 
-One thing to notice here is that we haven’t made a call to the [`wolfSSL_connect()`](https://www.wolfssl.com/doxygen/group__IO.html#ga5b8f41cca120758d1860c7bc959755dd) function. [`wolfSSL_connect()`](https://www.wolfssl.com/doxygen/group__IO.html#ga5b8f41cca120758d1860c7bc959755dd) initiates the SSL/TLS handshake with the server, and is called during [`wolfSSL_read()`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017) if it hadn't been called previously. In our case, we don’t explicitly call [`wolfSSL_connect()`](https://www.wolfssl.com/doxygen/group__IO.html#ga5b8f41cca120758d1860c7bc959755dd), as we let our first [`wolfSSL_read()`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017) do it for us.
+One thing to notice here is that we haven’t made a call to the [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) function. [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) initiates the SSL/TLS handshake with the server, and is called during [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) if it hadn't been called previously. In our case, we don’t explicitly call [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect), as we let our first [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) do it for us.
 
 ### EchoServer
 
@@ -344,7 +344,7 @@ wolfSSL_set_fd(ssl, connfd);
 
 A WOLFSSL object needs to be created after each TCP Connect and the socket file descriptor needs to be associated with the session.
 
-Create a new WOLFSSL object using the [`wolfSSL_new()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga3b1873a50ef7fcee4e2cc8968c81b6c9) function. This function returns a pointer to the `WOLFSSL` object if successful or `NULL` in the case of failure. We can then associate the socket file descriptor (`sockfd`) with the new `WOLFSSL` object (`ssl`):
+Create a new WOLFSSL object using the [`wolfSSL_new()`](group__Setup.md#function-wolfssl_new) function. This function returns a pointer to the `WOLFSSL` object if successful or `NULL` in the case of failure. We can then associate the socket file descriptor (`sockfd`) with the new `WOLFSSL` object (`ssl`):
 
 ```c
 /* Create WOLFSSL object */
@@ -374,9 +374,9 @@ In the `main()` function, the new argument (`ssl`) is passed to `str_cli()`:
 str_cli(stdin, ssl);
 ```
 
-Inside the `str_cli()` function, `Writen()` and `Readline()` are replaced with calls to [`wolfSSL_write()`](https://www.wolfssl.com/doxygen/group__IO.html#ga74b924a81e9efdf66d074690e5f53ef1) and [`wolfSSL_read()`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017) functions, and the `WOLFSSL` object (`ssl`) is used instead of the original file descriptor(`sockfd`). The new `str_cli()` function is shown below. Notice that we now need to check if our calls to [`wolfSSL_write`](https://www.wolfssl.com/doxygen/group__IO.html#ga74b924a81e9efdf66d074690e5f53ef1) and [`wolfSSL_read`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017) were successful.
+Inside the `str_cli()` function, `Writen()` and `Readline()` are replaced with calls to [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) and [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) functions, and the `WOLFSSL` object (`ssl`) is used instead of the original file descriptor(`sockfd`). The new `str_cli()` function is shown below. Notice that we now need to check if our calls to [`wolfSSL_write`](group__IO.md#function-wolfssl_write) and [`wolfSSL_read`](group__IO.md#function-wolfssl_read) were successful.
 
-The authors of the Unix Programming book wrote error checking into their `Writen()` function which we must make up for after it has been replaced. We add a new int variable, `n`, to monitor the return value of [`wolfSSL_read`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017) and before printing out the contents of the buffer, recvline, the end of our read data is marked with a `\0`:
+The authors of the Unix Programming book wrote error checking into their `Writen()` function which we must make up for after it has been replaced. We add a new int variable, `n`, to monitor the return value of [`wolfSSL_read`](group__IO.md#function-wolfssl_read) and before printing out the contents of the buffer, recvline, the end of our read data is marked with a `\0`:
 
 ```c
 void
@@ -401,7 +401,7 @@ str_cli(FILE *fp, WOLFSSL* ssl)
 }
 ```
 
-The last thing to do is free the `WOLFSSL` object when we are completely done with it. In the `main()` function, right before the line to free the `WOLFSSL_CTX`, call to [`wolfSSL_free()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga7fc776693622e2352a558d512bb9a127):
+The last thing to do is free the `WOLFSSL` object when we are completely done with it. In the `main()` function, right before the line to free the `WOLFSSL_CTX`, call to [`wolfSSL_free()`](group__Setup.md#function-wolfssl_free):
 
 ```c
 str_cli(stdin, ssl);
@@ -419,7 +419,7 @@ The echo server makes a call to `str_echo()` to handle reading and writing (wher
 void str_echo(WOLFSSL* ssl)
 ```
 
-Replace the calls to `Read()` and `Writen()` with calls to the [`wolfSSL_read()`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017) and [`wolfSSL_write()`](https://www.wolfssl.com/doxygen/group__IO.html#ga74b924a81e9efdf66d074690e5f53ef1) functions. The modified `str_echo()` function, including error checking of return values, is shown below. Note that the type of the variable `n` has been changed from `ssize_t` to `int` in order to accommodate for the change from `read()` to [`wolfSSL_read()`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017):
+Replace the calls to `Read()` and `Writen()` with calls to the [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) and [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) functions. The modified `str_echo()` function, including error checking of return values, is shown below. Note that the type of the variable `n` has been changed from `ssize_t` to `int` in order to accommodate for the change from `read()` to [`wolfSSL_read()`](group__IO.md#function-wolfssl_read):
 
 ```c
 void
@@ -479,7 +479,7 @@ For the echoserver we need to disable the operating system from restarting calls
 struct sigaction     act, oact;
 ```
 
-Insert the following code after variable declarations, before the call to [`wolfSSL_Init()`](https://www.wolfssl.com/doxygen/group__TLS.html#gae2a25854de5230820a6edf16281d8fd7) in the main function:
+Insert the following code after variable declarations, before the call to [`wolfSSL_Init()`](group__TLS.md#function-wolfssl_init) in the main function:
 
 ```c
 /* Signal handling code */
@@ -513,7 +513,7 @@ What we did:
 * Initialized wolfSSL
 * Created a `WOLFSSL_CTX` structure in which we chose what protocol we wanted to use
 * Created a `WOLFSSL` object to use for sending and receiving data
-* Replaced calls to `Writen()` and `Readline()` with [`wolfSSL_write()`](https://www.wolfssl.com/doxygen/group__IO.html#ga74b924a81e9efdf66d074690e5f53ef1) and [`wolfSSL_read()`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017)
+* Replaced calls to `Writen()` and `Readline()` with [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) and [`wolfSSL_read()`](group__IO.md#function-wolfssl_read)
 * Freed `WOLFSSL`, `WOLFSSL_CTX`
 * Made sure we handled client and server shutdown with signal handler
 

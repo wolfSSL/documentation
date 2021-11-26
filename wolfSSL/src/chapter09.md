@@ -22,7 +22,7 @@ When using only the wolfSSL native API, only the `/wolfssl/ssl.h` header is requ
 
 ## Startup and Exit
 
-All applications should call [`wolfSSL_Init()`](https://www.wolfssl.com/doxygen/group__TLS.html#gae2a25854de5230820a6edf16281d8fd7) before using the library and call [`wolfSSL_Cleanup()`](https://www.wolfssl.com/doxygen/group__TLS.html#gae9840467c69fd63eb606e74f8e3af294) at program termination. Currently these functions only initialize and free the shared mutex for the session cache in multi-user mode but in the future they may do more so it's always a good idea to use them.
+All applications should call [`wolfSSL_Init()`](group__TLS.md#function-wolfssl_init) before using the library and call [`wolfSSL_Cleanup()`](group__TLS.md#function-wolfssl_cleanup) at program termination. Currently these functions only initialize and free the shared mutex for the session cache in multi-user mode but in the future they may do more so it's always a good idea to use them.
 
 ## Structure Usage
 
@@ -44,7 +44,7 @@ wolfSSL (formerly CyaSSL) is thread safe by design. Multiple threads can enter t
 
     wolfSSL could take a more aggressive (constrictive) stance and lock out other users when a function is entered that cannot be shared but this level of granularity seems counter-intuitive. All users (even single threaded ones) will pay for the locking and multi-thread ones won't be able to re-enter the library even if they aren't sharing objects across threads. This penalty seems much too high and wolfSSL leaves the responsibility of synchronizing shared objects in the hands of the user.
 
-2. Besides sharing WOLFSSL pointers, users must also take care to completely initialize an `WOLFSSL_CTX` before passing the structure to [`wolfSSL_new()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga3b1873a50ef7fcee4e2cc8968c81b6c9). The same `WOLFSSL_CTX` can create multiple `WOLFSSL` structs but the `WOLFSSL_CTX` is only read during [`wolfSSL_new()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga3b1873a50ef7fcee4e2cc8968c81b6c9) creation and any future (or simultaneous changes) to the `WOLFSSL_CTX` will not be reflected once the `WOLFSSL` object is created.
+2. Besides sharing WOLFSSL pointers, users must also take care to completely initialize an `WOLFSSL_CTX` before passing the structure to [`wolfSSL_new()`](group__Setup.md#function-wolfssl_new). The same `WOLFSSL_CTX` can create multiple `WOLFSSL` structs but the `WOLFSSL_CTX` is only read during [`wolfSSL_new()`](group__Setup.md#function-wolfssl_new) creation and any future (or simultaneous changes) to the `WOLFSSL_CTX` will not be reflected once the `WOLFSSL` object is created.
 
     Again, multiple threads should synchronize writing access to a `WOLFSSL_CTX` and it is advised that a single thread initialize the `WOLFSSL_CTX` to avoid the synchronization and update problem described above.
 
@@ -54,4 +54,4 @@ wolfSSL now uses dynamic buffers for input and output. They default to 0 bytes a
 
 If you prefer the previous way that wolfSSL operated, with 16Kb static buffers that will never need dynamic memory, you can still get that option by defining `LARGE_STATIC_BUFFERS`.
 
-If dynamic buffers are used and the user requests a [`wolfSSL_write()`](https://www.wolfssl.com/doxygen/group__IO.html#ga74b924a81e9efdf66d074690e5f53ef1) that is bigger than the buffer size, then a dynamic block up to `MAX_RECORD_SIZE` is used to send the data. Users wishing to only send the data in chunks of at most `RECORD_SIZE` size can do this by defining `STATIC_CHUNKS_ONLY`.  This will cause wolfSSL to use I/O buffers which grow up to `RECORD_SIZE`, which is 128 bytes by default.
+If dynamic buffers are used and the user requests a [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) that is bigger than the buffer size, then a dynamic block up to `MAX_RECORD_SIZE` is used to send the data. Users wishing to only send the data in chunks of at most `RECORD_SIZE` size can do this by defining `STATIC_CHUNKS_ONLY`.  This will cause wolfSSL to use I/O buffers which grow up to `RECORD_SIZE`, which is 128 bytes by default.

@@ -15,7 +15,7 @@ typedef unsigned int  word32;
 
 **NOTE**:  MD4 is outdated and considered insecure. Please consider using a different hashing function if possible.
 
-To use MD4 include the MD4 header `wolfssl/wolfcrypt/md4.h`. The structure to use is `Md4`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitMd4()`](https://www.wolfssl.com/doxygen/group__MD4.html#gabdbe7f889ba699f850b98cf4f0ec3205) call. Use [`wc_Md4Update()`](https://www.wolfssl.com/doxygen/group__MD4.html#ga2aa015e1b7b7031f7507b462772a090c) to update the hash and [`wc_Md4Final()`](https://www.wolfssl.com/doxygen/group__MD4.html#gafd0393827b3fc5be0c7f975d7b3e4140) to retrieve the final hash.
+To use MD4 include the MD4 header `wolfssl/wolfcrypt/md4.h`. The structure to use is `Md4`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitMd4()`](group__MD4.md#function-wc_initmd4) call. Use [`wc_Md4Update()`](group__MD4.md#function-wc_initmd4) to update the hash and [`wc_Md4Final()`](group__MD4.md#function-wc_md4final) to retrieve the final hash.
 
 ```c
 byte md4sum[MD4_DIGEST_SIZE];
@@ -36,7 +36,7 @@ wc_Md4Final(&md4, md4sum);
 
 **NOTE**:  MD5 is outdated and considered insecure. Please consider using a different hashing function if possible.
 
-To use MD5 include the MD5 header `wolfssl/wolfcrypt/md5.h`. The structure to use is `Md5`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitMd5()`](https://www.wolfssl.com/doxygen/group__MD5.html#ga5ae07c409b9e857d35a5eebf28fd0e93) call. Use [`wc_Md5Update()`](https://www.wolfssl.com/doxygen/group__MD5.html#ga18ba9588218416a1661feedce17e3490) to update the hash and [`wc_Md5Final()`](https://www.wolfssl.com/doxygen/group__MD5.html#gaf691a53845c0c309e1c6e3c7c46a2530) to retrieve the final hash
+To use MD5 include the MD5 header `wolfssl/wolfcrypt/md5.h`. The structure to use is `Md5`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitMd5()`](group__MD5.md#function-wc_initmd5) call. Use [`wc_Md5Update()`](group__MD5.md#function-wc_md5update) to update the hash and [`wc_Md5Final()`](group__MD5.md#function-wc_md5final) to retrieve the final hash
 
 ```c
 byte md5sum[MD5_DIGEST_SIZE];
@@ -55,7 +55,7 @@ wc_Md5Final(&md5, md5sum);
 
 ### SHA / SHA-224 / SHA-256 / SHA-384 / SHA-512
 
-To use SHA include the SHA header `wolfssl/wolfcrypt/sha.h`. The structure to use is `Sha`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitSha()`](https://www.wolfssl.com/doxygen/group__SHA.html#gac3337a92a220bbac72f91faf9b445f08) call. Use [`wc_ShaUpdate()`](https://www.wolfssl.com/doxygen/group__SHA.html#gabf979f479f40b61f7ada0a5fab38d997) to update the hash and [`wc_ShaFinal()`](https://www.wolfssl.com/doxygen/group__SHA.html#ga8d87f04a62e6c7f4b20a4ab948def4aa) to retrieve the final hash:
+To use SHA include the SHA header `wolfssl/wolfcrypt/sha.h`. The structure to use is `Sha`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitSha()`](group__SHA.md#function-wc_initsha) call. Use [`wc_ShaUpdate()`](group__SHA.md#function-wc_shaupdate) to update the hash and [`wc_ShaFinal()`](group__SHA.md#function-wc_shafinal) to retrieve the final hash:
 
 ```c
 byte shaSum[SHA_DIGEST_SIZE];
@@ -74,17 +74,17 @@ wc_ShaFinal(&sha, shaSum);
 
 To use either SHA-224, SHA-256, SHA-384, or SHA-512, follow the same steps as shown above, but use either the `wolfssl/wolfcrypt/sha256.h` or `wolfssl/wolfcrypt/sha512.h` (for both SHA-384 and SHA-512).  The SHA-256, SHA-384, and SHA-512 functions are named similarly to the SHA functions.
 
-For **SHA-224**, the functions [`wc_InitSha224()`](https://www.wolfssl.com/doxygen/group__SHA.html#ga975ebdd57a0f5d8ec25a653443cf4e63), [`wc_Sha224Update()`](https://www.wolfssl.com/doxygen/group__SHA.html#gae84c8f4a143cf8f707c3439c3f8e0f69), and [`wc_Sha224Final()`](https://www.wolfssl.com/doxygen/group__SHA.html#ga5804383261c7874689ae09afb2eab419) will be used with the structure Sha224.
+For **SHA-224**, the functions [`wc_InitSha224()`](group__SHA.md#function-wc_initsha224), [`wc_Sha224Update()`](group__SHA.md#function-wc_sha224update), and [`wc_Sha224Final()`](group__SHA.md#function-wc_sha224final) will be used with the structure Sha224.
 
-For **SHA-256**, the functions [`wc_InitSha256()`](https://www.wolfssl.com/doxygen/group__SHA.html#ga9327dbe0a37780f624d8c59a4e16cb60), [`wc_Sha256Update()`](https://www.wolfssl.com/doxygen/group__SHA.html#ga085bc993e65bbf0603442287710d2aa4), and [`wc_Sha256Final()`](https://www.wolfssl.com/doxygen/group__SHA.html#gad4c5f1632656e3baab7047aba31ebe4a) will be used with the structure Sha256.
+For **SHA-256**, the functions [`wc_InitSha256()`](group__SHA.md#function-wc_initsha256), [`wc_Sha256Update()`](group__SHA.md#function-wc_sha256update), and [`wc_Sha256Final()`](group__SHA.md#function-wc_sha256final) will be used with the structure Sha256.
 
-For **SHA-384**, the functions [`InitSha384()`](https://www.wolfssl.com/doxygen/group__SHA.html#ga9710ce790d622b2fbf01909a0a9c88b0), [`wc_Sha384Update()`](https://www.wolfssl.com/doxygen/group__SHA.html#ga8df9aa28efbf0ca33b7dd53773602088), and [`wc_Sha384Final()`](https://www.wolfssl.com/doxygen/group__SHA.html#ga269544162e566fc97d531fad57b048f1) will be used with the structure Sha384.
+For **SHA-384**, the functions [`wc_InitSha384()`](group__SHA.md#function-wc_initsha384), [`wc_Sha384Update()`](group__SHA.md#function-wc_sha384update), and [`wc_Sha384Final()`](group__SHA.md#function-wc_sha384final) will be used with the structure Sha384.
 
-For **SHA-512**, the functions [`wc_InitSha512()`](https://www.wolfssl.com/doxygen/group__SHA.html#ga51e53c87ac9a07bedc216608d7c2eaa1), [`Sha512Update()`](https://www.wolfssl.com/doxygen/group__SHA.html#ga9ab08a07f1fd6d104c8bd8301d715f96), and [`Sha512Final()`](https://www.wolfssl.com/doxygen/group__SHA.html#ga6c656b63a63d9626e40596759b7cd2b2) will be used with the structure Sha512.
+For **SHA-512**, the functions [`wc_InitSha512()`](group__SHA.md#function-wc_initsha512), [`wc_Sha512Update()`](group__SHA.md#function-wc_sha512update), and [`wc_Sha512Final()`](group__SHA.md#function-wc_sha512final) will be used with the structure Sha512.
 
 ### BLAKE2b
 
-To use BLAKE2b (a SHA-3 finalist) include the BLAKE2b header `wolfssl/wolfcrypt/blake2.h`. The structure to use is `Blake2b`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitBlake2b()`](https://www.wolfssl.com/doxygen/group__BLAKE2.html#ga034ab85502b8e04b4c656c75152db0ca) call. Use [`wc_Blake2bUpdate()`](https://www.wolfssl.com/doxygen/group__BLAKE2.html#ga74d1c9bde68426986aac9b8861c8f778) to update the hash and [`wc_Blake2bFinal()`](https://www.wolfssl.com/doxygen/group__BLAKE2.html#gae31cb1d070a587bb88f3f31845326dd0) to retrieve the final hash:
+To use BLAKE2b (a SHA-3 finalist) include the BLAKE2b header `wolfssl/wolfcrypt/blake2.h`. The structure to use is `Blake2b`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitBlake2b()`](group__BLAKE2.md#function-wc_initblake2b) call. Use [`wc_Blake2bUpdate()`](group__BLAKE2.md#function-wc_blake2bupdate) to update the hash and [`wc_Blake2bFinal()`](group__BLAKE2.md#function-wc_blake2bfinal) to retrieve the final hash:
 
 ```c
 byte digest[64];
@@ -97,14 +97,14 @@ wc_Blake2bUpdate(&b2b, input, sizeof(input));
 wc_Blake2bFinal(&b2b, digest, 64);
 ```
 
-The second parameter to [`wc_InitBlake2b()`](https://www.wolfssl.com/doxygen/group__BLAKE2.html#ga034ab85502b8e04b4c656c75152db0ca) should be the final digest size. `digest` now contains the digest of the hashed data in buffer.
+The second parameter to [`wc_InitBlake2b()`](group__BLAKE2.md#function-wc_initblake2b) should be the final digest size. `digest` now contains the digest of the hashed data in buffer.
 
 Example usage can be found in the wolfCrypt test application (`wolfcrypt/test/test.c`), inside the `blake2b_test()` function.
 
 
 ### RIPEMD-160
 
-To use RIPEMD-160, include the header `wolfssl/wolfcrypt/ripemd.h`. The structure to use is `RipeMd`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitRipeMd()`](https://www.wolfssl.com/doxygen/group__RIPEMD.html#ga4101595eb19a3876258d818d3cc1ce46) call. Use [`wc_RipeMdUpdate()`](https://www.wolfssl.com/doxygen/group__RIPEMD.html#gae006f8b2927b65d14581c57cf02c493c) to update the hash and [`wc_RipeMdFinal()`](https://www.wolfssl.com/doxygen/group__RIPEMD.html#ga5fa78223f9769e4c4afe1cca26f32991) to retrieve the final hash
+To use RIPEMD-160, include the header `wolfssl/wolfcrypt/ripemd.h`. The structure to use is `RipeMd`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitRipeMd()`](group__RIPEMD.md#function-wc_initripemd) call. Use [`wc_RipeMdUpdate()`](group__RIPEMD.md#function-wc_ripemdupdate) to update the hash and [`wc_RipeMdFinal()`](group__RIPEMD.md#function-wc_ripemdfinal) to retrieve the final hash
 
 ```c
 byte ripeMdSum[RIPEMD_DIGEST_SIZE];
@@ -125,7 +125,7 @@ wc_RipeMdFinal(&ripemd, ripeMdSum);
 
 ### HMAC
 
-wolfCrypt currently provides HMAC for message digest needs. The structure `Hmac` is found in the header `wolfssl/wolfcrypt/hmac.h`. HMAC initialization is done with [`wc_HmacSetKey()`](https://www.wolfssl.com/doxygen/group__HMAC.html#ga473ec44a80e2c2a3015006bf538d4c91).  5 different types are supported with HMAC: MD5, SHA, SHA-256, SHA-384, and SHA-512. Here's an example with SHA-256.
+wolfCrypt currently provides HMAC for message digest needs. The structure `Hmac` is found in the header `wolfssl/wolfcrypt/hmac.h`. HMAC initialization is done with [`wc_HmacSetKey()`](group__HMAC.md#function-wc_hmacsetkey).  5 different types are supported with HMAC: MD5, SHA, SHA-256, SHA-384, and SHA-512. Here's an example with SHA-256.
 
 ```c
 Hmac	hmac;
@@ -142,7 +142,7 @@ wc_HmacFinal(&hmac, hmacDigest);
 
 ### GMAC
 
-wolfCrypt also provides GMAC for message digest needs. The structure `Gmac` is found in the header `wolfssl/wolfcrypt/aes.h`, as it is an application AES-GCM. GMAC initialization is done with [`wc_GmacSetKey()`](https://www.wolfssl.com/doxygen/group__AES.html#ga656b05eb12dcdd9a864aff030a0f84cb).
+wolfCrypt also provides GMAC for message digest needs. The structure `Gmac` is found in the header `wolfssl/wolfcrypt/aes.h`, as it is an application AES-GCM. GMAC initialization is done with [`wc_GmacSetKey()`](group__AES.md#function-wc_gmacsetkey).
 
 ```c
 Gmac gmac;
@@ -160,7 +160,7 @@ gmacDigest, sizeof(gmacDigest));
 
 ### Poly1305
 
-wolfCrypt also provides Poly1305 for message digest needs. The structure `Poly1305` is found in the header `wolfssl/wolfcrypt/poly1305.h`. Poly1305 initialization is done with [`wc_Poly1305SetKey()`](https://www.wolfssl.com/doxygen/group__Poly1305.html#gab0c73a9256b4cb9d1d7aa0b4f01727bf). The process of setting a key in Poly1305 should be done again, with a new key, when next using Poly1305 after [`wc_Poly1305Final()`](https://www.wolfssl.com/doxygen/group__Poly1305.html#gadeee21a98c2c7ad7f950b0035f421939) has been called.
+wolfCrypt also provides Poly1305 for message digest needs. The structure `Poly1305` is found in the header `wolfssl/wolfcrypt/poly1305.h`. Poly1305 initialization is done with [`wc_Poly1305SetKey()`](group__Poly1305.md#function-wc_poly1305setkey). The process of setting a key in Poly1305 should be done again, with a new key, when next using Poly1305 after [`wc_Poly1305Final()`](group__Poly1305.md#function-wc_poly1305final) has been called.
 
 ```c
 Poly1305    pmac;
@@ -181,7 +181,7 @@ wc_Poly1305Final(&pmac, pmacDigest);
 
 wolfCrypt provides support for AES with key sizes of 16 bytes (128 bits), 24 bytes (192 bits), or 32 bytes (256 bits). Supported AES modes include CBC, CTR, GCM, and CCM-8.
 
-CBC mode is supported for both encryption and decryption and is provided through the [`wc_AesSetKey()`](https://www.wolfssl.com/doxygen/group__AES.html#ga712dec743cae54ca3f5d3e67eedaa504), [`wc_AesCbcEncrypt()`](https://www.wolfssl.com/doxygen/group__AES.html#ga1466f105e2e23ce9d3b044bc20bc07f2) and [`wc_AesCbcDecrypt()`](https://www.wolfssl.com/doxygen/group__AES.html#ga87c89c64e24e60fb1a636bcc6efbae73) functions. Please include the header `wolfssl/wolfcrypt/aes.h` to use AES. AES has a block size of 16 bytes and the IV should also be 16 bytes. Function usage is usually as follows:
+CBC mode is supported for both encryption and decryption and is provided through the [`wc_AesSetKey()`](group__AES.md#function-wc_aessetkey), [`wc_AesCbcEncrypt()`](group__AES.md#function-wc_aescbcencrypt) and [`wc_AesCbcDecrypt()`](group__AES.md#function-wc_aescbcdecrypt) functions. Please include the header `wolfssl/wolfcrypt/aes.h` to use AES. AES has a block size of 16 bytes and the IV should also be 16 bytes. Function usage is usually as follows:
 
 ```c
 Aes enc;
@@ -210,16 +210,16 @@ wc_AesCbcDecrypt(&dec, plain, cipher, sizeof(cipher));
 
 wolfCrypt also supports CTR (Counter), GCM (Galois/Counter), and CCM-8 (Counter with CBC-MAC) modes of operation for AES.  When using these modes, like CBC, include the `wolfssl/wolfcrypt/aes.h` header.
 
-GCM mode is available for both encryption and decryption through the [`wc_AesGcmSetKey()`](https://www.wolfssl.com/doxygen/group__AES.html#ga807d1fb3bb9a2f2e7a1aa269706666cc), [`wc_AesGcmEncrypt()`](https://www.wolfssl.com/doxygen/group__AES.html#ga512cda371bd4f72c5ec836ddea29ce7a), and [`wc_AesGcmDecrypt()`](https://www.wolfssl.com/doxygen/group__AES.html#ga278f3e5a4b8b2f341c19a0751ff2de57) functions.  For a usage example, see the `aesgcm_test()` function in `<wolfssl_root>/wolfcrypt/test/test.c`.
+GCM mode is available for both encryption and decryption through the [`wc_AesGcmSetKey()`](group__AES.md#function-wc_aesgcmsetkey), [`wc_AesGcmEncrypt()`](group__AES.md#function-wc_aesgcmencrypt), and [`wc_AesGcmDecrypt()`](group__AES.md#function-wc_aesgcmdecrypt) functions.  For a usage example, see the `aesgcm_test()` function in `<wolfssl_root>/wolfcrypt/test/test.c`.
 
-CCM-8 mode is supported for both encryption and decryption through the [`wc_AesCcmSetKey()`](https://www.wolfssl.com/doxygen/group__AES.html#ga7544488439c4bd369e14e9613f21df9a), [`wc_AesCcmEncrypt()`](https://www.wolfssl.com/doxygen/group__AES.html#gad09e65d89dc98d674ed06222a0e8305a), and [`wc_AesCcmDecrypt()`](https://www.wolfssl.com/doxygen/group__AES.html#gabd7b25bd041af0b9e5d4d5ba9512065e) functions.  For a usage example, see the `aesccm_test()` function in `<wolfssl_root>/wolfcrypt/test/test.c`.
+CCM-8 mode is supported for both encryption and decryption through the [`wc_AesCcmSetKey()`](group__AES.md#function-wc_aesccmsetkey), [`wc_AesCcmEncrypt()`](group__AES.md#function-wc_aesccmencrypt), and [`wc_AesCcmDecrypt()`](group__AES.md#function-wc_aesccmdecrypt) functions.  For a usage example, see the `aesccm_test()` function in `<wolfssl_root>/wolfcrypt/test/test.c`.
 
-CTR mode is available for both encryption and decryption through the [`wc_AesCtrEncrypt()`](https://www.wolfssl.com/doxygen/group__AES.html#gac483dab8a4fe8f743eefb5a53881e472) function. The encrypt and decrypt actions are identical so the same function is used for both. For a usage example, see the function `aes_test()` in file `wolfcrypt/test/test.c`.
+CTR mode is available for both encryption and decryption through the [`wc_AesCtrEncrypt()`](group__AES.md#function-wc_aesctrencrypt) function. The encrypt and decrypt actions are identical so the same function is used for both. For a usage example, see the function `aes_test()` in file `wolfcrypt/test/test.c`.
 
 
 #### DES and 3DES
 
-wolfCrypt provides support for DES and 3DES (Des3 since 3 is an invalid leading C identifier). To use these include the header `wolfssl/wolfcrypt/des.h`. The structures you can use are `Des` and `Des3`. Initialization is done through [`wc_Des_SetKey()`](https://www.wolfssl.com/doxygen/group__DES.html#ga84096e59f0f54f696637054f8eeb1ea0) or [`wc_Des3_SetKey()`](https://www.wolfssl.com/doxygen/group__DES.html#gad15902f9dd5c881527b6baf60c130bb5). CBC encryption/decryption is provided through [`wc_Des_CbcEnrypt()`](https://www.wolfssl.com/doxygen/group__DES.html#gab7ca8e9f1c14e756c8116b098a28fa99) / [`wc_Des_CbcDecrypt()`](https://www.wolfssl.com/doxygen/group__DES.html#ga93337303f055a416be701083b16365ff) and [`wc_Des3_CbcEncrypt()`](https://www.wolfssl.com/doxygen/group__DES.html#ga23fee0de0d859d983ad57bdde68e2735) / [`wc_Des3_CbcDecrypt()`](https://www.wolfssl.com/doxygen/group__DES.html#ga9888b4c6da506b2d967ca29d21236cd2). Des has a key size of 8 bytes (24 for 3DES) and the block size is 8 bytes, so only pass increments of 8 bytes to encrypt/decrypt functions. If your data isn't in a block size increment you'll need to add padding to make sure it is. Each `SetKey()` also takes an IV (an initialization vector that is the same size as the key size). Usage is usually like the following:
+wolfCrypt provides support for DES and 3DES (Des3 since 3 is an invalid leading C identifier). To use these include the header `wolfssl/wolfcrypt/des.h`. The structures you can use are `Des` and `Des3`. Initialization is done through [`wc_Des_SetKey()`](group__DES.md#function-wc_des_setkey) or [`wc_Des3_SetKey()`](group__DES.md#function-wc_des3_setkey). CBC encryption/decryption is provided through [`wc_Des_CbcEnrypt()`](group__DES.md#function-wc_des_cbcencrypt) / [`wc_Des_CbcDecrypt()`](group__DES.md#function-wc_dec_cbcdecrypt) and [`wc_Des3_CbcEncrypt()`](group__DES.md#function-wc_des3_cbcencrypt) / [`wc_Des3_CbcDecrypt()`](group__DES.md#function-wc_des3_cbcdecrypt). Des has a key size of 8 bytes (24 for 3DES) and the block size is 8 bytes, so only pass increments of 8 bytes to encrypt/decrypt functions. If your data isn't in a block size increment you'll need to add padding to make sure it is. Each `SetKey()` also takes an IV (an initialization vector that is the same size as the key size). Usage is usually like the following:
 
 ```c
 Des3 enc;
@@ -248,7 +248,7 @@ wc_Des3_CbcDecrypt(&dec, plain, cipher, sizeof(cipher));
 
 #### Camellia
 
-wolfCrypt provides support for the Camellia block cipher. To use Camellia include the header `wolfssl/wolfcrypt/camellia.h`. The structure you can use is called `Camellia`. Initialization is done through [`wc_CamelliaSetKey()`](https://www.wolfssl.com/doxygen/group__Camellia.html#gaad5170c0cf0e476f2cdb6a6ce7b2bc49). CBC encryption/decryption is provided through [`wc_CamelliaCbcEnrypt()`](https://www.wolfssl.com/doxygen/group__Camellia.html#ga3f0dfaad7807ac1a38f708994cf5a18b) and [`wc_CamelliaCbcDecrypt()`](https://www.wolfssl.com/doxygen/group__Camellia.html#ga427d62eb0a47298d4b6e92ed2d7a8605) while direct encryption/decryption is provided through [`wc_CamelliaEncryptDirect()`](https://www.wolfssl.com/doxygen/group__Camellia.html#ga7bab7fc9928d97432f0799b05e105c20) and [`wc_CamelliaDecryptDirect()`](https://www.wolfssl.com/doxygen/group__Camellia.html#gab5bfd093f252a586f199d1ef6503fc7f).
+wolfCrypt provides support for the Camellia block cipher. To use Camellia include the header `wolfssl/wolfcrypt/camellia.h`. The structure you can use is called `Camellia`. Initialization is done through [`wc_CamelliaSetKey()`](group__Camellia.md#function-wc_camelliasetkey). CBC encryption/decryption is provided through [`wc_CamelliaCbcEnrypt()`](group__Camellia.md#function-wc_CamelliacbcEncrypt) and [`wc_CamelliaCbcDecrypt()`](group__Camellia.md#function-wc_camelliacbcdecrypt) while direct encryption/decryption is provided through [`wc_CamelliaEncryptDirect()`](group__Camellia.md#function-wc_camelliaencryptdirect) and [`wc_CamelliaDecryptDirect()`](group__Camellia.md#function-wc_camelliadecryptdirect).
 
 For usage examples please see the camellia_test() function in `<wolfssl_root>/wolfcrypt/test/test.c`.
 
@@ -374,7 +374,7 @@ wc_Chacha_Process(&enc, plain, cipher, sizeof(cipher));
 
 `plain` now contains the original plaintext from the ciphertext.
 
-[`wc_Chacha_SetKey`](https://www.wolfssl.com/doxygen/group__ChaCha.html#gaae70ea0cd7c9c1dd37a2689970d13f16) only needs to be set once but for each packet of information sent [`wc_Chacha_SetIV()`](https://www.wolfssl.com/doxygen/group__ChaCha.html#gaf85a59f0f1d82f112cfda81998a7befd) must be called with a new iv (nonce). Counter is set as an argument to allow for partially decrypting/encrypting information by starting at a different block when performing the encrypt/decrypt process, but in most cases is set to 0. **ChaCha should not be used without a mac algorithm (e.g. Poly1305 , hmac).**
+[`wc_Chacha_SetKey`](group__ChaCha.md#function-wc_chacha_setkey) only needs to be set once but for each packet of information sent [`wc_Chacha_SetIV()`](group__ChaCha.md#function-wc_chacha_setiv) must be called with a new iv (nonce). Counter is set as an argument to allow for partially decrypting/encrypting information by starting at a different block when performing the encrypt/decrypt process, but in most cases is set to 0. **ChaCha should not be used without a mac algorithm (e.g. Poly1305 , hmac).**
 
 ## Public Key Cryptography
 
@@ -400,9 +400,9 @@ wc_InitRng(&rng);
 word32 outLen = RsaPublicEncrypt(in, sizeof(in), out, sizeof(out), &rsaPublicKey, &rng);
 ```
 
-Now `out` holds the ciphertext from the plain text `in`. [`wc_RsaPublicEncrypt()`](https://www.wolfssl.com/doxygen/group__RSA.html#gaf339effdd51d5eb0eb61fff07dade9b3) will return the length in bytes written to out or a negative number in case of an error. [`wc_RsaPublicEncrypt()`](https://www.wolfssl.com/doxygen/group__RSA.html#gaf339effdd51d5eb0eb61fff07dade9b3) needs a RNG (Random Number Generator) for the padding used by the encryptor and it must be initialized before it can be used. To make sure that the output buffer is large enough to pass you can first call [`wc_RsaEncryptSize()`](https://www.wolfssl.com/doxygen/group__RSA.html#gad16430ccec12d700953c2e42953eef63) which will return the number of bytes that a successful call to [`wc_RsaPublicEnrypt()`](https://www.wolfssl.com/doxygen/group__RSA.html#gaf339effdd51d5eb0eb61fff07dade9b3) will write.
+Now `out` holds the ciphertext from the plain text `in`. [`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt) will return the length in bytes written to out or a negative number in case of an error. [`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt) needs a RNG (Random Number Generator) for the padding used by the encryptor and it must be initialized before it can be used. To make sure that the output buffer is large enough to pass you can first call [`wc_RsaEncryptSize()`](group__RSA.md#function-wc_rsaencryptsize) which will return the number of bytes that a successful call to [`wc_RsaPublicEnrypt()`](group__RSA.md#function-wc_rsapublicencrypt) will write.
 
-In the event of an error, a negative return from [`wc_RsaPublicEnrypt()`](https://www.wolfssl.com/doxygen/group__RSA.html#gaf339effdd51d5eb0eb61fff07dade9b3), or [`wc_RsaPublicKeyDecode()`](https://www.wolfssl.com/doxygen/group__RSA.html#ga054bd3f110ed3024bfe03f35bda1f728) for that matter, you can call [`wc_ErrorString()`](https://www.wolfssl.com/doxygen/group__Error.html#ga68acc3c94319dd083ab74cc7267bc697) to get a string describing the error that occurred.
+In the event of an error, a negative return from [`wc_RsaPublicEnrypt()`](group__RSA.md#function-wc_rsapublicencrypt), or [`wc_RsaPublicKeyDecode()`](group__RSA.md#function-wc_rsapublickeydecode) for that matter, you can call [`wc_ErrorString()`](group__Error.md#function-wc_errorstring) to get a string describing the error that occurred.
 
 ```c
 void wc_ErrorString(int error, char* buffer);
@@ -427,7 +427,7 @@ word32 plainSz = wc_RsaPrivateDecrypt(out, outLen, plain,
    					   sizeof(plain), &rsaPrivateKey);
 ```
 
-Now plain will hold plainSz bytes or an error code. For complete examples of each type in wolfCrypt please see the file `wolfcrypt/test/test.c`.  Note that the [`wc_RsaPrivateKeyDecode`](https://www.wolfssl.com/doxygen/group__RSA.html#ga49c56ab962875a5b91e8a123b9ee7b1b) function only accepts keys in raw `DER` format.
+Now plain will hold plainSz bytes or an error code. For complete examples of each type in wolfCrypt please see the file `wolfcrypt/test/test.c`.  Note that the [`wc_RsaPrivateKeyDecode`](group__RSA.md#function-wc_rsaprivatekeydecode) function only accepts keys in raw `DER` format.
 
 ### DH (Diffie-Hellman)
 
@@ -456,14 +456,14 @@ wc_DhKeyDecode(tmp, &idx, &dhPublicKey, publicKeyBuffer);
 wc_InitRng(&rng);  /*Initialize random number generator*/
 ```
 
-[`wc_DhGenerateKeyPair()`](https://www.wolfssl.com/doxygen/group__Diffie-Hellman.html#ga7ea4a1441bfb5a0c12008bc6f11d0bfb) will generate a public and private DH key based on the initial public parameters in dhPublicKey.
+[`wc_DhGenerateKeyPair()`](group__Diffie-Hellman.md#function-wc_dhgeneratekeypair) will generate a public and private DH key based on the initial public parameters in dhPublicKey.
 
 ```c
 wc_DhGenerateKeyPair(&dhPublicKey, &rng, privA, &privASz,
             pubA, &pubASz);
 ```
 
-After sideB sends their public key (`pubB`) to sideA, sideA can then generate the mutually-agreed key(`agreeA`) using the [`wc_DhAgree()`](https://www.wolfssl.com/doxygen/group__Diffie-Hellman.html#gae36725d66e00e0ee51555d0f03aa6a08) function.
+After sideB sends their public key (`pubB`) to sideA, sideA can then generate the mutually-agreed key(`agreeA`) using the [`wc_DhAgree()`](group__Diffie-Hellman.md#function-wc_dhagree) function.
 
 ```c
 wc_DhAgree(&dhPublicKey, agreeA, &agreeASz, privA, privASz,
@@ -526,13 +526,13 @@ wc_DsaPrivateKeyDecode(dsaKeyBuffer, &idx, &key,
 wc_InitRng(&rng);
 ```
 
-The [`wc_DsaSign()`](https://www.wolfssl.com/doxygen/group__DSA.html#ga0628e4be8f74b4266dfb98ef4fc5c732) function creates a signature (`signature`) using the DSA private key, hash value, and random number generator.
+The [`wc_DsaSign()`](group__DSA.md#function-wc_dsasign) function creates a signature (`signature`) using the DSA private key, hash value, and random number generator.
 
 ```c
 wc_DsaSign(hash, signature, &key, &rng);
 ```
 
-To verify the signature, use [`wc_DsaVerify()`](https://www.wolfssl.com/doxygen/group__DSA.html#ga94e6e31bb2f6dc244ac1e03787126b04). If verification is successful, answer will be equal to “**1**”. Once finished, free the DSA key structure using [`wc_FreeDsaKey()`](https://www.wolfssl.com/doxygen/group__DSA.html#gaeb1567ea08b350c310290788a41eba9a).
+To verify the signature, use [`wc_DsaVerify()`](group__DSA.md#function-wc_dsaverify). If verification is successful, answer will be equal to “**1**”. Once finished, free the DSA key structure using [`wc_FreeDsaKey()`](group__DSA.md#function-wc_freedsakey).
 
 ```c
 wc_DsaVerify(hash, signature, &key, &answer);

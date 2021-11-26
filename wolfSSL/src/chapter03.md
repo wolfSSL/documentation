@@ -144,7 +144,7 @@ Max RSA key size in bits for build is set at : 4096
 -r          Resume session
 -w          Wait for bidirectional shutdown
 -M <prot>   Use STARTTLS, using <prot> protocol (smtp)
--f          Fewer packets/group messages
+-f          Fewer packet/group messages
 -x          Disable client cert/key loading
 -X          Driven by eXternal test case
 -j          Use verify callback override
@@ -247,7 +247,7 @@ Or load the correct CA certificate into the wolfSSL client using the `-A` comman
 
 ## Server Example
 
-The server example demonstrates a simple SSL server that optionally performs client authentication. Only one client connection is accepted and then the server quits. The client example in normal mode (no command line arguments) will work just fine against the example server, but if you specify command line arguments for the client example, then a client certificate isn't loaded and the [`wolfSSL_connect()`](https://www.wolfssl.com/doxygen/group__IO.html#ga5b8f41cca120758d1860c7bc959755dd) will fail (unless client cert check is disabled using the `-d` option). The server will report an error "-245, peer didn't send cert". Like the example client, the server can be used with several
+The server example demonstrates a simple SSL server that optionally performs client authentication. Only one client connection is accepted and then the server quits. The client example in normal mode (no command line arguments) will work just fine against the example server, but if you specify command line arguments for the client example, then a client certificate isn't loaded and the [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) will fail (unless client cert check is disabled using the `-d` option). The server will report an error "-245, peer didn't send cert". Like the example client, the server can be used with several
 command line arguments as well:
 
 ```sh
@@ -274,7 +274,7 @@ server 4.8.1 NOTE: All files relative to wolfSSL home dir
 -b          Bind to any interface instead of localhost only
 -s          Use pre Shared keys
 -u          Use UDP DTLS, add -v 2 for DTLSv1, -v 3 for DTLSv1.2 (default)
--f          Fewer packets/group messages
+-f          Fewer packet/group messages
 -r          Allow one client Resumption
 -N          Use Non-blocking sockets
 -S <str>    Use Host Name Indication
@@ -414,7 +414,7 @@ Although the performance of individual ciphers and algorithms will depend on the
 
 ![Benchmark](benchmark.png)
 
-If you want to use only a subset of ciphers, you can customize which specific cipher suites and/or ciphers wolfSSL uses when making an SSL/TLS connection. For example, to force 128-bit AES, add the following line after the call to [`wolfSSL_CTX_new(SSL_CTX_new)`](https://www.wolfssl.com/doxygen/group__Setup.html#gadfa552e771944a6a1102aa43f45378b5):
+If you want to use only a subset of ciphers, you can customize which specific cipher suites and/or ciphers wolfSSL uses when making an SSL/TLS connection. For example, to force 128-bit AES, add the following line after the call to [`wolfSSL_CTX_new(SSL_CTX_new)`](group__Setup.md#function-wolfssl_ctx_new):
 
 ```c
 wolfSSL_CTX_set_cipher_list(ctx, “AES128-SHA”);
@@ -499,7 +499,7 @@ This section will explain the basic steps needed to add wolfSSL to a client appl
     }
     wolfSSL_set_fd(ssl, fd);
     ```
-4. Change all calls from `read()` (or `recv()`) to [`wolfSSL_read()`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017) so:
+4. Change all calls from `read()` (or `recv()`) to [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) so:
 
     ```c
     result = read(fd, buffer, bytes);
@@ -511,7 +511,7 @@ This section will explain the basic steps needed to add wolfSSL to a client appl
     result = wolfSSL_read(ssl, buffer, bytes);
     ```
 
-5. Change all calls from `write()` (or `send()`) to [`wolfSSL_write()`](https://www.wolfssl.com/doxygen/group__IO.html#ga74b924a81e9efdf66d074690e5f53ef1) so:
+5. Change all calls from `write()` (or `send()`) to [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) so:
 
     ```c
     result = write(fd, buffer, bytes);
@@ -523,15 +523,15 @@ This section will explain the basic steps needed to add wolfSSL to a client appl
     result = wolfSSL_write(ssl, buffer, bytes);
     ```
 
-6. You can manually call [`wolfSSL_connect()`](https://www.wolfssl.com/doxygen/group__IO.html#ga5b8f41cca120758d1860c7bc959755dd) but that's not even necessary; the first call to [`wolfSSL_read()`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017) or [`wolfSSL_write()`](https://www.wolfssl.com/doxygen/group__IO.html#ga74b924a81e9efdf66d074690e5f53ef1) will initiate the [`wolfSSL_connect()`](https://www.wolfssl.com/doxygen/group__IO.html#ga5b8f41cca120758d1860c7bc959755dd) if it hasn't taken place yet.
-7. Error checking. Each [`wolfSSL_read()`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017) and [`wolfSSL_write()`](https://www.wolfssl.com/doxygen/group__IO.html#ga74b924a81e9efdf66d074690e5f53ef1) call will return the number of bytes written upon success, 0 upon connection closure, and -1 for an error, just like `read()` and `write()`. In the event of an error you can use two calls to get more information about the error:
+6. You can manually call [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) but that's not even necessary; the first call to [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) or [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) will initiate the [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) if it hasn't taken place yet.
+7. Error checking. Each [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) and [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) call will return the number of bytes written upon success, 0 upon connection closure, and -1 for an error, just like `read()` and `write()`. In the event of an error you can use two calls to get more information about the error:
 
     ```c
     char errorString[80];
     int err = wolfSSL_get_error(ssl, 0);
     wolfSSL_ERR_error_string(err, errorString);
     ```
-    If you are using non-blocking sockets, you can test for errno `EAGAIN`/`EWOULDBLOCK` or more correctly you can test the specific error code returned by [`wolfSSL_get_error()`](https://www.wolfssl.com/doxygen/group__Debug.html#gae30b3ae133f07c6b9d2b567367489b02) for `SSL_ERROR_WANT_READ` or`SSL_ERROR_WANT_WRITE`.
+    If you are using non-blocking sockets, you can test for errno `EAGAIN`/`EWOULDBLOCK` or more correctly you can test the specific error code returned by [`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error) for `SSL_ERROR_WANT_READ` or`SSL_ERROR_WANT_WRITE`.
 8. Cleanup. After each WOLFSSL object is done being used you can free it up by
 calling:
 
@@ -583,6 +583,6 @@ This section will explain the basic steps needed to add wolfSSL to a server appl
     }
     ```
 
-It is possible to load certificates and keys from buffers as well if there is no filesystem available. In this case, see the [`wolfSSL_CTX_use_certificate_buffer()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#gabd9aed33a8dc16a8edf18d0aaefe155c) and [`wolfSSL_CTX_use_PrivateKey_buffer()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga71850887b87138b7c2d794bf6b1eafab) API documentation, linked here, for more information.
+It is possible to load certificates and keys from buffers as well if there is no filesystem available. In this case, see the [`wolfSSL_CTX_use_certificate_buffer()`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_buffer) and [`wolfSSL_CTX_use_PrivateKey_buffer()`](group__CertsKeys.md#function-wolfssl_ctx_use_privatekey_buffer) API documentation, linked here, for more information.
 
 For an example of a server application using wolfSSL, see the server example located in the `<wolfssl_root>/examples/server.c` file.
