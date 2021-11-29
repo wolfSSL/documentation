@@ -14,29 +14,29 @@ wolfSSL supports **SSL 3.0**, **TLS **(**1.0**, **1.1**, **1.2, 1.3**), and **DT
 
 ### Server Functions
 
-* [`wolfDTLSv1_server_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gaf418d2cdcba0b6389b6ad75eab927347) - DTLS 1.0
-* [`wolfDTLSv1_2_server_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gad509f76e1ac3ef1beddd6f9549740075) - DTLS 1.2
-* [`wolfSSLv3_server_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga29cb8f4188a54ece2c5c91d13ff2fdee) - SSL 3.0
-* [`wolfTLSv1_server_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga7f5c45e48e18fd0638da5522acff40d2) - TLS 1.0
-* [`wolfTLSv1_1_server_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gae69f7ca1c91761c2321f23e590d3ab23) - TLS 1.1
-* [`wolfTLSv1_2_server_method()`](https://wolfssl.com/doxygen/group__Setup.html#ga1eb25bb098c005afaf859ade2c8a7a06) - TLS 1.2
-* [`wolfTLSv1_3_server_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gac5981b6217a145f572e070d5fbba7598) - TLS 1.3
-* [`wolfSSLv23_server_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gaec510d9f1206e05e5f2046b367b1f4c0) - Use highest possible version from SSLv3 - TLS 1.2
+* [`wolfDTLSv1_server_method()`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS 1.0
+* [`wolfDTLSv1_2_server_method()`](group__Setup.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
+* [`wolfSSLv3_server_method()`](group__Setup.md#function-wolfsslv3_server_method) - SSL 3.0
+* [`wolfTLSv1_server_method()`](group__Setup.md#function-wolftlsv1_server_method) - TLS 1.0
+* [`wolfTLSv1_1_server_method()`](group__Setup.md#function-wolftlsv1_1_server_method) - TLS 1.1
+* [`wolfTLSv1_2_server_method()`](group__Setup.md#function-wolftlsv1_2_server_method) - TLS 1.2
+* [`wolfTLSv1_3_server_method()`](group__Setup.md#function-wolftlsv1_3_server_method) - TLS 1.3
+* [`wolfSSLv23_server_method()`](group__Setup.md#function-wolfsslv23_server_method) - Use highest possible version from SSLv3 - TLS 1.2
 
-wolfSSL supports robust server downgrade with the [`wolfSSLv23_server_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gaec510d9f1206e05e5f2046b367b1f4c0) function. See [Robust Client and Server Downgrade](#robust-client-and-server-downgrade) for a details.
+wolfSSL supports robust server downgrade with the [`wolfSSLv23_server_method()`](group__Setup.md#function-wolfsslv23_server_method) function. See [Robust Client and Server Downgrade](#robust-client-and-server-downgrade) for a details.
 
 ### Client Functions
 
-* [`wolfDTLSv1_client_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga54ce048303a97222c9e5cc81dcb69f0a) - DTLS 1.0
-* [`wolfDTLSv1_2_client_method_ex()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a285af74c1737ba6e87306d3cefd093b8) - DTLS 1.2
-* [`wolfSSLv3_client_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga76150354400b8a9c51d86f98b492e30c) - SSL 3.0
-* [`wolfTLSv1_client_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga766c120c5ebfd425f9bad7e4104c3a03) - TLS 1.0
-* [`wolfTLSv1_1_client_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga17bc479b058fc4b6fb245b7aa0676531) - TLS 1.1
-* [`wolfTLSv1_2_client_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gad509f76e1ac3ef1beddd6f9549740075) - TLS 1.2
-* [`wolfTLSv1_3_client_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga403e9eb25c8d5cde0a5917e5b10b9762) - TLS 1.3
-* [`wolfSSLv23_client_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gae5d3f13c218a012a3c8b1e018388ec49) - Use highest possible version from SSLv3 - TLS 1.2
+* [`wolfDTLSv1_client_method()`](group__Setup.md#function-v1_client_method) - DTLS 1.0
+* [`wolfDTLSv1_2_client_method_ex()`](ssl_8h.md#function-wolfdtlsv1_2_client_method_ex) - DTLS 1.2
+* [`wolfSSLv3_client_method()`](group__Setup.md#function-wolfsslv3_client_method) - SSL 3.0
+* [`wolfTLSv1_client_method()`](group__Setup.md#function-wolftlsv1_client_method) - TLS 1.0
+* [`wolfTLSv1_1_client_method()`](group__Setup.md#function-wolftlsv1_1_client_method) - TLS 1.1
+* [`wolfTLSv1_2_client_method()`](group__Setup.md#function-wolftlsv1_2_client_method) - TLS 1.2
+* [`wolfTLSv1_3_client_method()`](group__Setup.md#function-wolftlsv1_3_client_method) - TLS 1.3
+* [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) - Use highest possible version from SSLv3 - TLS 1.2
 
-wolfSSL supports robust client downgrade with the [`wolfSSLv23_client_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gae5d3f13c218a012a3c8b1e018388ec49) function. See [Robust Client and Server Downgrade](#robust-client-and-server-downgrade) for a details.
+wolfSSL supports robust client downgrade with the [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) function. See [Robust Client and Server Downgrade](#robust-client-and-server-downgrade) for a details.
 
 For details on how to use these functions, please see the [Getting Started](chapter03.md#getting-started) chapter. For a comparison between SSL 3.0, TLS 1.0, 1.1, 1.2, and DTLS, please see Appendix A.
 
@@ -44,9 +44,9 @@ For details on how to use these functions, please see the [Getting Started](chap
 
 Both wolfSSL clients and servers have robust version downgrade capability.  If a specific protocol version method is used on either side, then only that version will be negotiated or an error will be returned.  For example, a client that uses TLS 1.0 and tries to connect to an SSL 3.0 only server, the connection will fail, likewise connecting to a TLS 1.1 will fail as well.
 
-To resolve this issue, a client that uses the [`wolfSSLv23_client_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gae5d3f13c218a012a3c8b1e018388ec49) function will support the highest protocol version supported by the server by downgrading if necessary. In this case, the client will be able to connect to a server running TLS 1.0 - TLS 1.3 (or a subset or superset that includes SSL 3.0 depending on which protocol versions are configured in wolfSSL).  The only versions it can't connect to is SSL 2.0 which has been insecure for years, and SSL 3.0 which has been disabled by default.
+To resolve this issue, a client that uses the [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) function will support the highest protocol version supported by the server by downgrading if necessary. In this case, the client will be able to connect to a server running TLS 1.0 - TLS 1.3 (or a subset or superset that includes SSL 3.0 depending on which protocol versions are configured in wolfSSL).  The only versions it can't connect to is SSL 2.0 which has been insecure for years, and SSL 3.0 which has been disabled by default.
 
-Similarly, a server using the [`wolfSSLv23_server_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gaec510d9f1206e05e5f2046b367b1f4c0) function can handle clients supporting protocol versions from TLS 1.0 - TLS 1.2.  A wolfSSL server can't accept a connection from SSLv2 because no security is provided.
+Similarly, a server using the [`wolfSSLv23_server_method()`](group__Setup.md#function-wolfsslv23_server_method) function can handle clients supporting protocol versions from TLS 1.0 - TLS 1.2.  A wolfSSL server can't accept a connection from SSLv2 because no security is provided.
 
 ### IPv6 Support
 
@@ -107,7 +107,7 @@ A list of TLS extensions supported by wolfSSL and note of which RFC can be refer
 
 ### Cipher Suite Strength and Choosing Proper Key Sizes
 
-To see what ciphers are currently being used you can call the method: [`wolfSSL_get_ciphers()`](https://www.wolfssl.com/doxygen/group__IO.html#ga8ce5eb8872afd2784b562123e4607404).
+To see what ciphers are currently being used you can call the method: [`wolfSSL_get_ciphers()`](group__IO.md#function-wolfssl_get_ciphers).
 
 This function will return the currently enabled cipher suites.
 
@@ -433,12 +433,12 @@ Stream oriented API for PKCS7 decoding gives the option of passing inputs in sma
 For streaming when decoding/verifying bundles the following functions are supported:
 
 1. `wc_PKCS7_DecodeEncryptedData()`
-2. [`wc_PKCS7_VerifySignedData()`](https://www.wolfssl.com/doxygen/group__PKCS7.html#ga77daaf1333bb7aecef288a476cca411d)
-3. [`wc_PKCS7_VerifySignedData_ex()`](https://www.wolfssl.com/doxygen/group__PKCS7.html#gac940af4d5e8d11886b821b04674f48d3)
-4. [`wc_PKCS7_DecodeEnvelopedData()`](https://www.wolfssl.com/doxygen/group__PKCS7.html#gaf75f2185b48a9458dcfafbe764bafb2d)
+2. [`wc_PKCS7_VerifySignedData()`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata)
+3. [`wc_PKCS7_VerifySignedData_ex()`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata_ex)
+4. [`wc_PKCS7_DecodeEnvelopedData()`](group__PKCS7.md#function-wc_pkcs7_decodeenvelopeddate)
 5. `wc_PKCS7_DecodeAuthEnvelopedData()`
 
-**Note**: that when calling [`wc_PKCS7_VerifySignedData_ex`](https://www.wolfssl.com/doxygen/group__PKCS7.html#gac940af4d5e8d11886b821b04674f48d3) it is expected that the argument pkiMsgFoot is the full buffer. The internal structure only supports streaming of one buffer which in this case would be `pkiMsgHead`.
+**Note**: that when calling [`wc_PKCS7_VerifySignedData_ex`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata_ex) it is expected that the argument pkiMsgFoot is the full buffer. The internal structure only supports streaming of one buffer which in this case would be `pkiMsgHead`.
 
 ### Forcing the Use of a Specific Cipher
 
@@ -448,7 +448,7 @@ By default, wolfSSL will pick the “best” (highest security) cipher suite tha
 wolfSSL_CTX_set_cipher_list(ctx, "AES128-SHA");
 ```
 
-after the call to [`wolfSSL_CTX_new()`](https://www.wolfssl.com/doxygen/group__Setup.html#gadfa552e771944a6a1102aa43f45378b5) so that you have:
+after the call to [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new) so that you have:
 
 ```c
 ctx = wolfSSL_CTX_new(method);
@@ -581,7 +581,7 @@ Statistics collecting with the sniffer can be compiled in with defining the macr
 
 wolfSSL supports data compression with the **zlib** library. The `./configure` build system detects the presence of this library, but if you're building in some other way define the constant `HAVE_LIBZ` and include the path to zlib.h for your includes.
 
-Compression is off by default for a given cipher. To turn it on, use the function [`wolfSSL_set_compression()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga072ad1832a9f74102e204afde9cd9dd6) before SSL connecting or accepting. Both the client and server must have compression turned on in order for compression to be used.
+Compression is off by default for a given cipher. To turn it on, use the function [`wolfSSL_set_compression()`](group__Setup.md#function-wolfssl_set_compression) before SSL connecting or accepting. Both the client and server must have compression turned on in order for compression to be used.
 
 Keep in mind that while compressing data before sending decreases the actual size of the messages being sent and received, the amount of data saved by compression usually takes longer time to analyze than it does to send it raw on all but the slowest of networks.
 
@@ -604,7 +604,7 @@ wolfSSL has support for these ciphers with static pre-shared keys:
 * `TLS_PSK_WITH_AES_256_CCM_8`
 * `TLS_PSK_WITH_CHACHA20_POLY1305`
 
-These suites are built into wolfSSL with `WOLFSSL_STATIC_PSK` on, all PSK suites can be turned off at build time with the constant `NO_PSK`. To only use these ciphers at runtime use the function [`wolfSSL_CTX_set_cipher_list()`](https://www.wolfssl.com/doxygen/group__Setup.html#gac5835a41f08b90828e72ec20d46d6399) with the desired ciphersuite.
+These suites are built into wolfSSL with `WOLFSSL_STATIC_PSK` on, all PSK suites can be turned off at build time with the constant `NO_PSK`. To only use these ciphers at runtime use the function [`wolfSSL_CTX_set_cipher_list()`](group__Setup.md#function-wolfssl_ctx_set_cipher_list) with the desired ciphersuite.
 
 wolfSSL has support for ephemeral key PSK suites:
 
@@ -618,12 +618,12 @@ wolfSSL has support for ephemeral key PSK suites:
 * `DHE-PSK-AES128-CBC-SHA256`
 * `DHE-PSK-AES128-CBC-SHA256`
 
-On the client, use the function [`wolfSSL_CTX_set_psk_client_callback()`](https://www.wolfssl.com/doxygen/ssl_8h.html#afbf551ed2cfbc67dae6e3237c526d022) to setup the callback. The client example in `<wolfSSL_Home>/examples/client/client.c` gives example usage for setting up the client identity and key, though the actual callback is implemented in `wolfssl/test.h`.
+On the client, use the function [`wolfSSL_CTX_set_psk_client_callback()`](ssl_8h.md#function-wolfssl_ctx_set_psk_client_callback) to setup the callback. The client example in `<wolfSSL_Home>/examples/client/client.c` gives example usage for setting up the client identity and key, though the actual callback is implemented in `wolfssl/test.h`.
 
 On the server side two additional calls are required:
 
-* [`wolfSSL_CTX_set_psk_server_callback()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a9088d514ee6bf4c62333ab1ec0ebb9bf)
-* [`wolfSSL_CTX_use_psk_identity_hint()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#gaa9eba22667861bb69697879e19f7cd5f)
+* [`wolfSSL_CTX_set_psk_server_callback()`](ssl_8h.md#function-wolfssl_ctx_set_psk_server_callback)
+* [`wolfSSL_CTX_use_psk_identity_hint()`](group__CertsKeys.md#function-wolfssl_ctx_use_psk_identity_hint)
 
 The server stores its identity hint to help the client with the 2nd call, in our server example that's "wolfssl server".  An example server psk callback can also be found in `my_psk_server_cb()` in `wolfssl/test.h`.
 
@@ -639,7 +639,7 @@ By default, wolfSSL validates all certificates that it receives - this includes 
 wolfSSL_CTX_load_verify_locations(ctx, caCert, 0);
 ```
 
-To turn on client verification and control its behavior, the [`wolfSSL_CTX_set_verify()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga9ea9a0b45f8cb4feb7eff739e83aa7bd) function is used.  In the following example, `SSL_VERIFY_PEER` turns on a certificate request from the server to the client.  `SSL_VERIFY_FAIL_IF_NO_PEER_CERT` instructs the server to fail if the client does not present a certificate to validate on the server side.  Other options to [`wolfSSL_CTX_set_verify()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga9ea9a0b45f8cb4feb7eff739e83aa7bd) include `SSL_VERIFY_NONE` and `SSL_VERIFY_CLIENT_ONCE`.
+To turn on client verification and control its behavior, the [`wolfSSL_CTX_set_verify()`](group__Setup.md#function-wolfssl_ctx_set_verify) function is used.  In the following example, `SSL_VERIFY_PEER` turns on a certificate request from the server to the client.  `SSL_VERIFY_FAIL_IF_NO_PEER_CERT` instructs the server to fail if the client does not present a certificate to validate on the server side.  Other options to [`wolfSSL_CTX_set_verify()`](group__Setup.md#function-wolfssl_ctx_set_verify) include `SSL_VERIFY_NONE` and `SSL_VERIFY_CLIENT_ONCE`.
 
 ```c
 wolfSSL_CTX_set_verify(ctx,SSL_VERIFY_PEER | ((usePskPlus)?
@@ -659,20 +659,20 @@ SNI is useful when a server hosts multiple ‘virtual’ servers at a single und
 
 Using SNI on the client side requires an additional function call, which should be one of the following functions:
 
-* [`wolfSSL_CTX_UseSNI()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a9c0f3a9d0e24d6c1573bd5c80468bff5)
-* [`wolfSSL_UseSNI()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a1e9a31d166aa1135c8170a769ca420bb)
+* [`wolfSSL_CTX_UseSNI()`](ssl_8h.md#function-wolfssl_ctx_usesni)
+* [`wolfSSL_UseSNI()`](ssl_8h.md#function-wolfssl_usesni)
 
-[`wolfSSL_CTX_UseSNI()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a9c0f3a9d0e24d6c1573bd5c80468bff5) is most recommended when the client contacts the same server multiple times. Setting the SNI extension at the context level will enable the SNI usage in all SSL objects created from that same context from the moment of the call forward.
+[`wolfSSL_CTX_UseSNI()`](ssl_8h.md#function-wolfssl_ctx_usesni) is most recommended when the client contacts the same server multiple times. Setting the SNI extension at the context level will enable the SNI usage in all SSL objects created from that same context from the moment of the call forward.
 
-[`wolfSSL_UseSNI()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a1e9a31d166aa1135c8170a769ca420bb) will enable SNI usage for one SSL object only, so it is recommended to use this function when the server name changes between sessions.
+[`wolfSSL_UseSNI()`](ssl_8h.md#function-wolfssl_usesni) will enable SNI usage for one SSL object only, so it is recommended to use this function when the server name changes between sessions.
 
-On the server side one of the same function calls is required. Since the wolfSSL server doesn't host multiple 'virtual' servers, the SNI usage is useful when the termination of the connection is desired in the case of SNI mismatch. In this scenario, [`wolfSSL_CTX_UseSNI()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a9c0f3a9d0e24d6c1573bd5c80468bff5) will be more efficient, as the server will set it only once per context creating all subsequent SSL objects with SNI from that same context.
+On the server side one of the same function calls is required. Since the wolfSSL server doesn't host multiple 'virtual' servers, the SNI usage is useful when the termination of the connection is desired in the case of SNI mismatch. In this scenario, [`wolfSSL_CTX_UseSNI()`](ssl_8h.md#function-wolfssl_ctx_usesni) will be more efficient, as the server will set it only once per context creating all subsequent SSL objects with SNI from that same context.
 
 ## Handshake Modifications
 
 ### Grouping Handshake Messages
 
-wolfSSL has the ability to group handshake messages if the user desires.  This can be done at the context level with [`wolfSSL_CTX_set_group_messages(ctx);`](https://www.wolfssl.com/doxygen/group__Setup.html#gaaf5a2105cfefaf340ec42046022d55ea) or at the SSL object level with [`wolfSSL_set_group_messages(ssl);`](https://www.wolfssl.com/doxygen/group__Setup.html#ga09578c76efc115ca197d2c92bc3df7b8).
+wolfSSL has the ability to group handshake messages if the user desires.  This can be done at the context level with [`wolfSSL_CTX_set_group_messages(ctx);`](group__Setup.md#function-wolfssl_ct_set_group_messages) or at the SSL object level with [`wolfSSL_set_group_messages(ssl);`](group__Setup.md#function-wolfssl_set_group_messages).
 
 ## Truncated HMAC
 
@@ -684,12 +684,12 @@ Currently defined TLS cipher suites use the HMAC to authenticate record-layer co
 
 Using Truncated HMAC on the client side requires an additional function call, which should be one of the following functions:
 
-* [`wolfSSL_CTX_UseTruncatedHMAC()`](https://www.wolfssl.com/doxygen/ssl_8h.html#ab7b37dc3206175bb2a28e6b60f0079b6)
-* [`wolfSSL_UseTruncatedHMAC()`](https://www.wolfssl.com/doxygen/ssl_8h.html#ae94274ae30a6bb3992d291c6267467d1)
+* [`wolfSSL_CTX_UseTruncatedHMAC()`](ssl_8h.md#function-wolfssl_ctx_usetruncatedhmac)
+* [`wolfSSL_UseTruncatedHMAC()`](ssl_8h.md#function-wolfssl_usetruncatedhmac)
 
-[`wolfSSL_CTX_UseTruncatedHMAC()`](https://www.wolfssl.com/doxygen/ssl_8h.html#ab7b37dc3206175bb2a28e6b60f0079b6) is most recommended when the client would like to enable Truncated HMAC for all sessions. Setting the Truncated HMAC extension at context level will enable it in all SSL objects created from that same context from the moment of the call forward.
+[`wolfSSL_CTX_UseTruncatedHMAC()`](ssl_8h.md#function-wolfssl_ctx_usetrunctatedhmac) is most recommended when the client would like to enable Truncated HMAC for all sessions. Setting the Truncated HMAC extension at context level will enable it in all SSL objects created from that same context from the moment of the call forward.
 
-[`wolfSSL_UseTruncatedHMAC()`](https://www.wolfssl.com/doxygen/ssl_8h.html#ae94274ae30a6bb3992d291c6267467d1) will enable it for one SSL object only, so it's recommended to use this function when there is no need for Truncated HMAC on all sessions.
+[`wolfSSL_UseTruncatedHMAC()`](ssl_8h.md#function-wolfssl_usetruncatedhmac) will enable it for one SSL object only, so it's recommended to use this function when there is no need for Truncated HMAC on all sessions.
 
 On the server side no call is required. The server will automatically attend to the client's request for Truncated HMAC.
 
@@ -750,53 +750,53 @@ Timing resistance and cache resistance defines enabled with `--enable-harden`:
 
 wolfSSL provides a fixed Application Binary Interface (ABI) for a subset of the Application Programming Interface (API). Starting with wolfSSL v4.3.0, the following functions will be compatible across all future releases of wolfSSL:
 
-* [`wolfSSL_Init()`](https://www.wolfssl.com/doxygen/group__TLS.html#gae2a25854de5230820a6edf16281d8fd7)
-* [`wolfTLSv1_2_client_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#gad509f76e1ac3ef1beddd6f9549740075)
-* [`wolfTLSv1_3_client_method()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga403e9eb25c8d5cde0a5917e5b10b9762)
-* [`wolfSSL_CTX_new()`](https://www.wolfssl.com/doxygen/group__Setup.html#gadfa552e771944a6a1102aa43f45378b5)
-* [`wolfSSL_CTX_load_verify_locations()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga8cd186024ebed18b23e155a19510bb8a)
-* [`wolfSSL_new()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga3b1873a50ef7fcee4e2cc8968c81b6c9)
-* [`wolfSSL_set_fd()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga4f23ec6e60cc92e0e899071653d3188b)
-* [`wolfSSL_connect()`](https://www.wolfssl.com/doxygen/group__IO.html#ga5b8f41cca120758d1860c7bc959755dd)
-* [`wolfSSL_read()`](https://www.wolfssl.com/doxygen/group__IO.html#ga33732bde756a527d61a32212b4b9a017)
-* [`wolfSSL_write()`](https://www.wolfssl.com/doxygen/group__IO.html#ga74b924a81e9efdf66d074690e5f53ef1)
-* [`wolfSSL_get_error()`](https://www.wolfssl.com/doxygen/group__Debug.html#gae30b3ae133f07c6b9d2b567367489b02)
-* [`wolfSSL_shutdown()`](https://www.wolfssl.com/doxygen/group__TLS.html#ga4d8ddcffbe653b7ec26878e34093c048)
-* [`wolfSSL_free()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga7fc776693622e2352a558d512bb9a127)
-* [`wolfSSL_CTX_free()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga93af2b070b4397008992b8272b960b55)
-* [`wolfSSL_check_domain_name()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga72e50573073c923af27afbdac38ed003)
-* [`wolfSSL_UseALPN()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga175c36853fc902b7b3722f6f22a819f4)
-* [`wolfSSL_CTX_SetMinVersion()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga5a8633d4f99f9129b66287a4c78cbf12)
-* [`wolfSSL_pending()`](https://www.wolfssl.com/doxygen/group__IO.html#gab66706eee747081a26b7cc0fd32b2e2b)
-* [`wolfSSL_set_timeout()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga67478ea936f476426fa9da48fbdf6aa2)
-* [`wolfSSL_CTX_set_timeout()`](https://www.wolfssl.com/doxygen/group__Setup.html#gaaa43e8ada566eb593d4f97e556a7cd31)
-* [`wolfSSL_get_session()`](https://www.wolfssl.com/doxygen/group__IO.html#ga516dc5cbe0553fc01cea02bff4a13361)
-* [`wolfSSL_set_session()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga898ec1024c7b5dfb6c6997242f3c85d4)
-* [`wolfSSL_flush_sessions()`](https://www.wolfssl.com/doxygen/group__IO.html#gafb9b8ef0c2ba29ff514353366edfd50a)
-* [`wolfSSL_CTX_set_session_cache_mode()`](https://www.wolfssl.com/doxygen/group__Setup.html#gacb05e0623f30437047701e4b967b2b69)
-* [`wolfSSL_get_sessionID()`](https://www.wolfssl.com/doxygen/group__openSSL.html#gaaebff9ff526a2464b1f67bb770bb1749)
-* [`wolfSSL_UseSNI()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a1e9a31d166aa1135c8170a769ca420bb)
-* [`wolfSSL_CTX_UseSNI()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a9c0f3a9d0e24d6c1573bd5c80468bff5)
-* [`wc_ecc_init_ex()`](https://www.wolfssl.com/doxygen/group__ECC.html#gaa67c8901e9f2f244747ac2d8543d27cb)
-* [`wc_ecc_make_key_ex()`](https://www.wolfssl.com/doxygen/group__ECC.html#gad510edd30f492a95fe70b3f8588362e8)
-* [`wc_ecc_sign_hash()`](https://www.wolfssl.com/doxygen/group__ECC.html#ga0de1f56d50dcd1eb684a0e2a45eebf27)
-* [`wc_ecc_free()`](https://www.wolfssl.com/doxygen/group__ECC.html#gacc8ca4ad64faa3a702da1cca449015bc)
-* [`wolfSSL_SetDevId()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a0781e7d7f789b6c21c76f39c66f02f22)
-* [`wolfSSL_CTX_SetDevId()`](https://www.wolfssl.com/doxygen/ssl_8h.html#ab85c92d48d5f0fee51c94742081bf203)
-* [`wolfSSL_CTX_SetEccSignCb()`](https://www.wolfssl.com/doxygen/ssl_8h.html#a9fd0345508d38eec20c19362cd95264c)
-* [`wolfSSL_CTX_use_certificate_chain_file()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#gae89581a7f4f389787b260af942bd679a)
-* [`wolfSSL_CTX_use_certificate_file()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga5b680f7fbb898ae5321eb751969b5c26)
-* [`wolfSSL_use_certificate_chain_file()`](https://www.wolfssl.com/doxygen/group__openSSL.html#ga288b96eafef6b56d6cf1b0e3863cac68)
-* [`wolfSSL_use_certificate_file()`](https://www.wolfssl.com/doxygen/group__openSSL.html#ga591d02d2721bc1d2fc2d0113804fb33a)
-* [`wolfSSL_CTX_use_PrivateKey_file()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga0b3a1e99413ae72d4324fb912ca20b6c)
-* [`wolfSSL_use_PrivateKey_file()`](https://www.wolfssl.com/doxygen/group__openSSL.html#ga6a3c37cdb1d7c357e3fb9d857596357b)
-* [`wolfSSL_X509_load_certificate_file()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga5ea2c2225d5733a1112320371b83a60c)
-* [`wolfSSL_get_peer_certificate()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#gaba449cd82adf628f6820220e7afacd9d)
-* [`wolfSSL_X509_NAME_oneline()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga3c6c437135932840ac1549c031e6c91d)
-* [`wolfSSL_X509_get_issuer_name()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga0a9ae5277d16909ce71ee414c4c701e7)
-* [`wolfSSL_X509_get_subject_name()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#gaf4ca6eb0f6a9ba1c5bb150b773bbea3b)
-* [`wolfSSL_X509_get_next_altname()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga8cbf7b5b55ab5f48f4117310c8f3e875)
-* [`wolfSSL_X509_notBefore()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga46b5758cddc77d9cd908254286f06cb2)
-* [`wolfSSL_X509_notAfter()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#ga8307df36fb9968c39564503a57ccbc6a)
-* [`wc_ecc_key_new()`](https://www.wolfssl.com/doxygen/group__ECC.html#ga19edca21f45eca90c1e8a12d7c0023f8)
-* [`wc_ecc_key_free()`](https://www.wolfssl.com/doxygen/group__ECC.html#ga11c9d85dc7576f54da58eca7fea6468d)
+* [`wolfSSL_Init()`](group__TLS.md#function-wolfssl_init)
+* [`wolfTLSv1_2_client_method()`](group__Setup.md#function-wolftlsv1_2_client_method)
+* [`wolfTLSv1_3_client_method()`](group__Setup.md#function-wolftlsv1_3_client_method)
+* [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new)
+* [`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)
+* [`wolfSSL_new()`](group__Setup.md#function-wolfssl_new)
+* [`wolfSSL_set_fd()`](group__Setup.md#function-wolfssl_set_fd)
+* [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)
+* [`wolfSSL_read()`](group__IO.md#function-wolfssl_read)
+* [`wolfSSL_write()`](group__IO.md#function-wolfssl_write)
+* [`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error)
+* [`wolfSSL_shutdown()`](group__TLS.md#function-wolfssl_shutdown)
+* [`wolfSSL_free()`](group__Setup.md#function-wolfssl_free)
+* [`wolfSSL_CTX_free()`](group__Setup.md#function-wolfssl_ctx_free)
+* [`wolfSSL_check_domain_name()`](group__Setup.md#function-wolfssl_check_domain_name)
+* [`wolfSSL_UseALPN()`](group__Setup.md#function-wolfssl_usealpn)
+* [`wolfSSL_CTX_SetMinVersion()`](group__Setup.md#function-wolfssl_ctx_setminversion)
+* [`wolfSSL_pending()`](group__IO.md#function-wolfssl_pending)
+* [`wolfSSL_set_timeout()`](group__Setup.md#function-wolfssl_set_timeout)
+* [`wolfSSL_CTX_set_timeout()`](group__Setup.md#function-wolfssl_ctx_set_timeout)
+* [`wolfSSL_get_session()`](group__IO.md#function-wolfssl_get_session)
+* [`wolfSSL_set_session()`](group__Setup.md#function-wolfssl_set_session)
+* [`wolfSSL_flush_sessions()`](group__IO.md#function-wolfssl_flush_sessions)
+* [`wolfSSL_CTX_set_session_cache_mode()`](group__Setup.md#function-wolfssl_ctx_set_session_cache_mode)
+* [`wolfSSL_get_sessionID()`](group__openSSL.md#function-wolfssl_get_sessionid)
+* [`wolfSSL_UseSNI()`](ssl_8h.md#function-wolfssl_usesni)
+* [`wolfSSL_CTX_UseSNI()`](ssl_8h.md#function-wolfssl_ctx_usesni)
+* [`wc_ecc_init_ex()`](group__ECC.md#function-wc_ecc_init_ex)
+* [`wc_ecc_make_key_ex()`](group__ECC.md#function-wc_ecc_make_key_ex)
+* [`wc_ecc_sign_hash()`](group__ECC.md#function-wc_ecc_sign_hash)
+* [`wc_ecc_free()`](group__ECC.md#function-wc_ecc_free)
+* [`wolfSSL_SetDevId()`](ssl_8h.md#function-wolfssl_setdevid)
+* [`wolfSSL_CTX_SetDevId()`](ssl_8h.md#function-wolfssl_ctx_setdevid)
+* [`wolfSSL_CTX_SetEccSignCb()`](ssl_8h.md#function-wolfssl_ctx_seteccsigncb)
+* [`wolfSSL_CTX_use_certificate_chain_file()`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_chain_file)
+* [`wolfSSL_CTX_use_certificate_file()`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_file)
+* [`wolfSSL_use_certificate_chain_file()`](group__openSSL.md#function-wolfssl_use_certificate_chain_file)
+* [`wolfSSL_use_certificate_file()`](group__openSSL.md#function-wolfssl_use_certificate_file)
+* [`wolfSSL_CTX_use_PrivateKey_file()`](group__CertsKeys.md#function-wolfssl_ctx_use_privatekey_file)
+* [`wolfSSL_use_PrivateKey_file()`](group__openSSL.md#function-wolfssl_use_privatekey_file)
+* [`wolfSSL_X509_load_certificate_file()`](group__CertsKeys.md#function-wolfssl_x509_load_certificate_file)
+* [`wolfSSL_get_peer_certificate()`](group__CertsKeys.md#function-wolfssl_get_peer_certificate)
+* [`wolfSSL_X509_NAME_oneline()`](group__CertsKeys.md#function-wolfssl_x509_name_oneline)
+* [`wolfSSL_X509_get_issuer_name()`](group__CertsKeys.md#function-wolfssl_x509_get_issuer_name)
+* [`wolfSSL_X509_get_subject_name()`](group__CertsKeys.md#function-wolfssl_x509_get_subject_name)
+* [`wolfSSL_X509_get_next_altname()`](group__CertsKeys.md#function-wolfssl_x509_get_next_altname)
+* [`wolfSSL_X509_notBefore()`](group__CertsKeys.md#function-wolfssl_x509_notbefore)
+* [`wolfSSL_X509_notAfter()`](group__CertsKeys.md#function-wolfssl_x509_notafter)
+* [`wc_ecc_key_new()`](group__ECC.md#function-wc_ecc_key_new)
+* [`wc_ecc_key_free()`](group__ECC.md#function-wc_ecc_key_free)

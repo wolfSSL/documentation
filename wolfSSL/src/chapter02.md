@@ -314,7 +314,7 @@ Turns on wolfSSL’s certificate generation functionality. See [Keys and Certifi
 
 #### WOLFSSL_DER_LOAD
 
-Allows loading DER-formatted CA certs into the wolfSSL context (`WOLFSSL_CTX`) using the function [`wolfSSL_CTX_der_load_verify_locations()`](https://www.wolfssl.com/doxygen/group__CertsKeys.html#gae890067d262d2342833021845f53bdbe).
+Allows loading DER-formatted CA certs into the wolfSSL context (`WOLFSSL_CTX`) using the function [`wolfSSL_CTX_der_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_der_load_verify_locations).
 
 #### WOLFSSL_DTLS
 
@@ -426,7 +426,7 @@ Turns on the use of ARMv8 hardware acceleration.
 
 #### WC_RSA_NONBLOCK
 
-Turns on fast math RSA non-blocking support for splitting RSA operations into smaller chunks of work. Feature is enabled by calling [`wc_RsaSetNonBlock()`](https://www.wolfssl.com/doxygen/group__RSA.html#ga7f9ba49b46c2ada35e7367ee3e4b2236) and checking for `FP_WOULDBLOCK` return code.
+Turns on fast math RSA non-blocking support for splitting RSA operations into smaller chunks of work. Feature is enabled by calling [`wc_RsaSetNonBlock()`](group__RSA.md#function-wc_rsasetnonblock) and checking for `FP_WOULDBLOCK` return code.
 
 #### WOLFSSL_RSA_VERIFY_ONLY
 
@@ -528,7 +528,7 @@ Is an extension that allows debugging callbacks through the use of signals in an
 
 #### WOLFSSL_USER_IO
 
-Allows the user to remove automatic setting of the default I/O functions [`EmbedSend()`](https://www.wolfssl.com/doxygen/wolfio_8h.html#af653b3f6ea60177fbef090d07b9f8e47) and [`EmbedReceive()`](https://www.wolfssl.com/doxygen/wolfio_8h.html#a02055ed06a40f0998c0981b348bed628). Used for custom I/O abstraction layer (see [Abstraction Layers](chapter05.md#abstraction-layers) for more details).
+Allows the user to remove automatic setting of the default I/O functions [`EmbedSend()`](wolfio_8h.md#function-embedsend) and [`EmbedReceive()`](wolfio_8h.md#function-embedrecieve). Used for custom I/O abstraction layer (see [Abstraction Layers](chapter05.md#abstraction-layers) for more details).
 
 #### NO_FILESYSTEM
 
@@ -593,7 +593,7 @@ extern int custom_rand_generate_block(unsigned char* output, unsigned int sz);
 
 #### NO_PUBLIC_GCM_SET_IV
 
-Use this if you have done your own custom hardware port and not provided a public implementation of [`wc_AesGcmSetIV()`](https://www.wolfssl.com/doxygen/group__AES.html#ga807d1fb3bb9a2f2e7a1aa269706666cc)
+Use this if you have done your own custom hardware port and not provided a public implementation of [`wc_AesGcmSetIV()`](group__AES.md#function-wc_aesgcmsetiv)
 
 #### NO_PUBLIC_CCM_SET_NONCE
 
@@ -939,7 +939,7 @@ By default, wolfSSL only builds in shared mode, with static mode being disabled.
 
 ### `--enable-debug`
 
-Enable wolfSSL debugging support. Enabling debug support allows easier debugging by compiling with debug information and defining the constant [`DEBUG_WOLFSSL`](#debug_wolfssl) which outputs messages to `stderr`. To turn debug on at runtime, call [`wolfSSL_Debugging_ON()`](https://www.wolfssl.com/doxygen/group__Debug.html#ga9a46a862ed6a487c5a838b1ae9f73809). To turn debug logging off at runtime, call [`wolfSSL_Debugging_OFF()`](https://www.wolfssl.com/doxygen/group__Debug.html#ga25f58f99133b5e7961bfc0d6de089036). For more information, see [Debugging](chapter08.md#debugging).
+Enable wolfSSL debugging support. Enabling debug support allows easier debugging by compiling with debug information and defining the constant [`DEBUG_WOLFSSL`](#debug_wolfssl) which outputs messages to `stderr`. To turn debug on at runtime, call [`wolfSSL_Debugging_ON()`](group__Debug.md#function-wolfssl_debugging_on). To turn debug logging off at runtime, call [`wolfSSL_Debugging_OFF()`](group__Debug.md#function-wolfssl_debugging_off). For more information, see [Debugging](chapter08.md#debugging).
 
 ### `--enable-distro`
 
@@ -1601,7 +1601,7 @@ This turns on the ability for wolfSSL to use NTRU cipher suites. NTRU is now ava
 
 Optionally include libz for compression.
 
-Enabling libz will allow compression support in wolfSSL from the libz library. Think twice about including this option and using it by calling [`wolfSSL_set_compression()`](https://www.wolfssl.com/doxygen/group__Setup.html#ga072ad1832a9f74102e204afde9cd9dd6). While compressing data before sending decreases the actual size of the messages being sent and received, the amount of data saved by compression usually takes longer in time to analyze than it does to send it raw on all but the slowest of networks.
+Enabling libz will allow compression support in wolfSSL from the libz library. Think twice about including this option and using it by calling [`wolfSSL_set_compression()`](group__Setup.md#function-wolfssl_set_compression). While compressing data before sending decreases the actual size of the messages being sent and received, the amount of data saved by compression usually takes longer in time to analyze than it does to send it raw on all but the slowest of networks.
 
 ### `--with-cavium`
 
