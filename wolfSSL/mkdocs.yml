@@ -20,7 +20,7 @@ nav:
     - "14. Licensing": chapter14.md
     - "15. Support and Consulting": chapter15.md
     - "16. wolfSSL Updates": chapter16.md
-    - "17. wolfSSL API Reference":
+    - "A. wolfSSL API Reference":
       - "CertManager API": group__CertManager.md
       - "Memory Handling": group__Memory.md
       - "OpenSSL API": group__openSSL.md
@@ -29,7 +29,7 @@ nav:
       - "wolfSSL Context and Session Set Up": group__Setup.md
       - "wolfSSL Error Handling and Reporting": group__Debug.md
       - "wolfSSL Initialization/Shutdown": group__TLS.md
-    - "18. wolfCrypt API Reference":
+    - "B. wolfCrypt API Reference":
       - "ASN.1": group__ASN.md
       - "Base Encoding": group__Base__Encoding.md
       - "Compression": group__Compression.md
@@ -80,7 +80,7 @@ nav:
       - "Algorithms - RSA": group__RSA.md
       - "Algorithms - SHA 128/224/256/384/512": group__SHA.md
       - "Algorithms - SRP": group__SRP.md
-    - "19. API Header Files":
+    - "C. API Header Files":
       - aes_8h.md
       - arc4_8h.md
       - asn_8h.md
@@ -137,10 +137,10 @@ nav:
       - wc__encrypt_8h.md
       - wc__port_8h.md
       - wolfio_8h.md
-    - "A. SSL/TLS Overview": appendix01.md
-    - "B. RFCs, Specifications, and Reference": appendix02.md
-    - "C. Error Codes": appendix03.md
-    - "D. Experimenting with Post-Quantum Cryptography": appendix04.md
+    - "D. SSL/TLS Overview": appendix04.md
+    - "E. RFCs, Specifications, and Reference": appendix05.md
+    - "F. Error Codes": appendix06.md
+    - "G. Experimenting with Post-Quantum Cryptography": appendix07.md
 theme: readthedocs
 extra_css: [skin.css]
 use_directory_urls: false
