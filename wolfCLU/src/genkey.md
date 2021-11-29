@@ -1,5 +1,5 @@
 ### GENKEY Command
-Used to generate RSA, ECC, and ED25519 keys. If using "-output KEY" a private key is created having .priv appended to -out argument and a public key is created with .pub appended to the -out argument.
+Used to generate RSA, ECC, and ED25519 keys. If using "-output KEY" a private key is created having .priv appended to -out argument and a public key is created with .pub appended to the -out argument. If generating ED25519 keys compile wolfSSL with --enable-ed25519.
 
 Available arguments are:    
 
