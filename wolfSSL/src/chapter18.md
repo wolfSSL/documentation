@@ -1,1 +1,0 @@
-# wolfCrypt API Reference
