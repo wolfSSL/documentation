@@ -1,4 +1,3 @@
-![](../wolfSSL/src/logo.png)\
 
 # wolfCLU Manual
 

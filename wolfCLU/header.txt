@@ -1,0 +1,10 @@
+% ![](../wolfSSL/src/logo.png)
+
+---
+header-includes:
+    # Fancy page headers
+    - \usepackage{fancyhdr}
+    - \pagestyle{fancy}
+    - \fancyfoot[LO,RE]{COPYRIGHT \copyright 2021 wolfSSL Inc.}
+subparagraph: yes
+---
