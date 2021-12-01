@@ -1730,13 +1730,11 @@ Default value: Enabled RSA public key only support (**note** requires [`--enable
 
 ### `--enable-sp`
 
-Enable single-precision math for RSA, DH, and ECC to improve performance.
+Please see the "Special Math Optimization Flags" section.
 
 ### `--enable-sp-asm`
 
-Enable single-precision assembly implementation.
-
-Can be used to enable single-precision performance improvements through assembly with ARM and 64-bit ARM architectures.
+Please see the "Special Math Optimization Flags" section.
 
 ### `--enable-armasm`
 
@@ -1811,6 +1809,33 @@ Enables Signaling Cipher Suite Value(SCSV)
 ### `--enable-psk-one-id`
 
 Enables support for single PSK ID with TLS 1.3
+
+## Special Math Optimization Flags
+
+### `--enable-sp=OPT`
+
+Enable single-precision math for RSA, DH, and ECC to improve performance.
+
+There are many possible values for OPT. Here is a list of ways to call enable-sp and the resulting macros that will be defined as a result (**NOTE**: This is for x86-64 and with no other configuration flags; your results may vary):
+
+__--enable-sp and --enable-sp=yes__
+
+WOLFSSL_HAVE_SP_RSA
+WOLFSSL_HAVE_SP_DH
+WOLFSSL_SP_4096
+WOLFSSL_SP_LARGE_CODE
+WOLFSSL_HAVE_SP_ECC
+HAVE_ECC384
+WOLFSSL_SP_384
+
+....more and more....
+
+
+### `--enable-sp-asm`
+
+Enable single-precision assembly implementation.
+
+Can be used to enable single-precision performance improvements through assembly with ARM and 64-bit ARM architectures.
 
 ## Cross Compiling
 
