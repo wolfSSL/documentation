@@ -92,7 +92,6 @@ A list of TLS extensions supported by wolfSSL and note of which RFC can be refer
 | [5246](https://datatracker.ietf.org/doc/html/rfc5246) | Signature Algorithm | `TLSX_SIGNATURE_ALGORITHMS` |
 | [7301](https://datatracker.ietf.org/doc/html/rfc7301) | Application Layer Protocol Negotiation | `TLSX_APPLICATION_LAYER_PROTOCOL` |
 | [6961](https://datatracker.ietf.org/doc/html/rfc6961) | Multiple Certificate Status Request | `TLSX_STATUS_REQUEST_V2` |
-| [Draft](https://tools.ietf.org/html/draft-whyte-qsh-tls12-00) | Quantum-Safe Hybrid Key Exchange | `TLSX_QUANTUM_SAFE_HYBRID` |
 | [5077](https://datatracker.ietf.org/doc/html/rfc5077) | Session Ticket | `TLSX_SESSION_TICKET` |
 | [5746](https://datatracker.ietf.org/doc/html/rfc5746) | Renegotiation Indication | `TLSX_RENEGOTIATION_INFO` |
 | [8446](https://datatracker.ietf.org/doc/html/rfc8446) | Key Share | `TLSX_KEY_SHARE` |
@@ -213,17 +212,6 @@ Blake2b cipher suites:
 * `TLS_RSA_WITH_AES_256_CBC_B2B256`
 * `TLS_RSA_WITH_HC_128_B2B256`
 
-wolfSSL extension - Quantum-Safe Handshake:
-
-* `TLS_QSH`
-
-wolfSSL extension - NTRU cipher suites:
-
-* `TLS_NTRU_RSA_WITH_RC4_128_SHA`
-* `TLS_NTRU_RSA_WITH_3DES_EDE_CBC_SHA`
-* `TLS_NTRU_RSA_WITH_AES_128_CBC_SHA`
-* `TLS_NTRU_RSA_WITH_AES_256_CBC_SHA`
-
 SHA-256 cipher suites:
 
 * `TLS_DHE_RSA_WITH_AES_256_CBC_SHA256`
@@ -326,20 +314,7 @@ wolfSSL supports several different hashing functions, including **MD2**, **MD4**
 
 ### Public Key Options
 
-wolfSSL supports the **RSA**, **ECC**, **DSA/DSS**, **DH**, and **NTRU** public key options, with support for **EDH** (Ephemeral Diffie-Hellman) on the wolfSSL server.  Detailed usage of these functions can be found in the wolfCrypt Usage Reference, [Public Key Cryptography](chapter10.md#public-key-cryptography).
-
-wolfSSL has support for four cipher suites utilizing NTRU public key:
-
-* `TLS_NTRU_RSA_WITH_3DES_EDE_CBC_SHA`
-* `TLS_NTRU_RSA_WITH_RC4_128_SHA`
-* `TLS_NTRU_RSA_WITH_AES_128_CBC_SHA`
-* `TLS_NTRU_RSA_WITH_AES_256_CBC_SHA`
-
-The strongest one, AES-256, is the default. If wolfSSL is enabled with NTRU and the NTRU library is available, these cipher suites are built into the wolfSSL library. A wolfSSL client will have these cipher suites available without any interaction needed by the user. On the other hand, a wolfSSL server application will need to load an NTRU private key and NTRU x509 certificate in order for those cipher suites to be available for use.
-
-The example servers, echoserver and server, both use the define `HAVE_NTRU` (which is turned on by enabling NTRU) to specify whether or not to load NTRU keys and certificates. The wolfSSL package comes with test keys and certificates in the /certs directory. ntru-cert.pem is the certificate and ntru-key.raw is the private key blob.
-
-The wolfSSL NTRU cipher suites are given the highest preference order when the protocol picks a suite. Their exact preference order is the reverse of the above listed suites, i.e., AES-256 will be picked first and 3DES last before moving onto the “standard” cipher suites. Basically, if a user builds NTRU into wolfSSL and both sides of the connection support NTRU then an NTRU cipher suite will be picked unless a user on one side has explicitly excluded them by stating to only use different cipher suites. Using NTRU over RSA can provide a 20 - 200X speed improvement. The improvement increases as the size of keys increases, meaning a much larger speed benefit when using large keys (8192-bit) versus smaller keys (1024-bit).
+wolfSSL supports the **RSA**, **ECC**, **DSA/DSS** and **DH** public key options, with support for **EDH** (Ephemeral Diffie-Hellman) on the wolfSSL server.  Detailed usage of these functions can be found in the wolfCrypt Usage Reference, [Public Key Cryptography](chapter10.md#public-key-cryptography).
 
 ### ECC Support
 
@@ -455,26 +430,9 @@ ctx = wolfSSL_CTX_new(method);
 wolfSSL_CTX_set_cipher_list(ctx, "AES128-SHA");
 ```
 
-### Quantum-Safe Handshake Ciphersuite
+### OpenQuantumSafe's liboqs Integration
 
-wolfSSL has support for the cipher suite utilizing post quantum handshake cipher suite such as with NTRU: `TLS_QSH`
-
-If wolfSSL is enabled with NTRU and the NTRU package is available, the `TLS_QSH` cipher suite is built into the wolfSSL library. A wolfSSL client and server will have this cipher suite available without any interaction needed by the user.
-
-The wolfSSL quantum safe handshake ciphersuite is given the highest preference order when the protocol picks a suite. Basically, if a user builds NTRU into wolfSSL and both sides of the connection support NTRU then an NTRU cipher suite will be picked unless a user on one side has explicitly excluded them by stating to only use different cipher suites.
-
-Users can adjust what crypto algorithms and if the client sends across public keys by using the function examples:
-
-```c
-wolfSSL_UseClientQSHKeys(ssl, 1);
-wolfSSL_UseSupportedQSH(ssl, WOLFSSL_NTRU_EESS439);
-```
-
-To test if a QSH connection was established after a client has connected the following function example can be used:
-
-```c
-wolfSSL_isQSH(ssl);
-```
+Please see the appendix "Experimenting with Quantum-Safe Cryptography" in this document for more details.
 
 ## Hardware Accelerated Crypto
 

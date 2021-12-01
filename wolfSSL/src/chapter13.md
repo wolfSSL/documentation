@@ -29,7 +29,7 @@ The points below outline several of the main differences between wolfSSL and Ope
 
 1. With a 20-100 kB build size, wolfSSL is up to 20 times smaller than OpenSSL.  wolfSSL is a better choice for resource constrained environments – where every byte matters.
 2. wolfSSL is up to date with the most current standards of TLS 1.3 with DTLS.  The wolfSSL team is dedicated to continually keeping wolfSSL up-to-date with current standards.
-3. wolfSSL offers the best current ciphers and standards available today, including ciphers for streaming media support.  In addition, the recently-introduced NTRU cipher allows speed increases of 20-200x over standard RSA.
+3. wolfSSL offers the best current ciphers and standards available today, including ciphers for streaming media support.  In addition, the recently-introduced liboqs integration allows for you to start experimenting with post-quantum cryptography.
 4. wolfSSL is dual licensed under both the GPLv2 as well as a commercial license, where OpenSSL is available only under their unique license from multiple sources.
 5. wolfSSL is backed by an outstanding company who cares about its users and about their security, and is always willing to help. The team actively works to improve and expand wolfSSL.  The wolfSSL team is based primarily out of Bozeman, MT, Portland, OR, and Seattle, WA, along with other team members located around the globe.
 6. wolfSSL is the leading SSL/TLS library for real time, mobile, and embedded systems by virtue of its breadth of platform support and successful implementations on embedded environments.  Chances are we’ve already been ported to your environment.  If not, let us know and we’ll be glad to help.
