@@ -2,7 +2,7 @@
 
 ## Content
 
-* Modify the "Build Options" in Chapter 2 to cover non-autotools builds
+* ~~Modify the "Build Options" in Chapter 2 to cover non-autotools builds~~
 * ~~Convert remaining chapters~~
 * ~~Switch API crosslinks to internal once we have the API chapters~~
 * ~~Replace worded "chapter" and "section" references with internal crosslinks~~

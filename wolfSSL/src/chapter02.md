@@ -235,7 +235,7 @@ The `<wolfssl_root>/IDE/XCODE` directory contains the following files:
 4. `wolfssl-FIPS.xcodeproj` -- project to build wolfSSL and wolfCrypt-FIPS if available
 5. `user_settings.h` -- custom library settings, which are shared across projects
 
-The library will output as `libwolfssl_osx.a` or 'libwolfssl_ios.a` depending on the target. It will also copy the wolfSSL/wolfCrypt (and the CyaSSL/CtaoCrypt 
+The library will output as `libwolfssl_osx.a` or `libwolfssl_ios.a` depending on the target. It will also copy the wolfSSL/wolfCrypt (and the CyaSSL/CtaoCrypt 
 compatibility) headers into an `include` directory located in 
 `Build/Products/Debug` or `Build/Products/Release`.
 
@@ -256,7 +256,7 @@ If needed the Xcode preprocessors can be modified with these steps:
 
 This project should build wolfSSL and wolfCrypt using the default settings.
 
-### Building on GCC ARM
+### Building with GCC ARM
 
 In the `<wolfssl_root>/IDE/GCC-ARM` directory, you will find an example wolfSSL project for Cortex M series, but it can be adopted for other architectures.
 
@@ -268,7 +268,7 @@ In the `<wolfssl_root>/IDE/GCC-ARM` directory, you will find an example wolfSSL 
 3. Use `make` to build the static library (libwolfssl.a), wolfCrypt test/benchmark and wolfSSL TLS client targets as `.elf` and `.hex` in `/Build`.
 
 
-#### Building on Raspberry Pi
+#### Building with generic makefile cross-compile
 
 Example `Makefile.common` changes for Raspberry Pi with Cortex-A53:
 
@@ -277,7 +277,7 @@ Example `Makefile.common` changes for Raspberry Pi with Cortex-A53:
 3. Clear `TOOLCHAIN`, so it will use default `gcc`. Set `TOOLCHAIN = `
 4. Comment out `LDFLAGS += --specs=nano.specs` and `LDFLAGS += --specs=nosys.specs` to nosys and nano.
 
-#### Building with configure
+#### Building with configure with cross-compile
 
 The configure script in the main project directory can perform a cross-compile
 build with the the gcc-arm-none-eabi tools. Assuming the tools are installed in
