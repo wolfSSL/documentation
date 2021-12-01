@@ -196,6 +196,119 @@ Versions of wolfSSL following 3.15.5 include a TrueSTUDIO project file that is u
 
 The build then includes the settings located inside of `user_settings.h` at build-time. The default content of the `user_settings.h` file is minimal, and does not contain many features. Users are able to modify this file and add or remove features with options listed in the remainder of this chapter.
 
+### Building with IAR
+
+The `<wolfssl_root>/IDE/IAR-EWARM` directory contains the following files:
+
+1. Workspace: `wolfssl.eww`
+   The workspace includes wolfSSL-Lib library and wolfCrypt-test, wolfCrypt-benchmark
+   executable projects.
+2. wolfSSL-Lib Project: `lib/wolfSSL-lib.ewp`
+   generates full set library of wolfCrypt and wolfSSL functions.
+3. Test suites Project: `test/wolfCrypt-test.ewp`
+   generates test.out test suites executable
+4. Benchmark Project: `benchmark/wolfCrypt-benchmark.ewp`
+   generates benchmark.out benchmark executable
+
+These projects have been set up to generic ARM Cortex-M MPUs. In order to generate project for specific target MPU, take following steps.
+
+0. Default Setting: Default Target of the projects are set to Cortex-M3 Simulator. user_settings.h includes default options for the projects. You can build and 
+download the to the simulator. Open Terminal I/O window, by "view"->"Terminal I/O", and start execution.
+
+1. Project option settings: For each project, choose appropriate "Target" options.
+
+2. For executable projects: Add "SystemInit" and "startup" for your MPU, choose your debug "Driver".
+
+3. For benchmark project: Choose option for current_time function or write your own "current_time" benchmark timer with WOLFSSL_USER_CURRTIME option.
+
+4. Build and download: Go to "Project->Make" and "Download and Debug" in Menu bar for EWARM build and download.
+
+### Building on OS X and iOS 
+
+#### XCODE
+
+The `<wolfssl_root>/IDE/XCODE` directory contains the following files:
+
+1. `wolfssl.xcworkspace` -- workspace with library and testsuite client
+2. `wolfssl_testsuite.xcodeproj` -- project to run the testsuite.
+3. `wolfssl.xcodeproj` -- project to build OS/x and iOS libraries for wolfSSL and/or wolfCrypt
+4. `wolfssl-FIPS.xcodeproj` -- project to build wolfSSL and wolfCrypt-FIPS if available
+5. `user_settings.h` -- custom library settings, which are shared across projects
+
+The library will output as `libwolfssl_osx.a` or `libwolfssl_ios.a` depending on the target. It will also copy the wolfSSL/wolfCrypt (and the CyaSSL/CtaoCrypt 
+compatibility) headers into an `include` directory located in 
+`Build/Products/Debug` or `Build/Products/Release`.
+
+For the library and testsuite to link properly the build location needs to be configured as realitive to workspace.
+1. File -> Workspace Settings (or Xcode -> Preferences -> Locations -> Locations)
+2. Derived Data -> Advanced
+3. Custom -> Relative to Workspace
+4. Products -> Build/Products
+
+These Xcode projects define the `WOLFSSL_USER_SETTINGS` preprocessor to enable the `user_settings.h` file for setting macros across multiple projects.
+
+If needed the Xcode preprocessors can be modified with these steps:
+1. Click on the Project in "Project Navigator".
+2. Click on the "Build Settings" tab.
+3. Scroll down to the "Apple LLVM 6.0 - Preprocessing" section.
+4. Open the disclosure for "Preprocessor Macros" and use the "+" and 
+"-" buttons to modify. Remember to do this for both Debug and Release.
+
+This project should build wolfSSL and wolfCrypt using the default settings.
+
+### Building with GCC ARM
+
+In the `<wolfssl_root>/IDE/GCC-ARM` directory, you will find an example wolfSSL project for Cortex M series, but it can be adopted for other architectures.
+
+1. Make sure you have `gcc-arm-none-eabi` installed.
+2. Modify the `Makefile.common`:
+  * Use correct toolchain path `TOOLCHAIN`.
+  * Use correct architecture 'ARCHFLAGS'. See [GCC ARM Options](https://gcc.gnu.org/onlinedocs/gcc-4.7.3/gcc/ARM-Options.html) `-mcpu=name`.
+  * Confirm memory map in linker.ld matches your flash/ram or comment out `SRC_LD = -T./linker.ld` in Makefile.common.
+3. Use `make` to build the static library (libwolfssl.a), wolfCrypt test/benchmark and wolfSSL TLS client targets as `.elf` and `.hex` in `/Build`.
+
+
+#### Building with generic makefile cross-compile
+
+Example `Makefile.common` changes for Raspberry Pi with Cortex-A53:
+
+1. In Makefile.common change `ARCHFLAGS` to `-mcpu=cortex-a53 -mthumb`.
+2. Comment out `SRC_LD`, since custom memory map is not applicable.
+3. Clear `TOOLCHAIN`, so it will use default `gcc`. Set `TOOLCHAIN = `
+4. Comment out `LDFLAGS += --specs=nano.specs` and `LDFLAGS += --specs=nosys.specs` to nosys and nano.
+
+#### Building with configure with cross-compile
+
+The configure script in the main project directory can perform a cross-compile
+build with the the gcc-arm-none-eabi tools. Assuming the tools are installed in
+your executable path:
+
+```sh
+./configure \
+  --host=arm-non-eabi \
+  CC=arm-none-eabi-gcc \
+  AR=arm-none-eabi-ar \
+  STRIP=arm-none-eabi-strip \
+  RANLIB=arm-none-eabi-ranlib \
+  --prefix=/path/to/build/wolfssl-arm \
+  CFLAGS="-march=armv8-a --specs=nosys.specs \
+      -DHAVE_PK_CALLBACKS -DWOLFSSL_USER_IO -DNO_WRITEV" \
+  --disable-filesystem --enable-fastmath \
+  --disable-shared
+make
+make install
+```
+
+If you are building for a 32-bit architecture, add `-DTIME_T_NOT_64BIT` to the
+list of CFLAGS.
+
+### Building on Keil MDK-ARM
+
+You can find detailed instructions and tips for building wolfSSL on Keil MDK-ARM [here](https://www.wolfssl.com/docs/keil-mdk-arm/).
+
+**Note**: If MDK-ARM is not installed in the default installation location, you need to change all of the referencing path definitions in the project file to the 
+install location.
+
 ### Removing Features
 
 The following defines can be used to remove features from wolfSSL. This can be helpful if you are trying to reduce the overall library footprint size. In addition to defining a `NO_<feature-name>` define, you can also remove the respective source file as well from the build (but not the header file).
