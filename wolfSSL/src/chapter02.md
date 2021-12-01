@@ -601,10 +601,6 @@ Enables wolfcrypt secure remote password support
 
 Enables the strongest security features only and disables any weak or deprecated features. Results in slower performance due to near constant time execution to protect against timing based side-channel attacks.
 
-#### HAVE_QSH
-
-Turns on support for cipher suites resistant to Shor's algorithm. QSH stands for “Quantum Safe Handshake".
-
 #### WOLFSSL_STATIC_RSA
 
 Static ciphers are strongly discouraged and should never be used if avoidable. However there are still legacy systems that ONLY support static cipher suites. To that end if you need to connect to a legacy peer only supporting static RSA cipher suites use this to enable support for static RSA in wolfSSL. (See also [`WOLFSSL_STATIC_PSK`](#wolfssl_static_psk) and [`WOLFSSL_STATIC_DH`](#wolfssl_static_dh))
@@ -617,10 +613,6 @@ Static ciphers are highly discouraged see [`WOLFSSL_STATIC_RSA`](#wolfssl_static
 
 Static ciphers are highly discouraged see [`WOLFSSL_STATIC_RSA`](#wolfssl_static_rsa)
 
-#### HAVE_NTRU
-
-Turns on support for NTRU cipher suites. NTRU offers a Quantum resistant Public Key solution. Read more about it on the WIKI page: <https://en.wikipedia.org/wiki/NTRU>
-
 #### HAVE_NULL_CIPHER
 
 Turns on support for NULL ciphers. This option is highly discouraged from a security standpoint however some systems are too small to perform encrypt/decrypt operations and it is better to at least authenticate messages and peers to prevent message tampering than nothing at all!
@@ -628,6 +620,10 @@ Turns on support for NULL ciphers. This option is highly discouraged from a secu
 #### HAVE_ANON
 
 Turns on support for anonymous cipher suites. (Never recommended, some valid use cases involving closed or private networks detached from the web)
+
+#### HAVE_LIBOQS
+
+Turn on support for the OpenQuantumSafe team's liboqs integration. Please see the appendix "Experimenting with Quantum-Safe Cryptography" in this document for more details.
 
 ### Customizing or Porting wolfSSL
 
@@ -1704,11 +1700,11 @@ Disabling the shared library build will exclude a wolfSSL shared library from be
 
 Building static wolfSSL libraries [default=no]
 
-### `--with-ntru=PATH`
+### `--with-liboqs=PATH`
 
-Path to NTRU install (default `/usr/`).
+Path to OpenQuantumSafe install (default `/usr/local`).
 
-This turns on the ability for wolfSSL to use NTRU cipher suites. NTRU is now available under the GPLv2 from Security Innovation.  The NTRU bundle may be downloaded from the Security Innovation GitHub repository available at [https://github.com/NTRUOpenSourceProject/ntru-crypto](https://github.com/NTRUOpenSourceProject/ntru-crypto).
+This turns on the ability for wolfSSL to use the experimental TLS 1.3 quantum-safe KEM groups, hybrid quantum-safe KEM groups and FALCON signature scheme via wolfSSL integration with liboqs. Please see the appendix "Experimenting with Quantum-Safe Cryptography" in this document for more details.
 
 ### `--with-libz=PATH`
 

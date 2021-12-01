@@ -39,7 +39,6 @@
 * RSA - [MIT Paper](https://people.csail.mit.edu/rivest/Rsapaper.pdf) [Wikipedia](https://en.wikipedia.org/wiki/RSA)
 * DSA/DSS - [NIST FIPS186-3](https://csrc.nist.gov/publications/fips/fips186-3/fips_186-3.pdf)
 * ECDSA - [Specification Document](https://www.cs.miami.edu/home/burt/learning/Csc609.142/ecdsa-cert.pdf)
-* NTRU - [Wikipedia](https://en.wikipedia.org/wiki/NTRU)
 * X.509 - [RFC3279](https://www.ietf.org/rfc/rfc3279.txt)
 * ASN.1 - [Specification Document](https://luca.ntop.org/Teaching/Appunti/asn1.html) [Wikipedia](https://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One)
 * PSK - [RFC4279](https://tools.ietf.org/html/rfc4279)

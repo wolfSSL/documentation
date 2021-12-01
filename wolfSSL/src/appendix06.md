@@ -60,10 +60,6 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `ZERO_RETURN` | -343 | peer sent close notify |
 | `SIDE_ERROR` | -344 | wrong client/server type |
 | `NO_PEER_CERT` | -345 | peer didn't send key |
-| `NTRU_KEY_ERROR` | -346 | NTRU key error |
-| `NTRU_DRBG_ERROR` | -347 | NTRU drbg error |
-| `NTRU_ENCRYPT_ERROR` | -348 | NTRU encrypt error |
-| `NTRU_DECRYPT_ERROR` | -349 | NTRU decrypt error |
 | `ECC_CURVETYPE_ERROR` | -350 | Bad ECC Curve Type |
 | `ECC_CURVE_ERROR` | -351 | Bad ECC Curve |
 | `ECC_PEERKEY_ERROR` | -352 | Bad Peer ECC Key |
@@ -211,7 +207,6 @@ wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error.h`.
 | `ASN_SIG_HASH_E` | -156 | ASN sig error, unsupported hash type |
 | `ASN_SIG_KEY_E` | -157 | ASN sig error, unsupported key type |
 | `ASN_DH_KEY_E` | -158 | ASN key init error, invalid input |
-| `ASN_NTRU_KEY_E` | -159 | ASN ntru key decode error, invalid input |
 | `ASN_CRIT_EXT_E` | -160 | ASN unsupported critical extension |
 | `ECC_BAD_ARG_E` | -170 | ECC input argument of wrong type |
 | `ASN_ECC_KEY_E` | -171 | ASN ECC bad input |
