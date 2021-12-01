@@ -419,6 +419,14 @@ Removes support for SSLv3, TLSv1.0 and TLSv1.1
 
 Removes support for non-AEAD algorithms. AEAD stands for “authenticated encryption with associated data” which means these algorithms (such as AES-GCM) do not just encrypt and decrypt data, they also assure confidentiality and authenticity of that data.
 
+#### WOLFSSL_SP_NO_2048
+
+Removes RSA/DH 2048-bit single precision optimization.
+
+#### WOLFSSL_SP_NO_3072
+
+Removes RSA/DH 3072-bit single precision optimization.
+
 ### Enabling Features Disabled by Default
 
 #### WOLFSSL_CERT_GEN
@@ -625,6 +633,14 @@ Turns on support for anonymous cipher suites. (Never recommended, some valid use
 
 Turn on support for the OpenQuantumSafe team's liboqs integration. Please see the appendix "Experimenting with Quantum-Safe Cryptography" in this document for more details.
 
+#### WOLFSSL_SP_4096
+
+Enable RSA/DH 4096-bit support.
+
+#### WOLFSSL_SP_384
+
+Enable ECC SECP384R1 support.
+
 ### Customizing or Porting wolfSSL
 
 #### WOLFSSL_USER_SETTINGS
@@ -809,11 +825,23 @@ Allow user to choose ECC curve sizes that are enabled. Only the 256-bit curve is
 
 #### WOLFSSL_SP_SMALL
 
-If using SP math this will use smaller versions of the code.
+If using SP math this will use smaller versions of the code and avoid large stack variables.
 
 #### WOLFSSL_SP_MATH
 
-Enable only SP math to reduce code size. Eliminates big integer math code such as normal (`integer.c`) or fast (`tfm.c`). Restricts key sizes and curves to only ones supported by SP.
+Enable only SP math and algorithms. Eliminates big integer math code such as normal (`integer.c`) or fast (`tfm.c`). Restricts key sizes and curves to only ones supported by SP.
+
+#### WOLFSSL_SP_NO_MALLOC
+
+In the SP code, always use stack, no heap XMALLOC/XFREE calls are made.
+
+#### WOLFSSL_SP_NO_DYN_STACK
+
+Disable use of dynamic stack items. Used with small code size and not small stack.
+
+#### WOLFSSL_SP_FAST_MODEXP
+
+Allow fast mod_exp with small C code.
 
 ### Increasing Performance
 
@@ -868,9 +896,25 @@ Use these to speed up public key operations for specific keys sizes and curves t
 
 Enable Single Precision math support.
 
-#### WOLFSSL_SP_ASM
+#### SP_WORD_SIZE
 
-Enable assembly speedups for Single Precision
+Force 32 or 64 bit mode
+
+#### WOLFSSL_SP_NONBLOCK
+
+Enables "non blocking" mode for Single Precision math, which will return FP_WOULDBLOCK for long operations and function must be called again until complete.
+
+#### WOLFSSL_SP_FAST_NCT_EXPTMOD
+
+Enables the faster non-constant time modular exponentation implementation.
+
+#### WOLFSSL_SP_INT_NEGATIVE
+
+Enables negative values to be used.
+
+#### WOLFSSL_SP_INT_DIGIT_ALIGN
+
+Enable when unaligned access of sp_int_digit pointer is not allowed.
 
 #### WOLFSSL_HAVE_SP_RSA
 
@@ -882,13 +926,75 @@ Single Precision DH for 2048, 3072 and 4096 bit.
 
 #### WOLFSSL_HAVE_SP_ECC
 
-Single Precision ECC for SECP256R1.
+Single Precision ECC for SECP256R1 and SECP384R1.
 
 #### WOLFSSL_ASYNC_CRYPT
 
 Adds support for Asynchronous Crypto[^1]
 
 [^1]: Limited Software support, works best with Intel® QuickAssist Technology (Intel® QAT) and Cavium Nitrox V Processors
+
+#### WOLFSSL_SP_ASM
+
+Enable single-precision assembly speedups (auto-detect platform).
+
+#### WOLFSSL_SP_X86_64_ASM
+
+Enable single-precision Intel x64 assembly implementation.
+
+#### WOLFSSL_SP_ARM32_ASM
+
+Enable single-precision Aarch32 assembly implementation.
+
+#### WOLFSSL_SP_ARM64_ASM
+
+Enable single-precision Aarch64 assembly implementation.
+
+#### WOLFSSL_SP_ARM_CORTEX_M_ASM
+
+Enable single-precision Cortex-M assembly implementation.
+
+#### WOLFSSL_SP_ARM_THUMB_ASM
+
+Enable single-precision ARM Thumb assembly implementation (used with -mthumb).
+
+#### WOLFSSL_SP_X86_64
+
+TODO: ask sean what goes here. 
+Enable single-precision Intel x86 64-bit assembly speedups.
+
+#### WOLFSSL_SP_X86
+
+TODO: ask sean what goes here. 
+Enable single-precision Intel x86 assembly speedups.
+
+#### WOLFSSL_SP_PPC64
+
+Enable single-precision PPC64 assembly speedups.
+
+#### WOLFSSL_SP_PPC
+
+Enable single-precision PPC assembly speedups.
+
+#### WOLFSSL_SP_MIPS64
+
+Enable single-precision MIPS64 assembly speedups.
+
+#### WOLFSSL_SP_MIPS
+
+Enable single-precision MIPS assembly speedups.
+
+#### WOLFSSL_SP_RISCV64
+
+Enable single-precision RISCV64 assembly speedups.
+
+#### WOLFSSL_SP_RISCV32
+
+Enable single-precision RISCV32 assembly speedups.
+
+#### WOLFSSL_SP_S390X
+
+Enable single-precision S390X assembly speedups.
 
 ### Stack or Chip Specific Defines
 
