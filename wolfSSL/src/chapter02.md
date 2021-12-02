@@ -421,11 +421,15 @@ Removes support for non-AEAD algorithms. AEAD stands for “authenticated encryp
 
 #### WOLFSSL_SP_NO_2048
 
-Removes RSA/DH 2048-bit single precision optimization.
+Removes RSA/DH 2048-bit Single-Precision (SP) optimization.
 
 #### WOLFSSL_SP_NO_3072
 
-Removes RSA/DH 3072-bit single precision optimization.
+Removes RSA/DH 3072-bit Single-Precision (SP) optimization.
+
+#### WOLFSSL_SP_NO_256
+
+Removes ECC Single-Precision (SP) optimization for curves with 256-bit modulus.
 
 ### Enabling Features Disabled by Default
 
@@ -635,11 +639,15 @@ Turn on support for the OpenQuantumSafe team's liboqs integration. Please see th
 
 #### WOLFSSL_SP_4096
 
-Enable RSA/DH 4096-bit support.
+Enable RSA/DH 4096-bit Single-Precision (SP) support.
 
 #### WOLFSSL_SP_384
 
-Enable ECC SECP384R1 support.
+Enable ECC SECP384R1 Single-Precision (SP) support.
+
+#### WOLFSSL_SP_1024
+
+Enable SAKKE pairing based cryptography Single-Precision (SP) support.
 
 ### Customizing or Porting wolfSSL
 
@@ -833,7 +841,7 @@ Enable only SP math and algorithms. Eliminates big integer math code such as nor
 
 #### WOLFSSL_SP_NO_MALLOC
 
-In the SP code, always use stack, no heap XMALLOC/XFREE calls are made.
+In the SP code, always use stack, no heap XMALLOC()/XREALLOC()/XFREE() calls are made.
 
 #### WOLFSSL_SP_NO_DYN_STACK
 
@@ -869,6 +877,12 @@ Switches the big integer library to a faster one that uses assembly if possible.
 
 Enables ECC Fixed Point Cache, which speeds up repeated operations against same private key. Can also define number of entries and LUT bits using `FP_ENTRIES` and `FP_LUT` to reduce default static memory usage.
 
+#### WOLFSSL_ASYNC_CRYPT
+
+Adds support for Asynchronous Crypto[^1]
+
+[^1]: Limited Software support, works best with Intel® QuickAssist Technology (Intel® QAT) and Cavium Nitrox V Processors
+
 ### GCM Performance Tuning
 
 There are 4 variants of GCM performance:
@@ -878,7 +892,7 @@ There are 4 variants of GCM performance:
 * `GCM_TABLE` - Fast (FIPS validated)
 * `GCM_TABLE_4BIT` - Fastest (Not yet FIPS validated, will be included in FIPS 140-3!)
 
-### wolfSSL’s proprietary Single Precision math support
+### wolfSSL’s Proprietary Single Precision (SP) Math Support
 
 Use these to speed up public key operations for specific keys sizes and curves that are common. Make sure to include the correct code files such as:
 
@@ -898,7 +912,7 @@ Enable Single Precision math support.
 
 #### SP_WORD_SIZE
 
-Force 32 or 64 bit mode
+Force 32-bit or 64-bit data type for storing one word of a number.
 
 #### WOLFSSL_SP_NONBLOCK
 
@@ -906,11 +920,11 @@ Enables "non blocking" mode for Single Precision math, which will return FP_WOUL
 
 #### WOLFSSL_SP_FAST_NCT_EXPTMOD
 
-Enables the faster non-constant time modular exponentation implementation.
+Enables the faster non-constant time modular exponentation implementation. Will only be used for public key operations; not private key operations.
 
 #### WOLFSSL_SP_INT_NEGATIVE
 
-Enables negative values to be used.
+Allows multi-precision numbers to be negative. (Not required for cryptographic operations.)
 
 #### WOLFSSL_SP_INT_DIGIT_ALIGN
 
@@ -928,73 +942,81 @@ Single Precision DH for 2048, 3072 and 4096 bit.
 
 Single Precision ECC for SECP256R1 and SECP384R1.
 
-#### WOLFSSL_ASYNC_CRYPT
+#### WOLFSSL_SP_LARGE_CODE
 
-Adds support for Asynchronous Crypto[^1]
+Allows Single-Precision (SP) speedups that come at the cost of larger binary size. Might not be appropriate for some embedded platforms.
 
-[^1]: Limited Software support, works best with Intel® QuickAssist Technology (Intel® QAT) and Cavium Nitrox V Processors
+#### WOLFSSL_SP_DIV_WORD_HALF
+
+TODO: ask Sean what this is. 
+
+#### WOLFSSL_SP_DIV_32
+
+TODO: ask Sean what this is. 
+
+#### WOLFSSL_SP_DIV_64
+
+TODO: ask Sean what this is. 
 
 #### WOLFSSL_SP_ASM
 
-Enable single-precision assembly speedups (auto-detect platform).
+Enables Single-Precision (SP) platform specific assembly code implementation that is faster. Platform is detected.
 
 #### WOLFSSL_SP_X86_64_ASM
 
-Enable single-precision Intel x64 assembly implementation.
+Enable Single-Precision (SP) Intel x64 assembly implementation.
 
 #### WOLFSSL_SP_ARM32_ASM
 
-Enable single-precision Aarch32 assembly implementation.
+Enable Single-Precision (SP) Aarch32 assembly implementation.
 
 #### WOLFSSL_SP_ARM64_ASM
 
-Enable single-precision Aarch64 assembly implementation.
+Enable Single-Precision (SP) Aarch64 assembly implementation.
 
 #### WOLFSSL_SP_ARM_CORTEX_M_ASM
 
-Enable single-precision Cortex-M assembly implementation.
+Enable Single-Precision (SP) Cortex-M family (including Cortex-M4) assembly implementation.
 
 #### WOLFSSL_SP_ARM_THUMB_ASM
 
-Enable single-precision ARM Thumb assembly implementation (used with -mthumb).
+Enable Single-Precision (SP) ARM Thumb assembly implementation (used with -mthumb).
 
 #### WOLFSSL_SP_X86_64
 
-TODO: ask sean what goes here. 
-Enable single-precision Intel x86 64-bit assembly speedups.
+Enable Single-Precision (SP) Intel x86 64-bit assembly speedup macros.
 
 #### WOLFSSL_SP_X86
 
-TODO: ask sean what goes here. 
-Enable single-precision Intel x86 assembly speedups.
+Enable Single-Precision (SP) Intel x86 assembly speedup macros.
 
 #### WOLFSSL_SP_PPC64
 
-Enable single-precision PPC64 assembly speedups.
+Enable Single-Precision (SP) PPC64 assembly speedup macros.
 
 #### WOLFSSL_SP_PPC
 
-Enable single-precision PPC assembly speedups.
+Enable Single-Precision (SP) PPC assembly speedup macros.
 
 #### WOLFSSL_SP_MIPS64
 
-Enable single-precision MIPS64 assembly speedups.
+Enable Single-Precision (SP) MIPS64 assembly speedup macros.
 
 #### WOLFSSL_SP_MIPS
 
-Enable single-precision MIPS assembly speedups.
+Enable Single-Precision (SP) MIPS assembly speedup macros.
 
 #### WOLFSSL_SP_RISCV64
 
-Enable single-precision RISCV64 assembly speedups.
+Enable Single-Precision (SP) RISCV64 assembly speedup macros.
 
 #### WOLFSSL_SP_RISCV32
 
-Enable single-precision RISCV32 assembly speedups.
+Enable Single-Precision (SP) RISCV32 assembly speedup macros.
 
 #### WOLFSSL_SP_S390X
 
-Enable single-precision S390X assembly speedups.
+Enable Single-Precision (SP) S390X assembly speedup macros.
 
 ### Stack or Chip Specific Defines
 
@@ -1834,14 +1856,6 @@ Enables RSA verify only support (**note** requires [`--enable-cryptonly`](#enabl
 
 Default value: Enabled RSA public key only support (**note** requires [`--enable-cryptonly`](#enable-cryptonly))
 
-### `--enable-sp`
-
-Please see the "Special Math Optimization Flags" section.
-
-### `--enable-sp-asm`
-
-Please see the "Special Math Optimization Flags" section.
-
 ### `--enable-armasm`
 
 Enables ARMv8 ASM support.
@@ -1918,30 +1932,200 @@ Enables support for single PSK ID with TLS 1.3
 
 ## Special Math Optimization Flags
 
-### `--enable-sp=OPT`
+### `--enable-sp-math`
 
-Enable single-precision math for RSA, DH, and ECC to improve performance.
+Enable Single-Precision (SP) math implementation with restricted algorithm suite. Unsupported algorithms are disabled.
 
-There are many possible values for OPT. Here is a list of ways to call enable-sp and the resulting macros that will be defined as a result (**NOTE**: This is for x86-64 and with no other configuration flags; your results may vary):
+### `--enable-sp-math-all`
 
-__--enable-sp and --enable-sp=yes__
-
-WOLFSSL_HAVE_SP_RSA
-WOLFSSL_HAVE_SP_DH
-WOLFSSL_SP_4096
-WOLFSSL_SP_LARGE_CODE
-WOLFSSL_HAVE_SP_ECC
-HAVE_ECC384
-WOLFSSL_SP_384
-
-....more and more....
-
+Enable Single-Precision (SP) math implementation with full algorithm suite. Unsupported algorithms are enabled, but unoptimized.
 
 ### `--enable-sp-asm`
 
-Enable single-precision assembly implementation.
+Enable Single-Precision (SP) assembly implementation.
 
-Can be used to enable single-precision performance improvements through assembly with ARM and 64-bit ARM architectures.
+Can be used to enable Single-Precision performance improvements through assembly with ARM and 64-bit ARM architectures.
+
+### `--enable-sp=OPT`
+
+Enable Single-Precision (SP) math for RSA, DH, and ECC to improve performance.
+
+There are many possible values for OPT. Below is a list of ways to call enable-sp and the resulting macros that will be defined as a result. All of these can be combined in a coma separated list. For example, `--enable-sp=ec256,ec384`. The meaning of the macros that will be defined are defined above in the [wolfSSL’s Proprietary Single Precision (SP) Math Support] section. 
+
+**NOTE**: This is for x86-64 and with no other configuration flags; your results may vary depending on your archetecture and other configuration flags that you specify.
+
+#### `--enable-sp=no` or `--disable-sp`
+
+No new macros defined. Equivalent of not using `--enable-sp` at all.
+
+#### `--enable-sp` or `--enable-sp=yes`
+
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_HAVE_SP_ECC
+- WOLFSSL_HAVE_SP_DH
+- WOLFSSL_SP_384
+- WOLFSSL_SP_4096
+- WOLFSSL_SP_LARGE_CODE
+
+#### `--enable-sp=small`
+
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_HAVE_SP_DH
+- WOLFSSL_HAVE_SP_ECC
+- WOLFSSL_SP_4096
+- WOLFSSL_SP_384
+- WOLFSSL_SP_4096
+- WOLFSSL_SP_SMALL
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_384
+
+#### `--enable-sp=smallfast`
+
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_HAVE_SP_DH
+- WOLFSSL_HAVE_SP_ECC
+- WOLFSSL_SP_4096
+- WOLFSSL_SP_384
+- WOLFSSL_SP_SMALL
+- WOLFSSL_SP_4096
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_FAST_MODEXP
+
+#### `--enable-sp=ec256` or `--enable-sp=p256` or `--enable-sp=p256`
+
+- WOLFSSL_HAVE_SP_ECC
+
+#### `--enable-sp=smallec256` or `--enable-sp=smallp256` or `--enable-sp=small256`
+
+- WOLFSSL_HAVE_SP_ECC
+- WOLFSSL_SP_SMALL
+
+#### `--enable-sp=ec384` or `--enable-sp=p384` or `--enable-sp=384`
+
+- WOLFSSL_HAVE_SP_ECC
+- WOLFSSL_SP_384
+- WOLFSSL_SP_NO_256
+
+#### `--enable-sp=smallec384` or `--enable-sp=smallp384` or `--enable-sp=small384`
+
+- WOLFSSL_HAVE_SP_ECC
+- WOLFSSL_SP_384
+- WOLFSSL_SP_NO_256
+- WOLFSSL_SP_SMALL
+
+#### `--enable-sp=ec1024` or `--enable-sp=p1024` or `--enable-sp=1024`
+
+- WOLFSSL_HAVE_SP_ECC
+- WOLFSSL_SP_1024
+- WOLFSSL_SP_NO_256
+
+#### `--enable-sp=smallec1024` or `--enable-sp=smallp1024` or `--enable-sp=small1024`
+
+- WOLFSSL_HAVE_SP_ECC
+- WOLFSSL_SP_1024
+- WOLFSSL_SP_NO_256
+- WOLFSSL_SP_SMALL
+
+#### `--enable-sp=2048`
+
+- WOLFSSL_HAVE_SP_DH
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_3072
+
+#### `--enable-sp=small2048`
+
+- WOLFSSL_HAVE_SP_DH
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_3072
+- WOLFSSL_SP_SMALL
+
+#### `--enable-sp=rsa2048`
+
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_3072
+
+#### `--enable-sp=smallrsa2048`
+
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_3072
+- WOLFSSL_SP_SMALL
+
+#### `--enable-sp=3072`
+
+- WOLFSSL_HAVE_SP_DH
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_2048
+
+#### `--enable-sp=small3072`
+
+- WOLFSSL_HAVE_SP_DH
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_2048
+- WOLFSSL_SP_SMALL
+
+#### `--enable-sp=rsa3072`
+
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_2048
+
+#### `--enable-sp=smallrsa3072`
+
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_2048
+- WOLFSSL_SP_SMALL
+
+#### `--enable-sp=4096` or `--enable-sp=+4096`
+
+- WOLFSSL_HAVE_SP_DH
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_SP_4096
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_2048
+- WOLFSSL_SP_NO_3072
+
+#### `--enable-sp=small4096`
+
+- WOLFSSL_HAVE_SP_DH
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_SP_4096
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_2048
+- WOLFSSL_SP_NO_3072
+- WOLFSSL_SP_SMALL
+
+#### `--enable-sp=rsa4096`
+
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_SP_4096
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_2048
+- WOLFSSL_SP_NO_3072
+
+#### `--enable-sp=smallrsa4096`
+
+- WOLFSSL_HAVE_SP_RSA
+- WOLFSSL_SP_4096
+- WOLFSSL_SP_LARGE_CODE
+- WOLFSSL_SP_NO_2048
+- WOLFSSL_SP_NO_3072
+- WOLFSSL_SP_SMALL
+
+#### `--enable-sp=nomalloc`
+
+- WOLFSSL_SP_NO_MALLOC
+
+#### `--enable-sp=nonblock`
+
+- WOLFSSL_SP_NO_MALLOC
+- WOLFSSL_SP_NONBLOCK
+- WOLFSSL_SP_SMALL
 
 ## Cross Compiling
 
