@@ -892,7 +892,18 @@ There are 4 variants of GCM performance:
 
 ### wolfSSL’s Math Options
 
+There are three math libraries in wolfSSL.
+
+- Big Integer
+- Fast Math
+- Single Precision Math
+
+When building wolfSSL, one and only of these must be used.
+
 #### Big Integer Math Library
+
+TODO
+
 #### Fast Math
 
 ##### USE_FAST_MATH
