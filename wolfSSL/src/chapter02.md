@@ -309,6 +309,8 @@ You can find detailed instructions and tips for building wolfSSL on Keil MDK-ARM
 **Note**: If MDK-ARM is not installed in the default installation location, you need to change all of the referencing path definitions in the project file to the 
 install location.
 
+## Features Defined as C Pre-processor Macro
+
 ### Removing Features
 
 The following defines can be used to remove features from wolfSSL. This can be helpful if you are trying to reduce the overall library footprint size. In addition to defining a `NO_<feature-name>` define, you can also remove the respective source file as well from the build (but not the header file).
@@ -869,10 +871,6 @@ Enable Intel’s RDSEED for DRBG seed source.
 
 Enable Intel’s RDRAND instruction for wolfSSL’s random source.
 
-#### USE_FAST_MATH
-
-Switches the big integer library to a faster one that uses assembly if possible. fastmath will speed up public key operations like RSA, DH, and DSA. The big integer library is generally the most portable and generally easiest to get going with, but the negatives to the normal big integer library are that it is slower and it uses a lot of dynamic memory. Because the stack memory usage can be larger when using fastmath, we recommend defining [`TFM_TIMING_RESISTANT`](#tfm_timing_resistant) as well when using this option.
-
 #### FP_ECC
 
 Enables ECC Fixed Point Cache, which speeds up repeated operations against same private key. Can also define number of entries and LUT bits using `FP_ENTRIES` and `FP_LUT` to reduce default static memory usage.
@@ -892,7 +890,32 @@ There are 4 variants of GCM performance:
 * `GCM_TABLE` - Fast (FIPS validated)
 * `GCM_TABLE_4BIT` - Fastest (Not yet FIPS validated, will be included in FIPS 140-3!)
 
-### wolfSSL’s Proprietary Single Precision (SP) Math Support
+### wolfSSL’s Math Options
+
+#### Big Integer Math Library
+#### Fast Math
+
+##### USE_FAST_MATH
+
+Switches the big integer library to a faster one that uses assembly if possible. fastmath will speed up public key operations like RSA, DH, and DSA. By default, wolfSSL uses the normal big integer math library. This is generally the most portable and generally easiest to get going with.  The negatives to the normal big integer library are that it is slower and it uses a lot of dynamic memory.  This option switches the big integer library to a faster one that uses assembly if possible.  Assembly inclusion is dependent on compiler and processor combinations. Some combinations will need additional configure flags and some may not be possible. Help with optimizing fastmath with new assembly routines is available on a consulting basis.
+
+Because the stack memory usage can be larger when using fastmath, we recommend defining [`TFM_TIMING_RESISTANT`](#tfm_timing_resistant) as well when using this option. This will get rid of large static arrays.
+
+On ia32, for example, all of the registers need to be available so high optimization and omitting the frame pointer needs to be taken care of. wolfSSL will add `-O3 -fomit-frame-pointer` to GCC for non debug builds. If you're using a different compiler you may need to add these manually to `CFLAGS` during configure.
+
+OS X will also need `-mdynamic-no-pic` added to `CFLAGS`. In addition, if you're building in shared mode for ia32 on OS X you'll need to pass options to `LDFLAGS` as well:
+
+```sh
+LDFLAGS="-Wl,-read_only_relocs,warning"
+```
+
+This gives warning for some symbols instead of errors.
+
+fastmath also changes the way dynamic and stack memory is used. The normal math library uses dynamic memory for big integers. Fastmath uses fixed size buffers that hold 4096 bit integers by default, allowing for 2048 bit by 2048 bit multiplications. If you need 4096 bit by 4096 bit multiplications then change `FP_MAX_BITS` in `wolfssl/wolfcrypt/tfm.h`. As `FP_MAX_BITS` is increased, this will also increase the runtime stack usage since the buffers used in the public key operations will now be larger. A couple of functions in the library use several temporary big integers, meaning the stack can get relatively large. This should only come into play on embedded systems or in threaded environments where the stack size is set to a low value. If stack corruption occurs with fastmath during public key operations in those environments, increase the stack size to accommodate the stack usage.
+
+If you are enabling fastmath without using the autoconf system, you’ll need to define `USE_FAST_MATH` and add `tfm.c` to the wolfSSL build while removing `integer.c`.
+
+#### Proprietary Single Precision (SP) Math Support
 
 Use these to speed up public key operations for specific keys sizes and curves that are common. Make sure to include the correct code files such as:
 
@@ -906,115 +929,115 @@ Use these to speed up public key operations for specific keys sizes and curves t
 * `sp_x86_64.c`
 * `sp_x86_64_asm.S`
 
-#### WOLFSSL_SP
+##### WOLFSSL_SP
 
 Enable Single Precision math support.
 
-#### SP_WORD_SIZE
+##### SP_WORD_SIZE
 
 Force 32-bit or 64-bit data type for storing one word of a number.
 
-#### WOLFSSL_SP_NONBLOCK
+##### WOLFSSL_SP_NONBLOCK
 
 Enables "non blocking" mode for Single Precision math, which will return FP_WOULDBLOCK for long operations and function must be called again until complete.
 
-#### WOLFSSL_SP_FAST_NCT_EXPTMOD
+##### WOLFSSL_SP_FAST_NCT_EXPTMOD
 
 Enables the faster non-constant time modular exponentation implementation. Will only be used for public key operations; not private key operations.
 
-#### WOLFSSL_SP_INT_NEGATIVE
+##### WOLFSSL_SP_INT_NEGATIVE
 
 Allows multi-precision numbers to be negative. (Not required for cryptographic operations.)
 
-#### WOLFSSL_SP_INT_DIGIT_ALIGN
+##### WOLFSSL_SP_INT_DIGIT_ALIGN
 
 Enable when unaligned access of sp_int_digit pointer is not allowed.
 
-#### WOLFSSL_HAVE_SP_RSA
+##### WOLFSSL_HAVE_SP_RSA
 
 Single Precision RSA for 2048, 3072 and 4096 bit.
 
-#### WOLFSSL_HAVE_SP_DH
+##### WOLFSSL_HAVE_SP_DH
 
 Single Precision DH for 2048, 3072 and 4096 bit.
 
-#### WOLFSSL_HAVE_SP_ECC
+##### WOLFSSL_HAVE_SP_ECC
 
 Single Precision ECC for SECP256R1 and SECP384R1.
 
-#### WOLFSSL_SP_LARGE_CODE
+##### WOLFSSL_SP_LARGE_CODE
 
 Allows Single-Precision (SP) speedups that come at the cost of larger binary size. Might not be appropriate for some embedded platforms.
 
-#### WOLFSSL_SP_DIV_WORD_HALF
+##### WOLFSSL_SP_DIV_WORD_HALF
 
 TODO: ask Sean what this is. 
 
-#### WOLFSSL_SP_DIV_32
+##### WOLFSSL_SP_DIV_32
 
 TODO: ask Sean what this is. 
 
-#### WOLFSSL_SP_DIV_64
+##### WOLFSSL_SP_DIV_64
 
 TODO: ask Sean what this is. 
 
-#### WOLFSSL_SP_ASM
+##### WOLFSSL_SP_ASM
 
 Enables Single-Precision (SP) platform specific assembly code implementation that is faster. Platform is detected.
 
-#### WOLFSSL_SP_X86_64_ASM
+##### WOLFSSL_SP_X86_64_ASM
 
 Enable Single-Precision (SP) Intel x64 assembly implementation.
 
-#### WOLFSSL_SP_ARM32_ASM
+##### WOLFSSL_SP_ARM32_ASM
 
 Enable Single-Precision (SP) Aarch32 assembly implementation.
 
-#### WOLFSSL_SP_ARM64_ASM
+##### WOLFSSL_SP_ARM64_ASM
 
 Enable Single-Precision (SP) Aarch64 assembly implementation.
 
-#### WOLFSSL_SP_ARM_CORTEX_M_ASM
+##### WOLFSSL_SP_ARM_CORTEX_M_ASM
 
 Enable Single-Precision (SP) Cortex-M family (including Cortex-M4) assembly implementation.
 
-#### WOLFSSL_SP_ARM_THUMB_ASM
+##### WOLFSSL_SP_ARM_THUMB_ASM
 
 Enable Single-Precision (SP) ARM Thumb assembly implementation (used with -mthumb).
 
-#### WOLFSSL_SP_X86_64
+##### WOLFSSL_SP_X86_64
 
 Enable Single-Precision (SP) Intel x86 64-bit assembly speedup macros.
 
-#### WOLFSSL_SP_X86
+##### WOLFSSL_SP_X86
 
 Enable Single-Precision (SP) Intel x86 assembly speedup macros.
 
-#### WOLFSSL_SP_PPC64
+##### WOLFSSL_SP_PPC64
 
 Enable Single-Precision (SP) PPC64 assembly speedup macros.
 
-#### WOLFSSL_SP_PPC
+##### WOLFSSL_SP_PPC
 
 Enable Single-Precision (SP) PPC assembly speedup macros.
 
-#### WOLFSSL_SP_MIPS64
+##### WOLFSSL_SP_MIPS64
 
 Enable Single-Precision (SP) MIPS64 assembly speedup macros.
 
-#### WOLFSSL_SP_MIPS
+##### WOLFSSL_SP_MIPS
 
 Enable Single-Precision (SP) MIPS assembly speedup macros.
 
-#### WOLFSSL_SP_RISCV64
+##### WOLFSSL_SP_RISCV64
 
 Enable Single-Precision (SP) RISCV64 assembly speedup macros.
 
-#### WOLFSSL_SP_RISCV32
+##### WOLFSSL_SP_RISCV32
 
 Enable Single-Precision (SP) RISCV32 assembly speedup macros.
 
-#### WOLFSSL_SP_S390X
+##### WOLFSSL_SP_S390X
 
 Enable Single-Precision (SP) S390X assembly speedup macros.
 
@@ -1742,36 +1765,6 @@ Enable SCRYPT
 
 Enable wolfCrypt Only build
 
-### `--enable-fastmath`
-
-Enabled by default on x86\_64
-
-Enable fast math ops.
-
-Enabling fastmath will speed up public key operations like RSA, DH, and DSA.  By default, wolfSSL uses the normal big integer math library.  This is generally the most portable and generally easiest to get going with.  The negatives to the normal big integer library are that it is slower and it uses a lot of dynamic memory.  This option switches the big integer library to a faster one that uses assembly if possible.  Assembly inclusion is dependent on compiler and processor combinations. Some combinations will need additional configure flags and some may not be possible. Help with optimizing fastmath with new assembly routines is available on a consulting basis.
-
-On ia32, for example, all of the registers need to be available so high optimization and omitting the frame pointer needs to be taken care of. wolfSSL will add `-O3 -fomit-frame-pointer` to GCC for non debug builds. If you're using a different compiler you may need to add these manually to `CFLAGS` during configure.
-
-OS X will also need `-mdynamic-no-pic` added to `CFLAGS`. In addition, if you're building in shared mode for ia32 on OS X you'll need to pass options to `LDFLAGS` as well:
-
-```sh
-LDFLAGS="-Wl,-read_only_relocs,warning"
-```
-
-This gives warning for some symbols instead of errors.
-
-fastmath also changes the way dynamic and stack memory is used. The normal math library uses dynamic memory for big integers. Fastmath uses fixed size buffers that hold 4096 bit integers by default, allowing for 2048 bit by 2048 bit multiplications. If you need 4096 bit by 4096 bit multiplications then change `FP_MAX_BITS` in `wolfssl/wolfcrypt/tfm.h`. As `FP_MAX_BITS` is increased, this will also increase the runtime stack usage since the buffers used in the public key operations will now be larger. A couple of functions in the library use several temporary big integers, meaning the stack can get relatively large. This should only come into play on embedded systems or in threaded environments where the stack size is set to a low value. If stack corruption occurs with fastmath during public key operations in those environments, increase the stack size to accommodate the stack usage.
-
-If you are enabling fastmath without using the autoconf system, you’ll need to define `USE_FAST_MATH` and add `tfm.c` to the wolfSSL build instead of `integer.c`.
-
-Since the stack memory can be large when using fastmath, we recommend defining `TFM_TIMING_RESISTANT` when using the fastmath library.  This will get rid of large static arrays.
-
-### `--enable-fasthugemath`
-
-Enable fast math + huge code
-
-Enabling fasthugemath includes support for the fastmath library and greatly increases the code size by unrolling loops for popular key sizes during public key operations. Try using the benchmark utility before and after using fasthugemath to see if the slight speedup is worth the increased code size.
-
 ### `--disable-examples`
 
 Disable building examples.
@@ -1932,9 +1925,21 @@ Enables support for single PSK ID with TLS 1.3
 
 ## Special Math Optimization Flags
 
+### `--enable-fastmath`
+
+Enabled by default on x86\_64. If enabled, it is disable by Single-Precision (SP) math.
+
+See USE_FAST_MATH.
+
+### `--enable-fasthugemath`
+
+Enable fast math + huge code.
+
+Enabling fasthugemath includes support for the fastmath library and greatly increases the code size by unrolling loops for popular key sizes during public key operations. Try using the benchmark utility before and after using fasthugemath to see if the slight speedup is worth the increased code size.
+
 ### `--enable-sp-math`
 
-Enable Single-Precision (SP) math implementation with restricted algorithm suite. Unsupported algorithms are disabled.
+Enable Single-Precision (SP) math implementation with restricted algorithm suite. Unsupported algorithms are disabled. Overrides `--enable-sp-math-all`.
 
 ### `--enable-sp-math-all`
 
