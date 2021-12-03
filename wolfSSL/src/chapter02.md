@@ -853,6 +853,10 @@ Disable use of dynamic stack items. Used with small code size and not small stac
 
 Allow fast mod_exp with small C code.
 
+#### WC_DISABLE_RADIX_ZERO_PAD
+
+Disable printing of leading zero in hexidecimal string output. For example, if this macro is defined, the value 8 will be printed as the string "0x8" but if it is not defined it will be printed as "0x08". Defining this macro can reduce code size.
+
 ### Increasing Performance
 
 #### USE_INTEL_SPEEDUP
@@ -898,15 +902,17 @@ There are three math libraries in wolfSSL.
 - Fast Math
 - Single Precision Math
 
-When building wolfSSL, one and only of these must be used.
+When building wolfSSL, only one of these must be used.
 
 #### Big Integer Math Library
 
-TODO
+Forked from public domain LibTomMath library. For more information about LibTomMath, please see https://www.libtom.net/LibTomMath/ . Please note that since then, the wolfSSL team has made many modifications and optimizations so much of the documentation on that site might not apply to wolfSSL's implementation.
 
 #### Fast Math
 
 ##### USE_FAST_MATH
+
+Forked from public domain LibTomFastMath library. For more information about LibTomFastMath, please see https://www.libtom.net/LibTomFastMath/ . Please note that since then, the wolfSSL team has made many modifications and optimizations so much of the documentation on that site might not apply to wolfSSL's implementation.
 
 Switches the big integer library to a faster one that uses assembly if possible. fastmath will speed up public key operations like RSA, DH, and DSA. By default, wolfSSL uses the normal big integer math library. This is generally the most portable and generally easiest to get going with.  The negatives to the normal big integer library are that it is slower and it uses a lot of dynamic memory.  This option switches the big integer library to a faster one that uses assembly if possible.  Assembly inclusion is dependent on compiler and processor combinations. Some combinations will need additional configure flags and some may not be possible. Help with optimizing fastmath with new assembly routines is available on a consulting basis.
 
@@ -925,6 +931,47 @@ This gives warning for some symbols instead of errors.
 fastmath also changes the way dynamic and stack memory is used. The normal math library uses dynamic memory for big integers. Fastmath uses fixed size buffers that hold 4096 bit integers by default, allowing for 2048 bit by 2048 bit multiplications. If you need 4096 bit by 4096 bit multiplications then change `FP_MAX_BITS` in `wolfssl/wolfcrypt/tfm.h`. As `FP_MAX_BITS` is increased, this will also increase the runtime stack usage since the buffers used in the public key operations will now be larger. A couple of functions in the library use several temporary big integers, meaning the stack can get relatively large. This should only come into play on embedded systems or in threaded environments where the stack size is set to a low value. If stack corruption occurs with fastmath during public key operations in those environments, increase the stack size to accommodate the stack usage.
 
 If you are enabling fastmath without using the autoconf system, you’ll need to define `USE_FAST_MATH` and add `tfm.c` to the wolfSSL build while removing `integer.c`.
+
+##### Archetecture-Specific Optimizations
+
+The following macros can be defined for assembly optimizations with USE_FAST_MATH.
+
+- `TFM_ARM`
+- `TFM_SSE2`
+- `TFM_AVR32`
+- `TFM_PPC32`
+- `TFM_PPC64`
+- `TFM_MIPS`
+- `TFM_X86`
+- `TFM_X86_64`
+
+If none of these are defined or TFM_NO_ASM is defined, then `TFM_ISO` will be defined and ISO C portable code will be used.
+
+##### Algorithm-Specific Optimizations
+
+When enabled, optimized implementations for multiplication and squaring are used for the respective ECC curve.
+
+- `TFM_ECC192`
+- `TFM_ECC224`
+- `TFM_ECC256`
+- `TFM_ECC384`
+- `TFM_ECC521`
+
+##### FREESCALE_LTC_TFM_RSA_4096_ENABLE
+
+Both software and hardware algorithm for fastmath are linked in. The decision for which algorithm is used is determined at runtime from size of inputs. If inputs and result can fit into LTC (see LTC_MAX_INT_BYTES) then we call the hardware algorithm, otherwise we call software algorithm. Chinese reminder theorem is used to break RSA 4096 exponentiations (both public and private key) into several computations with 2048-bit modulus and exponents.
+
+##### TFM_SMALL_SET
+
+Speed optimization for multiplication of smaller numbers.
+
+##### TFM_HUGE_SET
+
+Speed optimization for multiplication of larger numbers.
+
+##### TFM_SMALL_MONT_SET
+
+Speed optimization for montgomery reduction of smaller numbers on Intel archetectures.
 
 #### Proprietary Single Precision (SP) Math Support
 
@@ -1938,9 +1985,9 @@ Enables support for single PSK ID with TLS 1.3
 
 ### `--enable-fastmath`
 
-Enabled by default on x86\_64. If enabled, it is disable by Single-Precision (SP) math.
+Enabled by default on x86\_64 and aarch64. On all other archetectures, the default is the Big Integer Math library. Both fastmath and Big Integer library are disabled if Single-Precision (SP) math is enabled.
 
-See USE_FAST_MATH.
+See USE_FAST_MATH and Big Integer Math Library sections.
 
 ### `--enable-fasthugemath`
 
@@ -1950,11 +1997,11 @@ Enabling fasthugemath includes support for the fastmath library and greatly incr
 
 ### `--enable-sp-math`
 
-Enable Single-Precision (SP) math implementation with restricted algorithm suite. Unsupported algorithms are disabled. Overrides `--enable-sp-math-all`.
+Enable Single-Precision (SP) math implementation with restricted algorithm suite. Unsupported algorithms are disabled. Overrides `--enable-sp-math-all`, `--enable-fastmath` and `--enable-fasthugemath`.
 
 ### `--enable-sp-math-all`
 
-Enable Single-Precision (SP) math implementation with full algorithm suite. Unsupported algorithms are enabled, but unoptimized.
+Enable Single-Precision (SP) math implementation with full algorithm suite. Unsupported algorithms are enabled, but unoptimized. Overrides `--enable-fastmath` and `--enable-fasthugemath`.
 
 ### `--enable-sp-asm`
 
@@ -1972,7 +2019,7 @@ There are many possible values for OPT. Below is a list of ways to call enable-s
 
 #### `--enable-sp=no` or `--disable-sp`
 
-No new macros defined. Equivalent of not using `--enable-sp` at all.
+No new macros defined. Equivalent of not using `--enable-sp`.
 
 #### `--enable-sp` or `--enable-sp=yes`
 
