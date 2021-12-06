@@ -906,11 +906,11 @@ If built without configuration nor modification to any macros, for example for a
 
 ##### USE_FAST_MATH
 
-Forked from public domain LibTomFastMath library. For more information about LibTomFastMath, please see https://www.libtom.net/LibTomFastMath/ . Please note that since then, the wolfSSL team has made many modifications and optimizations so much of the documentation on that site might not apply to wolfSSL's implementation.
+Forked from public domain LibTomFastMath library. For more information about LibTomFastMath, please see https://www.libtom.net/LibTomFastMath/ . Please note that our fork is considerably more active and secure than the original public domain code from LibTomFastMath. We have improved performance, security and code quality. Also we have taken the fast math code through FIPS and DO-178C certifications.
 
-Switches the big integer library to a faster one that uses assembly if possible. fastmath will speed up public key operations like RSA, DH, and DSA. By default, wolfSSL's configure scripts are setup to use the math library for x86_64 and aarch archetectures. This option switches the big integer library to a faster one that uses assembly if possible.  Assembly inclusion is dependent on compiler and processor combinations. Some combinations will need additional configure flags and some may not be possible. Help with optimizing fastmath with new assembly routines is available on a consulting basis.
+The fast math option switches to a faster big integer library that uses assembly if possible. The fast math option will speed up public key operations like RSA, DH, and DSA. By default, wolfSSL's configure scripts are setup to use the math library for x86_64 and aarch architectures. This option switches the big integer library to a faster one that uses assembly if possible.  Assembly inclusion is dependent on compiler and processor combinations. Some combinations will need additional configure flags and some may not be possible. Help with optimizing fastmath with new assembly routines is available on a consulting basis.
 
-For fast math, all memory is allocated on the stack. Because the stack memory usage can be larger when using fastmath, we recommend defining [`TFM_TIMING_RESISTANT`](#tfm_timing_resistant) as well when using this option. This will get rid of large static arrays. This uses less stack because there are no shortcuts and therefore less branching during private key operations. This also makes the implementation more secure as timing attacks are a real threat and can give malicious third parties enough information to reproduce the private key.
+For fast math, all memory is allocated on the stack. Because the stack memory usage can be larger when using fastmath, we recommend defining [`TFM_TIMING_RESISTANT`](#tfm_timing_resistant) as well when using this option. The fast math code is timing resistant if TFM_TIMING_RESISTANT is defined. This will reduce some of the large math windows for constant time, which use less memory. This uses less stack because there are no shortcuts and therefore less branching during private key operations. This also makes the implementation more secure as timing attacks are a real threat and can give malicious third parties enough information to reproduce the private key.
 
 On ia32, for example, all of the registers need to be available so high optimization and omitting the frame pointer needs to be taken care of. wolfSSL will add `-O3 -fomit-frame-pointer` to GCC for non debug builds. If you're using a different compiler you may need to add these manually to `CFLAGS` during configure.
 
@@ -961,7 +961,7 @@ Speed optimization for multiplication of larger numbers. Includes implementation
 
 ##### TFM_SMALL_MONT_SET
 
-Speed optimization for montgomery reduction of smaller numbers on Intel archetectures. Includes implementations of 1-16 word Montgomery reduction. Useful for improving the performance of ECC operations.
+Speed optimization for montgomery reduction of smaller numbers on Intel architectures. Includes implementations of 1-16 word Montgomery reduction. Useful for improving the performance of ECC operations.
 
 #### Proprietary Single Precision (SP) Math Support
 
@@ -1987,7 +1987,7 @@ Enables support for single PSK ID with TLS 1.3
 
 ### `--enable-fastmath`
 
-Enabled by default on x86\_64 and aarch64. On all other archetectures, the default is the Big Integer Math library. Both fastmath and Big Integer library are disabled if Single-Precision (SP) math is enabled.
+Enabled by default on x86\_64 and aarch64. On all other architectures, the default is the Big Integer Math library. Both fastmath and Big Integer library are disabled if Single-Precision (SP) math is enabled.
 
 See USE_FAST_MATH and Big Integer Math Library sections.
 
@@ -2017,7 +2017,7 @@ Enable Single-Precision (SP) math for RSA, DH, and ECC to improve performance.
 
 There are many possible values for OPT. Below is a list of ways to call enable-sp and the resulting macros that will be defined as a result. All of these can be combined in a coma separated list. For example, `--enable-sp=ec256,ec384`. The meaning of the macros that will be defined are defined above in the [wolfSSL’s Proprietary Single Precision (SP) Math Support] section. 
 
-**NOTE**: This is for x86_64 and with no other configuration flags; your results may vary depending on your archetecture and other configuration flags that you specify. For example,  WOLFSSL_SP_384 and WOLFSSL_SP_4096 will only be enabled for Intel x86_64.
+**NOTE**: This is for x86_64 and with no other configuration flags; your results may vary depending on your architectures and other configuration flags that you specify. For example,  WOLFSSL_SP_384 and WOLFSSL_SP_4096 will only be enabled for Intel x86_64.
 
 #### `--enable-sp=no` or `--disable-sp`
 
