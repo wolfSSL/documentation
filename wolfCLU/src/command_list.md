@@ -9,6 +9,7 @@
 - md5
 - pkcs12
 - pkey
+- rand
 - req
 - rsa
 - s_client
