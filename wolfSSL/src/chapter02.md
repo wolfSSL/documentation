@@ -431,7 +431,7 @@ Removes RSA/DH 3072-bit Single-Precision (SP) optimization.
 
 #### WOLFSSL_SP_NO_256
 
-Removes ECC Single-Precision (SP) optimization for SECP256R1.
+Removes ECC Single-Precision (SP) optimization for SECP256R1. Only applies to `WOLFSSL_SP_MATH`.
 
 ### Enabling Features Disabled by Default
 
@@ -645,7 +645,7 @@ Enable RSA/DH 4096-bit Single-Precision (SP) support.
 
 #### WOLFSSL_SP_384
 
-Enable ECC SECP384R1 Single-Precision (SP) support.
+Enable ECC SECP384R1 Single-Precision (SP) support. Only applies to `WOLFSSL_SP_MATH`.
 
 #### WOLFSSL_SP_1024
 
@@ -924,7 +924,7 @@ This gives warnings for some symbols instead of errors.
 
 fastmath also changes the way dynamic and stack memory is used. The normal math library uses dynamic memory for big integers. Fastmath uses fixed size buffers that hold 4096 bit integers by default, allowing for 2048 bit by 2048 bit multiplications. If you need 4096 bit by 4096 bit multiplications then change `FP_MAX_BITS` in `wolfssl/wolfcrypt/tfm.h`. As `FP_MAX_BITS` is increased, this will also increase the runtime stack usage since the buffers used in the public key operations will now be larger. A couple of functions in the library use several temporary big integers, meaning the stack can get relatively large. This should only come into play on embedded systems or in threaded environments where the stack size is set to a low value. If stack corruption occurs with fastmath during public key operations in those environments, increase the stack size to accommodate the stack usage.
 
-If you are enabling fastmath without using the autoconf system, you’ll need to define `USE_FAST_MATH` and add `tfm.c` to the wolfSSL build while removing `integer.c`. Defining ALT_ECC_SIZE will allocate ECC variables on the heap instead of the stack.
+If you are enabling fastmath without using the autoconf system, you’ll need to define `USE_FAST_MATH` and add `tfm.c` to the wolfSSL build while removing `integer.c`. Defining `ALT_ECC_SIZE` will allocate ECC points only from the heap instead of the stack.
 
 ##### Archetecture-Specific Optimizations
 
