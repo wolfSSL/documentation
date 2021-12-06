@@ -431,7 +431,7 @@ Removes RSA/DH 3072-bit Single-Precision (SP) optimization.
 
 #### WOLFSSL_SP_NO_256
 
-Removes ECC Single-Precision (SP) optimization for curves with 256-bit modulus.
+Removes ECC Single-Precision (SP) optimization for SECP256R1.
 
 ### Enabling Features Disabled by Default
 
@@ -953,15 +953,15 @@ When enabled, optimized implementations for multiplication and squaring are used
 
 ##### TFM_SMALL_SET
 
-Speed optimization for multiplication of smaller numbers.
+Speed optimization for multiplication of smaller numbers. Includes implementations of 1-16 word Comba multiplication and squaring. Useful for improving the performance of ECC operations.
 
 ##### TFM_HUGE_SET
 
-Speed optimization for multiplication of larger numbers.
+Speed optimization for multiplication of larger numbers. Includes implementations of 20, 24, 28, 32, 48 and 64 word Comba multiplication and squaring where bit size allows. Useful for improving the performance of RSA/DH/DSA operations.
 
 ##### TFM_SMALL_MONT_SET
 
-Speed optimization for montgomery reduction of smaller numbers on Intel archetectures.
+Speed optimization for montgomery reduction of smaller numbers on Intel archetectures. Includes implementations of 1-16 word Montgomery reduction. Useful for improving the performance of ECC operations.
 
 #### Proprietary Single Precision (SP) Math Support
 
@@ -987,7 +987,7 @@ Enable only SP math and algorithms. Eliminates big integer math code such as nor
 
 #### WOLFSSL_SP_MATH_ALL
 
-Enable SP math and algorithms. Uses big integer math code such as normal (`integer.c`) or fast (`tfm.c`) for key sizes and curves not supported by SP.
+Enable SP math and algorithms. Implements big integer math code such as normal (`integer.c`) or fast (`tfm.c`) for key sizes and curves not supported by SP.
 
 #### WOLFSSL_SP_SMALL
 
@@ -1031,15 +1031,15 @@ Allows Single-Precision (SP) speedups that come at the cost of larger binary siz
 
 ##### WOLFSSL_SP_DIV_WORD_HALF
 
-TODO: ask Sean what this is. 
+Indicates that division using a double length word isn't available. For example, on 32-bit CPUs, if you do not want to compile in a 64-bit division from a library, then defining this macro turn on an implementation where the divide is done using half word size portions. 
 
 ##### WOLFSSL_SP_DIV_32
 
-TODO: ask Sean what this is. 
+Indicates that 32-bit division isn't available and that wolfSSL should use its own Single-Precision (SP) implementation.
 
 ##### WOLFSSL_SP_DIV_64
 
-TODO: ask Sean what this is. 
+Indicates that 64-bit division isn't available and that wolfSSL should use its own Single-Precision (SP) implementation.
 
 ##### WOLFSSL_SP_ASM
 
@@ -2009,7 +2009,7 @@ Enable Single-Precision (SP) math implementation with full algorithm suite. Unsu
 
 Enable Single-Precision (SP) assembly implementation.
 
-Can be used to enable Single-Precision performance improvements through assembly with ARM and 64-bit ARM architectures.
+Can be used to enable Single-Precision performance improvements through assembly with Intel x86\_64 and ARM architectures.
 
 ### `--enable-sp=OPT`
 
@@ -2017,7 +2017,7 @@ Enable Single-Precision (SP) math for RSA, DH, and ECC to improve performance.
 
 There are many possible values for OPT. Below is a list of ways to call enable-sp and the resulting macros that will be defined as a result. All of these can be combined in a coma separated list. For example, `--enable-sp=ec256,ec384`. The meaning of the macros that will be defined are defined above in the [wolfSSL’s Proprietary Single Precision (SP) Math Support] section. 
 
-**NOTE**: This is for x86-64 and with no other configuration flags; your results may vary depending on your archetecture and other configuration flags that you specify.
+**NOTE**: This is for x86_64 and with no other configuration flags; your results may vary depending on your archetecture and other configuration flags that you specify. For example,  WOLFSSL_SP_384 and WOLFSSL_SP_4096 will only be enabled for Intel x86_64.
 
 #### `--enable-sp=no` or `--disable-sp`
 
@@ -2191,6 +2191,10 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 - WOLFSSL_SP_NO_MALLOC
 - WOLFSSL_SP_NONBLOCK
 - WOLFSSL_SP_SMALL
+
+#### `asm`
+
+Combine with other algorithm options to indicate that assembly code is turned on for those options. For example, `--enable-sp=rsa2048,asm`.
 
 ## Cross Compiling
 
