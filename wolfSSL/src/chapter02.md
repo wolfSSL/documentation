@@ -843,7 +843,7 @@ Disable use of dynamic stack items. Used with small code size and not small stac
 
 #### WOLFSSL_SP_FAST_MODEXP
 
-Allow fast mod_exp with small C code.
+Compiles in a faster mod_exp implementation at the expense of code size.
 
 #### WC_DISABLE_RADIX_ZERO_PAD
 
