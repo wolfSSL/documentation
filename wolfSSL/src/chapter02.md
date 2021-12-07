@@ -873,9 +873,7 @@ Enables ECC Fixed Point Cache, which speeds up repeated operations against same 
 
 #### WOLFSSL_ASYNC_CRYPT
 
-Adds support for Asynchronous Crypto[^1]
-
-[^1]: Limited Software support, works best with Intel® QuickAssist Technology (Intel® QAT) and Cavium Nitrox V Processors
+This enables support for asynchronous cryptography using hardware based adapters such as the Intel QuickAssist or Marvell (Cavium) Nitrox V. The asynchronous code is not included in the public distribution and is available for evaluation by contacting us via email at facts@wolfssl.com.
 
 ### GCM Performance Tuning
 
@@ -898,15 +896,15 @@ When building wolfSSL, only one of these must be used.
 
 #### Big Integer Math Library
 
-Forked from public domain LibTomMath library. For more information about LibTomMath, please see https://www.libtom.net/LibTomMath/ . Please note that since then, the wolfSSL team has made many modifications and optimizations so much of the documentation on that site might not apply to wolfSSL's implementation.
+Forked from public domain LibTomMath library. For more information about LibTomMath, please see https://www.libtom.net/LibTomMath/ . Please note that our fork is considerably more active and secure than the original public domain code.
 
-If built without configuration nor modification to any macros, for example for an embedded target, the macros will use this implementation. This is generally the most portable and generally easiest to get going with. The negatives to the normal big integer library are that it is slower, it uses a lot of heap memory as all memory is allocated from the heap and requires an `XREALLOC()` implementation.
+If built without configuration nor modification to any macros, for example for an embedded target, the macros will use this implementation. This is generally the most portable and generally easiest to get going with. The negatives to the normal big integer library are that it is slower, it uses a lot of heap memory as all memory is allocated from the heap, requires an `XREALLOC()` implementation and is not timing resistant. The implementation can be found in `integer.c`.
 
 #### Fast Math
 
 ##### USE_FAST_MATH
 
-Forked from public domain LibTomFastMath library. For more information about LibTomFastMath, please see https://www.libtom.net/LibTomFastMath/ . Please note that our fork is considerably more active and secure than the original public domain code from LibTomFastMath. We have improved performance, security and code quality. Also we have taken the fast math code through FIPS and DO-178C certifications.
+Forked from public domain LibTomFastMath library. For more information about LibTomFastMath, please see https://www.libtom.net/LibTomFastMath/ . Please note that our fork is considerably more active and secure than the original public domain code from LibTomFastMath. We have improved performance, security and code quality. Also we have taken the fast math code through DO-178C certifications.
 
 The fast math option switches to a faster big integer library that uses assembly if possible. The fast math option will speed up public key operations like RSA, DH, and DSA. By default, wolfSSL's configure scripts are setup to use the math library for x86_64 and aarch architectures. This option switches the big integer library to a faster one that uses assembly if possible.  Assembly inclusion is dependent on compiler and processor combinations. Some combinations will need additional configure flags and some may not be possible. Help with optimizing fastmath with new assembly routines is available on a consulting basis.
 
@@ -976,6 +974,7 @@ SP math is our recommended option, but not yet on by default. Use these to speed
 * `sp_int.c`
 * `sp_x86_64.c`
 * `sp_x86_64_asm.S`
+* `sp_x86_64_asm.asm`
 
 ##### WOLFSSL_SP
 
@@ -1999,11 +1998,11 @@ Enabling fasthugemath includes support for the fastmath library and greatly incr
 
 ### `--enable-sp-math`
 
-Enable Single-Precision (SP) math implementation with restricted algorithm suite. Unsupported algorithms are disabled. Overrides `--enable-sp-math-all`, `--enable-fastmath` and `--enable-fasthugemath`.
+Enable Single-Precision (SP) math implementation with restricted algorithm suite. Unsupported algorithms are disabled. Overrides `--enable-sp`, `--enable-sp-math-all`, `--enable-fastmath` and `--enable-fasthugemath`.
 
 ### `--enable-sp-math-all`
 
-Enable Single-Precision (SP) math implementation with full algorithm suite. Unsupported algorithms are enabled, but unoptimized. Overrides `--enable-fastmath` and `--enable-fasthugemath`.
+Enable Single-Precision (SP) math implementation with full algorithm suite. Unsupported algorithms are enabled, but unoptimized. Overrides `--enable-sp`, `--enable-fastmath` and `--enable-fasthugemath`.
 
 ### `--enable-sp-asm`
 
