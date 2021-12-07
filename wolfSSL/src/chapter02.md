@@ -894,6 +894,12 @@ There are three math libraries in wolfSSL.
 
 When building wolfSSL, only one of these must be used.
 
+Big Integer Library is the most portable option as it is written in C without any assembly. As such it is not optimized for specific architectures. All math variables are instanciated on the heap; minimal stack usage. Unfortunately, Big Integer Library is not timing resistant.
+
+Fast Math Library is a good option. It is implemented using both C and assembly. As such, it has optimizations for specific architectures. All math variables are instanciated on the stack; minimal heap usage. It can be made timing resistant if the `TFM_TIMING_RESISTANT` macro is defined. We have taken it through FIPS 140-2 and 140-3 certifications.
+
+Single Precision (SP) Math Library is our recommended library. It is implemented using both C and assembly. As such, it has optimizations for specific architectures. All math variables are instanciated on the stack; minimal heap usage. It is always timing resistant. It is generally optimized for speed at the cost of code size, but is highly configurable to compile out unneeded code. We have taken it through DO-178C certifications.
+
 #### Big Integer Math Library
 
 Forked from public domain LibTomMath library. For more information about LibTomMath, please see https://www.libtom.net/LibTomMath/ . Please note that our fork is considerably more active and secure than the original public domain code.
@@ -904,11 +910,11 @@ If built without configuration nor modification to any macros, for example for a
 
 ##### USE_FAST_MATH
 
-Forked from public domain LibTomFastMath library. For more information about LibTomFastMath, please see https://www.libtom.net/LibTomFastMath/ . Please note that our fork is considerably more active and secure than the original public domain code from LibTomFastMath. We have improved performance, security and code quality. Also we have taken the fast math code through DO-178C certifications.
+Forked from public domain LibTomFastMath library. For more information about LibTomFastMath, please see https://www.libtom.net/LibTomFastMath/ . Please note that our fork is considerably more active and secure than the original public domain code from LibTomFastMath. We have improved performance, security and code quality. Also we have taken the Fastmath code through  FIPS 140-2 and 140-3 certifications.
 
-The fast math option switches to a faster big integer library that uses assembly if possible. The fast math option will speed up public key operations like RSA, DH, and DSA. By default, wolfSSL's configure scripts are setup to use the math library for x86_64 and aarch architectures. This option switches the big integer library to a faster one that uses assembly if possible.  Assembly inclusion is dependent on compiler and processor combinations. Some combinations will need additional configure flags and some may not be possible. Help with optimizing fastmath with new assembly routines is available on a consulting basis.
+The Fastmath option switches to a faster big integer library that uses assembly if possible. The Fastmath option will speed up asymmetric private/public key operations like RSA, DH, and DSA. By default, wolfSSL's configure scripts are setup to use the Fastmath library for x86_64 and aarch architectures. This option switches the big integer library to a faster one that uses assembly if possible.  Assembly inclusion is dependent on compiler and processor combinations. Some combinations will need additional configure flags and some may not be possible. Help with optimizing Fastmath with new assembly routines is available on a consulting basis. Use of the assembly code is dependent on the compiler and processor used. See the Archetecture-Specific Optimizations.
 
-For fast math, all memory is allocated on the stack. Because the stack memory usage can be larger when using fastmath, we recommend defining [`TFM_TIMING_RESISTANT`](#tfm_timing_resistant) as well when using this option. The fast math code is timing resistant if TFM_TIMING_RESISTANT is defined. This will reduce some of the large math windows for constant time, which use less memory. This uses less stack because there are no shortcuts and therefore less branching during private key operations. This also makes the implementation more secure as timing attacks are a real threat and can give malicious third parties enough information to reproduce the private key.
+For Fastmath, all memory is allocated on the stack. Because the stack memory usage can be larger when using Fastmath, we recommend defining [`TFM_TIMING_RESISTANT`](#tfm_timing_resistant) as well when using this option. The Fastmath code is timing resistant if TFM_TIMING_RESISTANT is defined. This will reduce some of the large math windows for constant time, which use less memory. This uses less stack because there are no shortcuts and therefore less branching during private key operations. This also makes the implementation more secure as timing attacks are a real threat and can give malicious third parties enough information to reproduce the private key.
 
 On ia32, for example, all of the registers need to be available so high optimization and omitting the frame pointer needs to be taken care of. wolfSSL will add `-O3 -fomit-frame-pointer` to GCC for non debug builds. If you're using a different compiler you may need to add these manually to `CFLAGS` during configure.
 
@@ -920,9 +926,9 @@ LDFLAGS="-Wl,-read_only_relocs,warning"
 
 This gives warnings for some symbols instead of errors.
 
-fastmath also changes the way dynamic and stack memory is used. The normal math library uses dynamic memory for big integers. Fastmath uses fixed size buffers that hold 4096 bit integers by default, allowing for 2048 bit by 2048 bit multiplications. If you need 4096 bit by 4096 bit multiplications then change `FP_MAX_BITS` in `wolfssl/wolfcrypt/tfm.h`. As `FP_MAX_BITS` is increased, this will also increase the runtime stack usage since the buffers used in the public key operations will now be larger. A couple of functions in the library use several temporary big integers, meaning the stack can get relatively large. This should only come into play on embedded systems or in threaded environments where the stack size is set to a low value. If stack corruption occurs with fastmath during public key operations in those environments, increase the stack size to accommodate the stack usage.
+Fastmath also changes the way dynamic and stack memory is used. The normal math library uses dynamic memory for big integers. Fastmath uses fixed size buffers that hold 4096 bit integers by default, allowing for 2048 bit by 2048 bit multiplications. If you need 4096 bit by 4096 bit multiplications then change `FP_MAX_BITS` in `wolfssl/wolfcrypt/tfm.h`. As `FP_MAX_BITS` is increased, this will also increase the runtime stack usage since the buffers used in the public key operations will now be larger. `FP_MAX_BITS` needs to be double the max key size. For example if your biggest key is 2048-bit, `FP_MAX_BITS` should be 4096 and if it is 4096-bit `FP_MAX_BITS` should be 8192. If using ECC only this can be reduced to the maximum ECC key size times two. A couple of functions in the library use several temporary big integers, meaning the stack can get relatively large. This should only come into play on embedded systems or in threaded environments where the stack size is set to a low value. If stack corruption occurs with Fastmath during public key operations in those environments, increase the stack size to accommodate the stack usage.
 
-If you are enabling fastmath without using the autoconf system, you’ll need to define `USE_FAST_MATH` and add `tfm.c` to the wolfSSL build while removing `integer.c`. Defining `ALT_ECC_SIZE` will allocate ECC points only from the heap instead of the stack.
+If you are enabling Fastmath without using the autoconf system, you’ll need to define `USE_FAST_MATH` and add `tfm.c` to the wolfSSL build while removing `integer.c`. Defining `ALT_ECC_SIZE` will allocate ECC points only from the heap instead of the stack.
 
 ##### Archetecture-Specific Optimizations
 
@@ -963,7 +969,7 @@ Speed optimization for montgomery reduction of smaller numbers on Intel architec
 
 #### Proprietary Single Precision (SP) Math Support
 
-SP math is our recommended option, but not yet on by default. Use these to speed up public key operations for specific keys sizes and curves that are common. Make sure to include the correct code files such as:
+SP math is our recommended option and has been taken through DO-178C certifications, but not yet on by default. Use these to speed up public key operations for specific keys sizes and curves that are common. Make sure to include the correct code files such as:
 
 * `sp_c32.c`
 * `sp_c64.c`
@@ -1986,7 +1992,7 @@ Enables support for single PSK ID with TLS 1.3
 
 ### `--enable-fastmath`
 
-Enabled by default on x86\_64 and aarch64. On all other architectures, the default is the Big Integer Math library. Both fastmath and Big Integer library are disabled if Single-Precision (SP) math is enabled.
+Enabled by default on x86\_64 and aarch64. On all other architectures, the default is the Big Integer Math library. Both Fastmath and Big Integer library are disabled if Single-Precision (SP) math is enabled.
 
 See USE_FAST_MATH and Big Integer Math Library sections.
 
@@ -1994,7 +2000,7 @@ See USE_FAST_MATH and Big Integer Math Library sections.
 
 Enable fast math + huge code.
 
-Enabling fasthugemath includes support for the fastmath library and greatly increases the code size by unrolling loops for popular key sizes during public key operations. Try using the benchmark utility before and after using fasthugemath to see if the slight speedup is worth the increased code size.
+Enabling fasthugemath includes support for the Fastmath library and greatly increases the code size by unrolling loops for popular key sizes during public key operations. Try using the benchmark utility before and after using fasthugemath to see if the slight speedup is worth the increased code size.
 
 ### `--enable-sp-math`
 
