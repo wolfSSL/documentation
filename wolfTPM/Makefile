@@ -37,6 +37,8 @@ pdf: api
 	@perl -i -pe "s/dox_comments\/header_files\///" api/md/*.md 
 	@perl -i -pe "s/^\\\\//" api/md/*.md 
 	@perl -i -pe "s/\\\\par/par/g" api/md/*.md 
+	@perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
+	@perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
 	@rm -rf src/chapter05.md
 	@echo '# API Reference' >> src/chapter05.md
 	@cat api/md/group__TPM2__Proprietary.md api/md/tpm2_8h.md api/md/tpm2__wrap_8h.md	api/md/group__wolfTPM2__Wrappers.md >> src/chapter05.md

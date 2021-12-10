@@ -3,12 +3,15 @@
 ## Library Headers
 
 wolfTPM header files are located in the following locations:
+
 **wolfTPM** :                     wolftpm/
+
 **wolfSSL** :                        wolfssl/
+
 **wolfCrypt** :                    wolfssl/wolfcrypt
 
 The general header file that should be included from wolfTPM is shown below:
-```c
+```
 #include <wolftpm/tpm2.h>
 ```
 
