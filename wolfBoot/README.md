@@ -9,7 +9,7 @@ This is a pandoc generated version of the wolfBoot manual.
 In Ubuntu run the following, this will be a large download/install:
 
 ```sh
-sudo apt install pandoc texlive-full
+sudo apt install pandoc texlive-full mkdocs
 ```
 
 #### Building
