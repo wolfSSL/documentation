@@ -1158,6 +1158,10 @@ Can be defined when using EBSnet products and RTIP.
 
 Can be defined when using wolfSSL with the LwIP TCP/IP stack (<https://savannah.nongnu.org/projects/lwip/>).
 
+#### WOLFSSL_ISOTP
+
+Can be defined when using wolfSSL with the ISO-TP transport protocol, typically used for CAN bus. A usage example can be found in the [wolfssl-examples repository](https://github.com/wolfssl/wolfssl-examples).
+
 #### WOLFSSL_GAME_BUILD
 
 Can be defined when building wolfSSL for a game console.
