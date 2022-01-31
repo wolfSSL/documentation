@@ -145,7 +145,7 @@ In some cases, you will see ciphers referenced as “**EXPORT**” ciphers.  The
 
 The following cipher suites are supported by wolfSSL. A cipher suite is a combination of authentication, encryption, and message authentication code (MAC) algorithms which are used during the TLS or SSL handshake to negotiate security settings for a connection.
 
-Each cipher suite defines a key exchange algorithm, a bulk encryption algorithm, and a message authentication code algorithm (MAC). The **key exchange algorithm **(RSA, DSS, DH, EDH) determines how the client and server will authenticate during the handshake process. The **bulk encryption algorithm** (DES, 3DES, AES, ARC4, RABBIT, HC-128), including block ciphers and stream ciphers, is used to encrypt the message stream. The **message authentication code (MAC) algorithm** (MD2, MD5, SHA-1, SHA-256, SHA-512, RIPEMD) is a hash function used to create the message digest.
+Each cipher suite defines a key exchange algorithm, a bulk encryption algorithm, and a message authentication code algorithm (MAC). The **key exchange algorithm **(RSA, DSS, DH, EDH) determines how the client and server will authenticate during the handshake process. The **bulk encryption algorithm** (DES, 3DES, AES, ARC4), including block ciphers and stream ciphers, is used to encrypt the message stream. The **message authentication code (MAC) algorithm** (MD2, MD5, SHA-1, SHA-256, SHA-512, RIPEMD) is a hash function used to create the message digest.
 
 The table below matches up to the cipher suites (and categories) found in `<wolfssl_root>/wolfssl/internal.h` (starting at about line 706).  If you are looking for a cipher suite which is not in the following list, please contact us to discuss getting it added to wolfSSL.
 
@@ -168,7 +168,6 @@ ECC cipher suites:
 * `SSL_RSA_WITH_RC4_128_SHA`
 * `SSL_RSA_WITH_RC4_128_MD5`
 * `SSL_RSA_WITH_3DES_EDE_CBC_SHA`
-* `SSL_RSA_WITH_IDEA_CBC_SHA`
 * `TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA`
 * `TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA`
 * `TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA`
@@ -200,17 +199,10 @@ Static ECC cipher suites:
 * `TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384`
 * `TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384`
 
-wolfSSL extension - eSTREAM cipher suites:
-
-* `TLS_RSA_WITH_HC_128_MD5`
-* `TLS_RSA_WITH_HC_128_SHA`
-* `TLS_RSA_WITH_RABBIT_SHA`
-
 Blake2b cipher suites:
 
 * `TLS_RSA_WITH_AES_128_CBC_B2B256`
 * `TLS_RSA_WITH_AES_256_CBC_B2B256`
-* `TLS_RSA_WITH_HC_128_B2B256`
 
 SHA-256 cipher suites:
 
@@ -296,9 +288,9 @@ wolfSSL supports AEAD suites, including AES-GCM, AES-CCM, and CHACHA-POLY1305. T
 
 ### Block and Stream Ciphers
 
-wolfSSL supports the **AES**, **DES**, **3DES**, and **Camellia** block ciphers and the **RC4**, **RABBIT**, **HC-128** and **CHACHA20 **stream ciphers. AES, DES, 3DES, RC4 and RABBIT are enabled by default.  Camellia, HC-128, and ChaCha20 can be enabled when building wolfSSL (with the [`--enable-hc128`](chapter02.md#enable-hc128), [`--enable-camellia`](chapter02.md#enable-camellia), and [`--disable-chacha`](chapter02.md#disable-chacha) build options, respectively). The default mode of AES is CBC mode.  To enable GCM or CCM mode with AES, use the [`--enable-aesgcm`](chapter02.md#enable-aesgcm) and [`--enable-aesccm`](chapter02.md#enable-aesccm) build options.  Please see the examples for usage and the [wolfCrypt Usage Reference](chapter10.md#wolfcrypt-usage-reference) for specific usage information.
+wolfSSL supports the **AES**, **DES**, **3DES**, and **Camellia** block ciphers and the **RC4**, and **CHACHA20 **stream ciphers. AES, DES, 3DES and RC4 are enabled by default.  Camellia, and ChaCha20 can be enabled when building wolfSSL (with the [`--enable-camellia`](chapter02.md#enable-camellia), and [`--disable-chacha`](chapter02.md#disable-chacha) build options, respectively). The default mode of AES is CBC mode.  To enable GCM or CCM mode with AES, use the [`--enable-aesgcm`](chapter02.md#enable-aesgcm) and [`--enable-aesccm`](chapter02.md#enable-aesccm) build options.  Please see the examples for usage and the [wolfCrypt Usage Reference](chapter10.md#wolfcrypt-usage-reference) for specific usage information.
 
-While SSL uses RC4 as the default stream cipher, it has been obsoleted due to compromise. wolfSSL has added two ciphers from the eStream project into the code base, RABBIT and HC-128. RABBIT is nearly twice as fast as RC4 and HC-128 is about 5 times as fast! So if you've ever decided not to use SSL because of speed concerns, using wolfSSL's stream ciphers should lessen or eliminate that performance doubt. Recently wolfSSL also added ChaCha20. While RC4 is about 11% more performant than ChaCha, RC4 is generally considered less secure than ChaCha. ChaCha can put up very nice times of it’s own with added security as a tradeoff.
+While SSL uses RC4 as the default stream cipher, it has been obsoleted due to compromise. Recently wolfSSL added ChaCha20. While RC4 is about 11% more performant than ChaCha, RC4 is generally considered less secure than ChaCha. ChaCha can put up very nice times of it’s own with added security as a tradeoff.
 
 To see a comparison of cipher performance, visit the wolfSSL Benchmark web page, located here: <https://www.wolfssl.com/docs/benchmarks>.
 
@@ -508,7 +500,7 @@ To look at wolfSSL's sniffer support and see a complete example, please see the 
 
 Keep in mind that because the encryption keys are setup in the SSL Handshake, the handshake needs to be decoded by the sniffer in order for future application data to be decoded. For example, if you are using "snifftest" with the wolfSSL example echoserver and echoclient, the snifftest application must be started before the handshake begins between the server and client.
 
-The sniffer can only decode streams encrypted with the following algorithms: AES-CBC, DES3-CBC, ARC4, HC-128, RABBIT, Camellia-CBC, and IDEA. If ECDHE or DHE key agreement is used the stream cannot be sniffed; only RSA or ECDH key-exchange is supported.
+The sniffer can only decode streams encrypted with the following algorithms: AES-CBC, DES3-CBC, ARC4 and Camellia-CBC. If ECDHE or DHE key agreement is used the stream cannot be sniffed; only RSA or ECDH key-exchange is supported.
 
 Watch callbacks with wolfSSL sniffer can be turned on with `WOLFSSL_SNIFFER_WATCH`. With the sniffer watch feature compiled in, the function `ssl_SetWatchKeyCallback()` can be used to set a custom callback. The callback is then used to inspect the certificate chain, error value, and digest of the certificate sent from the peer. If a non 0 value is returned from the callback then an error state is set when processing the peer’s certificate. Additional supporting functions for the watch callbacks are:
 

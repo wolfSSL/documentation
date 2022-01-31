@@ -348,7 +348,7 @@ Many users are curious about how the wolfSSL embedded SSL library will perform o
 
 To help wolfSSL users and customers in determining SSL performance for wolfSSL / wolfCrypt, a benchmark application is provided which is bundled with wolfSSL. wolfSSL uses the wolfCrypt cryptography library for all crypto operations by default. Because the underlying crypto is a very performance-critical aspect of SSL/TLS, our benchmark application runs performance tests on wolfCrypt’s algorithms.
 
-The benchmark utility located in wolfcrypt/benchmark (`./wolfcrypt/benchmark/benchmark`) may be used to benchmark the cryptographic functionality of wolfCrypt. Typical output may look like the following (in this output, several optional algorithms/ciphers were enabled including HC-128, RABBIT, ECC, SHA-256, SHA-512, AES-GCM, AES-CCM, and Camellia):
+The benchmark utility located in wolfcrypt/benchmark (`./wolfcrypt/benchmark/benchmark`) may be used to benchmark the cryptographic functionality of wolfCrypt. Typical output may look like the following (in this output, several optional algorithms/ciphers were enabled including ECC, SHA-256, SHA-512, AES-GCM, AES-CCM, and Camellia):
 
 ```sh
 ./wolfcrypt/benchmark/benchmark

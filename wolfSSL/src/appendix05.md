@@ -14,8 +14,6 @@
 ## Stream Ciphers
 
 * Stream Cipher	Information - [Wikipedia](https://en.wikipedia.org/wiki/Stream_cipher)
-* HC-128 - [Specification document](https://www.ecrypt.eu.org/stream/p3ciphers/hc/hc128_p3.pdf)
-* RABBIT - [Specification document](https://cr.yp.to/streamciphers/rabbit/desc.pdf)
 * RC4 / ARC4 - [IETF Draft](https://tools.ietf.org/id/draft-kaukonen-cipher-arcfour-03.txt) [Wikipedia](https://en.wikipedia.org/wiki/Rc4)
 
 ## Block Ciphers

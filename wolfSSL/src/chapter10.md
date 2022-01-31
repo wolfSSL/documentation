@@ -284,64 +284,6 @@ wc_Arc4Process(&dec, plain, cipher, sizeof(cipher));
 
 `plain` now contains the original plaintext from the ciphertext.
 
-### RABBIT
-
-A newer stream cipher gaining popularity is RABBIT. This stream cipher can be used through wolfCrypt by including the header `wolfssl/wolfcrypt/rabbit.h`. RABBIT is very fast compared to ARC4, but has key constraints of 16 bytes (128 bits) and an optional IV of 8 bytes (64 bits). Otherwise usage is exactly like ARC4:
-
-```c
-Rabbit enc;
-Rabbit dec;
-
-const byte key[] = {  /*some key 16 bytes*/};
-const byte iv[]  = {  /*some iv 8 bytes*/  };
-
-byte plain[27];   /*no size restriction, fill with data*/
-byte cipher[27];
-
-/*encrypt*/
-wc_RabbitSetKey(&enc, key, iv);  	/*iv can be a NULL pointer*/
-wc_RabbitProcess(&enc, cipher, plain, sizeof(plain));
-```
-
-`cipher` now contains the ciphertext from the plain text.
-
-```c
-/*decrypt*/
-wc_RabbitSetKey(&dec, key, iv);
-wc_RabbitProcess(&dec, plain, cipher, sizeof(cipher));
-```
-
-`plain` now contains the original plaintext from the ciphertext.
-
-### HC-128
-
-Another stream cipher in current use is HC-128, which is even faster than RABBIT (about 5 times faster than ARC4).  To use it with wolfCrypt, please include the header `wolfssl/wolfcrypt/hc128.h`. HC-128 also uses 16-byte keys (128 bits) but uses 16-byte IVs (128 bits) unlike RABBIT.
-
-```c
-HC128 enc;
-HC128 dec;
-
-const byte key[] = {  /*some key 16 bytes*/};
-const byte iv[]  = {  /*some iv 16 bytes*/ };
-
-byte plain[37];   /*no size restriction, fill with data*/
-byte cipher[37];
-
-/*encrypt*/
-wc_Hc128_SetKey(&enc, key, iv);  	/*iv can be a NULL pointer*/
-wc_Hc128_Process(&enc, cipher, plain, sizeof(plain));
-```
-
-`cipher` now contains the ciphertext from the plain text.
-
-```c
-/*decrypt*/
-wc_Hc128_SetKey(&dec, key, iv);
-wc_Hc128_Process(&dec, plain, cipher, sizeof(cipher));
-```
-
-`plain` now contains the original plaintext from the ciphertext.
-
 ### ChaCha
 
 ChaCha with 20 rounds is slightly faster than ARC4 while maintaining a high level of security.  To use it with wolfCrypt, please include the header `wolfssl/wolfcrypt/chacha.h`. ChaCha typically uses 32 byte keys (256 bit) but can also use 16 byte keys (128 bits).

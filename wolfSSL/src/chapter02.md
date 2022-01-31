@@ -369,10 +369,6 @@ Disables password-based key derivation functions such as PBKDF1, PBKDF2, and PBK
 
 Removes the use of the ARC4 stream cipher from the build. ARC4 is built-in by default because it is still popular and widely used.
 
-#### NO_RABBIT and NO_HC128
-
-Remove stream cipher extensions from the build.
-
 #### NO_SESSION_CACHE
 
 Can be defined when a session cache is not needed. This should reduce memory use by nearly 3 kB.
@@ -1403,8 +1399,6 @@ CBC ciphers:
 Stream ciphers:
 
 * RC4
-* Rabbit
-* HC-128
 
 ### `--enable-aesgcm`
 
@@ -1620,10 +1614,6 @@ Enable Base64 encoding
 
 Disable DES3
 
-### `--enable-idea`
-
-Enable IDEA Cipher
-
 ### `--enable-arc4`
 
 Enable ARC4
@@ -1641,14 +1631,6 @@ Disable SHA
 Enable Web Server.
 
 This turns on functions required over the standard build that will allow full functionality for building with the yaSSL Embedded Web Server.
-
-### `--enable-hc128`
-
-Enable streaming cipher HC-128
-
-### `--enable-rabbit`
-
-Enable streaming cipher RABBIT
 
 ### `--enable-fips`
 
