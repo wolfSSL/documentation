@@ -1,0 +1,22 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^group__"
+    },
+    {
+      "pattern": "^wolfio_8h"
+    },
+    {
+      "pattern": "^ssl_8h"
+    },
+    {
+      "comment": "Actively blocks linkcheck",
+      "pattern": "https://people.csail.mit.edu/rivest/Rsapaper.pdf"
+    }
+  ],
+  "timeout": "20s",
+  "retryOn429": true,
+  "retryCount": 5,
+  "fallbackRetryDelay": "30s",
+  "aliveStatusCodes": [200, 206]
+}

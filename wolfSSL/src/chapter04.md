@@ -1,6 +1,6 @@
 # Features
 
-wolfSSL (formerly CyaSSL) supports the C programming language as a primary interface, but also supports several other host languages, including Java, PHP, Perl, and Python (through a [SWIG](https://swig.org/) interface). If you have interest in hosting wolfSSL in another programming language that is not currently supported, please contact us.
+wolfSSL (formerly CyaSSL) supports the C programming language as a primary interface, but also supports several other host languages, including Java, PHP, Perl, and Python (through a [SWIG](http://swig.org/) interface). If you have interest in hosting wolfSSL in another programming language that is not currently supported, please contact us.
 
 This chapter covers some of the features of wolfSSL in more depth, including Stream Ciphers, AES-NI, IPv6 support, SSL Inspection (Sniffer) support, and more.
 
@@ -460,7 +460,7 @@ Documentation for the STM32F2 Standard Peripheral Library can be found in the fo
 
 ### Cavium NITROX
 
-wolfSSL has support for Cavium NITROX (<https://www.cavium.com/processor_security.html>). To enable Cavium NITROX support when building wolfSSL use the following configure option:
+wolfSSL has support for Marvell (previously Cavium) NITROX (<https://www.marvell.com/products/security-solutions.html>). To enable Marvell NITROX support when building wolfSSL use the following configure option:
 
 ```sh
 ./configure --with-cavium=/home/user/cavium/software

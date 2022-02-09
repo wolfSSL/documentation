@@ -127,6 +127,14 @@ pdf: api builddir $(SOURCES) $(APPENDIX)
 	@sed -e 's/chapter[0-9][0-9].md\|(appendix[0-9][0-9].md//g' src/$@ > build/pdf/$@
 	@sed -e 's/    ```/```/g' src/$@ > build/html/$@
 
+.PHONY: linkcheck
+linkcheck:
+	@$(foreach source_md,$(SOURCES),docker run -v ${CURDIR}:/tmp:ro --rm -i ghcr.io/tcort/markdown-link-check:stable --config /tmp/test/linkcheck.json /tmp/src/$(source_md) || exit;)
+	@$(foreach source_md,$(APPENDIX),docker run -v ${CURDIR}:/tmp:ro --rm -i ghcr.io/tcort/markdown-link-check:stable --config /tmp/test/linkcheck.json /tmp/src/$(source_md) || exit;)
+
+.PHONY: test
+test: linkcheck
+
 clean:
 	rm -f $(PDF)
 	rm -rf build

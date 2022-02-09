@@ -20,7 +20,7 @@
 
 * Block Cipher Information - [Wikipedia](https://en.wikipedia.org/wiki/Block_cipher)
 * AES - [NIST Publication](https://csrc.nist.gov/publications/fips/fips197/fips-197.pdf) [Wikipedia](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
-* AES-GCM - [NIST Specification](https://www.csrc.nist.gov/groups/ST/toolkit/BCM/documents/proposedmodes/gcm/gcm-revised-spec.pdf)
+* AES-GCM - [NIST Specification](https://csrc.nist.rip/groups/ST/toolkit/BCM/documents/proposedmodes/gcm/gcm-spec.pdf)
 * AES-NI - [Intel Sofware Network](https://software.intel.com/en-us/articles/intel-advanced-encryption-standard-instructions-aes-ni/)
 * DES/3DES - [NIST Publication](https://csrc.nist.gov/publications/fips/fips46-3/fips46-3.pdf) [Wikipedia](https://en.wikipedia.org/wiki/Data_Encryption_Standard)
 
