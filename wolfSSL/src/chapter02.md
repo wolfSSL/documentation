@@ -906,7 +906,7 @@ If built without configuration nor modification to any macros, for example for a
 
 ##### USE_FAST_MATH
 
-Forked from public domain LibTomFastMath library. For more information about LibTomFastMath, please see https://www.libtom.net/LibTomFastMath/ . Please note that our fork is considerably more active and secure than the original public domain code from LibTomFastMath. We have improved performance, security and code quality. Also we have taken the Fastmath code through  FIPS 140-2 and 140-3 certifications.
+Forked from public domain LibTomFastMath library. For more information about LibTomFastMath, please see https://www.libtom.net/TomsFastMath/ . Please note that our fork is considerably more active and secure than the original public domain code from LibTomFastMath. We have improved performance, security and code quality. Also we have taken the Fastmath code through  FIPS 140-2 and 140-3 certifications.
 
 The Fastmath option switches to a faster big integer library that uses assembly if possible. The Fastmath option will speed up asymmetric private/public key operations like RSA, DH, and DSA. By default, wolfSSL's configure scripts are setup to use the Fastmath library for x86_64 and aarch architectures. This option switches the big integer library to a faster one that uses assembly if possible.  Assembly inclusion is dependent on compiler and processor combinations. Some combinations will need additional configure flags and some may not be possible. Help with optimizing Fastmath with new assembly routines is available on a consulting basis. Use of the assembly code is dependent on the compiler and processor used. See the Archetecture-Specific Optimizations.
 

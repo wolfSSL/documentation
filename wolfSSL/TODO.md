@@ -38,12 +38,7 @@
 
 * Add MD lint checking
   - <https://github.com/tmknom/markdownlint>
-* Add URL validation (nightly?)
-  - There is a mkdocs community plugin for this
-
-```sh
-sudo docker run -v ${PWD}:/tmp:ro --rm -i ghcr.io/tcort/markdown-link-check:stable /tmp/chapter02.md
-```
+* ~~Add URL validation (nightly?)~~
 
 ## Other
 
