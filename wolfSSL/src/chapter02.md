@@ -212,18 +212,18 @@ The `<wolfssl_root>/IDE/IAR-EWARM` directory contains the following files:
 
 These projects have been set up to generic ARM Cortex-M MPUs. In order to generate project for specific target MPU, take following steps.
 
-0. Default Setting: Default Target of the projects are set to Cortex-M3 Simulator. user_settings.h includes default options for the projects. You can build and 
+1. Default Setting: Default Target of the projects are set to Cortex-M3 Simulator. user_settings.h includes default options for the projects. You can build and
 download the to the simulator. Open Terminal I/O window, by "view"->"Terminal I/O", and start execution.
 
-1. Project option settings: For each project, choose appropriate "Target" options.
+2. Project option settings: For each project, choose appropriate "Target" options.
 
-2. For executable projects: Add "SystemInit" and "startup" for your MPU, choose your debug "Driver".
+3. For executable projects: Add "SystemInit" and "startup" for your MPU, choose your debug "Driver".
 
-3. For benchmark project: Choose option for current_time function or write your own "current_time" benchmark timer with WOLFSSL_USER_CURRTIME option.
+4. For benchmark project: Choose option for current_time function or write your own "current_time" benchmark timer with WOLFSSL_USER_CURRTIME option.
 
-4. Build and download: Go to "Project->Make" and "Download and Debug" in Menu bar for EWARM build and download.
+5. Build and download: Go to "Project->Make" and "Download and Debug" in Menu bar for EWARM build and download.
 
-### Building on OS X and iOS 
+### Building on OS X and iOS
 
 #### XCODE
 
@@ -235,11 +235,12 @@ The `<wolfssl_root>/IDE/XCODE` directory contains the following files:
 4. `wolfssl-FIPS.xcodeproj` -- project to build wolfSSL and wolfCrypt-FIPS if available
 5. `user_settings.h` -- custom library settings, which are shared across projects
 
-The library will output as `libwolfssl_osx.a` or `libwolfssl_ios.a` depending on the target. It will also copy the wolfSSL/wolfCrypt (and the CyaSSL/CtaoCrypt 
-compatibility) headers into an `include` directory located in 
+The library will output as `libwolfssl_osx.a` or `libwolfssl_ios.a` depending on the target. It will also copy the wolfSSL/wolfCrypt (and the CyaSSL/CtaoCrypt
+compatibility) headers into an `include` directory located in
 `Build/Products/Debug` or `Build/Products/Release`.
 
 For the library and testsuite to link properly the build location needs to be configured as realitive to workspace.
+
 1. File -> Workspace Settings (or Xcode -> Preferences -> Locations -> Locations)
 2. Derived Data -> Advanced
 3. Custom -> Relative to Workspace
@@ -248,10 +249,11 @@ For the library and testsuite to link properly the build location needs to be co
 These Xcode projects define the `WOLFSSL_USER_SETTINGS` preprocessor to enable the `user_settings.h` file for setting macros across multiple projects.
 
 If needed the Xcode preprocessors can be modified with these steps:
+
 1. Click on the Project in "Project Navigator".
 2. Click on the "Build Settings" tab.
 3. Scroll down to the "Apple LLVM 6.0 - Preprocessing" section.
-4. Open the disclosure for "Preprocessor Macros" and use the "+" and 
+4. Open the disclosure for "Preprocessor Macros" and use the "+" and
 "-" buttons to modify. Remember to do this for both Debug and Release.
 
 This project should build wolfSSL and wolfCrypt using the default settings.
@@ -262,11 +264,10 @@ In the `<wolfssl_root>/IDE/GCC-ARM` directory, you will find an example wolfSSL 
 
 1. Make sure you have `gcc-arm-none-eabi` installed.
 2. Modify the `Makefile.common`:
-  * Use correct toolchain path `TOOLCHAIN`.
-  * Use correct architecture 'ARCHFLAGS'. See [GCC ARM Options](https://gcc.gnu.org/onlinedocs/gcc-4.7.3/gcc/ARM-Options.html) `-mcpu=name`.
-  * Confirm memory map in linker.ld matches your flash/ram or comment out `SRC_LD = -T./linker.ld` in Makefile.common.
+   * Use correct toolchain path `TOOLCHAIN`.
+   * Use correct architecture 'ARCHFLAGS'. See [GCC ARM Options](https://gcc.gnu.org/onlinedocs/gcc-4.7.3/gcc/ARM-Options.html) `-mcpu=name`.
+   * Confirm memory map in linker.ld matches your flash/ram or comment out `SRC_LD = -T./linker.ld` in Makefile.common.
 3. Use `make` to build the static library (libwolfssl.a), wolfCrypt test/benchmark and wolfSSL TLS client targets as `.elf` and `.hex` in `/Build`.
-
 
 #### Building with generic makefile cross-compile
 
@@ -274,7 +275,7 @@ Example `Makefile.common` changes for Raspberry Pi with Cortex-A53:
 
 1. In Makefile.common change `ARCHFLAGS` to `-mcpu=cortex-a53 -mthumb`.
 2. Comment out `SRC_LD`, since custom memory map is not applicable.
-3. Clear `TOOLCHAIN`, so it will use default `gcc`. Set `TOOLCHAIN = `
+3. Clear `TOOLCHAIN`, so it will use default `gcc`. Set `TOOLCHAIN =`
 4. Comment out `LDFLAGS += --specs=nano.specs` and `LDFLAGS += --specs=nosys.specs` to nosys and nano.
 
 #### Building with configure with cross-compile
@@ -306,7 +307,7 @@ list of CFLAGS.
 
 You can find detailed instructions and tips for building wolfSSL on Keil MDK-ARM [here](https://www.wolfssl.com/docs/keil-mdk-arm/).
 
-**Note**: If MDK-ARM is not installed in the default installation location, you need to change all of the referencing path definitions in the project file to the 
+**Note**: If MDK-ARM is not installed in the default installation location, you need to change all of the referencing path definitions in the project file to the
 install location.
 
 ## Features Defined as C Pre-processor Macro
@@ -884,9 +885,9 @@ There are 4 variants of GCM performance:
 
 There are three math libraries in wolfSSL.
 
-- Big Integer
-- Fast Math
-- Single Precision Math
+* Big Integer
+* Fast Math
+* Single Precision Math
 
 When building wolfSSL, only one of these must be used.
 
@@ -898,7 +899,7 @@ Single Precision (SP) Math Library is our recommended library. It is implemented
 
 #### Big Integer Math Library
 
-Forked from public domain LibTomMath library. For more information about LibTomMath, please see https://www.libtom.net/LibTomMath/ . Please note that our fork is considerably more active and secure than the original public domain code.
+Forked from public domain LibTomMath library. For more information about LibTomMath, please see <https://www.libtom.net/LibTomMath/>. Please note that our fork is considerably more active and secure than the original public domain code.
 
 If built without configuration nor modification to any macros, for example for an embedded target, the macros will use this implementation. This is generally the most portable and generally easiest to get going with. The negatives to the normal big integer library are that it is slower, it uses a lot of heap memory as all memory is allocated from the heap, requires an `XREALLOC()` implementation and is not timing resistant. The implementation can be found in `integer.c`.
 
@@ -906,7 +907,7 @@ If built without configuration nor modification to any macros, for example for a
 
 ##### USE_FAST_MATH
 
-Forked from public domain LibTomFastMath library. For more information about LibTomFastMath, please see https://www.libtom.net/TomsFastMath/ . Please note that our fork is considerably more active and secure than the original public domain code from LibTomFastMath. We have improved performance, security and code quality. Also we have taken the Fastmath code through  FIPS 140-2 and 140-3 certifications.
+Forked from public domain LibTomFastMath library. For more information about LibTomFastMath, please see <https://www.libtom.net/TomsFastMath>. Please note that our fork is considerably more active and secure than the original public domain code from LibTomFastMath. We have improved performance, security and code quality. Also we have taken the Fastmath code through  FIPS 140-2 and 140-3 certifications.
 
 The Fastmath option switches to a faster big integer library that uses assembly if possible. The Fastmath option will speed up asymmetric private/public key operations like RSA, DH, and DSA. By default, wolfSSL's configure scripts are setup to use the Fastmath library for x86_64 and aarch architectures. This option switches the big integer library to a faster one that uses assembly if possible.  Assembly inclusion is dependent on compiler and processor combinations. Some combinations will need additional configure flags and some may not be possible. Help with optimizing Fastmath with new assembly routines is available on a consulting basis. Use of the assembly code is dependent on the compiler and processor used. See the Archetecture-Specific Optimizations.
 
@@ -930,14 +931,14 @@ If you are enabling Fastmath without using the autoconf system, you’ll need to
 
 The following macros can be defined for assembly optimizations with USE_FAST_MATH.
 
-- `TFM_ARM`
-- `TFM_SSE2`
-- `TFM_AVR32`
-- `TFM_PPC32`
-- `TFM_PPC64`
-- `TFM_MIPS`
-- `TFM_X86`
-- `TFM_X86_64`
+* `TFM_ARM`
+* `TFM_SSE2`
+* `TFM_AVR32`
+* `TFM_PPC32`
+* `TFM_PPC64`
+* `TFM_MIPS`
+* `TFM_X86`
+* `TFM_X86_64`
 
 If none of these are defined or TFM_NO_ASM is defined, then `TFM_ISO` will be defined and ISO C portable code will be used.
 
@@ -945,11 +946,11 @@ If none of these are defined or TFM_NO_ASM is defined, then `TFM_ISO` will be de
 
 When enabled, optimized implementations for multiplication and squaring are used for the respective ECC curve.
 
-- `TFM_ECC192`
-- `TFM_ECC224`
-- `TFM_ECC256`
-- `TFM_ECC384`
-- `TFM_ECC521`
+* `TFM_ECC192`
+* `TFM_ECC224`
+* `TFM_ECC256`
+* `TFM_ECC384`
+* `TFM_ECC521`
 
 ##### TFM_SMALL_SET
 
@@ -1032,7 +1033,7 @@ Allows Single-Precision (SP) speedups that come at the cost of larger binary siz
 
 ##### WOLFSSL_SP_DIV_WORD_HALF
 
-Indicates that division using a double length word isn't available. For example, on 32-bit CPUs, if you do not want to compile in a 64-bit division from a library, then defining this macro turn on an implementation where the divide is done using half word size portions. 
+Indicates that division using a double length word isn't available. For example, on 32-bit CPUs, if you do not want to compile in a 64-bit division from a library, then defining this macro turn on an implementation where the divide is done using half word size portions.
 
 ##### WOLFSSL_SP_DIV_32
 
@@ -2006,7 +2007,7 @@ Can be used to enable Single-Precision performance improvements through assembly
 
 Enable Single-Precision (SP) math for RSA, DH, and ECC to improve performance.
 
-There are many possible values for OPT. Below is a list of ways to call enable-sp and the resulting macros that will be defined as a result. All of these can be combined in a coma separated list. For example, `--enable-sp=ec256,ec384`. The meaning of the macros that will be defined are defined above in the [wolfSSL’s Proprietary Single Precision (SP) Math Support] section. 
+There are many possible values for OPT. Below is a list of ways to call enable-sp and the resulting macros that will be defined as a result. All of these can be combined in a coma separated list. For example, `--enable-sp=ec256,ec384`. The meaning of the macros that will be defined are defined above in the [wolfSSL’s Proprietary Single Precision (SP) Math Support] section.
 
 **NOTE**: This is for x86_64 and with no other configuration flags; your results may vary depending on your architectures and other configuration flags that you specify. For example,  WOLFSSL_SP_384 and WOLFSSL_SP_4096 will only be enabled for Intel x86_64.
 
@@ -2016,172 +2017,172 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 
 #### `--enable-sp` or `--enable-sp=yes`
 
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_HAVE_SP_ECC
-- WOLFSSL_HAVE_SP_DH
-- WOLFSSL_SP_384
-- WOLFSSL_SP_4096
-- WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_HAVE_SP_DH
+* WOLFSSL_SP_384
+* WOLFSSL_SP_4096
+* WOLFSSL_SP_LARGE_CODE
 
 #### `--enable-sp=small`
 
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_HAVE_SP_DH
-- WOLFSSL_HAVE_SP_ECC
-- WOLFSSL_SP_4096
-- WOLFSSL_SP_384
-- WOLFSSL_SP_4096
-- WOLFSSL_SP_SMALL
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_384
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_HAVE_SP_DH
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_SP_4096
+* WOLFSSL_SP_384
+* WOLFSSL_SP_4096
+* WOLFSSL_SP_SMALL
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_384
 
 #### `--enable-sp=smallfast`
 
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_HAVE_SP_DH
-- WOLFSSL_HAVE_SP_ECC
-- WOLFSSL_SP_4096
-- WOLFSSL_SP_384
-- WOLFSSL_SP_SMALL
-- WOLFSSL_SP_4096
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_FAST_MODEXP
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_HAVE_SP_DH
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_SP_4096
+* WOLFSSL_SP_384
+* WOLFSSL_SP_SMALL
+* WOLFSSL_SP_4096
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_FAST_MODEXP
 
 #### `--enable-sp=ec256` or `--enable-sp=p256` or `--enable-sp=p256`
 
-- WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_HAVE_SP_ECC
 
 #### `--enable-sp=smallec256` or `--enable-sp=smallp256` or `--enable-sp=small256`
 
-- WOLFSSL_HAVE_SP_ECC
-- WOLFSSL_SP_SMALL
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_SP_SMALL
 
 #### `--enable-sp=ec384` or `--enable-sp=p384` or `--enable-sp=384`
 
-- WOLFSSL_HAVE_SP_ECC
-- WOLFSSL_SP_384
-- WOLFSSL_SP_NO_256
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_SP_384
+* WOLFSSL_SP_NO_256
 
 #### `--enable-sp=smallec384` or `--enable-sp=smallp384` or `--enable-sp=small384`
 
-- WOLFSSL_HAVE_SP_ECC
-- WOLFSSL_SP_384
-- WOLFSSL_SP_NO_256
-- WOLFSSL_SP_SMALL
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_SP_384
+* WOLFSSL_SP_NO_256
+* WOLFSSL_SP_SMALL
 
 #### `--enable-sp=ec1024` or `--enable-sp=p1024` or `--enable-sp=1024`
 
-- WOLFSSL_HAVE_SP_ECC
-- WOLFSSL_SP_1024
-- WOLFSSL_SP_NO_256
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_SP_1024
+* WOLFSSL_SP_NO_256
 
 #### `--enable-sp=smallec1024` or `--enable-sp=smallp1024` or `--enable-sp=small1024`
 
-- WOLFSSL_HAVE_SP_ECC
-- WOLFSSL_SP_1024
-- WOLFSSL_SP_NO_256
-- WOLFSSL_SP_SMALL
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_SP_1024
+* WOLFSSL_SP_NO_256
+* WOLFSSL_SP_SMALL
 
 #### `--enable-sp=2048`
 
-- WOLFSSL_HAVE_SP_DH
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_3072
+* WOLFSSL_HAVE_SP_DH
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_3072
 
 #### `--enable-sp=small2048`
 
-- WOLFSSL_HAVE_SP_DH
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_3072
-- WOLFSSL_SP_SMALL
+* WOLFSSL_HAVE_SP_DH
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_3072
+* WOLFSSL_SP_SMALL
 
 #### `--enable-sp=rsa2048`
 
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_3072
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_3072
 
 #### `--enable-sp=smallrsa2048`
 
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_3072
-- WOLFSSL_SP_SMALL
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_3072
+* WOLFSSL_SP_SMALL
 
 #### `--enable-sp=3072`
 
-- WOLFSSL_HAVE_SP_DH
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_2048
+* WOLFSSL_HAVE_SP_DH
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_2048
 
 #### `--enable-sp=small3072`
 
-- WOLFSSL_HAVE_SP_DH
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_2048
-- WOLFSSL_SP_SMALL
+* WOLFSSL_HAVE_SP_DH
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_2048
+* WOLFSSL_SP_SMALL
 
 #### `--enable-sp=rsa3072`
 
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_2048
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_2048
 
 #### `--enable-sp=smallrsa3072`
 
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_2048
-- WOLFSSL_SP_SMALL
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_2048
+* WOLFSSL_SP_SMALL
 
 #### `--enable-sp=4096` or `--enable-sp=+4096`
 
-- WOLFSSL_HAVE_SP_DH
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_SP_4096
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_2048
-- WOLFSSL_SP_NO_3072
+* WOLFSSL_HAVE_SP_DH
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_SP_4096
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_2048
+* WOLFSSL_SP_NO_3072
 
 #### `--enable-sp=small4096`
 
-- WOLFSSL_HAVE_SP_DH
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_SP_4096
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_2048
-- WOLFSSL_SP_NO_3072
-- WOLFSSL_SP_SMALL
+* WOLFSSL_HAVE_SP_DH
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_SP_4096
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_2048
+* WOLFSSL_SP_NO_3072
+* WOLFSSL_SP_SMALL
 
 #### `--enable-sp=rsa4096`
 
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_SP_4096
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_2048
-- WOLFSSL_SP_NO_3072
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_SP_4096
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_2048
+* WOLFSSL_SP_NO_3072
 
 #### `--enable-sp=smallrsa4096`
 
-- WOLFSSL_HAVE_SP_RSA
-- WOLFSSL_SP_4096
-- WOLFSSL_SP_LARGE_CODE
-- WOLFSSL_SP_NO_2048
-- WOLFSSL_SP_NO_3072
-- WOLFSSL_SP_SMALL
+* WOLFSSL_HAVE_SP_RSA
+* WOLFSSL_SP_4096
+* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_SP_NO_2048
+* WOLFSSL_SP_NO_3072
+* WOLFSSL_SP_SMALL
 
 #### `--enable-sp=nomalloc`
 
-- WOLFSSL_SP_NO_MALLOC
+* WOLFSSL_SP_NO_MALLOC
 
 #### `--enable-sp=nonblock`
 
-- WOLFSSL_SP_NO_MALLOC
-- WOLFSSL_SP_NONBLOCK
-- WOLFSSL_SP_SMALL
+* WOLFSSL_SP_NO_MALLOC
+* WOLFSSL_SP_NONBLOCK
+* WOLFSSL_SP_SMALL
 
 #### `asm`
 

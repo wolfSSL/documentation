@@ -27,17 +27,17 @@ All of the source code used in this tutorial can be downloaded from the wolfSSL 
 
 The downloaded ZIP file has the following structure:
 
-```
+```text
 /finished_src
-    /echoclient	(Completed echoclient code)
-    /echoserver	(Completed echoserver code)
-    /include	(Modified unp.h)
-    /lib	(Library functions)
+    /echoclient (Completed echoclient code)
+    /echoserver (Completed echoserver code)
+    /include    (Modified unp.h)
+    /lib    (Library functions)
 /original_src
-    /echoclient	(Starting echoclient code)
-    /echoserver	(Starting echoserver code)
-    /include	(Modified unp.h)
-    /lib	(Library functions)
+    /echoclient (Starting echoclient code)
+    /echoserver (Starting echoserver code)
+    /include    (Modified unp.h)
+    /lib    (Library functions)
 README
 ```
 
@@ -53,10 +53,10 @@ The following is a list of modifications that were made to the original echoserv
 * Moved `str_echo()` function from `str_echo.c` file into `tcpserv04.c` file
 * Added a printf statement to view the client address and the port we have connected through:
 
-    ```
+    ```text
     printf("Connection from %s, port %d\n",
-      		inet_ntop(AF_INET, &cliaddr.sin_addr, buff, sizeof(buff)),
-      		ntohs(cliaddr.sin_port));
+            inet_ntop(AF_INET, &cliaddr.sin_addr, buff, sizeof(buff)),
+            ntohs(cliaddr.sin_port));
     ```
 
 * Added a call to `setsockopt()` after creating the listening socket to eliminate the “Address already in use” bind error.
@@ -79,7 +79,7 @@ Before we begin, download the example code (`echoserver` and `echoclient`) from 
 
 You will need to download and install the most recent version of wolfSSL from the wolfSSL [download page](https://wolfssl.com/yaSSL/download/downloadForm.php).
 
-For a full list of available build options, see the [Building wolfSSL](https://www.yassl.com/yaSSL/Docs-cyassl-manual-2-building-cyassl.html) guide. wolfSSL was written with portability in mind, and should generally be easy to build on most systems. If you have difficulty building wolfSSL, please feel free to ask for support on the wolfSSL[ product support forums](https://www.wolfssl.com/forums).
+For a full list of available build options, see the [Building wolfSSL](https://www.yassl.com/yaSSL/Docs-cyassl-manual-2-building-cyassl.html) guide. wolfSSL was written with portability in mind, and should generally be easy to build on most systems. If you have difficulty building wolfSSL, please feel free to ask for support on the wolfSSL [product support forums](https://www.wolfssl.com/forums).
 
 When building wolfSSL on Linux, *BSD, OS X, Solaris, or other *nix like systems, you can use the autoconf system. For Windows-specific instructions, please refer to the [Building wolfSSL](chapter02.md#building-wolfssl) section of the wolfSSL Manual. To configure and build wolfSSL, run the following two commands from the terminal. Any desired build options may be appended to `./configure` (ex: `./configure -–enable-opensslextra`):
 
@@ -102,7 +102,7 @@ This will install wolfSSL headers into `/usr/local/include/wolfssl` and the wolf
 
 A set of tests will be run on wolfCrypt and wolfSSL to verify it has been installed correctly. After a successful run of the testsuite application, you should see output similar to the following:
 
-```
+```text
 MD5      test passed!
 SHA      test passed!
 SHA-224  test passed!
@@ -202,23 +202,23 @@ To create a new `WOLFSSL_CTX`, use [`wolfSSL_CTX_new()`](group__Setup.md#functio
 
 EchoClient:
 
-*  [`wolfSSLv3_client_method();`](group__Setup.md#function-wolfsslv3_client_method) - SSL 3.0
-*  [`wolfTLSv1_client_method();`](group__Setup.md#function-wolftlsv1_client_method) - TLS 1.0
-*  [`wolfTLSv1_1_client_method();`](group__Setup.md#function-wolftlsv1_1_client_method) - TLS 1.1
-*  [`wolfTLSv1_2_client_method();`](group__Setup.md#function-wolftlsv1_2_client_method) - TLS 1.2
-*  [`wolfSSLv23_client_method();`](group__Setup.md#function-wolfsslv23_client_method) - Use highest version possible from SSLv3 - TLS 1.2
-*  [`wolfDTLSv1_client_method();`](group__Setup.md#function-wolfdtlsv1_client_method) - DTLS 1.0
-*  [`wolfDTLSv1_2_client_method_ex();`](ssl_8h.md#function-wolfdtlsv1_2_client_method_ex) - DTLS 1.2
+* [`wolfSSLv3_client_method();`](group__Setup.md#function-wolfsslv3_client_method) - SSL 3.0
+* [`wolfTLSv1_client_method();`](group__Setup.md#function-wolftlsv1_client_method) - TLS 1.0
+* [`wolfTLSv1_1_client_method();`](group__Setup.md#function-wolftlsv1_1_client_method) - TLS 1.1
+* [`wolfTLSv1_2_client_method();`](group__Setup.md#function-wolftlsv1_2_client_method) - TLS 1.2
+* [`wolfSSLv23_client_method();`](group__Setup.md#function-wolfsslv23_client_method) - Use highest version possible from SSLv3 - TLS 1.2
+* [`wolfDTLSv1_client_method();`](group__Setup.md#function-wolfdtlsv1_client_method) - DTLS 1.0
+* [`wolfDTLSv1_2_client_method_ex();`](ssl_8h.md#function-wolfdtlsv1_2_client_method_ex) - DTLS 1.2
 
 EchoServer:
 
-*  [`wolfSSLv3_server_method();`](group__Setup.md#function-wolfsslv3_server_method) - SSLv3
-*  [`wolfTLSv1_server_method();`](group__Setup.md#function-wolftlsv1_server_method) - TLSv1
-*  [`wolfTLSv1_1_server_method();`](group__Setup.md#function-wolftlsv1_1_server_method) - TLSv1.1
-*  [`wolfTLSv1_2_server_method();`](group__Setup.md#function-wolftlsv1_2_server_method) - TLSv1.2
-*  [`wolfSSLv23_server_method();`](group__Setup.md#function-wolfsslv23_server_method) - Allow clients to connect with TLSv1+
-*  [`wolfDTLSv1_server_method();`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS
-*  [`wolfDTLSv1_2_server_method();`](ssl_8h.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
+* [`wolfSSLv3_server_method();`](group__Setup.md#function-wolfsslv3_server_method) - SSLv3
+* [`wolfTLSv1_server_method();`](group__Setup.md#function-wolftlsv1_server_method) - TLSv1
+* [`wolfTLSv1_1_server_method();`](group__Setup.md#function-wolftlsv1_1_server_method) - TLSv1.1
+* [`wolfTLSv1_2_server_method();`](group__Setup.md#function-wolftlsv1_2_server_method) - TLSv1.2
+* [`wolfSSLv23_server_method();`](group__Setup.md#function-wolfsslv23_server_method) - Allow clients to connect with TLSv1+
+* [`wolfDTLSv1_server_method();`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS
+* [`wolfDTLSv1_2_server_method();`](ssl_8h.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
 
 We need to load our CA (Certificate Authority) certificate into the `WOLFSSL_CTX` so that the when the echoclient connects to the echoserver, it is able to verify the server’s identity. To load the CA certificates into the `WOLFSSL_CTX`, use [`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations). This function requires three arguments: a `WOLFSSL_CTX` pointer, a certificate file, and a path value. The path value points to a directory which should contain CA certificates in PEM format. When looking up certificates, wolfSSL will look at the certificate file value before looking in the path location. In this case, we don’t need to specify a certificate path because we will specify one CA file - as such we use the value 0 for the path argument. The [`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations) function returns either `SSL_SUCCESS` or `SSL_FAILURE`:
 
@@ -275,17 +275,17 @@ When loading certificates into the `WOLFSSL_CTX`, the server certificate and key
 
 /* Load server certificates into WOLFSSL_CTX */
   if (wolfSSL_CTX_use_certificate_file(ctx,"../certs/server-cert.pem",
-       	SSL_FILETYPE_PEM) != SSL_SUCCESS){
+        SSL_FILETYPE_PEM) != SSL_SUCCESS){
       fprintf(stderr, "Error loading ../certs/server-cert.pem, please
-       	check the file.\n");
+        check the file.\n");
       exit(EXIT_FAILURE);
   }
 
   /* Load keys */
   if (wolfSSL_CTX_use_PrivateKey_file(ctx,"../certs/server-key.pem",
-       	SSL_FILETYPE_PEM) != SSL_SUCCESS){
+        SSL_FILETYPE_PEM) != SSL_SUCCESS){
       fprintf(stderr, "Error loading ../certs/server-key.pem, please check
-       	the file.\n");
+        the file.\n");
       exit(EXIT_FAILURE);
   }
 ```
@@ -335,8 +335,8 @@ At the end of the for loop in the main method, insert the WOLFSSL object and ass
 WOLFSSL* ssl;
 
 if ( (ssl = wolfSSL_new(ctx)) == NULL) {
-           	fprintf(stderr, "wolfSSL_new error.\n");
-           	exit(EXIT_FAILURE);
+            fprintf(stderr, "wolfSSL_new error.\n");
+            exit(EXIT_FAILURE);
 }
 
 wolfSSL_set_fd(ssl, connfd);
@@ -360,7 +360,7 @@ wolfSSL_set_fd(ssl, sockfd);
 
 ## Sending/Receiving Data
 
-### EchoClient
+### Sending with EchoClient
 
 The next step is to begin sending data securely. Take note that in the echoclient example, the `main()` function hands off the sending and receiving work to `str_cli()`. The `str_cli()` function is where our function replacements will be made. First we need access to our `WOLFSSL` object in the `str_cli()` function, so we add another argument and pass the ssl variable to `str_cli()`. Because the `WOLFSSL` object is now going to be used inside of the `str_cli()` function, we remove the `sockfd` parameter. The new `str_cli()` function signature after this modification is shown below:
 
@@ -388,7 +388,7 @@ str_cli(FILE *fp, WOLFSSL* ssl)
     while (Fgets(sendline, MAXLINE, fp) != NULL) {
 
         if(wolfSSL_write(ssl, sendline, strlen(sendline)) !=
-                   	 strlen(sendline)){
+                     strlen(sendline)){
             err_sys("wolfSSL_write failed");
         }
 
@@ -406,12 +406,12 @@ The last thing to do is free the `WOLFSSL` object when we are completely done wi
 ```c
 str_cli(stdin, ssl);
 
-wolfSSL_free(ssl);     	/* Free WOLFSSL object */
-wolfSSL_CTX_free(ctx); 	/* Free WOLFSSL_CTX object */
-wolfSSL_Cleanup();     	/* Free wolfSSL */
+wolfSSL_free(ssl);      /* Free WOLFSSL object */
+wolfSSL_CTX_free(ctx);  /* Free WOLFSSL_CTX object */
+wolfSSL_Cleanup();      /* Free wolfSSL */
 ```
 
-### EchoServer
+### Receiving with EchoServer
 
 The echo server makes a call to `str_echo()` to handle reading and writing (whereas the client made a call to `str_cli()`). As with the client, modify `str_echo()` by replacing the sockfd parameter with a `WOLFSSL` object (`ssl`) parameter in the function signature:
 

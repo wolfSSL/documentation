@@ -56,7 +56,7 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `SIGACT_ERROR` | -339 | sigaction failed ??? |
 | `SETITIMER_ERROR` | -340 | setitimer failed ??? |
 | `LENGTH_ERROR` | -341 | record layer length error |
-| `PEER_KEY_ERROR ` | -342 | cant decode peer key |
+| `PEER_KEY_ERROR` | -342 | cant decode peer key |
 | `ZERO_RETURN` | -343 | peer sent close notify |
 | `SIDE_ERROR` | -344 | wrong client/server type |
 | `NO_PEER_CERT` | -345 | peer didn't send key |
@@ -319,7 +319,7 @@ There are several error codes that commonly happen when getting an application u
 This error occurs when using a certificate and the signing CA certificate was not loaded. This can be seen using the wolfSSL example server or client against another client or server, for example connecting to Google using the wolfSSL example client:
 
 ```sh
-$ ./examples/client/client -g -h www.google.com -p 443
+./examples/client/client -g -h www.google.com -p 443
 ```
 
 This fails with error -188 because Google’s CA certificate wasn’t loaded with the “`-A`” command line option.

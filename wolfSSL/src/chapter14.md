@@ -15,4 +15,3 @@ Commercial licenses are also available for wolfMQTT and wolfSSH.  Please contact
 ## Support Packages
 
 Support packages for wolfSSL products are available on an annual basis directly from wolfSSL.  With three different package options, you can compare them side-by-side and choose the package that best fits your specific needs.  Please see our Support Packages page (<https://www.wolfssl.com/products/support-and-maintenance>) for more details.
-

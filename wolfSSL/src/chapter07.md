@@ -2,7 +2,6 @@
 
 For an introduction to X.509 certificates, as well as how they are used in SSL and TLS, please see Appendix A.
 
-
 ## Supported Formats and Sizes
 
 wolfSSL (formerly CyaSSL) has support for **PEM**, and **DER** formats for certificates and keys, as well as PKCS#8 private keys (with PKCS#5 or PKCS#12 encryption).
@@ -12,7 +11,6 @@ wolfSSL (formerly CyaSSL) has support for **PEM**, and **DER** formats for certi
 **DER**, or “Distinguished Encoding Rules”, is a binary format of a certificate. DER file extensions can include `.der` and `.cer`, and cannot be viewed with a text editor.
 
 An X.509 certificate is encoded using ASN.1 format. The DER format is the ASN.1 encoding. The PEM format is Base64 encoded and wrapped with a human readable header and footer. TLS send certificates in DER format.
-
 
 ## Certificate Loading
 
@@ -63,7 +61,6 @@ int wolfSSL_CTX_use_PrivateKey_file(WOLFSSL_CTX *ctx,
 ```
 
 `keyFile` is the private key file, and `type` is the format of the private key (e.g. `SSL_FILETYPE_PEM`).
-
 
 ### Loading Trusted Peer Certificates
 
@@ -217,20 +214,20 @@ Where CertName looks like:
 ```c
 typedef struct CertName {
 char country[CTC_NAME_SIZE];
-	char countryEnc;
-	char state[CTC_NAME_SIZE];
-	char stateEnc;
-	char locality[CTC_NAME_SIZE];
-	char localityEnc;
-	char sur[CTC_NAME_SIZE];
-	char surEnc;
-	char org[CTC_NAME_SIZE];
-	char orgEnc;
-	char unit[CTC_NAME_SIZE];
-	char unitEnc;
-	char commonName[CTC_NAME_SIZE];
-	char commonNameEnc;
-	char email[CTC_NAME_SIZE];  /* !!!! email has to be last!!!! */
+    char countryEnc;
+    char state[CTC_NAME_SIZE];
+    char stateEnc;
+    char locality[CTC_NAME_SIZE];
+    char localityEnc;
+    char sur[CTC_NAME_SIZE];
+    char surEnc;
+    char org[CTC_NAME_SIZE];
+    char orgEnc;
+    char unit[CTC_NAME_SIZE];
+    char unitEnc;
+    char commonName[CTC_NAME_SIZE];
+    char commonNameEnc;
+    char email[CTC_NAME_SIZE];  /* !!!! email has to be last!!!! */
 } CertName;
 ```
 
@@ -316,7 +313,7 @@ If you wish to create a CA signed certificate then a couple of steps are require
 ```c
 ret = SetIssuer(&myCert, "ca-cert.pem");
 if (ret < 0)
-	/* ret contains error */;
+    /* ret contains error */;
 ```
 
 Then you’ll need to perform the two-step process of creating the certificate and then signing it (`MakeSelfCert()` does these both in one step). You’ll need the private keys from both the issuer (`caKey`) and the subject (`key`). Please see the example in `test.c` for complete usage.
@@ -352,7 +349,6 @@ InitCert(&request);
 ```
 
 `InitCert()` sets defaults for some of the variables including setting the version to **3** (0x02), the serial number to **0** (randomly generated), the sigType to `CTC_SHAwRSA`, the daysValid to **500**, and selfSigned to **1** (TRUE). Supported signature types include:
-
 
 * `CTC_SHAwDSA`
 * `CTC_MD2wRSA`
@@ -405,13 +401,11 @@ ret = wc_DerToPem(der, derSz, pem, sizeof(pem), CERTREQ_TYPE);
 printf("%s", pem); /* or write to a file */
 ```
 
-
 ### Limitations
 
 There are fields that are mandatory in a certificate that are excluded in a CSR. There are other fields in a CSR that are also deemed “optional” that are otherwise mandatory when in a certificate. Because of this the wolfSSL certificate parsing engine, which strictly checks all certificate fields AND considers all fields mandatory, does not support consuming a CSR at this time. Therefore while CSR generation AND certificate generation from scratch are supported, wolfSSL does not support certificate generation FROM a CSR. Passing in a CSR to the wolfSSL parsing engine will return a failure at this time. Check back for updates once we support consuming a CSR for use in certificate generation!
 
 **See also**: [Certificate Generation](#certificate-generation)
-
 
 ## Convert to raw ECC key
 

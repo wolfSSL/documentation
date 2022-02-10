@@ -9,4 +9,3 @@ We regularly post update information on Twitter. For additional release informat
 * wolfSSL on Facebook - [https://www.facebook.com/wolfSSL](https://www.facebook.com/wolfSSL)
 * wolfSSL on Reddit - [https://www.reddit.com/r/wolfssl/](https://www.reddit.com/r/wolfssl/)
 * Daily Blog - [https://www.wolfssl.com/blog](https://www.wolfssl.com/blog)
-
