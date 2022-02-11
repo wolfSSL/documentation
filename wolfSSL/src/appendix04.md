@@ -1,6 +1,5 @@
 # SSL/TLS Overview
 
-
 ## General Architecture
 
 The wolfSSL (formerly CyaSSL) embedded SSL library implements SSL 3.0, TLS 1.0, TLS 1.1, TLS 1.2, and TLS 1.3 protocols. TLS 1.3 is currently the most secure and up to date version of the standard. wolfSSL does not support SSL 2.0 due to the fact that it has been insecure for several years.
@@ -12,7 +11,6 @@ A general diagram of how the SSL protocol fits into existing protocols can be se
 ![SSL Protocol Diagram](sslprotocol.png "SSL Protocol Diagram")
 
 ## SSL Handshake
-
 
 The SSL handshake involves several steps, some of which are optional depending on what options the SSL client and server have been configured with.  Below, in **Figure 2**, you will find a simplified diagram of the SSL handshake process.
 

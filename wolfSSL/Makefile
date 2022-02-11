@@ -132,8 +132,12 @@ linkcheck:
 	@$(foreach source_md,$(SOURCES),docker run -v ${CURDIR}:/tmp:ro --rm -i ghcr.io/tcort/markdown-link-check:stable --config /tmp/test/linkcheck.json /tmp/src/$(source_md) || exit;)
 	@$(foreach source_md,$(APPENDIX),docker run -v ${CURDIR}:/tmp:ro --rm -i ghcr.io/tcort/markdown-link-check:stable --config /tmp/test/linkcheck.json /tmp/src/$(source_md) || exit;)
 
+.PHONY: lintcheck
+lintcheck:
+	@docker run -i --rm -v  ${CURDIR}:/work tmknom/markdownlint -c /work/test/lintcheck.json /work/src
+
 .PHONY: test
-test: linkcheck
+test: lintcheck linkcheck
 
 clean:
 	rm -f $(PDF)

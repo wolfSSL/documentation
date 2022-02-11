@@ -65,7 +65,7 @@ byte buffer[1024];
 Sha sha;
 wc_InitSha(&sha);
 
-wc_ShaUpdate(&sha, buffer, sizeof(buffer));  /*can be called again 
+wc_ShaUpdate(&sha, buffer, sizeof(buffer));  /*can be called again
                                           and again*/
 wc_ShaFinal(&sha, shaSum);
 ```
@@ -88,7 +88,7 @@ To use BLAKE2b (a SHA-3 finalist) include the BLAKE2b header `wolfssl/wolfcrypt/
 
 ```c
 byte digest[64];
-byte input[64];		/*fill input with data to hash*/
+byte input[64];     /*fill input with data to hash*/
 
 Blake2b b2b;
 wc_InitBlake2b(&b2b, 64);
@@ -100,7 +100,6 @@ wc_Blake2bFinal(&b2b, digest, 64);
 The second parameter to [`wc_InitBlake2b()`](group__BLAKE2.md#function-wc_initblake2b) should be the final digest size. `digest` now contains the digest of the hashed data in buffer.
 
 Example usage can be found in the wolfCrypt test application (`wolfcrypt/test/test.c`), inside the `blake2b_test()` function.
-
 
 ### RIPEMD-160
 
@@ -128,10 +127,10 @@ wc_RipeMdFinal(&ripemd, ripeMdSum);
 wolfCrypt currently provides HMAC for message digest needs. The structure `Hmac` is found in the header `wolfssl/wolfcrypt/hmac.h`. HMAC initialization is done with [`wc_HmacSetKey()`](group__HMAC.md#function-wc_hmacsetkey).  5 different types are supported with HMAC: MD5, SHA, SHA-256, SHA-384, and SHA-512. Here's an example with SHA-256.
 
 ```c
-Hmac	hmac;
-byte	key[24];    	/*fill key with keying material*/
-byte	buffer[2048];   /*fill buffer with data to digest*/
-byte	hmacDigest[SHA256_DIGEST_SIZE];
+Hmac    hmac;
+byte    key[24];        /*fill key with keying material*/
+byte    buffer[2048];   /*fill buffer with data to digest*/
+byte    hmacDigest[SHA256_DIGEST_SIZE];
 
 wc_HmacSetKey(&hmac, SHA256, key, sizeof(key));
 wc_HmacUpdate(&hmac, buffer, sizeof(buffer));
@@ -146,10 +145,10 @@ wolfCrypt also provides GMAC for message digest needs. The structure `Gmac` is f
 
 ```c
 Gmac gmac;
-byte	key[16];    	 /*fill key with keying material*/
-byte iv[12];		 /*fill iv with an initialization vector*/
-byte	buffer[2048];   /*fill buffer with data to digest*/
-byte	gmacDigest[16];
+byte    key[16];         /*fill key with keying material*/
+byte iv[12];         /*fill iv with an initialization vector*/
+byte    buffer[2048];   /*fill buffer with data to digest*/
+byte    gmacDigest[16];
 
 wc_GmacSetKey(&gmac, key, sizeof(key));
 wc_GmacUpdate(&gmac, iv, sizeof(iv), buffer, sizeof(buffer),
@@ -164,9 +163,9 @@ wolfCrypt also provides Poly1305 for message digest needs. The structure `Poly13
 
 ```c
 Poly1305    pmac;
-byte	       key[32];    	   /*fill key with keying material*/
-byte	       buffer[2048];   /*fill buffer with data to digest*/
-byte	       pmacDigest[16];
+byte           key[32];        /*fill key with keying material*/
+byte           buffer[2048];   /*fill buffer with data to digest*/
+byte           pmacDigest[16];
 
 wc_Poly1305SetKey(&pmac, key, sizeof(key));
 wc_Poly1305Update(&pmac, buffer, sizeof(buffer));
@@ -215,7 +214,6 @@ GCM mode is available for both encryption and decryption through the [`wc_AesGcm
 CCM-8 mode is supported for both encryption and decryption through the [`wc_AesCcmSetKey()`](group__AES.md#function-wc_aesccmsetkey), [`wc_AesCcmEncrypt()`](group__AES.md#function-wc_aesccmencrypt), and [`wc_AesCcmDecrypt()`](group__AES.md#function-wc_aesccmdecrypt) functions.  For a usage example, see the `aesccm_test()` function in `<wolfssl_root>/wolfcrypt/test/test.c`.
 
 CTR mode is available for both encryption and decryption through the [`wc_AesCtrEncrypt()`](group__AES.md#function-wc_aesctrencrypt) function. The encrypt and decrypt actions are identical so the same function is used for both. For a usage example, see the function `aes_test()` in file `wolfcrypt/test/test.c`.
-
 
 #### DES and 3DES
 
@@ -300,7 +298,7 @@ byte cipher[37];
 
 /*encrypt*/
 wc_Chacha_SetKey(&enc, key, keySz);
-wc_Chacha_SetIV(&enc, iv, counter); /*counter is the start block 
+wc_Chacha_SetIV(&enc, iv, counter); /*counter is the start block
                          counter is usually set as 0*/
 wc_Chacha_Process(&enc, cipher, plain, sizeof(plain));
 ```
@@ -366,7 +364,7 @@ wc_RsaPrivateKeyDecode(privateKeyBuffer, &idx, &rsaPrivateKey,
 
 byte plain[128];
 word32 plainSz = wc_RsaPrivateDecrypt(out, outLen, plain,
-   					   sizeof(plain), &rsaPrivateKey);
+                       sizeof(plain), &rsaPrivateKey);
 ```
 
 Now plain will hold plainSz bytes or an error code. For complete examples of each type in wolfCrypt please see the file `wolfcrypt/test/test.c`.  Note that the [`wc_RsaPrivateKeyDecode`](group__RSA.md#function-wc_rsaprivatekeydecode) function only accepts keys in raw `DER` format.
@@ -378,8 +376,8 @@ wolfCrypt provides support for Diffie-Hellman through the header `wolfssl/wolfry
 In the following example, `dhPublicKey` contains the Diffie-Hellman public parameters signed by a Certificate Authority (or self-signed).  `privA` holds the generated private key for sideA, `pubA` holds the generated public key for sideA, and `agreeA` holds the mutual key that both sides have agreed on.
 
 ```c
-DhKey	dhPublicKey;
-word32 idx = 0;  /*where to start reading into the 
+DhKey   dhPublicKey;
+word32 idx = 0;  /*where to start reading into the
                    publicKeyBuffer*/
 word32 pubASz, pubBSz, agreeASz;
 byte   tmp[1024];

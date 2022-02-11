@@ -36,9 +36,9 @@
 
 ## CI
 
-* Add MD lint checking
-  - <https://github.com/tmknom/markdownlint>
+* ~~Add MD lint checking~~
 * ~~Add URL validation (nightly?)~~
+* Add to Jenkins for PR testing
 
 ## Other
 

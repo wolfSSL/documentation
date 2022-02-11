@@ -28,13 +28,13 @@ All applications should call [`wolfSSL_Init()`](group__TLS.md#function-wolfssl_i
 
 In addition to header file location changes, the release of wolfSSL 2.0.0 RC3 created a more visible distinction between the native wolfSSL API and the wolfSSL OpenSSL Compatibility Layer.  With this distinction, the main SSL/TLS structures used by the native wolfSSL API have changed names.  The new structures are as follows.  The previous names are still used when using the OpenSSL Compatibility Layer (see [OpenSSL Compatibility](chapter13.md#openssl-compatibility)).
 
-* `WOLFSSL`			(previously SSL)
-* `WOLFSSL_CTX`		(previously SSL_CTX)
-* `WOLFSSL_METHOD`		(previously SSL_METHOD)
-* `WOLFSSL_SESSION`	(previously SSL_SESSION)
-* `WOLFSSL_X509`		(previously X509)
-* `WOLFSSL_X509_NAME`	(previously X509_NAME)
-* `WOLFSSL_X509_CHAIN`	(previously X509_CHAIN)
+* `WOLFSSL`         (previously SSL)
+* `WOLFSSL_CTX`     (previously SSL_CTX)
+* `WOLFSSL_METHOD`      (previously SSL_METHOD)
+* `WOLFSSL_SESSION` (previously SSL_SESSION)
+* `WOLFSSL_X509`        (previously X509)
+* `WOLFSSL_X509_NAME`   (previously X509_NAME)
+* `WOLFSSL_X509_CHAIN`  (previously X509_CHAIN)
 
 ## Thread Safety
 

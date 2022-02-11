@@ -13,7 +13,7 @@
 
 ## Stream Ciphers
 
-* Stream Cipher	Information - [Wikipedia](https://en.wikipedia.org/wiki/Stream_cipher)
+* Stream Cipher Information - [Wikipedia](https://en.wikipedia.org/wiki/Stream_cipher)
 * RC4 / ARC4 - [IETF Draft](https://tools.ietf.org/id/draft-kaukonen-cipher-arcfour-03.txt) [Wikipedia](https://en.wikipedia.org/wiki/Rc4)
 
 ## Block Ciphers

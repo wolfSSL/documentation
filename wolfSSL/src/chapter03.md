@@ -26,7 +26,7 @@ On \*nix or Windows the examples and testsuite will check to see if the current 
 
 On a successful run you should see output like this, with additional output for unit tests and cipher suite tests:
 
-```
+```text
 ------------------------------------------------------------------------------
  wolfSSL version 4.8.1
 ------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ You can use the client example found in examples/client to test wolfSSL against 
 
 Which returns:
 
-```
+```text
 wolfSSL client 4.8.1 NOTE: All files relative to wolfSSL home dir
 Max RSA key size in bits for build is set at : 4096
 -? <num>    Help, print this usage
@@ -171,7 +171,7 @@ To test against example.com:443 try the following. This is using wolfSSL compile
 
 Which returns:
 
-```
+```text
 Alternate cert chain used
  issuer : /C=US/O=DigiCert Inc/CN=DigiCert TLS RSA SHA256 2020 CA1
  subject: /C=US/ST=California/L=Los Angeles/O=Internet Corporation for Assigned Names and Numbers/CN=www.example.org
@@ -212,7 +212,7 @@ The client is able to benchmark a connection when using the `-b <num>` argument.
 
 Returns:
 
-```
+```text
 wolfSSL_connect avg took:  296.417 milliseconds
 ```
 
@@ -228,7 +228,7 @@ By default, the wolfSSL example client tries to connect to the specified server 
 
 A common error users see when using the example client is -188:
 
-```
+```text
 wolfSSL_connect error -188, ASN no signer error to confirm failure
 wolfSSL error: wolfSSL_connect failed
 ```
@@ -256,7 +256,7 @@ command line arguments as well:
 
 Which returns:
 
-```
+```text
 server 4.8.1 NOTE: All files relative to wolfSSL home dir
 -? <num>    Help, print this usage
             0: English, 1: Japanese
@@ -318,7 +318,7 @@ The output of the echoserver is echoed to stdout unless `NO_MAIN_DRIVER` is defi
 
 The echoclient example can be run in interactive mode or batch mode with files. To run in interactive mode and write 3 strings "hello", "wolfssl", and "quit" results in:
 
-```
+```text
 ./examples/echoclient/echoclient
 hello
 hello
@@ -354,7 +354,7 @@ The benchmark utility located in wolfcrypt/benchmark (`./wolfcrypt/benchmark/ben
 ./wolfcrypt/benchmark/benchmark
 ```
 
-```
+```text
 ------------------------------------------------------------------------------
  wolfSSL version 4.8.1
 ------------------------------------------------------------------------------
@@ -438,11 +438,13 @@ wolfSSL_CTX_set_cipher_list(ctx, “AES128-SHA”);
     ```sh
     ./configure --enable-fastmath C_EXTRA_FLAGS=”-DTFM_NO_ASM”
     ```
+
 5. Using fasthugemath can try to push fastmath even more for users who are not running on embedded platforms:
 
     ```sh
     ./configure --enable-fasthugemath
     ```
+
 6. With the default wolfSSL build, we have tried to find a good balance between memory usage and performance. If you are more concerned about one of the two, please refer back to [Build Options](chapter02.md#build-options) for additional wolfSSL configuration options.
 7. **Bulk Transfers**: wolfSSL by default uses 128 byte I/O buffers since about 80% of SSL traffic falls within this size and to limit dynamic memory use. It can be configured to use 16K buffers (the maximum SSL size) if bulk transfers are required.
 
@@ -472,6 +474,7 @@ This section will explain the basic steps needed to add wolfSSL to a client appl
     ```c
     #include <wolfssl/ssl.h>
     ```
+
 2. Initialize wolfSSL and the `WOLFSSL_CTX`. You can use one `WOLFSSL_CTX` no matter how many WOLFSSL objects you end up creating. Basically you'll just need to load CA certificates to verify the server you are connecting to. Basic initialization looks like:
 
     ```c
@@ -488,6 +491,7 @@ This section will explain the basic steps needed to add wolfSSL to a client appl
         exit(EXIT_FAILURE);
     }
     ```
+
 3. Create the WOLFSSL object after each TCP connect and associate the file descriptor with the session:
 
     ```c
@@ -499,6 +503,7 @@ This section will explain the basic steps needed to add wolfSSL to a client appl
     }
     wolfSSL_set_fd(ssl, fd);
     ```
+
 4. Change all calls from `read()` (or `recv()`) to [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) so:
 
     ```c
@@ -531,6 +536,7 @@ This section will explain the basic steps needed to add wolfSSL to a client appl
     int err = wolfSSL_get_error(ssl, 0);
     wolfSSL_ERR_error_string(err, errorString);
     ```
+
     If you are using non-blocking sockets, you can test for errno `EAGAIN`/`EWOULDBLOCK` or more correctly you can test the specific error code returned by [`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error) for `SSL_ERROR_WANT_READ` or`SSL_ERROR_WANT_WRITE`.
 8. Cleanup. After each WOLFSSL object is done being used you can free it up by
 calling:
@@ -538,12 +544,14 @@ calling:
     ```c
     wolfSSL_free(ssl);
     ```
+
     When you are completely done using SSL/TLS altogether you can free the `WOLFSSL_CTX` object by calling:
 
     ```c
     wolfSSL_CTX_free(ctx);
     wolfSSL_Cleanup();
     ```
+
     For an example of a client application using wolfSSL, see the client example located in the `<wolfssl_root>/examples/client.c` file.
 
 ## Changing a Server Application to Use wolfSSL
@@ -567,6 +575,7 @@ This section will explain the basic steps needed to add wolfSSL to a server appl
     ```c
     wolfSSL_CTX_new(wolfSSLv23_server_method());
     ```
+
     To allow SSLv3 and TLSv1+ clients to connect to the server.
 2. Add the server's certificate and key file to the initialization in step 5 above:
 
