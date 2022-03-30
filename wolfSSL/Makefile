@@ -49,6 +49,7 @@ api: wolfssl-update
 # 3. Fix the titles of the header files markdown
 .PHONY: html-setup
 html-setup: api builddir $(SOURCES) $(APPENDIX)
+	-cd ../mkdocs-material; patch -p1 < ../Custom-wolfSSL-theme.patch --ignore-whitespace -N
 	@cp src/*.png build/html/
 	@cp src/*.css build/html/
 	@cp -a api/md/group* build/html/

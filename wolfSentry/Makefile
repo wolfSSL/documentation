@@ -18,6 +18,8 @@ html-setup: builddir $(SOURCES)
 	@cp src/*.png build/html/
 	@cp src/*.css build/html/
 	@mv build/html/chapter01.md build/html/index.md
+	-cd ../mkdocs-material; patch -p1 < ../Custom-wolfSSL-theme.patch --ignore-whitespace -N
+
 
 html: html-setup
 	@mkdir html

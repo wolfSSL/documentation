@@ -1,8 +1,8 @@
-site_name: wolfMQTT Manual
+site_name: wolfSSH Manual
 site_url: https://wolfssl.com/
 docs_dir: build/html/
 site_dir: html/
-copyright: wolfSSL Inc. 2021
+copyright: Copyright © 2022 wolfSSL Inc.
 nav:
     - "1. Introduction": index.md
     - "2. Building wolfSSH": chapter02.md
@@ -18,6 +18,20 @@ nav:
     - "12. wolfSSH Updates": chapter12.md
     - "13. API Reference": chapter13.md
     - "14. wolfSSL SFTP API Reference": chapter14.md
-theme: readthedocs
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: roboto
+    code: roboto mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
 extra_css: [skin.css]
 use_directory_urls: false
