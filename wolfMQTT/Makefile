@@ -32,6 +32,7 @@ api: wolfmqtt-update
 .PHONY: html-setup
 html-setup: api builddir $(SOURCES) 
 	@cp src/*.css build/html/
+	@cp src/*.png build/html/
 	@cp -a api/md/*8h* build/html/
 	@rm -rf build/html/chapter05.md	
 	@perl -i -pe "s/Classes\///g" build/html/*8h* 
@@ -42,6 +43,8 @@ html-setup: api builddir $(SOURCES)
 	@perl -i -pe "s/\/mqtt_/mqtt_/g" build/html/*8h*    
 	@perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*
 	@mv build/html/chapter01.md build/html/index.md
+	-cd ../mkdocs-material; patch -p1 < ../Custom-wolfSSL-theme.patch --ignore-whitespace -N
+
 
 html: html-setup
 	@mkdir -p html
