@@ -65,9 +65,7 @@ nav:
         - "Setup SAKKE Key": group__SAKKE__Setup.md
         - "Operations on/with SAKKE RSK": group__SAKKE__RSK.md
         - "Operations using SAKKE Key": group__SAKKE__Operations.md
-      - "Algorithms - HC128": group__HC128.md
       - "Algorithms - HMAC": group__HMAC.md
-      - "Algorithms - IDEA": group__IDEA.md
       - "Algorithms - MD2": group__MD2.md
       - "Algorithms - MD4": group__MD4.md
       - "Algorithms - MD5": group__MD5.md
@@ -76,7 +74,6 @@ nav:
       - "Algorithms - PKCS11": group__PKCS11.md
       - "Algorithms - Poly1305": group__Poly1305.md
       - "Algorithms - PSA": group__PSA.md
-      - "Algorithms - Rabbit": group__Rabbit.md
       - "Algorithms - RIPEMD": group__RIPEMD.md
       - "Algorithms - RSA": group__RSA.md
       - "Algorithms - SHA 128/224/256/384/512": group__SHA.md
@@ -109,9 +106,7 @@ nav:
       - error-crypt_8h.md
       - evp_8h.md
       - hash_8h.md
-      - hc128_8h.md
       - hmac_8h.md
-      - idea_8h.md
       - iotsafe_8h.md
       - logging_8h.md
       - md2_8h.md
@@ -124,7 +119,6 @@ nav:
       - poly1305_8h.md
       - psa_8h.md
       - pwdbased_8h.md
-      - rabbit_8h.md
       - random_8h.md
       - ripemd_8h.md
       - rsa_8h.md
@@ -161,4 +155,6 @@ theme:
   feature:
     tabs: true
 extra_css: [skin.css]
+extra:
+    generator: false
 use_directory_urls: false
