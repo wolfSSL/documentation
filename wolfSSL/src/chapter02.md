@@ -582,7 +582,7 @@ Enables ECC compressed key support.
 
 #### WOLFSSL_EXTRA_ALERTS
 
-Enables additional alerts to be sent during a TLS connection. This feature is also enabled automatically when [`--enable-opensslextra`](#enable-opensslextra) is used.
+Enables additional alerts to be sent during a TLS connection. This feature is also enabled automatically when [`--enable-opensslextra`](#--enable-opensslextra) is used.
 
 #### WOLFSSL_DEBUG_TLS
 
@@ -1415,7 +1415,7 @@ Enabling AES-GCM will add these cipher suites to wolfSSL.  wolfSSL offers four d
 
 ### `--disable-aescbc`
 
-Used to with [`--disable-aescbc`](#disable-aescbc) to compile out AES-CBC
+Used to with [`--disable-aescbc`](#--disable-aescbc) to compile out AES-CBC
 
 AES-GCM will enable Counter with CBC-MAC Mode with 8‑byte authentication (CCM-8) for AES.
 
@@ -1895,11 +1895,11 @@ Path to USER\_CRYPTO install (default `/usr/local`).
 
 ### `--enable-rsavfy`
 
-Enables RSA verify only support (**note** requires [`--enable-cryptonly`](#enable-cryptonly))
+Enables RSA verify only support (**note** requires [`--enable-cryptonly`](#--enable-cryptonly))
 
 ### `--enable-rsapub`
 
-Default value: Enabled RSA public key only support (**note** requires [`--enable-cryptonly`](#enable-cryptonly))
+Default value: Enabled RSA public key only support (**note** requires [`--enable-cryptonly`](#--enable-cryptonly))
 
 ### `--enable-armasm`
 
@@ -1915,7 +1915,7 @@ Disable TLS 1.2 support
 
 Enable TLS 1.3 support
 
-This build option can be combined with [`--disable-tlsv12`](#disable-tlsv12) and [`--disable-oldtls`](#disable-oldtlx) to produce a wolfSSL build that is only TLS 1.3.
+This build option can be combined with [`--disable-tlsv12`](#--disable-tlsv12) and [`--disable-oldtls`](#--disable-oldtlx) to produce a wolfSSL build that is only TLS 1.3.
 
 ### `--enable-all`
 
@@ -1929,7 +1929,7 @@ Enables AES-XTS mode
 
 Enables ASIO.
 
-Requires that the options [`--enable-opensslextra`](#enable-opensslextra) and [`--enable-opensslall`](#enable-opensslall) be enabled when configuring wolfSSL. If these two options are not enabled, then the autoconf tool will automatically enable these options to enable ASIO when configuring wolfSSL.
+Requires that the options [`--enable-opensslextra`](#--enable-opensslextra) and [`--enable-opensslall`](#--enable-opensslall) be enabled when configuring wolfSSL. If these two options are not enabled, then the autoconf tool will automatically enable these options to enable ASIO when configuring wolfSSL.
 
 ### `--enable-qt`
 
@@ -1951,7 +1951,7 @@ Enables Apache httpd support
 
 Enables use of Linux module AF\_ALG for hardware accleration. Additional Xilinx use with `=xilinx`, `=xilinx-rsa`, `=xilinx-aes`, `=xilinx-sha3`
 
-Is similar to [`--enable-devcrypto`](#enable-devcrypto) in that it leverages a Linux kernel module (AF\_ALG) for offloading crypto operations. On some hardware the module has performance accelerations available through the Linux crypto drivers. In the case of Petalinux with Xilinx the flag `--enable-afalg=xilinx` can be used to tell wolfSSL to use the Xilinx interface for AF\_ALG.
+Is similar to [`--enable-devcrypto`](#--enable-devcrypto) in that it leverages a Linux kernel module (AF\_ALG) for offloading crypto operations. On some hardware the module has performance accelerations available through the Linux crypto drivers. In the case of Petalinux with Xilinx the flag `--enable-afalg=xilinx` can be used to tell wolfSSL to use the Xilinx interface for AF\_ALG.
 
 ### `--enable-devcrypto`
 

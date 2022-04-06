@@ -25,14 +25,14 @@ COPY . .
 
 # Parallel build PDF
 FROM builder AS stage1
-WORKDIR /src/wolfssl
+WORKDIR /src/wolfssl/wolfSSL
 RUN make pdf
 
 # Parallel build HTML
 FROM builder AS stage2
-WORKDIR /src/wolfssl
+WORKDIR /src/wolfssl/wolfSSL
 RUN make html
 
 FROM scratch AS export-stage
-COPY --from=stage1 /src/wolfssl/wolfssl.pdf .
-COPY --from=stage2 /src/wolfssl/html ./html
+COPY --from=stage1 /src/wolfssl/wolfSSL/wolfssl.pdf .
+COPY --from=stage2 /src/wolfssl/wolfSSL/html ./html
