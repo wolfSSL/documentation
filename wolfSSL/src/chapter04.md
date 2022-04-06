@@ -66,7 +66,7 @@ The TLS protocol was designed to provide a secure transport channel across a **r
 
 Many people believe the difference between TLS and DTLS is the same as TCP vs. UDP. This is incorrect.  UDP has the benefit of having no handshake, no tear-down, and no delay in the middle if something gets lost (compared with TCP).  DTLS on the other hand, has an extended SSL handshake and tear-down and must implement TCP-like behavior for the handshake.  In essence, DTLS reverses the benefits that are offered by UDP in exchange for a secure connection.
 
-DTLS can be enabled when building wolfSSL by using the [`--enable-dtls`](chapter02.md#enable-dtls) build option.
+DTLS can be enabled when building wolfSSL by using the [`--enable-dtls`](chapter02.md#--enable-dtls) build option.
 
 ### LwIP (Lightweight Internet Protocol)
 
@@ -288,7 +288,7 @@ wolfSSL supports AEAD suites, including AES-GCM, AES-CCM, and CHACHA-POLY1305. T
 
 ### Block and Stream Ciphers
 
-wolfSSL supports the **AES**, **DES**, **3DES**, and **Camellia** block ciphers and the **RC4**, and **CHACHA20 **stream ciphers. AES, DES, 3DES and RC4 are enabled by default.  Camellia, and ChaCha20 can be enabled when building wolfSSL (with the [`--enable-camellia`](chapter02.md#enable-camellia), and [`--disable-chacha`](chapter02.md#disable-chacha) build options, respectively). The default mode of AES is CBC mode.  To enable GCM or CCM mode with AES, use the [`--enable-aesgcm`](chapter02.md#enable-aesgcm) and [`--enable-aesccm`](chapter02.md#enable-aesccm) build options.  Please see the examples for usage and the [wolfCrypt Usage Reference](chapter10.md#wolfcrypt-usage-reference) for specific usage information.
+wolfSSL supports the **AES**, **DES**, **3DES**, and **Camellia** block ciphers and the **RC4**, and **CHACHA20 **stream ciphers. AES, DES, 3DES and RC4 are enabled by default.  Camellia, and ChaCha20 can be enabled when building wolfSSL (with the [`--enable-camellia`](chapter02.md#--enable-camellia), and [`--disable-chacha`](chapter02.md#--disable-chacha) build options, respectively). The default mode of AES is CBC mode.  To enable GCM or CCM mode with AES, use the [`--enable-aesgcm`](chapter02.md#--enable-aesgcm) and [`--enable-aesccm`](chapter02.md#--enable-aesccm) build options.  Please see the examples for usage and the [wolfCrypt Usage Reference](chapter10.md#wolfcrypt-usage-reference) for specific usage information.
 
 While SSL uses RC4 as the default stream cipher, it has been obsoleted due to compromise. Recently wolfSSL added ChaCha20. While RC4 is about 11% more performant than ChaCha, RC4 is generally considered less secure than ChaCha. ChaCha can put up very nice times of it’s own with added security as a tradeoff.
 
@@ -360,7 +360,7 @@ int PKCS12_PBKDF(byte* output, const byte* passwd, int pLen,
 
 `output` contains the derived key, `passwd` holds the user password of length `pLen`, `salt` holds the salt input of length `sLen`, `iterations` is the number of iterations to perform, `kLen` is the desired derived key length, and `hashType` is the hash to use (which can be MD5, SHA1, or SHA2).
 
-If you are using `./configure` to build wolfssl, the way to enable this functionality is to use the option [`--enable-pwdbased`](chapter02.md#enable-pwdbased)
+If you are using `./configure` to build wolfssl, the way to enable this functionality is to use the option [`--enable-pwdbased`](chapter02.md#--enable-pwdbased)
 
 A full example can be found in `<wolfSSL Root>/wolfcrypt/test.c`. More information can be found on PKCS #5, PBKDF1, and PBKDF2 from the following specifications:
 
@@ -376,7 +376,7 @@ PKCS#8:  [https://tools.ietf.org/html/rfc5208](https://tools.ietf.org/html/rfc52
 
 #### PKCS #7
 
-PKCS #7 is designed to transfer bundles of data whether is an enveloped certificate or unencrypted but signed string of data. The functionality is turned on by using the enable option ([`--enable-pkcs7`](chapter02.md#enable-pkcs7)) or by using the macro `HAVE_PKCS7`. Note that degenerate cases are allowed by default as per the RFC having an empty set of signers. To toggle allowing degenerate cases on and off the function `wc_PKCS7_AllowDegenerate()` can be called.
+PKCS #7 is designed to transfer bundles of data whether is an enveloped certificate or unencrypted but signed string of data. The functionality is turned on by using the enable option ([`--enable-pkcs7`](chapter02.md#--enable-pkcs7)) or by using the macro `HAVE_PKCS7`. Note that degenerate cases are allowed by default as per the RFC having an empty set of signers. To toggle allowing degenerate cases on and off the function `wc_PKCS7_AllowDegenerate()` can be called.
 
 Supported features include:
 
@@ -440,7 +440,7 @@ Essentially, Intel and AMD have added AES instructions at the chip level that pe
 
 We have added the functionality to wolfSSL to allow it to call  the instructions directly from the chip, instead of running the algorithm in software. This means that when you’re running wolfSSL on a chipset that supports AES-NI, you can run your AES crypto 5-10 times faster!
 
-If you are running on an AES-NI supported chipset, enable AES-NI with the [`--enable-aesni` build option](chapter02.md#enable-aesni).  To build wolfSSL with AES-NI, GCC 4.4.3 or later is required to make use of the assembly code.  wolfSSL supports the ASM instructions on AMD processors using the same build options.
+If you are running on an AES-NI supported chipset, enable AES-NI with the [`--enable-aesni` build option](chapter02.md#--enable-aesni).  To build wolfSSL with AES-NI, GCC 4.4.3 or later is required to make use of the assembly code.  wolfSSL supports the ASM instructions on AMD processors using the same build options.
 
 References and further reading on AES-NI, ordered from general to specific, are listed below.  For information about performance gains with AES-NI, please see the third link to the Intel Software Network page.
 
@@ -466,7 +466,7 @@ wolfSSL has support for Marvell (previously Cavium) NITROX (<https://www.marvell
 ./configure --with-cavium=/home/user/cavium/software
 ```
 
-Where the [`--with-cavium=**`](chapter02.md#with-cavium) option is pointing to your licensed cavium/software directory.  Since Cavium doesn't build a library wolfSSL pulls in the `cavium_common.o` file which gives a libtool warning about the portability of this.  Also, if you're using the github source tree you'll need to remove the `-Wredundant-decls` warning from the generated Makefile because the cavium headers don't conform to this warning.
+Where the [`--with-cavium=**`](chapter02.md#--with-cavium) option is pointing to your licensed cavium/software directory.  Since Cavium doesn't build a library wolfSSL pulls in the `cavium_common.o` file which gives a libtool warning about the portability of this.  Also, if you're using the github source tree you'll need to remove the `-Wredundant-decls` warning from the generated Makefile because the cavium headers don't conform to this warning.
 
 Currently wolfSSL supports Cavium RNG, AES, 3DES, RC4, HMAC, and RSA directly at the crypto layer.  Support at the SSL level is partial and currently just does AES, 3DES, and RC4.  RSA and HMAC are slower until the Cavium calls can be utilized in non-blocking mode.  The example client turns on cavium support as does the crypto test and benchmark.  Please see the `HAVE_CAVIUM` define.
 
@@ -485,7 +485,7 @@ Beginning with the wolfSSL 1.5.0 release, wolfSSL has included a build option al
 * Monitoring network usage and data in motion
 * Debugging client/server communications
 
-To enable sniffer support, build wolfSSL with the [`--enable-sniffer`](chapter02.md#enable-sniffer) option on \*nix or use the **vcproj** files on Windows. You will need to have **pcap** installed on \*nix or **WinPcap** on Windows. The main sniffer functions which can be found in `sniffer.h` are listed below with a short description of each:
+To enable sniffer support, build wolfSSL with the [`--enable-sniffer`](chapter02.md#--enable-sniffer) option on \*nix or use the **vcproj** files on Windows. You will need to have **pcap** installed on \*nix or **WinPcap** on Windows. The main sniffer functions which can be found in `sniffer.h` are listed below with a short description of each:
 
 * `ssl_SetPrivateKey` - Sets the private key for a specific server and port.
 * `ssl_SetNamedPrivateKey` - Sets the private key for a specific server, port and domain name.
@@ -675,7 +675,7 @@ make
 sudo make install
 ```
 
-The included example in wolfSSL requires the use of IPP, which will need to be installed before the project can be built. Though even if not having IPP libraries to build the example it is intended to provide users with an example of file name choice and API interface. Once having made and installed both the library libusercrypto and header files, making wolfSSL use the crypto module does not require any extra steps. Simply using the configure flag [`--with-user-crypto`](chapter02.md#with-user-crypto) will map all function calls from the typical wolfSSL crypto to the user crypto module.
+The included example in wolfSSL requires the use of IPP, which will need to be installed before the project can be built. Though even if not having IPP libraries to build the example it is intended to provide users with an example of file name choice and API interface. Once having made and installed both the library libusercrypto and header files, making wolfSSL use the crypto module does not require any extra steps. Simply using the configure flag [`--with-user-crypto`](chapter02.md#--with-user-crypto) will map all function calls from the typical wolfSSL crypto to the user crypto module.
 
 Memory allocations, if using wolfSSL’s XMALLOC, should be tagged with `DYNAMIC_TYPE_USER_CRYPTO`. Allowing for analyzing memory allocations used by the module.
 
@@ -687,7 +687,7 @@ wolfSSL provides the function “ConstantCompare” which guarantees constant ti
 
 The wolfSSL ECC implementation has the define `ECC_TIMING_RESISTANT` to enable timing-resistance in the ECC algorithm. Similarly the define `TFM_TIMING_RESISTANT` is provided in the fast math libraries for RSA algorithm timing-resistance. The function exptmod uses the timing resistant Montgomery ladder.
 
-See also: [`--disable-harden`](chapter02.md#disable-harden)
+See also: [`--disable-harden`](chapter02.md#--disable-harden)
 
 Timing resistance and cache resistance defines enabled with `--enable-harden`:
 

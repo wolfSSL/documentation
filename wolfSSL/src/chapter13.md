@@ -10,7 +10,7 @@ Our test beds for OpenSSL compatibility are stunnel and Lighttpd, which means th
 
 Building wolfSSL With Compatibility Layer:
 
-1. Enable with ([`--enable-opensslextra`](chapter02.md#enable-opensslextra)) or by defining the macro `OPENSSL_EXTRA`.
+1. Enable with ([`--enable-opensslextra`](chapter02.md#--enable-opensslextra)) or by defining the macro `OPENSSL_EXTRA`.
 
     ```sh
     ./configure --enable-opensslextra
