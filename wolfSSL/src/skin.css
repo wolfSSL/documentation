@@ -84,10 +84,16 @@
 
 .md-footer-meta {
     background-color: #ccc;
+    height: 30px;
+}
+
+.md-footer-meta__inner{
+    bottom: 0;
+    position: absolute;
 }
 
 .md-copyright__highlight {
-    font-size: 1rem;
+    font-size: 0.6rem;
     color: black;
 }
 

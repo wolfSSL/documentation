@@ -1,14 +1,33 @@
-From ac39891392fd152495e3b46cf79c90b96c022862 Mon Sep 17 00:00:00 2001
+From 91c5005cc88851deda2f393fe37b2b5ffbc66ccb Mon Sep 17 00:00:00 2001
 From: Lealem Amedie <lealemta47@gmail.com>
-Date: Wed, 16 Feb 2022 14:47:56 -0800
-Subject: [PATCH] wolfSSL customization
+Date: Wed, 6 Apr 2022 13:23:44 -0700
+Subject: [PATCH 1/1] Adding wolfSSL link and google analytics
 
 ---
- material/partials/header.html   |   9 +++
- src/assets/stylesheets/skin.css | 100 ++++++++++++++++++++++++++++++++
- 2 files changed, 109 insertions(+)
- create mode 100644 src/assets/stylesheets/skin.css
+ material/base.html            | 9 +++++++++
+ material/partials/header.html | 9 +++++++++
+ 2 files changed, 18 insertions(+)
 
+diff --git a/material/base.html b/material/base.html
+index be0a8c88e..1c1380746 100644
+--- a/material/base.html
++++ b/material/base.html
+@@ -67,6 +67,15 @@
+       {% include "partials/integrations/analytics.html" %}
+     {% endblock %}
+     {% block extrahead %}{% endblock %}
++    <!-- Global site tag (gtag.js) - Google Analytics -->
++     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-64826966-1"></script>
++     <script>
++       window.dataLayer = window.dataLayer || [];
++       function gtag(){dataLayer.push(arguments);}
++       gtag('js', new Date());
++     
++       gtag('config', 'UA-64826966-1');
++     </script>
+   </head>
+   {% set direction = config.theme.direction or lang.t('direction') %}
+   {% if config.theme.palette %}
 diff --git a/material/partials/header.html b/material/partials/header.html
 index 4872af867..449bf03a4 100644
 --- a/material/partials/header.html
@@ -29,112 +48,6 @@ index 4872af867..449bf03a4 100644
      {% if "search" in config["plugins"] %}
        <label class="md-header__button md-icon" for="__search">
          {% include ".icons/material/magnify.svg" %}
-diff --git a/src/assets/stylesheets/skin.css b/src/assets/stylesheets/skin.css
-new file mode 100644
-index 000000000..8e69a8ae2
---- /dev/null
-+++ b/src/assets/stylesheets/skin.css
-@@ -0,0 +1,100 @@
-+.md-nav__link {
-+    color: #c46715;
-+}
-+
-+.md-nav__link:is(:focus, :hover){
-+    color: #1fbeca;
-+}
-+
-+.md-nav__item .md-nav__link--active {
-+    color: #1fbeca;
-+}
-+
-+.md-header__button.md-logo :is(img, svg){
-+    height: 3.5rem;
-+    width: 3.5rem;
-+}
-+
-+.md-typeset a:focus, .md-typeset a{    
-+    color: #c46715;
-+}
-+
-+.md-typeset a:hover {
-+     color: #1fbeca;
-+}
-+
-+.md-header{
-+    background-color: #fff;
-+}
-+
-+.md-ellipsis{
-+    color: #1fbeca;
-+    font-size: 1.1rem;
-+}
-+
-+.md-ellipsis-nav {
-+    margin-right: 3%;
-+    color: #1fbeca;
-+    font-size: 0.8rem;
-+    width: 450px;
-+}
-+
-+.md-ellipsis-nav a{
-+    color:#fff;
-+    background-color: #1fbeca;
-+    padding: 6px;
-+    border-radius: 3.5px;
-+    margin-left: 3px;
-+}
-+
-+.md-ellipsis-nav a:hover{
-+    color: #1fbeca;
-+    background-color: #000;
-+}
-+
-+@media screen and (max-width: 800px)
-+{   .md-ellipsis-nav { display: none; } }
-+
-+.md-search__input {
-+    background: #f2f2f2;
-+    border: 2px solid #dfdfdf;
-+    color: black;
-+}
-+
-+::placeholder {
-+    color: gray !important;
-+}
-+
-+.md-content {
-+    min-height: 550px;
-+}
-+
-+.md-footer {
-+    background-color: #fff;
-+    box-shadow: 0 0 .2rem rgba(0,0,0,.1),0 .2rem .4rem rgba(0,0,0,.2);
-+}
-+
-+.md-icon svg {
-+    fill: #1fbeca;
-+}
-+
-+.md-footer-meta {
-+    background-color: #ccc;
-+}
-+
-+.md-copyright__highlight {
-+    font-size: 1rem;
-+    color: black;
-+}
-+
-+.md-copyright {
-+    color: black;
-+}
-+
-+html .md-footer-meta.md-typeset a {
-+    color: black;
-+}
-+
-+html .md-footer-meta.md-typeset a:is(:focus, :hover) {
-+    color: #c46715;
-+}
 -- 
 2.25.1
 
