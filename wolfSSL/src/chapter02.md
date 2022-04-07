@@ -658,6 +658,10 @@ If defined allows a user specific settings file to be used. The file must be nam
 
 Is an extension that allows debugging callbacks through the use of signals in an environment without a debugger, it is off by default. It can also be used to set up a timer with blocking sockets. Please see [Callbacks](chapter06.md#callbacks) for more information.
 
+#### WOLF_CRYPTO_CB
+
+ Enable crypto callback support. This feature is also enabled automatically when [`--enable-cryptocb`](#enable-cryptocb) is used.
+
 #### WOLFSSL_USER_IO
 
 Allows the user to remove automatic setting of the default I/O functions [`EmbedSend()`](wolfio_8h.md#function-embedsend) and [`EmbedReceive()`](wolfio_8h.md#function-embedrecieve). Used for custom I/O abstraction layer (see [Abstraction Layers](chapter05.md#abstraction-layers) for more details).
@@ -1974,6 +1978,17 @@ Enables Signaling Cipher Suite Value(SCSV)
 ### `--enable-psk-one-id`
 
 Enables support for single PSK ID with TLS 1.3
+
+### `--enable-cryptocb`
+
+Enable crypto callbacks. Register a crypto callback using wc_CryptoCb_RegisterDevice and set the associated devId using wolfSSL_CTX_SetDevId.
+
+The following two defines can be used with `--enable-cryptocb` to complie out RSA or ECC software fallback to optimize for footprint reduction when software RSA/ECC is not required.
+
+* WOLF_CRYPTO_CB_ONLY_RSA - compiles out RSA software crypto fallback
+* WOLF_CRYPTO_CB_ONLY_ECC - compiles out ECC software crypto fallback
+
+Use of the WOLF_CRYPTO_CB_ONLY_* options requires disabling the examples. See [`--disable-examples`](#disable-examples)
 
 ## Special Math Optimization Flags
 
