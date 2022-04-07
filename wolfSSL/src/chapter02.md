@@ -1983,12 +1983,12 @@ Enables support for single PSK ID with TLS 1.3
 
 Enable crypto callbacks. Register a crypto callback using wc_CryptoCb_RegisterDevice and set the associated devId using wolfSSL_CTX_SetDevId.
 
-The following two defines can be used with `--enable-cryptocb` to complies out RSA or ECC software fallback to footprint usage optimization.
+The following two defines can be used with `--enable-cryptocb` to complie out RSA or ECC software fallback to optimize for footprint reduction when software RSA/ECC is not required.
 
 * WOLF_CRYPTO_CB_ONLY_RSA - compiles out RSA software crypto fallback
 * WOLF_CRYPTO_CB_ONLY_ECC - compiles out ECC software crypto fallback
 
-Require [`--disable-examples`](#disable-examples) option to disable examples because examples are not setup to handle this use case with WOLF_CRYPTO_CB_ONLY_*.  
+Use of the WOLF_CRYPTO_CB_ONLY_* options requires disabling the examples. See [`--disable-examples`](#disable-examples)
 
 ## Special Math Optimization Flags
 
