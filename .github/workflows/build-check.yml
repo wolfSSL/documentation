@@ -1,0 +1,52 @@
+name: Docs Build Test
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+      with:
+        repository: matusnovak/doxybook2
+        path: ./doxy
+    - name: wget vcpkg
+      working-directory: ./doxy 
+      run: wget -O vcpkg.tar.gz https://github.com/microsoft/vcpkg/archive/master.tar.gz
+    - name: mkdir vcpkg
+      working-directory: ./doxy 
+      run: sudo mkdir /opt/vcpkg
+    - name: tar vcpkg
+      working-directory: ./doxy 
+      run: sudo tar xf vcpkg.tar.gz --strip-components=1 -C /opt/vcpkg
+    - name: build vcpkg
+      working-directory: ./doxy 
+      run: sudo /opt/vcpkg/bootstrap-vcpkg.sh
+    - name: Doxybook depenecies
+      working-directory: ./doxy 
+      run: vcpkg install --triplet x64-linux $(cat vcpkg.txt)
+    - name: doxy mkdir build
+      working-directory: ./doxy 
+      run: mkdir build
+    - name: doxy cmake setup
+      working-directory: ./doxy 
+      run: cmake -B ./build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake .
+    - name: doxy cmake
+      working-directory: ./doxy 
+      run: cmake --build ./build --config MinSizeRel
+    - name: doxybook2 add to path
+      working-directory: ./doxy
+      run: cp build/src/DoxybookCli/doxybook2 ../..
+    - uses: actions/checkout@master
+    - name: Install Dependencies
+      run:  sudo apt install pandoc texlive-full mkdocs doxygen
+    - name: wolfssl html
+      run: cd wolfSSL && export PATH=$PATH:"/home/runner/work/documentation" && make html
+    - name: wolfssl pdf
+      run: cd wolfSSL && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
