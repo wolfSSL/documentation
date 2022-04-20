@@ -74,10 +74,17 @@ COPY --from=wolfboot-stage2 /src/wolfssl/wolfBoot/html wolfboot-html
 # Build wolfCLU PDF
 FROM builder AS wolfclu-stage1
 WORKDIR /src/wolfssl/wolfCLU
-RUN ./create-pdf.sh
+RUN make pdf
 
+# Build wolfCLU HTML
+FROM builder AS wolfclu-stage2
+WORKDIR /src/wolfssl/wolfCLU
+RUN make html
+
+# Build wolfCLU HTML and PDF
 FROM scratch AS wolfclu
 COPY --from=wolfclu-stage1 /src/wolfssl/wolfCLU/wolfCLU_Manual.pdf wolfclu.pdf
+COPY --from=wolfclu-stage2 /src/wolfssl/wolfCLU/html wolfboot-html
 
 # Build wolfCrypt JNI PDF
 FROM builder AS wolfcrypt-jni-stage1
