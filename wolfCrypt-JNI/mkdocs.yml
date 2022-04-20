@@ -12,6 +12,22 @@ nav:
     - "6. Supported Algorithms and Classes": chapter06.md
     - "7. JAR Code Signing": chapter07.md
     - "8. Usage": chapter08.md
-theme: readthedocs
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
 extra_css: [skin.css]
+extra:
+    generator: false
 use_directory_urls: false
