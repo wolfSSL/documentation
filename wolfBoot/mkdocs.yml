@@ -12,6 +12,22 @@ nav:
     - "6. wolfBoot Features": chapter06.md
     - "7. Integrating wolfBoot in an existing project": chapter07.md
     - "8. Troubleshooting": chapter08.md
-theme: readthedocs
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
 extra_css: [skin.css]
+extra:
+    generator: false
 use_directory_urls: false
