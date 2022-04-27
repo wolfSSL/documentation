@@ -476,6 +476,10 @@ wolfSSL is able to use the ESP32-WROOM-32 hardware-based cryptography.
 
 For necessary defines, see the `WOLFSSL_ESPWROOM32` define in `settings.h`. The `WOLFSSL_ESPWROOM32` define enables ESP32-WROOM-32 hardware crypto and RNG support by default. Currently wolfSSL supports RNG, AES, SHA and RSA primitive at the crypt layer. The example projects including TLS server/client, wolfCrypt test and benchmark can be found at /examples/protocols directory in ESP-IDF after deploying files.
 
+### ESP8266
+
+Unlike the ESP32, there's no hardware-based cryptography available for the ESP8266. See the `WOLFSSL_ESP8266` define in `settings.h`.
+
 ## SSL Inspection (Sniffer)
 
 Beginning with the wolfSSL 1.5.0 release, wolfSSL has included a build option allowing it to be built with SSL Sniffer (SSL Inspection) functionality. This means that you can collect SSL traffic packets and with the correct key file, are able to decrypt them as well. The ability to “inspect” SSL traffic can be useful for several reasons, some of which include:
