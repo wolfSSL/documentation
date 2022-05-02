@@ -430,6 +430,30 @@ Removes RSA/DH 3072-bit Single-Precision (SP) optimization.
 
 Removes ECC Single-Precision (SP) optimization for SECP256R1. Only applies to `WOLFSSL_SP_MATH`.
 
+
+### Enabling Features macros (on by default)
+
+#### HAVE_TLS_EXTENSIONS
+
+Enables support for TLS extensions, which are required for most TLS builds. Enabled by default with `./configure`, but needs to be manually defined if building with `WOLFSSL_USER_SETTINGS`.
+
+#### HAVE_SUPPORTED_CURVES
+
+Enables the TLS supported curves and key share extensions used with TLS. Required with ECC, Curve25519 and Curve448. Enabled by default with `./configure`, but needs to be manually defined if building with `WOLFSSL_USER_SETTINGS`.
+
+#### HAVE_EXTENDED_MASTER
+
+Enables extended master secret PRF for calculation of session keys used with TLS v1.2 and older. The PRF method is on by default and is considered more secure. This is on by default if using `./configure`, but needs to be manually defined if building with `WOLFSSL_USER_SETTINGS`.
+
+#### HAVE_ENCRYPT_THEN_MAC
+
+Enables encrypt-then-mac support to perform mac after encryption with block ciphers. This is the default and improves security. This is on by default if using `./configure`, but needs to be manually defined if building with `WOLFSSL_USER_SETTINGS`.
+
+#### HAVE_ONE_TIME_AUTH
+
+Required if using Chacha20/Poly1305 with TLS v1.2 for setting up Poly authentication. This is on by default with ChaCha20/Poly1305 if using `./configure`, but needs to be manually defined if building with `WOLFSSL_USER_SETTINGS`.
+
+
 ### Enabling Features Disabled by Default
 
 #### WOLFSSL_CERT_GEN
