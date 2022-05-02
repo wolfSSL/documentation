@@ -1,0 +1,69 @@
+# vim: ft=automake
+
+HTML = html/
+
+.PHONY: builddir
+builddir:
+	@mkdir -p build/pdf
+	@mkdir -p build/html
+
+.PHONY: html-setup
+html-setup:
+	@git submodule update --init
+	-cd ../mkdocs-material; patch -p1 < ../Custom-wolfSSL-theme.patch --ignore-whitespace -N
+	@cp -a src/* build/html/
+	@cp ../common/*.png build/html/
+	@cp ../common/*.css build/html/
+	@perl -i -pe 's/    ```/```/g' build/html/*.md
+	@perl -i -pe "s/\#--/\#-/g" build/html/*.md
+	@mv build/html/$(word 1,$(SOURCES)) build/html/index.md
+
+.PHONY: html
+html: builddir html-setup html-prep
+	@mkdir -p html
+	@mkdocs build
+
+.PHONY: pdf-setup
+pdf-setup: builddir
+	@cp -a src/* build/pdf/
+	@cp ../common/*.png build/pdf/
+	@perl -i -pe "s/chapter[0-9][0-9].md|appendix[0-9][0-9].md//g" build/pdf/*.md
+	@perl -i -pe "s/\#--/\#/g" build/pdf/*.md
+
+.PHONY: pdf
+pdf: pdf-setup pdf-prep
+	@cd build/pdf && pandoc \
+		-N \
+		-s \
+		--metadata date="`date -I`" \
+		--variable mainfont="Noto Sans" \
+		--variable sansfont="Noto Sans" \
+		--variable monofont="Noto Sans Mono" \
+		--variable papersize=letter \
+		--variable geometry="margin=2.5cm" \
+		--variable version=2.0 \
+		--variable colorlinks=true \
+		../../header.txt $(SOURCES) ../../../common/appendix_head.txt $(APPENDIX) \
+		--pdf-engine=xelatex \
+		--toc \
+		-o ../../$(PDF)
+
+.PHONY: serve
+serve: builddir html-setup html-prep
+	@mkdocs serve
+
+.PHONY: linkcheck
+linkcheck:
+	@$(foreach source_md,$(SOURCES),docker run -v ${CURDIR}:/tmp:ro --rm -i ghcr.io/tcort/markdown-link-check:stable --config /tmp/test/linkcheck.json /tmp/src/$(source_md) || exit;)
+	@$(foreach source_md,$(APPENDIX),docker run -v ${CURDIR}:/tmp:ro --rm -i ghcr.io/tcort/markdown-link-check:stable --config /tmp/test/linkcheck.json /tmp/src/$(source_md) || exit;)
+
+.PHONY: lintcheck
+lintcheck:
+	@docker run -i --rm -v  ${CURDIR}:/work tmknom/markdownlint -c /work/test/lintcheck.json /work/src
+
+.PHONY: test
+test: lintcheck linkcheck
+
+clean:
+	rm -f $(PDF)
+	rm -rf build $(HTML)

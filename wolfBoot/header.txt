@@ -1,4 +1,4 @@
-% wolfBoot Documentation  ![](png/logo.png)
+% wolfBoot Documentation  ![](logo.png)
 
 ---
 header-includes:

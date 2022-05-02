@@ -1,0 +1,44 @@
+site_name: wolfCLU Manual
+site_url: https://wolfssl.com/
+docs_dir: build/html/
+site_dir: html/
+copyright: wolfSSL Inc. 2022
+nav:
+    - "1. Introduction": index.md
+    - "2. Building wolfCLU": build.md
+    - "3. Commands":
+      - "BENCH Command": bench.md
+      - "CRL Command": crl.md
+      - "DGST Command": dgst.md
+      - "ECPARAM Command": ecparam.md
+      - "ENC Command": enc.md
+      - "GENKEY Command": genkey.md
+      - "HASH Command": hash.md
+      - "MD5 Command": md5.md
+      - "PKCS12 Command": pkcs12.md
+      - "PKEY Command": pkey.md
+      - "RAND Command": rand.md
+      - "REQ Command": req.md
+      - "RSA Command": rsa.md
+      - "S_CLIENT Command": s_client.md
+      - "VERIFY Command": verify.md
+      - "X509 Command": x509.md
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
+extra_css: [skin.css]
+extra:
+    generator: false
+use_directory_urls: false
