@@ -478,7 +478,8 @@ For necessary defines, see the `WOLFSSL_ESPWROOM32` define in `settings.h`. The 
 
 ### ESP8266
 
-Unlike the ESP32, there's no hardware-based cryptography available for the ESP8266. See the `WOLFSSL_ESP8266` define in `settings.h`.
+Unlike the ESP32, there's no hardware-based cryptography available for the ESP8266. See the `WOLFSSL_ESP8266` define in `user_settings.h`
+or use `./configure CFLAGS="-DWOLFSSL_ESP8266"` to compile for the embedded ESP8266 target.
 
 ## SSL Inspection (Sniffer)
 
