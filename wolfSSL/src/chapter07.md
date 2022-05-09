@@ -12,6 +12,92 @@ wolfSSL (formerly CyaSSL) has support for **PEM**, and **DER** formats for certi
 
 An X.509 certificate is encoded using ASN.1 format. The DER format is the ASN.1 encoding. The PEM format is Base64 encoded and wrapped with a human readable header and footer. TLS send certificates in DER format.
 
+## Supported Certificate Extensions
+
+    
+If an unsupported or unknown extension that is marked as critical is found then 
+an error message is returned otherwise unsupported or unknown extensions found 
+are ignored. Certificate extension parsing expect that at the very least 
+--enable-certext (macro WOLFSSL_CERT_EXT) has been used when 
+compiling the wolfSSL library. This is a high level list of certificate 
+extensions that can be **parsed** and at least part if not all of the extensions
+ be used.
+    
+| Extension From [RFC 5280](https://datatracker.ietf.org/doc/html/rfc5280#section-4.2) | Supported |
+| ------------------------ | --------- |
+| Authority Key Identifier | Yes |
+| Subject Key Identifier | Yes |
+| Key Usage | Yes |
+| Certificate Policies | Yes |
+| Policy Mappings | No |
+| Subject Alternative Name | Yes |
+| Issuer Alternative Name | No |
+| Subject Directory Attributes | No |
+| Basic Constraints | Yes |
+| Name Constraints | Yes |
+| Policy Constraints | Yes |
+| Extended Key Usage | Yes |
+| CRL Distribution Points | Yes |
+| Inihibit anyPolicy | Yes |
+| Freshest CRL | No |
+    
+| Additional Extension | Supported |
+| -------------------- | --------- |
+| Netscape | Yes |
+    
+The next couple of sections delve deeper into the support of the individual 
+certificate extensions.
+    
+#### Auth/Subject Key ID
+    
+By default key ID's are a SHA1 hash of the key. SHA256 hashes of the key are 
+also supported.
+    
+#### Subject Alternative Names
+    
+    
+| Alternative Name Types | Supported |
+| ---------------------- | --------- |
+| email | Yes |
+| DNS name | Yes |
+| IP address | Yes |
+| URI | Yes |
+    
+#### Key Usage
+    
+Key usage can be parsed and retrieved after parsing of the certificate is 
+complete.
+    
+| Key Usage | Supported |
+| --------- | --------- |
+| digitalSignature | Yes |
+| nonRepudiation | Yes |
+| keyEncipherment | Yes |
+| dataEncipherment | Yes |
+| keyAgreement | Yes |
+| keyCertSign | Yes |
+| cRLSign | Yes |
+| encipherOnly | Yes |
+| decipherOnly | Yes |
+    
+#### Extended Key Usage
+    
+Starting at wolfSSL version 3.15.5 if an extended key usage is 
+unknown/unsupported then it is ignored. For versions before 3.15.5 an unknown 
+extended key usage OID will cause a parsing error.
+   
+| Extended Key Usage | Supported |
+| ------------------ | --------- |
+| anyExtendedKeyUsage | Yes |
+| id-kp-serverAuth | Yes |
+| id-kp-clientAuth | Yes |
+| id-kp-codeSigning | Yes |
+| id-kp-emailProtection | Yes |
+| id-kp-timeStamping | Yes |
+| id-kp-OCSPSigning | Yes |
+    
+
+
 ## Certificate Loading
 
 Certificates are normally loaded using the file system (although loading from memory buffers is supported as well - see [No File System and using Certificates](#no-file-system-and-using-certificates)).
