@@ -418,16 +418,24 @@ can be used to set a temporary encryption key for the external partition, or era
 
 Moreover, using `libwolfboot` to access the external flash with wolfboot hal from the application will not use encryption. This way the received update, already encrypted at origin, can be stored in the external memory unchanged, and retrieved in its encrypted format, e.g. to verify that the transfer has been successful before reboot.
 
-### Symmetric encryption algorithm
+### Symmetric encryption algorithms
 
-The algorithm currently used to encrypt and decrypt data in external partitions is Chacha20-256.
+Encryption can be enabled in wolfBoot using `ENCRYPT=1`.
+
+The default algorithm used to encrypt and decrypt data in external partitions is Chacha20-256.
+AES-128 and AES-256 options are also available and can be selected using  `ENCRYPT_WITH_AES128=1` or `ENCRYPT_WITH_AES256=1`
+
+### Chacha20-256
+
+
+When ChaCha20 is selected:
 
  - The `key` provided to `wolfBoot_set_encrypt_key()` must be exactly 32 Bytes long.
  - The `nonce` argument must be a 96-bit (12 Bytes) randomly generated buffer, to be used as IV for encryption and decryption.
 
-### Example usage
 
-#### Signing and encrypting the update bundle
+#### Example usage with ChaCha20-256
+
 
 The `sign.py` tool can sign and encrypt the image with a single command. The encryption secret is provided in a binary file that should contain a concatenation of a 32B ChaCha-256 key and a 12B nonce.
 
@@ -452,6 +460,44 @@ secret file:
 ```
 
 which will produce as output the file `test-app/image_v24_signed_and_encrypted.bin`, that can be transferred to the target's external device.
+
+### AES-CTR
+
+
+AES is used in CTR mode. When AES is selected:
+ - The `key` provided to `wolfBoot_set_encrypt_key()` must be 16 Bytes (AES128) or 32 Bytes (AES256) long.
+ - The `nonce` argument is a 128-bit (16 Byyes) randomly generated buffer, used as initial counter for encryption and decryption.
+
+
+#### Example usage with AES-256
+
+
+In case of AES-256, the encryption secret is provided in a binary file that should contain a concatenation of
+a 32B key and a 16B IV.
+
+In the examples provided, the test application uses the following parameters:
+
+```
+key = "0123456789abcdef0123456789abcdef"
+iv = "0123456789abcdef"
+```
+
+So it is easy to prepare the encryption secret in the test scripts or from the command line using:
+
+```
+echo -n "0123456789abcdef0123456789abcdef0123456789abcdef" > enc_key.der
+```
+
+The `sign.py` script can now be invoked to produce a signed+encrypted image, by using the extra argument `--encrypt` followed by the
+secret file. To select AES-256, use the `--aes256` option.
+
+```
+./tools/keytools/sign.py --aes256 --encrypt enc_key.der test-app/image.bin ecc256.der 24
+
+```
+
+which will produce as output the file `test-app/image_v24_signed_and_encrypted.bin`, that can be transferred to the target's external device.
+
 
 
 ### API usage in the application

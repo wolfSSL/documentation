@@ -170,7 +170,7 @@ For more details, see the section [Remote External flash memory support via UART
 
 #### Encryption support for external partitions
 
-When update and swap partitions are mapped to an external device using `EXT_FLASH=1`, either in combination with `SPI_FLASH`, `UART_FLASH`, or any custom external mapping, it is possible to enable ChaCha20 encryption when accessing those partition from the bootloader. The update images must be pre-encrypted at the source using the key tools, and wolfBoot should be instructed to use a temporary ChaCha20 symmetric key to access the content of the updates.
+When update and swap partitions are mapped to an external device using `EXT_FLASH=1`, either in combination with `SPI_FLASH`, `UART_FLASH`, or any custom external mapping, it is possible to enable ChaCha20, Aes128 or Aes256 encryption when accessing those partition from the bootloader. The update images must be pre-encrypted at the source using the key tools, and wolfBoot should be instructed to use a temporary ChaCha20 symmetric key to access the content of the updates.
 
 For more details about this optional feature, please refer to the [Encrypted external partitions](chapter06.md#encrypted-external-partitions) section.
 
@@ -220,4 +220,10 @@ LC_ALL=
 ```
 
 Then run the normal `make` steps.
+
+### Enabling mitigations against glitches and fault injections
+
+One type of attacks against secure boot mechanisms consists in skipping the execution of authentication and validation steps by injecting faults into the CPU through forced voltage or clock anomalies, or electromagnetic interferences at close range.
+
+Extra protection from specific attacks aimed to skip CPU instructions can be enabled using `ARMOR=1`. This feature is currently only available for ARM Cortex-M targets.
 
