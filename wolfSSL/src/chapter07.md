@@ -15,10 +15,10 @@ An X.509 certificate is encoded using ASN.1 format. The DER format is the ASN.1 
 ## Supported Certificate Extensions
 
     
-If an unsupported or unknown extension that is marked as critical is found then 
-an error message is returned otherwise unsupported or unknown extensions found 
+If an unsupported or unknown extension that is marked as critical is found, then 
+an error message is returned, otherwise unsupported or unknown extensions found 
 are ignored. Certificate extension parsing expect that at the very least 
---enable-certext (macro WOLFSSL_CERT_EXT) has been used when 
+`--enable-certext` (macro WOLFSSL_CERT_EXT) has been used when 
 compiling the wolfSSL library. This is a high level list of certificate 
 extensions that can be **parsed** and at least part if not all of the extensions
  be used.
