@@ -44,6 +44,7 @@ extensions that can be **parsed** and at least part if not all of the extensions
 | Additional Extension | Supported |
 | -------------------- | --------- |
 | Netscape | Yes |
+| Custom OID | Yes |
     
 The next couple of sections delve deeper into the support of the individual 
 certificate extensions.
@@ -96,7 +97,12 @@ extended key usage OID will cause a parsing error.
 | id-kp-timeStamping | Yes |
 | id-kp-OCSPSigning | Yes |
     
-
+#### Custom OID
+    
+Custom OID injection and parsing was introduced in wolfSSL version 5.3.0. The 
+macros WOLFSSL_CUSTOM_OID and HAVE_OID_ENCODING must be defined to make use
+of custom extensions. After building wolfSSL with these macros the function
+wc_SetCustomExtension can be used to set a custom extension in a Cert struct.
 
 ## Certificate Loading
 
