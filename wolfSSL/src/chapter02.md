@@ -1521,6 +1521,10 @@ Enable key generation
 
 Enable cert generation
 
+### `--enable-certext`
+
+Enable cert extensions (see chapter 7 on supported extensions)
+
 ### `--enable-certreq`
 
 Enable cert request generation
