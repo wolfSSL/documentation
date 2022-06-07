@@ -592,7 +592,7 @@ Turns on build for SHA3 use. This is support for SHA3 Keccak for the sizes SHA3-
 
 Will choose a hash algorithm that matches the ephemeral ECDHE key size or the next highest available. This workaround resolves issues with some peers that do not properly support scenarios such as a P-256 key hashed with SHA512.
 
-#### WOLFSSL_ALT_CERT_CHAIN
+#### WOLFSSL_ALT_CERT_CHAINS
 
 Allows CA's to be presented by peer, but not part of a valid chain. Default wolfSSL behavior is to require validation of all presented peer certificates. This also allows loading intermediate CA's as trusted and ignoring no signer failures for CA's up the chain to root. The alternate certificate chain mode only requires that the peer certificate validate to a trusted CA.
 
