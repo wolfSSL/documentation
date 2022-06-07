@@ -872,7 +872,7 @@ the monitor command sequence below:
 NXP RT1060/1062 and RT1050
 
 The NXP iMX-RT1060 is a Cortex-M7 with a DCP coprocessor for SHA256 acceleration.
-Example configuration for this target is provided in [/config/examples/imx-rt1060.config](/config/examples/imx-rt1060.config).
+Example configuration for this target is provided in `/config/examples/imx-rt1060.config`.
 
 ### Building wolfBoot
 
