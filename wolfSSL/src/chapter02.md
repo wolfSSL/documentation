@@ -1187,6 +1187,14 @@ Can be defined when building for the FreeRTOS windows simulator (<https://www.fr
 
 Can be defined when using EBSnet products and RTIP.
 
+#### WOLFSSL_EMBOS
+
+Can be defined when building for SEGGER embOS (<https://www.segger.com/products/rtos/embos/>). If using emNET, define [`WOLFSSL_EMNET`](#wolfssl_emnet) as well.
+
+#### WOLFSSL_EMNET
+
+Can be defined when building for SEGGER emNET TCP/IP stack (<https://www.segger.com/products/connectivity/emnet/>).
+
 #### WOLFSSL_LWIP
 
 Can be defined when using wolfSSL with the LwIP TCP/IP stack (<https://savannah.nongnu.org/projects/lwip/>).
