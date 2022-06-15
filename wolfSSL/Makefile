@@ -27,7 +27,37 @@ APPENDIX= appendix01.md \
 		  appendix06.md \
 		  appendix07.md
 
-PDF = wolfSSL-Manual.pdf
+ifeq ($(DOC_LANG),JA)
+PDF = wolfssl-jp.pdf
+HTML = html-ja/
+SRC  = src-ja
+DOXY = Doxyfile-ja
+MKDOC= mkdocs-ja.yml
+else
+ifeq ($(DOC_LANG),DE)
+PDF = wolfssl-de.pdf
+HTML = html/
+SRC  = src/de
+DOXY = Doxyfile
+MKDOC= mkdocs.yml
+else
+ifeq ($(DOC_LANG),ZH_TW)
+PDF = wolfssl-zh-tw.pdf
+HTML = html/
+SRC  = src/zh-tw
+DOXY = Doxyfile
+MKDOC= mkdocs.yml
+else
+PDF = wolfssl.pdf
+HTML = html/
+SRC  = src
+DOXY = Doxyfile
+MKDOC= mkdocs.yml
+endif
+endif
+endif
+
+
 
 wolfssl:
 	@git clone --depth 1 https://github.com/wolfSSL/wolfssl
@@ -39,8 +69,8 @@ wolfssl-update: wolfssl
 .PHONY: api
 api: wolfssl-update
 	@mkdir -p api/md
-	@cp Doxyfile wolfssl/doc
-	@cd wolfssl/doc && doxygen Doxyfile
+	@cp $(DOXY) wolfssl/doc
+	@cd wolfssl/doc && doxygen $(DOXY)
 	@PATH=${DOXYBOOK_PATH}:${PATH} doxybook2 --input wolfssl/doc/xml --output api/md --config doxybook.cfg
 
 # Need an index.md, so let's make it chapter01.
