@@ -39,7 +39,7 @@ pdf: pdf-setup pdf-prep
 		--variable mainfont="Noto Sans" \
 		--variable sansfont="Noto Sans" \
 		--variable monofont="Noto Sans Mono" \
-        --variable CJKmainfont="Noto Sans CJK JP"\
+                --variable CJKmainfont="Noto Sans CJK JP"\
 		--variable papersize=letter \
 		--variable geometry="margin=2.5cm" \
 		--variable version=2.0 \
