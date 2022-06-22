@@ -23,7 +23,7 @@ SOURCES = Intro.md \
 		  verify.md \
 		  x509.md
 
-PDF = wolfCLU_Manual.pdf
+PDF = wolfCLU-Manual.pdf
 
 .PHONY: html-prep
 html-prep:
