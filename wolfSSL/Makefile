@@ -27,7 +27,7 @@ APPENDIX= appendix01.md \
 		  appendix06.md \
 		  appendix07.md
 
-PDF = wolfssl.pdf
+PDF = wolfSSL-Manual.pdf
 
 wolfssl:
 	@git clone --depth 1 https://github.com/wolfSSL/wolfssl
