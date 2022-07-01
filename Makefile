@@ -7,7 +7,7 @@ build:
 
 .PHONY: wolfssl
 wolfssl: MANPATH=wolfSSL
-wolfssl: PDFFILE=wolfssl.pdf
+wolfssl: PDFFILE=wolfSSL-Manual.pdf
 wolfssl: build
 	@$(DOCKER_CMD)
 
@@ -25,7 +25,7 @@ wolfboot: build
 
 .PHONY: wolfclu
 wolfclu: MANPATH=wolfCLU
-wolfclu: PDFFILE=wolfCLU_Manual.pdf
+wolfclu: PDFFILE=wolfCLU-Manual.pdf
 wolfclu: build
 	@$(DOCKER_CMD)
 
@@ -43,7 +43,7 @@ wolfmqtt: build
 
 .PHONY: wolfsentry
 wolfsentry: MANPATH=wolfSentry
-wolfsentry: PDFFILE=wolfsentry.pdf
+wolfsentry: PDFFILE=wolfSentry-Manual.pdf
 wolfsentry: build
 	@$(DOCKER_CMD)
 
