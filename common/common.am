@@ -21,7 +21,8 @@ html-setup:
 .PHONY: html
 html: builddir html-setup html-prep
 	@mkdir -p html
-	@mkdocs build -f $(MKDOC)
+	@cp $(MKDOC) .
+	@mkdocs build
 
 .PHONY: pdf-setup
 pdf-setup: builddir
@@ -39,7 +40,7 @@ pdf: pdf-setup pdf-prep
 		--variable mainfont="Noto Sans" \
 		--variable sansfont="Noto Sans" \
 		--variable monofont="Noto Sans Mono" \
-                --variable CJKmainfont="Noto Sans CJK JP"\
+		--variable CJKmainfont="Noto Sans CJK JP"\
 		--variable papersize=letter \
 		--variable geometry="margin=2.5cm" \
 		--variable version=2.0 \

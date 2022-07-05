@@ -27,50 +27,61 @@ APPENDIX= appendix01.md \
 		  appendix06.md \
 		  appendix07.md
 
+PDF = wolfssl.pdf
+HTML = html/en
+SRC  = src/en
+DOXY = Doxy/en/Doxyfile
+MKDOC= mkdocs/en/mkdocs.yml
+
 ifeq ($(DOC_LANG),JA)
 PDF = wolfssl-jp.pdf
-HTML = html-ja/
-SRC  = src-ja
-DOXY = Doxyfile-ja
-MKDOC= mkdocs-ja.yml
+HTML = html/ja/
+SRC  = src/ja
+DOXY = Doxy/ja/Doxyfile
+MKDOC= mkdocs/ja/mkdocs.yml
 else
 ifeq ($(DOC_LANG),DE)
 PDF = wolfssl-de.pdf
-HTML = html/
+HTML = html/de
 SRC  = src/de
-DOXY = Doxyfile
-MKDOC= mkdocs.yml
+DOXY = Doxy/de/Doxyfile
+MKDOC= mkdocs/de/mkdocs.yml
 else
 ifeq ($(DOC_LANG),ZH_TW)
 PDF = wolfssl-zh-tw.pdf
-HTML = html/
+HTML = html/zh-tw
 SRC  = src/zh-tw
-DOXY = Doxyfile
-MKDOC= mkdocs.yml
+DOXY = Doxy/zh-tw/Doxyfile
+MKDOC= mkdocs/zh-tw/mkdocs.yml
+ifeq ($(DOC_LANG),EN)
+PDF = wolfssl.pdf
+HTML = html/en
+SRC  = src/en
+DOXY = Doxy/en/Doxyfile
+MKDOC= mkdocs/en/mkdocs.yml
 else
 PDF = wolfssl.pdf
-HTML = html/
-SRC  = src
-DOXY = Doxyfile
-MKDOC= mkdocs.yml
+HTML = html/en
+SRC  = src/en
+DOXY = Doxy/en/Doxyfile
+MKDOC= mkdocs/en/mkdocs.yml
 endif
 endif
 endif
-
-
+endif
 
 wolfssl:
-	@git clone --depth 1 https://github.com/wolfSSL/wolfssl
+	#@git clone --depth 1 https://github.com/wolfSSL/wolfssl
 
 .PHONY: wolfssl-update
 wolfssl-update: wolfssl
-	@cd wolfssl && git pull --ff-only
+	#@cd wolfssl && git pull --ff-only
 
 .PHONY: api
 api: wolfssl-update
 	@mkdir -p api/md
 	@cp $(DOXY) wolfssl/doc
-	@cd wolfssl/doc && doxygen $(DOXY)
+	@cd wolfssl/doc && doxygen Doxyfile
 	@PATH=${DOXYBOOK_PATH}:${PATH} doxybook2 --input wolfssl/doc/xml --output api/md --config doxybook.cfg
 
 # Need an index.md, so let's make it chapter01.
@@ -80,6 +91,7 @@ api: wolfssl-update
 # 3. Fix the titles of the header files markdown
 .PHONY: html-prep
 html-prep: api
+	@cp $(MKDOC) build/html/
 	@cp -a api/md/group* build/html/
 	@cp -a api/md/*8h* build/html/
 	@rm -f build/html/appendix01.md build/html/appendix02.md build/html/appendix03.md
@@ -97,7 +109,7 @@ html-prep: api
 # 6. Two regexes to handle bad Doxygen that didn't convert and the LaTeX processor thinks is LaTeX commands
 .PHONY: pdf-prep
 pdf-prep: api
-	@cp src/*.png build/pdf/
+	@cp $(SRC)/*.png build/pdf/
 	@cp -a api/md/group* build/pdf/
 	@cp -a api/md/*8h* build/pdf/
 	@perl -i -pe "s/^(#+ )/#\$$1/g" build/pdf/group* build/pdf/*8h*
