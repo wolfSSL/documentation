@@ -33,10 +33,10 @@ typedef void (*wolfSSL_Logging_cb)(const int logLevel,
 
 
 
-wolfSSLは、デバッグを支援するために、有益なエラーメッセージを提供しようとします。
+wolfSSLは、デバッグを支援するために、有益なエラーメッセージを提供します。
 
 
-各[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)および[`wolfSSL_write()`](group__IO.md#function-wolfssl_write)呼び出しは、`read()`と`write()`と同じように、成功時に0、接続クロージャーの場合は0、およびエラーの間のバイト数を返します。エラーが発生した場合は、2つの通話を使用して、以下の情報を入手できます。エラー。
+各[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)および[`wolfSSL_write()`](group__IO.md#function-wolfssl_write)呼び出しは、`read()`と`write()`と同じように、成功時に0、接続クロージャーの場合は0、およびエラーの間のバイト数を返します。エラーが発生した場合は、2つのAPIを使用して、エラーの情報を入手できます。
 
 
 関数[`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error)は現在のエラーコードを返します。現在の`WOLFSSL`オブジェクト、および[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)または[`wolfSSL_write()`](group__IO.md#function-wolfssl_write)の結果値を引数として取得し、対応するエラーコードを返します。
@@ -49,7 +49,7 @@ int err=wolfSSL_get_error(ssl, result);
 
 
 
-より人間的な読み取り可能なエラーコードの説明を取得するには、[`wolfSSL_ERR_error_string()`](group__Debug.md#function-wolfssl_err_error_string)関数を使用できます。[`wolfSSL_get_error`](group__Debug.md#function-wolfssl_get_error)からの返品コードとストレージバッファーを引数として取得し、対応するエラーの説明をストレージバッファー(以下の例の`errorString`)に配置します。
+より読み取り可能なエラーコードの説明を取得するには、[`wolfSSL_ERR_error_string()`](group__Debug.md#function-wolfssl_err_error_string)関数を使用できます。[`wolfSSL_get_error`](group__Debug.md#function-wolfssl_get_error)からのリターンコードとストレージバッファーを引数として取得し、対応するエラーの説明をストレージバッファー(以下の例の`errorString`)に配置します。
 
 
 
@@ -60,6 +60,6 @@ wolfSSL_ERR_error_string(err, errorString);
 
 
 
-ノンブロッキングソケットを使用している場合は、Errno eagain/ewouldblockをテストするか、`SSL_ERROR_WANT_READ`または`SSL_ERROR_WANT_WRITE`の特定のエラーコードをテストできます。
+ノンブロッキングソケットを使用している場合は、EEAGAIN/EWOULDBLOCKをテストするか、`SSL_ERROR_WANT_READ`または`SSL_ERROR_WANT_WRITE`の特定のエラーコードをテストできます。
 
 wolfSSLとWolfCryptエラーコードのリストについては、付録C(エラーコード)を参照してください。
