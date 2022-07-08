@@ -4,7 +4,7 @@ This manual is written as a technical guide to the wolfSSL embedded SSL/TLS libr
 will explain how to build and get started with wolfSSL, provide an overview of build
 options, features, portability enhancements, support, and much more. 
 
-You can find the PDF version of this document [here](https://www.wolfssl.com/documentation/wolfSSL-Manual.pdf).
+You can find the PDF version of this document [here](https://www.wolfssl.com/documentation/manuals/wolfssl/wolfSSL-Manual.pdf).
 
 ## Why Choose wolfSSL?
 
