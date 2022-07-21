@@ -8,6 +8,7 @@ nav:
     - "2. Building wolfSentry": chapter02.md
     - "3. wolfSentry API": chapter03.md
     - "4. wolfSentry Examples": chapter04.md
+    - "5. wolfSentry JSON Setting File": chapter05.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
