@@ -61,14 +61,14 @@ It is recommended that you keep the logs following running whilst running the te
 
 #### Testing
 
-#### Accessing nodes
+##### Accessing nodes
 
 There are three user test nodes to play with. They are named `linux-lwip-tester?-1` where `?` is 1, 2 or 3. To log into tester2 as an example:
 
 ```sh
 sudo docker exec -it linux-lwip-tester2-1 /bin/sh
 ```
-#### Ping test
+##### Ping test
 
 You can ping from any of the nodes using:
 
@@ -78,7 +78,7 @@ ping 127.20.20.5
 
 Tester node 1 will work, tester 2 will be rejected for ICMP ping and tester 3 will be rejected for MAC address. This will be reflected in the logging output.
 
-#### Echo test
+##### Echo test
 
 You can connect from any of the nodes using:
 
@@ -90,17 +90,17 @@ Tested node 2 will work and whatever you enter into the netcat terminal will be 
 
 #### Node details
 
-#### Echoserver
+##### Echoserver
 
 * IP address: 172.20.20.3 (node) 172.20.20.5 (echo process)
-* MAC address: de:c0:de:01:02:03
+* MAC address: `de:c0:de:01:02:03`
 
 The echo test process runs from this node, it uses PCAP and lwIP to create a static IP of 127.20.20.5 for the actually test.
 
-#### Tester 1
+##### Tester 1
 
 * IP address: 172.20.20.10
-* MAC address: de:c0:de:03:02:01
+* MAC address: `de:c0:de:03:02:01`
 
 The sentry test is configured to allow this node to ping the echoserver node, but the TCP connection is not accepted during handshake.
 
@@ -146,10 +146,10 @@ linux-lwip-echoserver-1  | Sentry rejected connection from: 172.20.20.10
 
 ```
 
-#### Tester 2
+##### Tester 2
 
 * IP address: 172.20.20.20
-* MAC address: de:c0:de:03:02:02
+* MAC address: `de:c0:de:03:02:02`
 
 The sentry test is configured to block this node pinging the echoserver node, but the TCP connection is accepted during handshake.
 
@@ -207,10 +207,10 @@ linux-lwip-echoserver-1  | Sentry accepted MAC address DE:C0:DE:03:02:02
 
 ```
 
-#### Tester 3
+##### Tester 3
 
 * IP address: 172.20.20.30
-* MAC address: de:c0:de:03:03:01
+* MAC address: `de:c0:de:03:03:01`
 
 The sentry test is configured to deny traffic from this MAC address.
 
@@ -362,9 +362,9 @@ static err_t filter_input(struct pbuf *p, struct netif *inp)
     /* "src" contains the source hardware address from the packet */
     if (sentry_action_mac(&ethhdr->src) != 0)
     {
-        //printf("Sentry rejected MAC address %02X:%02X:%02X:%02X:%02X:%02X\n",
+        /* printf("Sentry rejected MAC address %02X:%02X:%02X:%02X:%02X:%02X\n",
                 ethaddr->addr[0], ethaddr->addr[1], ethaddr->addr[2],
-                ethaddr->addr[3], ethaddr->addr[4], ethaddr->addr[5]);
+                ethaddr->addr[3], ethaddr->addr[4], ethaddr->addr[5]); */
 
         /* Basically drop the packet */
         return ERR_ABRT;
@@ -579,9 +579,9 @@ static err_t filter_input(struct pbuf *p, struct netif *inp)
     /* "src" contains the source hardware address from the packet */
     if (sentry_action_mac(&ethhdr->src) != 0)
     {
-        //printf("Sentry rejected MAC address %02X:%02X:%02X:%02X:%02X:%02X\n",
+        /* printf("Sentry rejected MAC address %02X:%02X:%02X:%02X:%02X:%02X\n",
                 ethaddr->addr[0], ethaddr->addr[1], ethaddr->addr[2],
-                ethaddr->addr[3], ethaddr->addr[4], ethaddr->addr[5]);
+                ethaddr->addr[3], ethaddr->addr[4], ethaddr->addr[5]); */
 
         /* Basically drop the packet */
         return ERR_ABRT;

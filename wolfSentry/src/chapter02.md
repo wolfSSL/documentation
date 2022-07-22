@@ -55,8 +55,8 @@ These will be stored at build time in the `wolfsentry_options.h` file where wolf
 
 The following table lists the possible options:
 
-| `make` option | &nbsp;&nbsp;Description&nbsp;&nbsp; |
-| --------------| ----------------------------------- |
+| `make` option | Description |
+| --------------| ------------|
 | `V` |  Verbose `make` output |
 || e.g. `make V=1 -j test`|
 | `USER_MAKE_CONF` | A user-defined Makefile to include  |
@@ -83,8 +83,8 @@ The following table lists the possible options:
 
 [^2]: Defined as `VERSION := $(shell git rev-parse --short=8 HEAD 2>/dev/null || echo xxxxxxxx)$(shell git diff --quiet 2>/dev/null || [ $$? -ne 1 ] || echo "-dirty")`
 
-| &nbsp;Preprocesssor Macro&nbsp; | &nbsp;Description&nbsp; |
-| ------------------- | ----------------------------------- |
+| Preprocesssor Macro | Description |
+| ------------------- | ----------- |
 | `WOLFSENTRY_NO_STDIO` | The platform does not have `STDIO` |
 | `WOLFSENTRY_NO_JSON` | Do not compile JSON configuration support |
 | `WOLFSENTRY_USER_SETTINGS_FILE` | An additional header file to include |
@@ -104,7 +104,7 @@ The following table lists the possible options:
 Install from an alternate build location to a non-standard destination:
 
 ```sh
-$make BUILD_TOP=./build INSTALL_DIR=/usr INSTALL_LIBDIR=/usr/lib64 install`
+$make BUILD_TOP=./build INSTALL_DIR=/usr INSTALL_LIBDIR=/usr/lib64 install
 ```
 
 Build libwolfsentry.a and test it under various analyzers (memory and thread
@@ -127,7 +127,7 @@ can also be usefully overridden.
 Build with a user-supplied makefile preamble to override defaults:
 
 ```sh
-$make -j USER_MAKE_CONF=Makefile.settings`
+$make -j USER_MAKE_CONF=Makefile.settings
 ```
 
 (`Makefile.settings` can contain simple settings like `OPTIM := -Os`, or
@@ -136,12 +136,11 @@ elaborate makefile code including additional rules and dependency mechanisms.)
 Build the smallest simplest possible library:
 
 ```sh
-make -j SINGLETHREADED=1 NO_STDIO=1 DEBUG= OPTIM=-Os EXTRA_CFLAGS='-DWOLFSENTRY_NO_CLOCK_BUILTIN -DWOLFSENTRY_NO_MALLOC_BUILTIN -DWOLFSENTRY_NO_ERROR_STRINGS -Wno-error=inline -Wno-inline'`
+make -j SINGLETHREADED=1 NO_STDIO=1 DEBUG= OPTIM=-Os EXTRA_CFLAGS='-DWOLFSENTRY_NO_CLOCK_BUILTIN -DWOLFSENTRY_NO_MALLOC_BUILTIN -DWOLFSENTRY_NO_ERROR_STRINGS -Wno-error=inline -Wno-inline'
 ```
 
 Build and test with user settings:
 
 ```sh
-$make -j USER_SETTINGS_FILE=user_settings.h test`
+$make -j USER_SETTINGS_FILE=user_settings.h test
 ```
-
