@@ -93,6 +93,37 @@ Usage: `sign[.py] [OPTIONS] IMAGE.BIN KEY.DER VERSION`
 `VERSION`:    The version associated with this signed software
 `OPTIONS`:    Zero or more options, described below
 
+#### Public key signature options
+
+If none of the following arguments is given, the tool will try to guess the key
+size from the format and key length detected in KEY.DER.
+
+  * `--ed25519` Use ED25519 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--ed448` Use ED448 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--ecc256` Use ecc256 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--ecc384` Use ecc384 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--rsa2048` Use rsa2048 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--rsa3072` Use rsa3072 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--rsa4096` Use rsa4096 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--no-sign` Disable secure boot signature verification. No signature
+    verification is performed in the bootloader, and the KEY.DER argument is
+    ignored.
+
+
 ### Signing Firmware
 
 1. Load the private key to use for signing into `./wolfboot_signing_private_key.der`
