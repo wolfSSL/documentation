@@ -516,7 +516,7 @@ resume 0x0000001
 To sign the same application image as new version (2), use the python script `sign.py` provided:
 
 ```
-tools/keytools/sign.py test-app/image.bin ed25519.der 2
+tools/keytools/sign.py test-app/image.bin wolfboot_signing_private_key.der 2
 ```
 
 From OpenOCD, the updated image (version 2) can be flashed to the second bank:
@@ -609,7 +609,7 @@ reset
 To sign the same application image as new version (2), use the python script `sign.py` provided:
 
 ```
-tools/keytools/sign.py test-app/image.bin ecc256.der 2
+tools/keytools/sign.py test-app/image.bin wolfboot_signing_private_key.der 2
 ```
 
 From OpenOCD, the updated image (version 2) can be flashed to the second bank:
@@ -718,7 +718,7 @@ make wolfboot-align.bin
 
 * Sign Image
 ```
-tools/keytools/sign.py --rsa4096 --sha3 Image rsa4096.der 1
+tools/keytools/sign.py --rsa4096 --sha3 Image wolfboot_signing_private_key.der 1
 ```
 
 * Compose the image
@@ -765,7 +765,7 @@ make CROSS_COMPILE=aarch64-unknown-nto-qnx7.0.0-
 
 #### Signing
 
-`tools/keytools/sign.py --rsa4096 --sha3 /srv/linux-rpi4/vmlinux.bin rsa4096.der 1`
+`tools/keytools/sign.py --rsa4096 --sha3 /srv/linux-rpi4/vmlinux.bin wolfboot_signing_private_key.der 1`
 
 
 ## Cypress PSoC-6

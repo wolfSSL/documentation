@@ -17,11 +17,11 @@ Additional examples available on our GitHub wolfBoot-examples repository [here](
 
 The following steps are automated in the default `Makefile` target, using the baremetal test application as an example to create the factory image. By running `make`, the build system will:
 
-   - Create a Ed25519 Key-pair using the `ed25519_keygen` tool
+   - Create a Ed25519 Key-pair using the `keygen` tool
    - Compile the bootloader. The public key generated in the step above is included in the build
    - Compile the firmware image from the test application in the `test_app' directory
    - Re-link the firmware to change the entry-point to the start address of the primary partition
-   - Sign the firmware image using the `ed25519_sign` tool
+   - Sign the firmware image using the `sign` tool
    - Create a factory image by concatenating the bootloader and the firmware image
 
 The factory image can be flashed to the target device. It contains the bootloader and the signed initial firmware at the specified address on the flash.

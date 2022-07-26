@@ -58,25 +58,50 @@ Use the `wolfBootSignTool.vcxproj` Visual Studio project to build the `sign.exe`
 
 ### Command Line Usage
 
-```
-./tools/keytools/keygen [--ed25519 | --ed448 | --ecc256 | --rsa2048 | --rsa4096 ]  pub_key_file.c
-```
+#### Keygen tool
 
-```
-./tools/keytools/sign [--ed25519 | --ed448 | --ecc256 | --rsa2048 | --rsa4096 ] [--sha256 | --sha3] [--wolfboot-update] image key.der fw_version
-  - or -        ./tools/keytools/sign [--sha256 | --sha3] [--sha-only] [--wolfboot-update] image pub_key.der fw_version
-  - or -        ./tools/keytools/sign [--ed25519 | --ed448 | --ecc256 | --rsa2048 | --rsa4096 ] [--sha256 | --sha3] [--manual-sign] image pub_key.der fw_version signature.sig
-```
+Usage: `keygen[.py] [OPTIONS] [-g new-keypair.der] [-i existing-pubkey.der] [...]`
+
+`keygen` is used to populate a keystore with existing and new public keys.
+Two options are supported:
+
+- `-g privkey.der` to generate a new keypair, add the public key to the keystore and save the private key in a new file `privkey.der`
+- `-i existing.der` to import an existing public key from `existing.der`
+
+Arguments are not exclusive, and can be repeated more than once to populate a keystore with multiple keys.
+
+One option must be specified to select the algorithm enabled in the keystore (e.g. `--ed25519` or `--rsa3072`. See the section "Public key signature options" for the sign tool for the available options.
+
+The files generate by the keygen tool is the following:
+
+- A C file `src/keystore.c`, which is normally linked with the wolfBoot image, when the keys are provisioned through generated C code.
+- A binary file `keystore.img` that can be used to provision the public keys through an alternative storage
+- The private key, for each `-g` option provided from command line
+
+For more information about the keystore mechanism, see [keystore.md](keystore.md).
+
+
+#### Sign tool
+
+`sign` and `sign.py` produce a signed firmware image by creating a manifest header
+in the format supported by wolfBoot.
+
+Usage: `sign[.py] [OPTIONS] IMAGE.BIN KEY.DER VERSION`
+
+`IMAGE.BIN`:  A file containing the binary firmware/software to sign
+`KEY.DER`:    Private key file, in DER format, to sign the binary image
+`VERSION`:    The version associated with this signed software
+`OPTIONS`:    Zero or more options, described below
 
 ### Signing Firmware
 
-1. Load the private key to use for signing into `./rsa2048.der`, `./rsa4096.der`, `./ed25519.der`, `ecc256.der`, or `./ed448.der`
+1. Load the private key to use for signing into `./wolfboot_signing_private_key.der`
 2. Run the signing tool with asymmetric algorithm, hash algorithm, file to sign, key and version.
 
-```
-./tools/keytools/sign --rsa2048 --sha256 test-app/image.bin rsa2048.der 1
-## OR
-python3 ./tools/keytools/sign.py --rsa2048 --sha256 test-app/image.bin rsa2048.der 1
+```sh
+./tools/keytools/sign --rsa2048 --sha256 test-app/image.bin wolfboot_signing_private_key.der 1
+# OR
+python3 ./tools/keytools/sign.py --rsa2048 --sha256 test-app/image.bin wolfboot_signing_private_key.der 1
 ```
 
 Note: The last argument is the “version” number.
@@ -85,21 +110,31 @@ Note: The last argument is the “version” number.
 
 Steps for manually signing firmware using an external key source.
 
-```
-## Create file with Public Key
-openssl rsa -inform DER -outform DER -in rsa2048.der -out rsa2048_pub.der -pubout
-## Generate Hash to Sign
+```sh
+# Create file with Public Key
+openssl rsa -inform DER -outform DER -in my_key.der -out rsa2048_pub.der -pubout
+
+# Add the public key to the wolfBoot keystore using `keygen -i`
+./tools/keytools/keygen --rsa2048 -i rsa2048_pub.der
+# OR
+python3 ./tools/keytools/keygen.py --rsa2048 -i rsa4096_pub.der
+
+# Generate Hash to Sign
 ./tools/keytools/sign            --rsa2048 --sha-only --sha256 test-app/image.bin rsa2048_pub.der 1
-## OR
+# OR
 python3 ./tools/keytools/sign.py --rsa2048 --sha-only --sha256 test-app/image.bin rsa4096_pub.der 1
-## Sign hash Example (here is where you would use an HSM)
-openssl rsautl -sign -keyform der -inkey rsa2048.der -in test-app/image_v1_digest.bin > test-app/image_v1.sig
-## Generate final signed binary
+
+# Sign hash Example (here is where you would use an HSM)
+openssl pkeyutl -sign -keyform der -inkey my_key.der -in test-app/image_v1_digest.bin > test-app/image_v1.sig
+
+# Generate final signed binary
 ./tools/keytools/sign            --rsa2048 --sha256 --manual-sign test-app/image.bin rsa2048_pub.der 1 test-app/image_v1.sig
-## OR
+# OR
 python3 ./tools/keytools/sign.py --rsa2048 --sha256 --manual-sign test-app/image.bin rsa4096_pub.der 1 test-app/image_v1.sig
-## Combine into factory image
-cat wolfboot-align.bin test-app/image_v1_signed.bin > factory.bin
+
+# Combine into factory image (0xc0000 is the WOLFBOOT_PARTITION_BOOT_ADDRESS)
+tools/bin-assemble/bin-assemble factory.bin 0x0 wolfboot.bin \
+                              0xc0000 test-app/image_v1_signed.bin
 ```
 
 ## Measured Boot using wolfBoot
@@ -322,11 +357,11 @@ Requirement: wolfBoot is compiled with `DELTA_UPDATES=1`
 
 Version "1" is signed as usual, as a standalone image:
 
-`tools/keytools/sign.py --ecc256 --sha256 test-app/image.bin ecc256.der 1`
+`tools/keytools/sign.py --ecc256 --sha256 test-app/image.bin wolfboot_signing_private_key.der 1`
 
 When updating from version 1 to version 2, you can invoke the sign tool as:
 
-`tools/keytools/sign.py --delta test-app/image_v1_signed.bin --ecc256 --sha256 test-app/image.bin ecc256.der 2`
+`tools/keytools/sign.py --delta test-app/image_v1_signed.bin --ecc256 --sha256 test-app/image.bin wolfboot_signing_private_key.der 2`
 
 Besides the usual output file `image_v2_signed.bin`, the sign tool creates an additional `image_v2_signed_diff.bin` which should be noticeably smaller in size as long as the two binary files contain overlapping areas.
 
@@ -456,7 +491,7 @@ The `sign.py` script can now be invoked to produce a signed+encrypted image, by 
 secret file:
 
 ```
-./tools/keytools/sign.py --encrypt enc_key.der test-app/image.bin ecc256.der 24
+./tools/keytools/sign.py --encrypt enc_key.der test-app/image.bin wolfboot_signing_private_key.der 24
 ```
 
 which will produce as output the file `test-app/image_v24_signed_and_encrypted.bin`, that can be transferred to the target's external device.
@@ -492,7 +527,7 @@ The `sign.py` script can now be invoked to produce a signed+encrypted image, by 
 secret file. To select AES-256, use the `--aes256` option.
 
 ```
-./tools/keytools/sign.py --aes256 --encrypt enc_key.der test-app/image.bin ecc256.der 24
+./tools/keytools/sign.py --aes256 --encrypt enc_key.der test-app/image.bin wolfboot_signing_private_key.der 24
 
 ```
 
