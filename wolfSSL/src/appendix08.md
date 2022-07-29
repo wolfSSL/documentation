@@ -22,7 +22,7 @@ In the `./wolfssl/wolfcrypt/settings.h` file, there are several defines specific
 
 2. For users not wanting to contribute back their changes to wolfSSL proper, or for users who want to customize the wolfSSL build with additional preprocessor defines, wolfSSL recommends the use of a custom `user_settings.h` header file.  If `WOLFSSL_USER_SETTINGS` is defined when compiling the wolfSSL source files, wolfSSL will automatically include a custom header file called `user_settings.h`.  This header should be created by the user and placed on the include path.  This allows users to maintain one single file for their wolfSSL build, and makes it much easier to update to newer versions of wolfSSL.
 
-wolfSSL encourages the submission of patches and code changes through either direct email ([info@wolfssl.com](mailto:info@wolfssl.com)), or through [GitHub pull request](https://github.com/wolfssl/wolfssl).
+wolfSSL encourages the submission of patches and code changes through either direct email ([facts@wolfssl.com](mailto:facts@wolfssl.com)), or through [GitHub pull request](https://github.com/wolfssl/wolfssl).
 
 
 ## Porting wolfSSL
@@ -321,6 +321,6 @@ Support Packages:  [https://www.wolfssl.com/wolfSSL/Support/support_tiers.php](h
 
 Consulting Services: [https://www.wolfssl.com/wolfSSL/wolfssl-consulting.html](https://www.wolfssl.com/wolfSSL/wolfssl-consulting.html)
 
-General Inquiries: [info@wolfssl.com](mailto:info@wolfssl.com)
+General Inquiries: [facts@wolfssl.com](mailto:facts@wolfssl.com)
 
 
