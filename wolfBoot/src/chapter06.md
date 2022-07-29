@@ -1,8 +1,11 @@
 # wolfBoot Features
 
+
 ## Signing
 
-### wolfBoot Key Tools
+
+### wolfBoot key tools installation
+
 
 Instructions for setting up Python, wolfCrypt-py module and wolfBoot for firmware signing and key generation.
 
@@ -12,6 +15,7 @@ Note: There is a pure C version of the key tool available as well. See [C Key To
 
 1. Download latest Python 3.x and run installer: https://www.python.org/downloads
 2. Check the box that says Add Python 3.x to PATH
+
 
 ### Install wolfCrypt
 
@@ -60,6 +64,7 @@ Use the `wolfBootSignTool.vcxproj` Visual Studio project to build the `sign.exe`
 
 #### Keygen tool
 
+
 Usage: `keygen[.py] [OPTIONS] [-g new-keypair.der] [-i existing-pubkey.der] [...]`
 
 `keygen` is used to populate a keystore with existing and new public keys.
@@ -79,9 +84,56 @@ The files generate by the keygen tool is the following:
 - The private key, for each `-g` option provided from command line
 
 
-#### Keystore
+#### Sign tool
 
-KeyStore is the mechanism used by wolfBoot to store all the public keys used for
+
+`sign` and `sign.py` produce a signed firmware image by creating a manifest header
+in the format supported by wolfBoot.
+
+Usage: `sign[.py] [OPTIONS] IMAGE.BIN KEY.DER VERSION`
+
+`IMAGE.BIN`:  A file containing the binary firmware/software to sign
+`KEY.DER`:    Private key file, in DER format, to sign the binary image
+`VERSION`:    The version associated with this signed software
+`OPTIONS`:    Zero or more options, described below
+
+#### Public key signature options
+
+
+If none of the following arguments is given, the tool will try to guess the key
+size from the format and key length detected in KEY.DER.
+
+  * `--ed25519` Use ED25519 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--ed448` Use ED448 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--ecc256` Use ecc256 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--ecc384` Use ecc384 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--rsa2048` Use rsa2048 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--rsa3072` Use rsa3072 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--rsa4096` Use rsa4096 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--no-sign` Disable secure boot signature verification. No signature
+    verification is performed in the bootloader, and the KEY.DER argument is
+    ignored.
+
+
+
+### Key generation and management
+
+
+KeyStore is the name of the mechanism used by wolfBoot to store all the public keys used for
 authenticating the signature of current firmware and updates.
 
 wolfBoot's key generation tool can be used to generate one or more keys. By default,
@@ -96,8 +148,6 @@ of the keystore
  - A .bin file (keystore.bin) which contains the keystore that can be hosted
    on a custom memory support. In order to access the keystore, a small driver is
    required (see section "Interface API" below).
-
-## Default usage (built-in keystore)
 
 By default, the keystore object in `src/keystore.c` is accessed by wolfboot by including
 its symbols in the build.
@@ -133,6 +183,7 @@ When booting, wolfBoot will automatically select the public key associated to th
 
 
 #### Creating multiple keys
+
 
 `keygen` accepts multiple filenames for private keys.
 
@@ -192,7 +243,8 @@ const struct keystore_slot PubKeys[NUM_PUBKEYS] = {
 ```
 
 
-### Public keys permissions
+#### Public keys and permissions
+
 
 By default, when a new keystore is created, the permissions mask is set
 to `KEY_VERIFY_ALL`, which means that the key can be used to verify a firmware
@@ -211,48 +263,6 @@ Beside `KEY_VERIFY_ALL`, pre-defined mask values can also be used here:
 - `KEY_VERIFY_APP_ONLY` only verifies the main application, with partition id 1
 - `KEY_VERIFY_SELF_ONLY` this key can only be used to authenticate wolfBoot self-updates (id = 0)
 - `KEY_VERIFY_ONLY_ID(N)` macro that can be used to restrict the usage of the key to a specific partition id `N`
-
-#### Sign tool
-
-`sign` and `sign.py` produce a signed firmware image by creating a manifest header
-in the format supported by wolfBoot.
-
-Usage: `sign[.py] [OPTIONS] IMAGE.BIN KEY.DER VERSION`
-
-`IMAGE.BIN`:  A file containing the binary firmware/software to sign
-`KEY.DER`:    Private key file, in DER format, to sign the binary image
-`VERSION`:    The version associated with this signed software
-`OPTIONS`:    Zero or more options, described below
-
-#### Public key signature options
-
-If none of the following arguments is given, the tool will try to guess the key
-size from the format and key length detected in KEY.DER.
-
-  * `--ed25519` Use ED25519 for signing the firmware. Assume that the given KEY.DER
-file is in this format.
-
-  * `--ed448` Use ED448 for signing the firmware. Assume that the given KEY.DER
-file is in this format.
-
-  * `--ecc256` Use ecc256 for signing the firmware. Assume that the given KEY.DER
-file is in this format.
-
-  * `--ecc384` Use ecc384 for signing the firmware. Assume that the given KEY.DER
-file is in this format.
-
-  * `--rsa2048` Use rsa2048 for signing the firmware. Assume that the given KEY.DER
-file is in this format.
-
-  * `--rsa3072` Use rsa3072 for signing the firmware. Assume that the given KEY.DER
-file is in this format.
-
-  * `--rsa4096` Use rsa4096 for signing the firmware. Assume that the given KEY.DER
-file is in this format.
-
-  * `--no-sign` Disable secure boot signature verification. No signature
-    verification is performed in the bootloader, and the KEY.DER argument is
-    ignored.
 
 
 ### Signing Firmware
