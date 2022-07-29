@@ -25,7 +25,8 @@ APPENDIX= appendix01.md \
 		  appendix04.md \
 		  appendix05.md \
 		  appendix06.md \
-		  appendix07.md
+		  appendix07.md \
+		  appendix08.md
 
 PDF = wolfSSL-Manual.pdf
 

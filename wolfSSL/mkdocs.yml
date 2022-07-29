@@ -139,6 +139,7 @@ nav:
     - "E. RFCs, Specifications, and Reference": appendix05.md
     - "F. Error Codes": appendix06.md
     - "G. Experimenting with Post-Quantum Cryptography": appendix07.md
+    - "H. wolfSSL Porting Guide": appendix08.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
