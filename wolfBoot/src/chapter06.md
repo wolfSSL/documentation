@@ -1,8 +1,11 @@
 # wolfBoot Features
 
+
 ## Signing
 
-### wolfBoot Key Tools
+
+### wolfBoot key tools installation
+
 
 Instructions for setting up Python, wolfCrypt-py module and wolfBoot for firmware signing and key generation.
 
@@ -12,6 +15,7 @@ Note: There is a pure C version of the key tool available as well. See [C Key To
 
 1. Download latest Python 3.x and run installer: https://www.python.org/downloads
 2. Check the box that says Add Python 3.x to PATH
+
 
 ### Install wolfCrypt
 
@@ -58,25 +62,218 @@ Use the `wolfBootSignTool.vcxproj` Visual Studio project to build the `sign.exe`
 
 ### Command Line Usage
 
-```
-./tools/keytools/keygen [--ed25519 | --ed448 | --ecc256 | --rsa2048 | --rsa4096 ]  pub_key_file.c
-```
+#### Keygen tool
+
+
+Usage: `keygen[.py] [OPTIONS] [-g new-keypair.der] [-i existing-pubkey.der] [...]`
+
+`keygen` is used to populate a keystore with existing and new public keys.
+Two options are supported:
+
+- `-g privkey.der` to generate a new keypair, add the public key to the keystore and save the private key in a new file `privkey.der`
+- `-i existing.der` to import an existing public key from `existing.der`
+
+Arguments are not exclusive, and can be repeated more than once to populate a keystore with multiple keys.
+
+One option must be specified to select the algorithm enabled in the keystore (e.g. `--ed25519` or `--rsa3072`. See the section "Public key signature options" for the sign tool for the available options.
+
+The files generate by the keygen tool is the following:
+
+- A C file `src/keystore.c`, which is normally linked with the wolfBoot image, when the keys are provisioned through generated C code.
+- A binary file `keystore.img` that can be used to provision the public keys through an alternative storage
+- The private key, for each `-g` option provided from command line
+
+
+#### Sign tool
+
+
+`sign` and `sign.py` produce a signed firmware image by creating a manifest header
+in the format supported by wolfBoot.
+
+Usage: `sign[.py] [OPTIONS] IMAGE.BIN KEY.DER VERSION`
+
+`IMAGE.BIN`:  A file containing the binary firmware/software to sign
+`KEY.DER`:    Private key file, in DER format, to sign the binary image
+`VERSION`:    The version associated with this signed software
+`OPTIONS`:    Zero or more options, described below
+
+#### Public key signature options
+
+
+If none of the following arguments is given, the tool will try to guess the key
+size from the format and key length detected in KEY.DER.
+
+  * `--ed25519` Use ED25519 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--ed448` Use ED448 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--ecc256` Use ecc256 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--ecc384` Use ecc384 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--rsa2048` Use rsa2048 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--rsa3072` Use rsa3072 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--rsa4096` Use rsa4096 for signing the firmware. Assume that the given KEY.DER
+file is in this format.
+
+  * `--no-sign` Disable secure boot signature verification. No signature
+    verification is performed in the bootloader, and the KEY.DER argument is
+    ignored.
+
+
+
+### Key generation and management
+
+
+KeyStore is the name of the mechanism used by wolfBoot to store all the public keys used for
+authenticating the signature of current firmware and updates.
+
+wolfBoot's key generation tool can be used to generate one or more keys. By default,
+when running `make` for the first time, a single key `wolfboot_signing_private_key.der`
+is created, and added to the keystore module. This key should be used to sign any firmware
+running on the target, as well as firmware update binaries.
+
+Additionally, the `keygen` tool creates additional files with different representations
+of the keystore
+ - A .c file (src/keystore.c) which can be used to deploy public keys as part
+   of the bootloader itself, by linking the keystore in `wolfboot.elf`
+ - A .bin file (keystore.bin) which contains the keystore that can be hosted
+   on a custom memory support. In order to access the keystore, a small driver is
+   required (see section "Interface API" below).
+
+By default, the keystore object in `src/keystore.c` is accessed by wolfboot by including
+its symbols in the build.
+Once generated, this file contains an array of structures describing each public
+key that will be available to wolfBoot on the target system. Additionally, there are a few
+functions that connect to the wolfBoot keystore API to access the details and the
+content of the public key slots.
+
+The public key is described by the following structure:
 
 ```
-./tools/keytools/sign [--ed25519 | --ed448 | --ecc256 | --rsa2048 | --rsa4096 ] [--sha256 | --sha3] [--wolfboot-update] image key.der fw_version
-  - or -        ./tools/keytools/sign [--sha256 | --sha3] [--sha-only] [--wolfboot-update] image pub_key.der fw_version
-  - or -        ./tools/keytools/sign [--ed25519 | --ed448 | --ecc256 | --rsa2048 | --rsa4096 ] [--sha256 | --sha3] [--manual-sign] image pub_key.der fw_version signature.sig
+ struct keystore_slot {
+     uint32_t slot_id;
+     uint32_t key_type;
+     uint32_t part_id_mask;
+     uint32_t pubkey_size;
+     uint8_t  pubkey[KEYSTORE_PUBKEY_SIZE];
+ };
+
 ```
+
+- `slot_id` is the incremental identifier for the key slot, starting from 0.
+
+- `key_type` describes the algorithm of the key, e.g. `AUTH_KEY_ECC256` or `AUTH_KEY_RSA3072`
+
+- `mask` describes the permissions for the key. It's a bitmap of the partition ids for which this key can be used for verification
+
+- `pubkey_size` the size of the public key buffer
+
+- `pubkey` the actual buffer containing the public key in its raw format
+
+When booting, wolfBoot will automatically select the public key associated to the signed firmware image, check that it matches the permission mask for the partition id where the verification is running and then attempts to authenticate the signature of the image using the selected public key slot.
+
+
+#### Creating multiple keys
+
+
+`keygen` accepts multiple filenames for private keys.
+
+Two arguments:
+
+ - `-g priv.der` generate new keypair, store the private key in priv.der, add the public key to the keystore
+ - `-i pub.der` import an existing public key and add it to the keystore
+
+Example of creation of a keystore with two ED25519 keys:
+
+`./tools/keytools/keygen.py --ed25519 -g first.der -g second.der`
+
+will create the following files:
+
+ - `first.der` first private key
+ - `second.der` second private key
+ - `src/keystore.c` C keystore containing both public keys associated with `first.der`
+     and `second.der`.
+
+The `keystore.c` generated should look similar to this:
+
+```
+#define NUM_PUBKEYS 2
+const struct keystore_slot PubKeys[NUM_PUBKEYS] = {
+
+     /* Key associated to private key 'first.der' */
+    {
+        .slot_id = 0,
+        .key_type = AUTH_KEY_ED25519,
+        .part_id_mask = KEY_VERIFY_ALL,
+        .pubkey_size = KEYSTORE_PUBKEY_SIZE_ED25519,
+        .pubkey = {
+            0x21, 0x7B, 0x8E, 0x64, 0x4A, 0xB7, 0xF2, 0x2F,
+            0x22, 0x5E, 0x9A, 0xC9, 0x86, 0xDF, 0x42, 0x14,
+            0xA0, 0x40, 0x2C, 0x52, 0x32, 0x2C, 0xF8, 0x9C,
+            0x6E, 0xB8, 0xC8, 0x74, 0xFA, 0xA5, 0x24, 0x84
+        },
+    },
+
+     /* Key associated to private key 'second.der' */
+    {
+        .slot_id = 1,
+        .key_type = AUTH_KEY_ED25519,
+        .part_id_mask = KEY_VERIFY_ALL,
+        .pubkey_size = KEYSTORE_PUBKEY_SIZE_ED25519,
+        .pubkey = {
+            0x41, 0xC8, 0xB6, 0x6C, 0xB5, 0x4C, 0x8E, 0xA4,
+            0xA7, 0x15, 0x40, 0x99, 0x8E, 0x6F, 0xD9, 0xCF,
+            0x00, 0xD0, 0x86, 0xB0, 0x0F, 0xF4, 0xA8, 0xAB,
+            0xA3, 0x35, 0x40, 0x26, 0xAB, 0xA0, 0x2A, 0xD5
+        },
+    },
+
+
+};
+
+```
+
+
+#### Public keys and permissions
+
+
+By default, when a new keystore is created, the permissions mask is set
+to `KEY_VERIFY_ALL`, which means that the key can be used to verify a firmware
+targeting any partition id.
+
+To restrict the permissions for single keys, it would be sufficient to change the value
+of their `part_id_mask` attributes.
+
+The `part_id_mask` value is a bitmask, where each bit represent a different partition.
+The bit '0' is reserved for wolfBoot self-update, while typically the main firmware partition
+is associated to id 1, so it requires a key with the bit '1' set. In other words, signing a
+partition with `--id 3` would require turning on bit '3' in the mask, i.e. adding (1U << 3) to it.
+
+Beside `KEY_VERIFY_ALL`, pre-defined mask values can also be used here:
+
+- `KEY_VERIFY_APP_ONLY` only verifies the main application, with partition id 1
+- `KEY_VERIFY_SELF_ONLY` this key can only be used to authenticate wolfBoot self-updates (id = 0)
+- `KEY_VERIFY_ONLY_ID(N)` macro that can be used to restrict the usage of the key to a specific partition id `N`
+
 
 ### Signing Firmware
 
-1. Load the private key to use for signing into `./rsa2048.der`, `./rsa4096.der`, `./ed25519.der`, `ecc256.der`, or `./ed448.der`
+1. Load the private key to use for signing into `./wolfboot_signing_private_key.der`
 2. Run the signing tool with asymmetric algorithm, hash algorithm, file to sign, key and version.
 
-```
-./tools/keytools/sign --rsa2048 --sha256 test-app/image.bin rsa2048.der 1
-## OR
-python3 ./tools/keytools/sign.py --rsa2048 --sha256 test-app/image.bin rsa2048.der 1
+```sh
+./tools/keytools/sign --rsa2048 --sha256 test-app/image.bin wolfboot_signing_private_key.der 1
+# OR
+python3 ./tools/keytools/sign.py --rsa2048 --sha256 test-app/image.bin wolfboot_signing_private_key.der 1
 ```
 
 Note: The last argument is the “version” number.
@@ -85,21 +282,31 @@ Note: The last argument is the “version” number.
 
 Steps for manually signing firmware using an external key source.
 
-```
-## Create file with Public Key
-openssl rsa -inform DER -outform DER -in rsa2048.der -out rsa2048_pub.der -pubout
-## Generate Hash to Sign
+```sh
+# Create file with Public Key
+openssl rsa -inform DER -outform DER -in my_key.der -out rsa2048_pub.der -pubout
+
+# Add the public key to the wolfBoot keystore using `keygen -i`
+./tools/keytools/keygen --rsa2048 -i rsa2048_pub.der
+# OR
+python3 ./tools/keytools/keygen.py --rsa2048 -i rsa4096_pub.der
+
+# Generate Hash to Sign
 ./tools/keytools/sign            --rsa2048 --sha-only --sha256 test-app/image.bin rsa2048_pub.der 1
-## OR
+# OR
 python3 ./tools/keytools/sign.py --rsa2048 --sha-only --sha256 test-app/image.bin rsa4096_pub.der 1
-## Sign hash Example (here is where you would use an HSM)
-openssl rsautl -sign -keyform der -inkey rsa2048.der -in test-app/image_v1_digest.bin > test-app/image_v1.sig
-## Generate final signed binary
+
+# Sign hash Example (here is where you would use an HSM)
+openssl pkeyutl -sign -keyform der -inkey my_key.der -in test-app/image_v1_digest.bin > test-app/image_v1.sig
+
+# Generate final signed binary
 ./tools/keytools/sign            --rsa2048 --sha256 --manual-sign test-app/image.bin rsa2048_pub.der 1 test-app/image_v1.sig
-## OR
+# OR
 python3 ./tools/keytools/sign.py --rsa2048 --sha256 --manual-sign test-app/image.bin rsa4096_pub.der 1 test-app/image_v1.sig
-## Combine into factory image
-cat wolfboot-align.bin test-app/image_v1_signed.bin > factory.bin
+
+# Combine into factory image (0xc0000 is the WOLFBOOT_PARTITION_BOOT_ADDRESS)
+tools/bin-assemble/bin-assemble factory.bin 0x0 wolfboot.bin \
+                              0xc0000 test-app/image_v1_signed.bin
 ```
 
 ## Measured Boot using wolfBoot
@@ -322,11 +529,11 @@ Requirement: wolfBoot is compiled with `DELTA_UPDATES=1`
 
 Version "1" is signed as usual, as a standalone image:
 
-`tools/keytools/sign.py --ecc256 --sha256 test-app/image.bin ecc256.der 1`
+`tools/keytools/sign.py --ecc256 --sha256 test-app/image.bin wolfboot_signing_private_key.der 1`
 
 When updating from version 1 to version 2, you can invoke the sign tool as:
 
-`tools/keytools/sign.py --delta test-app/image_v1_signed.bin --ecc256 --sha256 test-app/image.bin ecc256.der 2`
+`tools/keytools/sign.py --delta test-app/image_v1_signed.bin --ecc256 --sha256 test-app/image.bin wolfboot_signing_private_key.der 2`
 
 Besides the usual output file `image_v2_signed.bin`, the sign tool creates an additional `image_v2_signed_diff.bin` which should be noticeably smaller in size as long as the two binary files contain overlapping areas.
 
@@ -456,7 +663,7 @@ The `sign.py` script can now be invoked to produce a signed+encrypted image, by 
 secret file:
 
 ```
-./tools/keytools/sign.py --encrypt enc_key.der test-app/image.bin ecc256.der 24
+./tools/keytools/sign.py --encrypt enc_key.der test-app/image.bin wolfboot_signing_private_key.der 24
 ```
 
 which will produce as output the file `test-app/image_v24_signed_and_encrypted.bin`, that can be transferred to the target's external device.
@@ -492,7 +699,7 @@ The `sign.py` script can now be invoked to produce a signed+encrypted image, by 
 secret file. To select AES-256, use the `--aes256` option.
 
 ```
-./tools/keytools/sign.py --aes256 --encrypt enc_key.der test-app/image.bin ecc256.der 24
+./tools/keytools/sign.py --aes256 --encrypt enc_key.der test-app/image.bin wolfboot_signing_private_key.der 24
 
 ```
 
