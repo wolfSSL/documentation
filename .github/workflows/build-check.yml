@@ -50,3 +50,35 @@ jobs:
       run: cd wolfSSL && export PATH=$PATH:"/home/runner/work/documentation" && make html
     - name: wolfssl pdf
       run: cd wolfSSL && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: wolfssh html
+      run: cd wolfSSH && export PATH=$PATH:"/home/runner/work/documentation" && make html
+    - name: wolfssh pdf
+      run: cd wolfSSH && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: wolftpm html
+      run: cd wolfTPM && export PATH=$PATH:"/home/runner/work/documentation" && make html
+    - name: wolfTPM pdf
+      run: cd wolfTPM && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: wolfmqtt html
+      run: cd wolfMQTT && export PATH=$PATH:"/home/runner/work/documentation" && make html
+    - name: wolfmqtt pdf
+      run: cd wolfMQTT && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: wolfBoot html
+      run: cd wolfBoot && export PATH=$PATH:"/home/runner/work/documentation" && make html
+    - name: wolfBoot pdf
+      run: cd wolfBoot && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: wolfSentry html
+      run: cd wolfSentry && export PATH=$PATH:"/home/runner/work/documentation" && make html
+    - name: wolfSentry pdf
+      run: cd wolfSentry && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: wolfclu html
+      run: cd wolfCLU && export PATH=$PATH:"/home/runner/work/documentation" && make html
+    - name: wolfclu pdf
+      run: cd wolfCLU && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: wolfssl-jni html
+      run: cd wolfSSL-JNI && export PATH=$PATH:"/home/runner/work/documentation" && make html
+    - name: wolfssl-jni pdf
+      run: cd wolfSSL-JNI && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: wolfcrypt-jni html
+      run: cd wolfCrypt-JNI && export PATH=$PATH:"/home/runner/work/documentation" && make html
+    - name: wolfcrypt-jni pdf
+      run: cd wolfCrypt-JNI && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
