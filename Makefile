@@ -60,9 +60,9 @@ wolftpm: build
 	@$(DOCKER_CMD)
 
 .PHONY: wolfengine
-wolftpm: MANPATH=wolfEngine
-wolftpm: PDFFILE=wolfEngine-Manual.pdf
-wolftpm: build
+wolfengine: MANPATH=wolfEngine
+wolfengine: PDFFILE=wolfEngine-Manual.pdf
+wolfengine: build
 	@$(DOCKER_CMD)
 
 clean:
