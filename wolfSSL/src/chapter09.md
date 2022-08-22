@@ -38,7 +38,7 @@ In addition to header file location changes, the release of wolfSSL 2.0.0 RC3 cr
 
 ## Thread Safety
 
-wolfSSL (formerly CyaSSL) is thread safe by design. Multiple threads can enter the library simultaneously without creating conflicts because wolfSSL avoids global data, static data, and the sharing of objects. The user must still take care to avoid potential problems in two areas.
+wolfSSL (formerly CyaSSL) is thread safe by design. Multiple threads can enter the library simultaneously without creating conflicts because wolfSSL avoids global data, static data, and the sharing of objects. The user must still take care to avoid potential problems in some areas.
 
 1. A client may share an WOLFSSL object across multiple threads but access must be synchronized, i.e., trying to read/write at the same time from two different threads with the same SSL pointer is not supported.
 
@@ -47,6 +47,8 @@ wolfSSL (formerly CyaSSL) is thread safe by design. Multiple threads can enter t
 2. Besides sharing WOLFSSL pointers, users must also take care to completely initialize an `WOLFSSL_CTX` before passing the structure to [`wolfSSL_new()`](group__Setup.md#function-wolfssl_new). The same `WOLFSSL_CTX` can create multiple `WOLFSSL` structs but the `WOLFSSL_CTX` is only read during [`wolfSSL_new()`](group__Setup.md#function-wolfssl_new) creation and any future (or simultaneous changes) to the `WOLFSSL_CTX` will not be reflected once the `WOLFSSL` object is created.
 
     Again, multiple threads should synchronize writing access to a `WOLFSSL_CTX` and it is advised that a single thread initialize the `WOLFSSL_CTX` to avoid the synchronization and update problem described above.
+
+3. Some optimizations allocate memory on a per thread basis. If fixed point ECC cache is enabled (`FP_ECC`), then threads should release the cached buffers using `wc_ecc_fp_free()` before the thread exits.
 
 ## Input and Output Buffers
 
