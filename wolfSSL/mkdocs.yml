@@ -48,6 +48,7 @@ nav:
       - "Algorithms - Camellia": group__Camellia.md
       - "Algorithms - ChaCha": group__ChaCha.md
       - "Algorithms - ChaCha20_Poly1305": group__ChaCha20Poly1305.md
+      - "Algorithms - CMAC ": group__CMAC.md
       - "Callbacks - CryptoCb": group__Crypto.md
       - "Algorithms - Curve25519": group__Curve25519.md
       - "Algorithms - Curve448": group__Curve448.md
@@ -89,6 +90,7 @@ nav:
       - camellia_8h.md
       - chacha20__poly1305_8h.md
       - chacha_8h.md
+      - cmac_8h.md
       - coding_8h.md
       - compress_8h.md
       - cryptocb_8h.md
@@ -119,6 +121,7 @@ nav:
       - poly1305_8h.md
       - psa_8h.md
       - pwdbased_8h.md
+      - quic_8h.md
       - random_8h.md
       - ripemd_8h.md
       - rsa_8h.md
