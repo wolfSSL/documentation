@@ -432,7 +432,7 @@ wolfSSL supports X.509 v3 certificate signing request (CSR) generation. CSR gene
 
 Before a CSR can be generated the user needs to provide information about the subject of the certificate. This information is contained in a structure from `wolfssl/wolfcrypt/asn_public.h` named `Cert`:
 
-For details on the Cert and CertName structures please reference [Certificate Generation](#certificat-generation) above.
+For details on the Cert and CertName structures please reference [Certificate Generation](#certificate-generation) above.
 
 Before filling in the subject information an initialization function needs to be called like this:
 
