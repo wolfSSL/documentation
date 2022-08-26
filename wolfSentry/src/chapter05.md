@@ -19,7 +19,9 @@ The following table lists the possible value of `config-update` object :
 | --------| -----|----------------------------------- |
 | `max-connection-count` | number | The value is the max number of simultaneous connections that are allowed at a time for a given peer. |
 | `penaltybox-duration` | number\|string | The value tells wolfSentry how long a peer should be blocked |
-
+| `derog-thresh-for-penalty-boxing` | number | The value is a threshold whether a route is put intoe into penalty box. |
+| `derog-thresh-ignore-commendable` | true\|false | The derogatory threshold is subtracted by a number of commendable count when this is `true`.|
+| `commendable-clears-derogatory` | true\|false | A derogatory count is cleared when a route becomes commendable when this is `true`|
 
 The following table lists the possible value of `event-insert` object :
 
@@ -41,6 +43,9 @@ The following table lists the possible value of `config` object of `event-insert
 | --------| -----|----------------------------------- |
 | `max-connection-count` | number | The value is the max number of simultaneous connections that are allowed at a time for a given peer |
 | `penaltybox-duration` | number\|string | The value tells wolfSentry how long a peer should be blocked. |
+| `derog-thresh-for-penalty-boxing` | number | The value is a threshold whether a route is put intoe into penalty box. |
+| `derog-thresh-ignore-commendable` | true\|false | The derogatory threshold is subtracted by a number of commendable count when this is `true`.|
+| `commendable-clears-derogatory` | true\|false | A derogatory count is cleared when a route becomes commendable when this is `true`|
 
 The following table lists the possible value of `static-routes-insert` object :
 
