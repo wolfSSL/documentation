@@ -10,7 +10,7 @@
 
 
 
-### C標準図書館抽象化レイヤー
+### C標準ライブラリ抽象化レイヤー
 
 
 
@@ -83,7 +83,7 @@ external void* my_memcpy(void* d, const void* s, size_t n);
 
 
 
-wolfSSLは、`math.h`の`pow()` `log()`のように振る舞う2つの機能を使用しています。Difie-Hellmanのみが必要とするため、ビルドからDHを除外すると、独自のDHを提供する必要はありません。それらは`XPOW()`および`XLOG()`に抽象化され、`wolfcrypt/src/dh.c`に見つかりました。
+wolfSSLは、`math.h`の`pow()` `log()`のように振る舞う2つの機能を使用しています。Difie-Hellmanのみが必要とするため、ビルドからDHを除外すると、独自のDHを提供する必要はありません。それらは`XPOW()`および`XLOG()`として`wolfcrypt/src/dh.c`に定義されます。
 
 
 
@@ -91,7 +91,7 @@ wolfSSLは、`math.h`の`pow()` `log()`のように振る舞う2つの機能を�
 
 
 
-デフォルトでは、wolfSSLはキーと証明書をロードするためにシステムのファイルシステムを使用します。`NO_FILESYSTEM`を定義することでオフにすることができます。代わりに項目Vを参照してください。Dが好きです。Micrium Defineによって提供される例を参照してください。
+デフォルトでは、wolfSSLはキーと証明書をロードするためにシステムのファイルシステムを使用します。`NO_FILESYSTEM`を定義することでオフにすることができます。代わりに項目Vを参照してください。もし、システムの提供するファイルシステムを使用したい場合は、ssl.c 中のXFILE()を利用することができます。Micrium Defineによって提供される例を参照してください。
 
 
 
@@ -167,7 +167,7 @@ OS特有の定義は、WolfCryptおよびWolfsslの`wolfssl/internal.h`の`wolfs
 
 
 
-wolfSSLを定義する1つの要因は、新しいプラットフォームに簡単に移植される能力です。そのため、wolfsslは、箱外のオペレーティングシステムの長いリストをサポートしています。現在サポートされているオペレーティングシステムは次のとおりです。
+wolfSSLを定義する1つの要因は、新しいプラットフォームに簡単に移植される能力です。そのため、wolfsslは、out-of-box のオペレーティングシステムの多くをサポートしています。現在サポートされているオペレーティングシステムは次のとおりです。
 
 
 
@@ -180,10 +180,10 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 * Mac OS X
 
 
-* ソラリス
+* Solaris
 
 
-* スレッド
+* ThreadX
 
 
 * vxworks
@@ -198,7 +198,7 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 * openBSD.
 
 
-* 埋め込まれたLinux
+* Embeded Linux
 
 
 * yocto linux
@@ -207,13 +207,13 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 * openembeded
 
 
-* ひるみ
+* WinCE
 
 
-* 俳句
+* Haiku
 
 
-* openwrt
+* OpenWRT
 
 
 * iPhone(iOS)
@@ -229,31 +229,31 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 
 
 
-* モンタヴィスタ
+* MontaVista
 
 
-* ノンストップ
+* NonStop
 
 
-* トロン/ ITRON /μITRON
+* TRON/ ITRON /μITRON
 
 
 * MicriumのµC/OS-III
 
 
-* フレートス
+* FreeRTOS
 
 
-* Safertos
+* SafeRTOS
 
 
-* NXP/フリースケールMQX
+* NXP/Freescae MQX
 
 
-* 核
+* Nucleus
 
 
-* tinyos
+* TinyOS
 
 
 * HP/UX
@@ -272,19 +272,19 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 
 
 
-* ウタスカー
+* uTasker
 
 
-* 媚びる
+* embOS
 
 
-* 無期限
+* INtime
 
 
-* m m
+* Mbed
 
 
-* µTカーネル
+* µT-Kernel
 
 
 * RIOT
@@ -299,7 +299,7 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 
 
 
-* グリーンヒルズの完全性
+* Green Hilles INTEGRITY
 
 
 * keil RTX
@@ -329,7 +329,7 @@ wolfSSLは、ARM、Intel、Motorola、MBED、Freescale、Microchip(PIC32)、Stmi
 
 
 
-wolfSSLは、C＃での使用に対するサポートが限られています。ポートを含むビジュアルスタジオプロジェクトは、ディレクトリ`root_wolfSSL/wrapper/CSharp/`にあります。ビジュアルスタジオプロジェクトを開いた後、ビルド -  \>構成マネージャーをクリックして「アクティブソリューション構成」と「アクティブソリューションプラットフォーム」を設定します。」はDLLデバッグとDLLリリースです。サポートされているプラットフォームはWin32およびX64です。
+wolfSSLは、制限付きですがC＃での使用をサポートしています。ポートを含むビジュアルスタジオプロジェクトは、ディレクトリ`root_wolfSSL/wrapper/CSharp/`にあります。ビジュアルスタジオプロジェクトを開いた後、ビルド -  \>構成マネージャーをクリックして「アクティブソリューション構成」と「アクティブソリューションプラットフォーム」を設定します。」はDLLデバッグとDLLリリースです。サポートされているプラットフォームはWin32およびX64です。
 
 
 ソリューションとプラットフォームを設定したら、プリプロセッサフラグ`HAVE_CSHARP`を追加する必要があります。これにより、C＃ラッパーで使用され、例で使用されるオプションがオンになります。
@@ -338,7 +338,7 @@ wolfSSLは、C＃での使用に対するサポートが限られています。
 その後、ビルドするだけでビルドソリューションを選択します。これにより、`wolfssl.dll`、`wolfSSL_CSharp.dll`および例が作成されます。例は、それらをエントリポイントとしてターゲットにして、Visual Studioでデバッグを実行することで実行できます。
 
 
-作成されたC＃ラッパーをC＃プロジェクトに追加することは、いくつかの方法で実行できます。1つの方法は、作成された`wolfssl.dll`および`wolfSSL_CSharp.dll`をディレクトリ`C:/Windows/System/`にインストールすることです。これにより、次のプロジェクトが可能になります。
+作成されたC＃ラッパーをC＃プロジェクトに追加することは、いくつかの方法で実行できます。1つの方法は、作成された`wolfssl.dll`および`wolfSSL_CSharp.dll`をディレクトリ`C:/Windows/System/`にインストールすることです。これにより、Wolfssl C＃ラッパーの呼び出しが可能になります。
 
 
 
@@ -354,5 +354,4 @@ public some_class {
 ...
 ```
 
-
-Wolfssl C＃ラッパーに電話をかける。別の方法は、Visual Studioプロジェクトを作成し、wolfSSLのバンドルC＃ラッパーソリューションを参照することです。
+別の方法は、Visual Studioプロジェクトを作成し、wolfSSLのバンドルC＃ラッパーソリューションを参照することです。
