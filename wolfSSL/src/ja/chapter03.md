@@ -392,7 +392,7 @@ server 4.8.1 NOTE: All files relative to wolfSSL home dir
 
 
 
-## EchoServerサンプルプログラム
+## エコーザーの例
 
 
 
@@ -424,7 +424,7 @@ server 4.8.1 NOTE: All files relative to wolfSSL home dir
 
 
 
-## EchoClientサンプルプログラム
+## エコーリントの例
 
 
 

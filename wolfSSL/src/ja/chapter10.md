@@ -616,11 +616,11 @@ WolfCryptのDiffie-Hellmanの完全な例については、ファイル`wolfcryp
 
 
 
-### EDH(エフェメラルDIFFIE-HELLMAN)
+### EDH(Ephemeral DIFFIE-HELLMAN)
 
 
 
-wolfSSLサーバーは、Ephemeral Diffie-Hellmanを行うことができます。この機能を追加するためにビルドの変更は必要ありませんが、アプリケーションはEDH暗号スイートを有効にするためにサーバー側にはかなかグループパラメーターを登録する必要があります。これを行うために新しいAPIを使用できます。
+wolfSSLサーバーは、Ephemeral Diffie-Hellmanを行うことができます。この機能を追加するためにビルドの変更は必要ありませんが、アプリケーションはEDH暗号スイートを有効にするためにサーバー側に Ephemeral グループパラメーターを登録する必要があります。これを行うために新しいAPIを使用できます。
 
 
 
@@ -631,7 +631,7 @@ int wolfSSL_SetTmpDH(WOLFSSL* ssl, unsigned char* p,
 
 
 
-サンプルサーバーとecheCoserverは、この関数を`SetDH()`から使用しています。
+サンプルサーバーとecho サーバーは、この関数を`SetDH()`から使用しています。
 
 
 
@@ -655,7 +655,7 @@ byte   dsaKeyBuffer[]={ /*holds the raw data from the DSA key,
 
 
 
-次に、SHA構造(`sha`)、乱数ジェネレーター(`rng`)、SHAハッシュ(`hash`)を保存する配列、署名(`signature`)、`idx`を保存する配列を宣言します(`dsaKeyBuffer`で読み始める場所をマークするために)、検証後に返品価値を保持するためのINT(`answer`)。
+次に、SHA構造(`sha`)、乱数ジェネレーター(`rng`)、SHAハッシュ(`hash`)を保存する配列、署名(`signature`)、`idx`を保存する配列を宣言します(`dsaKeyBuffer`で読み始める場所をマークするために)、検証後の戻り値を保持するためのint(`answer`)などがあります。
 
 
 

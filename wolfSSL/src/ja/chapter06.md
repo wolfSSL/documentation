@@ -9,7 +9,7 @@
 
 
 
-wolfSSL(以前のCyassl)には、ハンドシェイクコールバックが接続または承認に設定できるようにする拡張子があります。これは、別のデバッガが利用できず、スニッフィングが実用的でない場合に、サポートをデバッグするための組み込みシステムで役立ちます。wolfSSLハンドシェイクコールバックを使用するには、拡張機能、[`wolfSSL_connect_ex()`](ssl_8h.md#function_wolfssl_connect_ex)および[`wolfSSL_accept_ex()`](ssl_8h.md#function-wolfssl_accept_ex)を使用します。
+wolfSSL(以前のCyassl)には、ハンドシェイクコールバックが接続または待受に設定できるようにする拡張子があります。これは、別のデバッガが利用できず、スニッフィングが実用的でない場合に、組み込みシステムでのデバックに役立ちます。wolfSSLハンドシェイクコールバックを使用するには、拡張機能、[`wolfSSL_connect_ex()`](ssl_8h.md#function_wolfssl_connect_ex)および[`wolfSSL_accept_ex()`](ssl_8h.md#function-wolfssl_accept_ex)を使用します。
 
 
 
@@ -48,7 +48,7 @@ typedef struct handShakeInfo_st {
 
 
 
-握手交換のSSLパケットの最大数がわかっているため、動的メモリは使用されません。パケット名は`numberPackets`から`numberPackets`までにアクセスできます。コールバックは、ハンドシェイクエラーが発生したかどうかを呼び出します。例の使用法もクライアントの例にあります。
+ハンドシェーク中のSSLパケットの最大数がわかっているため、動的メモリは使用されません。パケット名は`numberPackets`から`numberPackets`までにアクセスできます。コールバックは、ハンドシェイクエラーが発生したかどうかを呼び出します。例の使用法もクライアントの例にあります。
 
 
 
@@ -82,7 +82,7 @@ typedef struct timeoutInfo_st {
 
 
 
-やはり、最大数のSSLパケットがハンドシェイクで知られているので、この構造に動的メモリは使用されない。`Timeval`は、struct timevalのtypedefです。
+やはり、最大数のSSLパケットがハンドシェイクでわかっているので、この構造に動的メモリは使用されません。`Timeval`は、struct timevalのtypedefです。
 
 
 `PacketInfo`は次のように定義されています。
@@ -115,17 +115,17 @@ typedef struct packetInfo_st {
 
 
 
-wolfSSLは、SSL/TLS接続中に機能をMAC/暗号化し、復号化/検証したいユーザーにアトミックレコード処理コールバックを提供します。
+wolfSSLは、SSL/TLS接続中にMAC/暗号化、復号化/検証などの機能をより制御したユーザーにアトミックレコード処理コールバックを提供します。
 
 
-ユーザーは2つの機能を定義する必要があります。
+ユーザーは2つの関数を定義する必要があります。
 
 
 
 1. Mac/暗号化コールバック関数
 
 
-2. コールバック関数を復号化/検証します
+2. 復号化/検証コールバック関数
 
 
 
