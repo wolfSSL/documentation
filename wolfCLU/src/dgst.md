@@ -9,12 +9,26 @@ Hash algos supported:
 - [-sha384]
 - [-sha512]
 
+**Sign**
+
 Parameters:     
 
-- [-signature] file containing the signature
-- [-verify] key used to verify the signature
+- [-sign] key used to create signature
+- [-out] file to write signature to
 
 Example:
 ```
-wolfssl dgst -signature test.sig -verify key.pem test
+wolfssl dgst -sign keyPrivate.pem -out test.sig testfile
+```
+
+**Verify**
+
+Parameters:     
+
+- [-verify] key used to verify the signature
+- [-signature] file containing the signature
+
+Example:
+```
+wolfssl dgst -verify keyPublic.pem -signature test.sig testfile
 ```

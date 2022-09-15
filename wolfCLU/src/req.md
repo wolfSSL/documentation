@@ -6,8 +6,8 @@ Available arguments are:
 - [-in] input file to read from
 - [-out] file to write to (default stdout)
 - [-key] public key to put into certificate request
-- [-inform] der or pem format for '-in'
-- [-outform] der or pem format for '-out'
+- [-inform] der or pem format for '-in' (defaults to pem) 
+- [-outform] der or pem format for '-out' (defaults to pem)
 - [-config] file to parse for certificate configuration
 - [-days] number of days should be valid for
 - [-x509] generate self signed certificate
