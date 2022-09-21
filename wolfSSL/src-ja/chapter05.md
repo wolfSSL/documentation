@@ -25,7 +25,7 @@ wolfSSL(以前のCyassl)は、C標準ライブラリなしでビルドして、�
 ほとんどのCプログラムは、動的メモリ割り当てに`malloc()`および`free()`を使用します。wolfSSLは、代わりに`XMALLOC()`および`XFREE()`を使用します。デフォルトでは、これらはCランタイムバージョンを指します。`XMALLOC_USER`を定義することにより、ユーザーは独自のフックを提供できます。各メモリ関数は、標準的なものについて2つの追加の引数、ヒープのヒント、および割り当てタイプを使用します。ユーザーは、これらを無視するか、好きな方法で使用できます。wolfSSLメモリ関数は`wolfssl/wolfcrypt/types.h`で見つけることができます。
 
 
-wolfSSLは、コンパイル時間の代わりに実行時にメモリオーバーライド関数を登録する機能も提供します。`wolfssl/wolfcrypt/memory.h`はこの機能のヘッダーであり、ユーザーは次の関数を呼び出してメモリ関数をセットアップできます。
+wolfSSLは、コンパイル時ではなく実行時にメモリオーバーライド関数を登録する機能も提供します。`wolfssl/wolfcrypt/memory.h`はこの機能のヘッダーであり、ユーザーは次の関数を呼び出してメモリ関数をセットアップできます。
 
 
 
@@ -91,7 +91,7 @@ wolfSSLは、`math.h`の`pow()` `log()`のように振る舞う2つの機能を�
 
 
 
-デフォルトでは、wolfSSLはキーと証明書をロードするためにシステムのファイルシステムを使用します。`NO_FILESYSTEM`を定義することでオフにすることができます。代わりに項目Vを参照してください。もし、システムの提供するファイルシステムを使用したい場合は、ssl.c 中のXFILE()を利用することができます。Micrium Defineによって提供される例を参照してください。
+デフォルトでは、wolfSSLはキーと証明書をロードするためにシステムのファイルシステムを使用します。`NO_FILESYSTEM`を定義することでオフにすることができます。代わりに項目Vを参照してください。Dが好きです。Micrium Defineによって提供される例を参照してください。
 
 
 
@@ -186,7 +186,7 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 * ThreadX
 
 
-* vxworks
+* VxWorks
 
 
 * FreeBSD
@@ -195,16 +195,17 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 * NetBSD
 
 
-* openBSD.
+* OpenBSD
 
 
-* Embeded Linux
+* 埋め込まれたLinux
 
+* embedded Linux
 
 * yocto linux
 
 
-* openembeded
+* OpenEmbedded
 
 
 * WinCE
@@ -219,26 +220,27 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 * iPhone(iOS)
 
 
-* アンドロイド
+* Android
 
 
-* Devkitproを通してニンテンドーWiiとGamecube
+* Nintendo Wii と Gamecube through DevKitPro
 
 
 * QNX
 
 
 
-* MontaVista
+* モンタヴィスタ
 
 
-* NonStop
+* ノンストップ
+
+* TRON/ITRON/µITRON
+
+* トロン/ ITRON /μITRON
 
 
-* TRON/ ITRON /μITRON
-
-
-* MicriumのµC/OS-III
+* Micrium's µC/OS-III
 
 
 * FreeRTOS
@@ -247,13 +249,14 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 * SafeRTOS
 
 
-* NXP/Freescae MQX
+* NXP/フリースケールMQX
+
+* NXP/Freescale MQX
+
+* 核
 
 
-* Nucleus
-
-
-* TinyOS
+* tinyos
 
 
 * HP/UX
@@ -299,7 +302,7 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 
 
 
-* Green Hilles INTEGRITY
+* グリーンヒルズの完全性
 
 
 * keil RTX
@@ -321,7 +324,7 @@ wolfSSLを定義する1つの要因は、新しいプラットフォームに簡
 
 
 
-wolfSSLは、ARM、Intel、Motorola、MBED、Freescale、Microchip(PIC32)、Stmicro(STM32F2/F4)、NXP、Analog Devices、Texas Instruments、AMDなどを含むチップセットをサポートしています。
+wolfSSLは、ARM、Intel、Motorola、MBED、Freescale、Microchip(PIC32)、STMicro(STM32F2/F4)、NXP、Analog Devices、Texas Instruments、AMDなどを含むチップセットをサポートしています。
 
 
 
@@ -354,4 +357,5 @@ public some_class {
 ...
 ```
 
-別の方法は、Visual Studioプロジェクトを作成し、wolfSSLのバンドルC＃ラッパーソリューションを参照することです。
+
+Wolfssl C＃ラッパーに電話をかける。別の方法は、Visual Studioプロジェクトを作成し、wolfSSLのバンドルC＃ラッパーソリューションを参照することです。
