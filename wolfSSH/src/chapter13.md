@@ -1005,6 +1005,7 @@ socket.
 **WS_BAD_ARGUMENT** – returns if one or more parameters is equal to NULL
 **WS_EOF** – returns when end of stream is reached
 **WS_FATAL_ERROR** – there was an error, call **wolfSSH_get_error()** for more detail
+**WS_REKEYING** if currently a rekey is in process, use wolfSSH_worker() to complete
 
 **Parameters**
 
@@ -1033,28 +1034,32 @@ wolfSSH_stream_send()
 
 **Description**
 
-wolfSSH_stream_send writes **bufSz** bytes from buf to the SSH stream data buffer. The
-bytes are removed from the internal buffer.
-
+wolfSSH_stream_send writes **bufSz** bytes from buf to the SSH stream data buffer.
 wolfSSH_stream_send() works with both blocking and non-blocking I/O. When the
-underlying I/O is non-blocking, wolfSSH_stream_send() will return when the underlying
-I/O could not satisfy the needs of wolfSSH_stream_send to continue. In this case, a call
-to wolfSSH_get_error() will yield either **WS_WANT_READ** or **WS_WANT_WRITE**. The
-calling process must then repeat the call to wolfSSH_stream_send when the socket it
-ready to send and wolfSSH will pick up where it left off. When using a non-blocking
-socket, nothing needs to be done, but select() can be used to check for the required
-condition.
-
+underlying I/O is non-blocking, wolfSSH_stream_send() will return a want write
+error when the underlying I/O could not satisfy the needs of wolfSSH_stream_send
+and there is still pending data in the SSH stream data buffer to be sent. In this
+case, a call to wolfSSH_get_error() will yield either **WS_WANT_READ** or
+**WS_WANT_WRITE**. The calling process must then repeat the call to
+wolfSSH_stream_send when the socket is ready to send and wolfSSH will send out
+any pending data left in the SSH stream data buffer then pull data from the input 
+**buf**. When using a non-blocking socket, nothing needs to be done, but select()
+can be used to check for the required condition.    
+    
 If the underlying I/O is blocking, wolfSSH_stream_send() will only return when the data
-has been sent or an error occurred.
+has been sent or an error occurred.    
+    
+In cases where I/O want write/read is not the error encountered (i.e. WS_REKEYING)
+then wolfSSH_worker() should be called until the internal SSH processes are completed.
 
 **Return Values**
 
-**>0** – number of bytes written upon success
+**>0** – number of bytes written to SSH stream data buffer upon success
 **0** – returned on socket failure caused by either a clean connection shutdown or a socket
 error, call **wolfSSH_get_error()** for more detail
 **WS_FATAL_ERROR** – there was an error, call wolfSSH_get_error() for more detail
 **WS_BAD_ARGUMENT** if any of the parameters is null
+**WS_REKEYING** if currently a rekey is in process, use wolfSSH_worker() to complete
 
 **Parameters**
 
