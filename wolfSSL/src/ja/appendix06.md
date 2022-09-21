@@ -13,20 +13,13 @@ wolfSSL(以前のCyassl)エラーコードは`wolfssl/ssl.h`にあります。�
 
 |エラーコード列挙|エラーコード|エラー説明|
 | --------------- | ---------- | ----------------- |
-| `SSL_ERROR_WANT_READ` | 2 | |
-
+| `SSL_ERROR_WANT_READ` |2||
 | `SSL_ERROR_WANT_WRITE` | 3 | |
-
 | `SSL_ERROR_WANT_CONNECT` | 7 | |
-
 | `SSL_ERROR_WANT_ACCEPT` | 8 | |
-
 | `SSL_ERROR_SYSCALL` | 5 | |
-
 | `SSL_ERROR_WANT_X509_LOOKUP` | 83 | |
-
 | `SSL_ERROR_ZERO_RETURN` | 6 | |
-
 | `SSL_ERROR_SSL` | 85 | |
 
 
@@ -38,109 +31,109 @@ wolfSSL(以前のCyassl)エラーコードは`wolfssl/ssl.h`にあります。�
 | --------------- | ---------- | ----------------- |
 |`INPUT_CASE_ERROR` |-301 |プロセス入力状態エラー|
 |`PREFIX_ERROR` |-302 |キーラウンドの悪いインデックス|
-|`MEMORY_ERROR` |-303 |メモリ外|
-|`VERIFY_FINISHED_ERROR` |-304 |終了時に問題を確認します|
-|`VERIFY_MAC_ERROR` |-305 |Macの問題を確認します|
+|`MEMORY_ERROR` |-303 |メモリ確保失敗|
+|`VERIFY_FINISHED_ERROR` |-304 |Finishedメッセージ検証に失敗|
+|`VERIFY_MAC_ERROR` |-305 |Mac検証に失敗|
 |`PARSE_ERROR` |-306 |ヘッダーの解析エラー|
-|`UNKNOWN_HANDSHAKE_TYPE` |-307 |奇妙な握手タイプ|
-|`SOCKET_ERROR_E` |-308 |ソケットのエラー状態|
-|`SOCKET_NODATA` |-309 |予想されるデータ、そこにはありません
-|`INCOMPLETE_DATA` |-310 |タスクの完了への十分なデータがありません
-|`UNKNOWN_RECORD_TYPE` |-311 |未知のタイプのレコードHDR |
-|`DECRYPT_ERROR` |-312 |復号化中の誤差|
-|`FATAL_ERROR` |-313 |REVCDアラート致命的なエラー|
+|`UNKNOWN_HANDSHAKE_TYPE` |-307 |不明なハンドシェークタイプ|
+|`SOCKET_ERROR_E` |-308 |ソケットがエラー状態|
+|`SOCKET_NODATA` |-309 |予想されるデータがソケットにない|
+|`INCOMPLETE_DATA` |-310 |タスク完了のための十分なデータがない|
+|`UNKNOWN_RECORD_TYPE` |-311 |レコードHDRに未知のタイプ |
+|`DECRYPT_ERROR` |-312 |復号中のエラー|
+|`FATAL_ERROR` |-313 |致命的なエラーアラートを受信|
 |`ENCRYPT_ERROR` |-314 |暗号化中のエラー|
-|`FREAD_ERROR` |-315 |野蛮な問題と
-|`NO_PEER_KEY` |-316 |ピアのキーが必要です|
-|`NO_PRIVATE_KEY` |-317 |秘密鍵が必要です|
-|`RSA_PRIVATE_ERROR` |-318 |RSA PRIVE op |の間のエラー
-|`NO_DH_PARAMS` |-319 |サーバーが見つからないDH Params |
-|`BUILD_MSG_ERROR` |-320 |メッセージの失敗を作成する
-|`BAD_HELLO` |-321 |クライアントハロー奇形|
-|`DOMAIN_NAME_MISMATCH` |-322 |ピア件名名前ミスマッチ|
-|`WANT_READ` |-323 |読みたい、もう一度電話してください|
-|`NOT_READY_ERROR` |-324 |ハンドシェイクレイヤーReady |
+|`FREAD_ERROR` |-315 |freadでエラー|
+|`NO_PEER_KEY` |-316 |ピアの鍵が存在しない|
+|`NO_PRIVATE_KEY` |-317 |秘密鍵が存在しない|
+|`RSA_PRIVATE_ERROR` |-318 |RSA秘密鍵操作中のエラー|
+|`NO_DH_PARAMS` |-319 |サーバーがDHパラメータを送ってこない|
+|`BUILD_MSG_ERROR` |-320 |メッセージの作成に失敗|
+|`BAD_HELLO` |-321 |ClientHelloメッセージが不正|
+|`DOMAIN_NAME_MISMATCH` |-322 |ピアのサブジェクト名がミスマッチ|
+|`WANT_READ` |-323 |データ再読み取りが必要|
+|`NOT_READY_ERROR` |-324 |ハンドシェイクレイヤーがReadyでない |
 |`VERSION_ERROR` |-326 |レコードレイヤーバージョンエラー|
-|`WANT_WRITE` |-327 |書きやすく、もう一度電話してください
+|`WANT_WRITE` |-327 |データ再送が必要|
 |`BUFFER_ERROR` |-328 |不正なバッファー入力|
-|`VERIFY_CERT_ERROR` |-329 |CERTエラーを確認してください
-|`VERIFY_SIGN_ERROR` |-330 |符号エラーを確認します|
+|`VERIFY_CERT_ERROR` |-329 |verify certエラ|
+|`VERIFY_SIGN_ERROR` |-330 |verify signエラー|
 |`CLIENT_ID_ERROR` |-331 |PSKクライアントIDエラー|
 |`SERVER_HINT_ERROR` |-332 |PSKサーバーヒントエラー|
-|`PSK_KEY_ERROR` |-333 |PSKキーエラー|
-|`GETTIME_ERROR` |-337 |GetTimeOfdayが失敗しましたか？|
-|`GETITIMER_ERROR` |-338 |Getitimerが失敗しましたか？|
-|`SIGACT_ERROR` |-339 |シガクションは失敗しましたか？|
-|`SETITIMER_ERROR` |-340 |setitimerが失敗しましたか？|
-|`LENGTH_ERROR` |-341 |レイヤーの長さエラーを記録します|
-|`PEER_KEY_ERROR` |-342 |カントデコードピアキー|
-|`ZERO_RETURN` |-343 |ピアが送信された通知|
-|`SIDE_ERROR` |-344 |間違ったクライアント/サーバータイプ|
-|`NO_PEER_CERT` |-345 |ピアはキーを送信しませんでした|
-|`ECC_CURVETYPE_ERROR` |-350 |悪いECCカーブタイプ|
-|`ECC_CURVE_ERROR` |-351 |悪いECC曲線|
-|`ECC_PEERKEY_ERROR` |-352 |悪いピアECCキー|
-|`ECC_MAKEKEY_ERROR` |-353 |悪いMake ECCキー|
-|`ECC_EXPORT_ERROR` |-354 |悪いECCエクスポートキー|
-|`ECC_SHARED_ERROR` |-355 |悪いECC共有セキュリティ|
-|`NOT_CA_ERROR` |-357 |CA CERTエラー|
-|`BAD_CERT_MANAGER_ERROR` |-359 |Bad Cert Manager
+|`PSK_KEY_ERROR` |-333 |PSK鍵エラー|
+|`GETTIME_ERROR` |-337 |GetTimeOfdayが失敗|
+|`GETITIMER_ERROR` |-338 |Getitimerが失敗|
+|`SIGACT_ERROR` |-339 |sigactionが失敗|
+|`SETITIMER_ERROR` |-340 |setitimerが失敗|
+|`LENGTH_ERROR` |-341 |レコードレイヤーの長さが不正|
+|`PEER_KEY_ERROR` |-342 |ピアの鍵をデコードできず|
+|`ZERO_RETURN` |-343 |ピアがclose notifyを送信|
+|`SIDE_ERROR` |-344 |クライアント/サーバータイプが不正|
+|`NO_PEER_CERT` |-345 |ピアが鍵を送信しなかった|
+|`ECC_CURVETYPE_ERROR` |-350 |ECCカーブタイプが不正|
+|`ECC_CURVE_ERROR` |-351 |ECC曲線が不正|
+|`ECC_PEERKEY_ERROR` |-352 |ピアECC鍵が不正|
+|`ECC_MAKEKEY_ERROR` |-353 |Make ECC鍵が不正|
+|`ECC_EXPORT_ERROR` |-354 |ECCエクスポート鍵が不正|
+|`ECC_SHARED_ERROR` |-355 |ECCシェアードシークレットが不正|
+|`NOT_CA_ERROR` |-357 |CA証明書ではない|
+|`BAD_CERT_MANAGER_ERROR` |-359 |Cert Managerが不正|
 |`OCSP_CERT_REVOKED` |-360 |OCSP証明書が取り消されました|
 |`CRL_CERT_REVOKED` |-361 |CRL証明書が取り消されました
 |`CRL_MISSING` |-362 |CRLロードされていない|
 |`MONITOR_SETUP_E` |-363 |CRLモニターセットアップエラー|
-|`THREAD_CREATE_E` |-364 |スレッド作成エラーの作成|
-|`OCSP_NEED_URL` |-365 |OCSP |検索用のURLが必要です
-|`OCSP_CERT_UNKNOWN` |-366 |OCSPレスポンダーはわからない|
-|`OCSP_LOOKUP_FAIL` |-367 |OCSPルックアップが成功しません
-|`MAX_CHAIN_ERROR` |-368 |最大チェーンの深さを超えました|
+|`THREAD_CREATE_E` |-364 |スレッド作成でエラー|
+|`OCSP_NEED_URL` |-365 |OCSP |検索用のURLが必要|
+|`OCSP_CERT_UNKNOWN` |-366 |OCSPレスポンダーが不明|
+|`OCSP_LOOKUP_FAIL` |-367 |OCSPルックアップが失敗|
+|`MAX_CHAIN_ERROR` |-368 |最大チェーンの深さを超えた|
 |`COOKIE_ERROR` |-369 |DTLSクッキーエラー|
 |`SEQUENCE_ERROR` |-370 |DTLSシーケンスエラー|
 |`SUITES_ERROR` |-371 |スイートポインタエラー|
-|`OUT_OF_ORDER_E` |-373 |Out of Orderメッセージ|
+|`OUT_OF_ORDER_E` |-373 |Out of Orderメッセージ受信|
 |`BAD_KEA_TYPE_E` |-374 |悪いKEAタイプが見つかりました|
 |`SANITY_CIPHER_E` |-375 |SANITYチェック暗号エラー|
-|`RECV_OVERFLOW_E` |-376 |RXCBはRQUED以上の通知を返しました
-|`GEN_COOKIE_E` |-377 |クッキーエラーを生成します..
-|`NO_PEER_VERIFY` |-378 |ピア証明書の確認エラーが必要です
-|`FWRITE_ERROR` |-379 |fwrite問題|
-|`CACHE_MATCH_ERROR` |-380 |キャッシュHRD一致エラー|
-|`UNKNOWN_SNI_HOST_NAME_E` |-381 |認識されていないホスト名エラー|
-|`UNKNOWN_MAX_FRAG_LEN_E` |-382 |認識されない最大フラグLENエラー|
-|`KEYUSE_SIGNATURE_E` |-383 |KeyUse Digsignatureエラー|
-|`KEYUSE_ENCIPHER_E` |-385 |KeyUseキー暗号エラー|
-|`EXTKEYUSE_AUTH_E` |-386 |extkeyuse server | client_auth |
-|`SEND_OOB_READ_E` |-387 |Bounds reads |を送信してください|
-|`SECURE_RENEGOTIATION_E` |-388 |無効なRenexeation Info |
-|`SESSION_TICKET_LEN_E` |-389 |セッションチケットの大きすぎます
+|`RECV_OVERFLOW_E` |-376 |受信コールバックが要求以上のデータを返却した|
+|`GEN_COOKIE_E` |-377 |クッキーエラーを生成|
+|`NO_PEER_VERIFY` |-378 |検証すべきピア証明書が無い|
+|`FWRITE_ERROR` |-379 |fwriteエラー|
+|`CACHE_MATCH_ERROR` |-380 |キャッシュHRD不一致|
+|`UNKNOWN_SNI_HOST_NAME_E` |-381 |認識されていないホスト名|
+|`UNKNOWN_MAX_FRAG_LEN_E` |-382 |認識されない最大フラグ長|
+|`KEYUSE_SIGNATURE_E` |-383 |KeyUse digSignatureエラー|
+|`KEYUSE_ENCIPHER_E` |-385 |KeyUse KeyEncipherエラー|
+|`EXTKEYUSE_AUTH_E` |-386 |ExtKeyUse server|
+|`SEND_OOB_READ_E` |-387 |送信コールバックが帯域外データ受信|
+|`SECURE_RENEGOTIATION_E` |-388 |無効な再ネゴシエーション情報|
+|`SESSION_TICKET_LEN_E` |-389 |セッションチケットが大きすぎ|
 |`SESSION_TICKET_EXPECT_E` |-390 |セッションチケットがありません|
 |`SCR_DIFFERENT_CERT_E` |-391 |SCR異なる証明書エラー|
 |`SESSION_SECRET_CB_E` |-392 |セッションシークレットCB FCN障害|
 |`NO_CHANGE_CIPHER_E` |-393 |Cipherを変更する前に終了|
-|`SANITY_MSG_E` |-394 |MSG注文エラーの正気チェック|
+|`SANITY_MSG_E` |-394 |メッセージ順のサニティチェックでエラー|
 |`DUPLICATE_MST_E` |-395 |重複メッセージエラー|
-|`SNI_UNSUPPORTED` |-396 |SSL 3.0はSNI |をサポートしません
-|`SOCKET_PEER_CLOSED_E` |-397 |基礎となる輸送は閉鎖されました|
-|`BAD_TICKET_KEY_CB_SZ` |-398 |悪いセッションチケットキーCBサイズ|
-|`BAD_TICKET_MSG_SZ` |-399 |悪いセッションチケットMSGサイズ|
-|`BAD_TICKET_ENCRYPT` |-400 |悪いユーザーチケット暗号化|
+|`SNI_UNSUPPORTED` |-396 |SSL 3.0はSNIをサポートしません|
+|`SOCKET_PEER_CLOSED_E` |-397 |トランスポート層がクローズされた|
+|`BAD_TICKET_KEY_CB_SZ` |-398 |セッションチケットキーCBサイズ不正|
+|`BAD_TICKET_MSG_SZ` |-399 |セッションチケットMSGサイズ不正|
+|`BAD_TICKET_ENCRYPT` |-400 |ユーザーチケット暗号化不正|
 |`DH_KEY_SIZE_E` |-401 |DHキーが小さすぎる|
 |`SNI_ABSENT_ERROR` |-402 |SNIリクエストはありません|
 |`RSA_SIGN_FAULT` |-403 |RSA署名障害|
-|`HANDSHAKE_SIZE_ERROR` |-404 |握手メッセージが大きすぎる|
+|`HANDSHAKE_SIZE_ERROR` |-404 |ハンドシェークメッセージが大きすぎる|
 |`UNKNOWN_ALPN_PROTOCOL_NAME_E` |-405 |認識されていないプロトコル名エラー|
 |`BAD_CERTIFICATE_STATUS_ERROR` |-406 |証明書ステータスメッセージ|
 |`OCSP_INVALID_STATUS` |-407 |OCSPステータスが無効です
 |`OCSP_WANT_READ` |-408 |OCSPコールバック応答|
 |`RSA_KEY_SIZE_E` |-409 |RSAキーが小さすぎる|
 |`ECC_KEY_SIZE_E` |-410 |ECCキーが小さすぎる|
-|`DTLS_EXPORT_VER_E` |-411 |バージョンエラーをエクスポートする
-|`INPUT_SIZE_E` |-412 |入力サイズ大きすぎます
-|`CTX_INIT_MUTEX_E` |-413 |CTXミューテックスエラーを初期化します
-|`EXT_MASTER_SECRET_NEEDED_E` |-414 |EMSが再開することができます
-|`DTLS_POOL_SZ_E` |-415 |DTLSプールサイズを超えました
-|`DECODE_E` |-416 |ハンドシェイクメッセージエラーをデコードします
-|`HTTP_TIMEOUT` |-417 |OCSPまたはCRL REQのHTTPタイムアウト
+|`DTLS_EXPORT_VER_E` |-411 |バージョンエラーをエクスポートする|
+|`INPUT_SIZE_E` |-412 |入力サイズ大きすぎます|
+|`CTX_INIT_MUTEX_E` |-413 |CTXミューテックスエラーを初期化します|
+|`EXT_MASTER_SECRET_NEEDED_E` |-414 |EMSが再開することができます|
+|`DTLS_POOL_SZ_E` |-415 |DTLSプールサイズを超えました|
+|`DECODE_E` |-416 |ハンドシェイクメッセージエラーをデコードします|
+|`HTTP_TIMEOUT` |-417 |OCSPまたはCRL REQのHTTPタイムアウト|
 |`WRITE_DUP_READ_E` |-418 |書き込みdup write sideは読めない|
 |`WRITE_DUP_WRITE_E` |-419 |dup読み取りsideは書くことができません|
 |`INVALID_CERT_CTX_E` |-420 |TLS CERT CTXは一致していません|
@@ -150,10 +143,10 @@ wolfSSL(以前のCyassl)エラーコードは`wolfssl/ssl.h`にあります。�
 |`EXT_NOT_ALLOWED` |-424 |MSGでは許可されていない拡張|
 |`INVALID_PARAMETER` |-425 |セキュリティパラメーター無効|
 |`MCAST_HIGHWATER_CB_E` |-426 |マルチキャストハイウォーターCB err |
-|`ALERT_COUNT_E` |-427 |アラート数を超えました
+|`ALERT_COUNT_E` |-427 |アラート数を超えました|
 |`EXT_MISSING` |-428 |必要な拡張機能が見つかりません|
-|`UNSUPPORTED_EXTENSION` |-429 |TLSXはクライアントから要求されていません
-|`PRF_MISSING` |-430 ||にコンパイルされていないPRF
+|`UNSUPPORTED_EXTENSION` |-429 |TLSXはクライアントから要求されていません|
+|`PRF_MISSING` |-430 ||にコンパイルされていないPRF|
 |`DTLS_RETX_OVER_TX` |-431 |DTLSフライトを再送信|
 |`DH_PARAMS_NOT_FFDHE_E` |-432 |ffdheではなくサーバーからのdhパラメーション|
 |`TCA_INVALID_ID_TYPE` |-433 |TLSX TCA IDタイプ無効|
@@ -183,12 +176,12 @@ WolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
 
 |エラーコード列挙|エラーコード|エラー説明|
 | --------------- | ---------- | ----------------- |
-|`OPEN_RAN_E` |-101 |ランダムデバイスエラーを開く|
-|`READ_RAN_E` |-102 |ランダムデバイスエラー|
+|`OPEN_RAN_E` |-101 |ランダムデバイスを開く際にエラー|
+|`READ_RAN_E` |-102 |ランダムデバイスのリード時にエラー|
 |`WINCRYPT_E` |-103 |Windows Crypt initエラー|
 |`CRYPTGEN_E` |-104 |Windows暗号化エラー|
-|`RAN_BLOCK_E` |-105 |ランダムデバイスの読み取りはブロックされます
-|`BAD_MUTEX_E` |-106 |悪いミューテックス操作|
+|`RAN_BLOCK_E` |-105 |ランダムデバイスの読み取りでwould block|
+|`BAD_MUTEX_E` |-106 |ミューテックス操作で失敗|
 |`MP_INIT_E` |-110 |mp_initエラー状態|
 |`MP_READ_E` |-111 |mp_readエラー状態|
 |`MP_EXPTMOD_E` |-112 |MP_EXPTMODエラー状態|
@@ -236,34 +229,34 @@ WolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
 |`ASN_ECC_KEY_E` |-171 |ASN ECC不良入力|
 |`ECC_CURVE_OID_E` |-172 |サポートされていないECC OIDカーブタイプ|
 |`BAD_FUNC_ARG` |-173 |提供された悪い関数引数|
-|`NOT_COMPILED_IN` |-174 |機能|のコンパイルされていない
+|`NOT_COMPILED_IN` |-174 |機能がコンパイルされていない|
 |`UNICODE_SIZE_E` |-175 |Unicodeパスワード|マウサー|
 |`NO_PASSWORD` |-176 |ユーザーが提供するパスワードはありません|
 |`ALT_NAME_E` |-177 |Alt Name Sizeの問題、大きすぎます
 |`AES_GCM_AUTH_E` |-180 |AES-GCM認証チェックの失敗|
 |`AES_CCM_AUTH_E` |-181 |AES-CCM認証チェック不良|
 |`CAVIUM_INIT_E` |-182 |キャビウムinitタイプエラー|
-|`COMPRESS_INIT_E` |-183 |init Error |を圧縮します..
+|`COMPRESS_INIT_E` |-183 |init Errorを圧縮します|
 |`COMPRESS_E` |-184 |エラーを圧縮する|
 |`DECOMPRESS_INIT_E` |-185 |initエラーを減圧します|
 |`DECOMPRESS_E` |-186 |解凍エラー|
-|`BAD_ALIGN_E` |-187 |操作のための悪いアライメント、Alloc |のない
-|`ASN_NO_SIGNER_E` |-188 |ASN SIGエラー、証明書を検証するためのCA署名者はありません。
-|`ASN_CRL_CONFIRM_E` |-189 |ASN CRL失敗を確認する署名者はありません...
-|`ASN_CRL_NO_SIGNER_E` |-190 |ASN CRL失敗を確認する署名者はありません...
-|`ASN_OCSP_CONFIRM_E` |-191 |ASN OCSPシグネチャーの確認失敗|.
+|`BAD_ALIGN_E` |-187 |操作のための悪いアライメント、Allocのない|
+|`ASN_NO_SIGNER_E` |-188 |ASN SIGエラー、証明書を検証するためのCA署名者はありません|
+|`ASN_CRL_CONFIRM_E` |-189 |ASN CRL失敗を確認する署名者はありません|
+|`ASN_CRL_NO_SIGNER_E` |-190 |ASN CRL失敗を確認する署名者はありません|
+|`ASN_OCSP_CONFIRM_E` |-191 |ASN OCSPシグネチャーの確認失敗|
 |`BAD_ENC_STATE_E` |-192 |悪いECC ENC状態操作|
 |`BAD_PADDING_E` |-193 |悪いパディング、MSGは正しい長さ|
 |`REQ_ATTRIBUTE_E` |-194 |CERT要求属性の設定エラー|
 |`PKCS7_OID_E` |-195 |PKCS＃7、不一致のOIDエラー|
 |`PKCS7_RECIP_E` |-196 |PKCS＃7、受信者エラー|
-|`FIPS_NOT_ALLOWED_E` |-197 |FIPSは許可されていません
+|`FIPS_NOT_ALLOWED_E` |-197 |FIPSは許可されていません|
 |`ASN_NAME_INVALID_E` |-198 |ASN名制約エラー|
 |`RNG_FAILURE_E` |-199 |RNGが失敗し、再生|
 |`HMAC_MIN_KEYLEN_E` |-200 |FIPSモードHMAC最小キー長エラー|
 |`RSA_PAD_E` |-201 |RSAパディングエラー|
 |`LENGTH_ONLY_E` |-202 |出力の長さのみを返す|
-|`IN_CORE_FIPS_E` |-203 |コアの整合性チェックの失敗(障害)
+|`IN_CORE_FIPS_E` |-203 |コアの整合性チェックの失敗(障害)|
 |`AES_KAT_FIPS_E` |-204 |AESカット失敗|
 |`DES3_KAT_FIPS_E` |-205 |DES3 KAT障害|
 |`HMAC_KAT_FIPS_E` |-206 |HMAC KAT障害|
@@ -281,7 +274,7 @@ WolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
 |`SRP_VERIFY_E` |-218 |SRPプルーフ検証失敗|
 |`SRP_BAD_KEY_E` |-219 |SRPの悪い一時的な値|
 |`ASN_NO_SKID` |-220 |ASN主題のキー識別子| |
-|`ASN_NO_AKID` |-221 |ASN認証鍵識別子を見つけません
+|`ASN_NO_AKID` |-221 |ASN認証鍵識別子を見つけません|
 |`ASN_NO_KEYUSAGE` |-223 |ASNキー使用量は見つかりませんでした|
 |`SKID_E` |-224 |件名キー識別子エラーの設定|
 |`AKID_E` |-225 |権限キー識別子エラー|
@@ -292,10 +285,10 @@ WolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
 |`BAD_PKCS7_SIGNEEDS_CHECKCOND_E` |-230 |悪条件変数演算|
 |`SIG_TYPE_E` |-231 |署名タイプが有効/利用可能な|
 |`HASH_TYPE_E` |-232 |ハッシュタイプは有効/利用可能ではありません|
-|`WC_KEY_SIZE_E` |-234 |キーサイズエラー、小さすぎるか大きすぎる
+|`WC_KEY_SIZE_E` |-234 |キーサイズエラー、小さすぎるか大きすぎる|
 |`ASN_COUNTRY_SIZE_E` |-235 |ASN CERT GEN、無効な国コードサイズ|
 |`MISSING_RNG_E` |-236 |RNGは必要ですが、提供されていません|
-|`ASN_PATHLEN_SIZE_E` |-237 |ASN CAパスの長さ大きすぎます
+|`ASN_PATHLEN_SIZE_E` |-237 |ASN CAパスの長さ大きすぎます|
 |`ASN_PATHLEN_INV_E` |-238 |ASN CAパスの長さ反転誤差|
 |`BAD_KEYWRAP_ALG_E` |-239 |KeyWrapのアルゴリズムエラー|
 |`BAD_KEYWRAP_IV_E` |-240 |復号化されたAESキーラップIV不正|
@@ -308,9 +301,9 @@ WolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
 |`EXTKEYUSAGE_E` |-247 |大幅なキー使用率値|
 |`WC_HW_E` |-248 |ハードウェア暗号を使用するエラー|
 |`WC_HW_WAIT_E` |-249 |リソースを待っているハードウェア|
-|`PSS_SALTLEN_E` |-250 |PSSの塩の長さはハッシュには長すぎます。
+|`PSS_SALTLEN_E` |-250 |PSSの塩の長さはハッシュには長すぎます|
 |`PRIME_GEN_E` |-251 |プライムを見つける障害|
-|`BER_INDEF_E` |-252 |無期限の長さのBER |を復号することはできません
+|`BER_INDEF_E` |-252 |無期限の長さのBERを復号することはできません|
 |`RSA_OUT_OF_RANGE_E` |-253 |範囲外の暗号化への暗号文|
 |`RSAPSS_PAT_FIPS_E` |-254 |RSA-PSSパット障害|
 |`ECDSA_PAT_FIPS_E` |-255 |ECDSA PAT FALION |
@@ -327,9 +320,9 @@ WolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
 |`ZLIB_INIT_ERROR` |-266 |ZLIB INITエラー|
 |`ZLIB_COMPRESS_ERROR` |-267 |Zlib圧縮エラー|
 |`ZLIB_DECOMPRESS_ERROR` |-268 |ZLIB伸張エラー|
-|`PKCS7_NO_SIGNER_E` |-269 |PKCS7署名データMSGの署名者はいません
+|`PKCS7_NO_SIGNER_E` |-269 |PKCS7署名データMSGの署名者はいません|
 |`WC_PKCS7_WANT_READ_E` |-270 |PKCS7ストリーム操作では、より多くの入力が必要です|
-|`CRYPTOCB_UNAVAILABLE` |-271 |Crypto Callbackが利用できません
+|`CRYPTOCB_UNAVAILABLE` |-271 |Crypto Callbackが利用できません|
 |`PKCS7_SIGNEEDS_CHECK` |-272 |発信者によって検証された署名のニーズ|
 |`ASN_SELF_SIGNED_E` |-273 |ASN自己署名証明書エラー|
 |`MIN_CODE_E` |-300 |エラー-101- -299 |
