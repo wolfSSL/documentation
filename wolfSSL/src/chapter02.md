@@ -2062,8 +2062,6 @@ be manually controlled when using a Makefile/IDE solution):
 sp_arm32.c
 sp_arm64.c
 sp_armthumb.c
-sp_c32.c
-sp_c64.c
 sp_cortexm.c
 sp_dsp32.c
 sp_x86_64.c
