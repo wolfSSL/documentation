@@ -2052,9 +2052,30 @@ Enabling fasthugemath includes support for the FastMath library and greatly incr
 
 Enable Single-Precision (SP) math implementation with restricted algorithm suite. Unsupported algorithms are disabled. Overrides `--enable-sp`, `--enable-sp-math-all`, `--enable-fastmath` and `--enable-fasthugemath`.
 
+- Replaces the math implementation with that in sp_int.c
+- A minimal implementation, turns on portions of sp_int.c but not all.
+- MUST combine with --enable-sp to turn on the solutions in sp_x86_64.c or sp_arm.c etc (list of files below depending on the target system) to be able to perform RSA/ECC/DH operations.
+- Not to be combined with --enable-sp-math-all (below)
+
+FILE LIST (platform dependent, chosen by configure based on system specs or can
+be manually controlled when using a Makefile/IDE solution):
+sp_arm32.c
+sp_arm64.c
+sp_armthumb.c
+sp_cortexm.c
+sp_dsp32.c
+sp_x86_64.c
+sp_x86_64_asm.S
+sp_x86_64_asm.asm
+
 ### `--enable-sp-math-all`
 
 Enabled by default. Enable Single-Precision (SP) math implementation with full algorithm suite. Unsupported algorithms are enabled, but unoptimized. Overrides `--enable-sp`, `--enable-fastmath` and `--enable-fasthugemath`.
+
+- Replaces the math implementation with that in sp_int.c
+- A FULL implementation, does not depend on --enable-sp to work
+- Can be combined with --enable-sp to allow use of the implementations written in portable c assembly (non-hardware specific assembly) in sp_c32.c for 32-bit or sp_c64.c for 64-bit when possible. The rest of the time (when not possible) the implementations in sp_int.c are used. The portable C assembly gives significant performance gains on targets that do not have hardware optimizations available.
+- Not to be combined with --enable-sp-math (above)
 
 **NOTE**: If you are using asymmetric cryptography with key length in bits [256, 384, 521, 1024, 2048, 3072, 4096], you should consider using --enable-sp-math option to get maximum performance with a larger footprint size.
 
@@ -2069,6 +2090,11 @@ Can be used to enable Single-Precision performance improvements through assembly
 Enable Single-Precision (SP) math for RSA, DH, and ECC to improve performance.
 
 There are many possible values for OPT. Below is a list of ways to call enable-sp and the resulting macros that will be defined as a result. All of these can be combined in a coma separated list. For example, `--enable-sp=ec256,ec384`. The meaning of the macros that will be defined are defined above in the [wolfSSL’s Proprietary Single Precision (SP) Math Support] section.
+
+**NOTE**:
+1) "--enable-sp=small --enable-sp-math" can be smaller than...
+2) "--enable-sp-math-all=small"...
+as (1) only has implementations of specific key sizes while (2) has implementations to support all key sizes.
 
 **NOTE**: This is for x86_64 and with no other configuration flags; your results may vary depending on your architectures and other configuration flags that you specify. For example,  WOLFSSL_SP_384 and WOLFSSL_SP_4096 will only be enabled for Intel x86_64.
 
