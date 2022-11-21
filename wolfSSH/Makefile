@@ -18,7 +18,15 @@ SOURCES = chapter01.md \
           chapter13.md \
           chapter14.md 
 
-PDF = wolfSSH-Manual.pdf
+ifeq ($(DOC_LANG),JA)
+PDF  = wolfSSH-Manual-jp.pdf
+SRC  = src-ja
+MKDOC= mkdocs-ja.yml
+else
+PDF  = wolfSSH-Manual.pdf
+SRC  = src
+MKDOC= mkdocs.yml
+endif
 
 .PHONY: html-prep
 html-prep:

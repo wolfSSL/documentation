@@ -1,0 +1,33 @@
+site_name: wolfBoot マニュアル
+site_url: https://wolfssl.com/
+docs_dir: build/html/
+site_dir: html/
+copyright: wolfSSL Inc. 2022
+nav:
+    - "1. イントロダクション": index.md
+    - "2. wolfBootのビルド": chapter02.md
+    - "3. ターゲット": chapter03.md
+    - "4. ハードウエア抽象化レイヤー": chapter04.md
+    - "5. Flushメモリのパーティション": chapter05.md
+    - "6. wolfBootの機能": chapter06.md
+    - "7. wolfBootの既存プロジェクトへの統合": chapter07.md
+    - "8. トラブルシューティング": chapter08.md
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
+extra_css: [skin.css]
+extra:
+    generator: false
+use_directory_urls: false
