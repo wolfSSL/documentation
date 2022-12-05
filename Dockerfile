@@ -15,6 +15,8 @@ RUN git clone --depth=1 https://github.com/pantor/inja
 RUN cd inja && cmake . -DBUILD_TESTING=OFF -DBUILD_BENCHMARK=OFF && make install
 
 RUN git clone --depth=1 https://github.com/matusnovak/doxybook2
+# Checkout to working version of doxybook2
+RUN cd doxybook2 && git checkout 187dc2991dabe65f808263
 RUN cd doxybook2 && cmake . && make install
 # Copy the source files into Docker, this and any subsequent steps won't be cached
 WORKDIR /src/wolfssl
