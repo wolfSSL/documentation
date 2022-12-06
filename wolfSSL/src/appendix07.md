@@ -35,6 +35,9 @@ These use different kinds of math from the conventional algorithms. They are des
 **Note**: SABER KEM and NTRU KEM were deprecated and removed as they did not
           move on to standardization.
 
+**Note**: KYBER KEM 90s variants were deprecated and removed as NIST is not
+          considering them for standardization.
+
 An explanation of lattice-based cryptography would fall outside the scope of this document but more information about these algorithms can be found in their NIST submissions at <https://csrc.nist.gov/projects/post-quantum-cryptography/round-3-submissions>.
 
 Unfortunately, it might come as a shock, but we do not actually know that these algorithms will resist attacks from quantum computers. In fact, we do not even know that these algorithms are safe against a conventional computer. Its getting less and less likely, but someone could break lattice-based cryptography. However, as security experts will tell you, this is how cryptography has always worked. Algorithms are good when we start using them, but weaknesses and vulnerabilities are discovered and technology gets better. The post-quantum algorithms are somewhat problematic in that they are relatively new and could use a bit more attention from the community.
@@ -117,9 +120,6 @@ wolfSSL Variant Name  |  PQC Submission Variant Name
 KYBER_LEVEL1          |  KYBER512
 KYBER_LEVEL3          |  KYBER768
 KYBER_LEVEL5          |  KYBER1024
-KYBER_90S_LEVEL1      |  KYBER90S512
-KYBER_90S_LEVEL3      |  KYBER90S768
-KYBER_90S_LEVEL5      |  KYBER90S1024
 
 Post-Quantum Hybrid KEM Naming Convention:
 
@@ -128,9 +128,6 @@ wolfSSL Variant Name  |  NIST ECC Curve and PQC Submission Variant Name
 P256_KYBER_LEVEL1     |  ECDSA P-256 and KYBER512
 P384_KYBER_LEVEL3     |  ECDSA P-384 and KYBER768
 P521_KYBER_LEVEL5     |  ECDSA P-521 and KYBER1024
-P256_KYBER90S_LEVEL1  |  ECDSA P-256 and KYBER90S512
-P384_KYBER90S_LEVEL3  |  ECDSA P-384 and KYBER90S768
-P521_KYBER90S_LEVEL5  |  ECDSA P-521 and KYBER90S1024
 
 ## Codepoints and OIDs
 
@@ -151,15 +148,9 @@ DILITHIUM_AES_LEVEL5  |  65196
 KYBER_LEVEL1          |  570
 KYBER_LEVEL3          |  572
 KYBER_LEVEL5          |  573
-KYBER_90S_LEVEL1      |  574
-KYBER_90S_LEVEL3      |  575
-KYBER_90S_LEVEL5      |  576
 P256_KYBER_LEVEL1     |  12090
 P384_KYBER_LEVEL3     |  12092
 P521_KYBER_LEVEL5     |  12093
-P256_KYBER90S_LEVEL1  |  12094
-P384_KYBER90S_LEVEL3  |  12095
-P521_KYBER90S_LEVEL5  |  12096
 
 Post-Quantum OIDs for Certificates:
 
