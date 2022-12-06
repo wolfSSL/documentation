@@ -35,7 +35,7 @@ If you are not building using the Docker build system above you can build using 
 sudo apt install pandoc texlive-full mkdocs doxygen
 ```
 
-You also need Doxybook2 installed which can be found at: <https://github.com/matusnovak/doxybook2>. Unfortunately there is no package for this. Installation instructions can be found at: <https://github.com/matusnovak/doxybook2#Install>
+You also need Doxybook2 installed which can be found at: <https://github.com/matusnovak/doxybook2>. Unfortunately there is no package for this. Installation instructions can be found at: <https://github.com/matusnovak/doxybook2#Install>. You'll likely have to checkout to this commit `1e5f8f0879aa1e908ccce250`.
 
 If Doxybook2 is installed in a non-stardard path you can use the environment variable `DOXYBOOK_PATH` to set it.
 
