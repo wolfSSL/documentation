@@ -12,7 +12,11 @@ SOURCES = chapter01.md \
           chapter07.md \
           chapter08.md 
 
-PDF = wolfBoot-Manual.pdf
+ifeq ($(DOC_LANG),JA)
+    PDF  = wolfBoot-Manual-jp.pdf
+else
+    PDF  = wolfBoot-Manual.pdf
+endif
 
 .PHONY: html-prep
 html-prep:

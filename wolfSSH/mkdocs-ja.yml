@@ -1,0 +1,37 @@
+site_name: wolfSSH マニュアル
+site_url: https://wolfssl.com/
+docs_dir: build/html/
+site_dir: html/
+copyright: Copyright © 2022 wolfSSL Inc.
+nav:
+    - "1. イントロダクション": index.md
+    - "2. wolfSSHのビルド": chapter02.md
+    - "3. 始めよう": chapter03.md
+    - "4. ライブラリ設計": chapter04.md
+    - "5. wolfSSHユーザー認証コールバック": chapter05.md
+    - "6. コールバック関数設定API": chapter06.md
+    - "7. wolfSSH SFTPのビルドと実行": chapter07.md
+    - "8. ポートフォワーディング": chapter08.md
+    - "9. 注意事項と制限": chapter09.md
+    - "10. ライセンス": chapter10.md
+    - "11. サポートとコンサルティング": chapter11.md
+    - "12. wolfSSHのアップデート": chapter12.md
+    - "13. APIリファレンス": chapter13.md
+    - "14. wolfSSL SFTP API リファレンス": chapter14.md
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: roboto
+    code: roboto mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
+extra_css: [skin.css]
+use_directory_urls: false

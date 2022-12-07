@@ -2,6 +2,16 @@
 
 HTML = html/
 
+ifeq ($(DOC_LANG),JA)
+    PATCH  = ../Custom-wolfSSL-theme-JA.patch
+    SRC    = src-ja
+    MKDOC  = mkdocs-ja.yml
+else
+    PATCH  = ../Custom-wolfSSL-theme.patch
+    SRC    = src
+    MKDOC  = mkdocs.yml
+endif
+
 .PHONY: builddir
 builddir:
 	@mkdir -p build/pdf
@@ -10,8 +20,8 @@ builddir:
 .PHONY: html-setup
 html-setup:
 	@git submodule update --init
-	-cd ../mkdocs-material; patch -p1 < ../Custom-wolfSSL-theme.patch --ignore-whitespace -N
-	@cp -a src/* build/html/
+	-cd ../mkdocs-material; patch -p1  < $(PATCH) --ignore-whitespace -N
+	@cp -a $(SRC)/* build/html/
 	@cp ../common/*.png build/html/
 	@cp ../common/*.css build/html/
 	@perl -i -pe 's/    ```/```/g' build/html/*.md
@@ -21,11 +31,11 @@ html-setup:
 .PHONY: html
 html: builddir html-setup html-prep
 	@mkdir -p html
-	@mkdocs build
+	@mkdocs build -f $(MKDOC)
 
 .PHONY: pdf-setup
 pdf-setup: builddir
-	@cp -a src/* build/pdf/
+	@cp -a $(SRC)/* build/pdf/
 	@cp ../common/*.png build/pdf/
 	@perl -i -pe "s/chapter[0-9][0-9].md|appendix[0-9][0-9].md//g" build/pdf/*.md
 	@perl -i -pe "s/\#--/\#/g" build/pdf/*.md
@@ -39,6 +49,7 @@ pdf: pdf-setup pdf-prep
 		--variable mainfont="Noto Sans" \
 		--variable sansfont="Noto Sans" \
 		--variable monofont="Noto Sans Mono" \
+		--variable CJKmainfont="Noto Sans CJK JP" \
 		--variable papersize=letter \
 		--variable geometry="margin=2.5cm" \
 		--variable version=2.0 \

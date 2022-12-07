@@ -1,0 +1,40 @@
+diff --git a/material/base.html b/material/base.html
+index be0a8c88e..1c1380746 100644
+--- a/material/base.html
++++ b/material/base.html
+@@ -67,6 +67,15 @@
+       {% include "partials/integrations/analytics.html" %}
+     {% endblock %}
+     {% block extrahead %}{% endblock %}
++    <!-- Global site tag (gtag.js) - Google Analytics -->
++     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-64826966-1"></script>
++     <script>
++       window.dataLayer = window.dataLayer || [];
++       function gtag(){dataLayer.push(arguments);}
++       gtag('js', new Date());
++     
++       gtag('config', 'UA-64826966-1');
++     </script>
+   </head>
+   {% set direction = config.theme.direction or lang.t('direction') %}
+   {% if config.theme.palette %}
+diff --git a/material/partials/header.html b/material/partials/header.html
+index 4872af867..6b3573812 100644
+--- a/material/partials/header.html
++++ b/material/partials/header.html
+@@ -66,6 +66,15 @@
+         </div>
+       </div>
+     {% endif %}
++     <div class="md-ellipsis-nav" style="font-size:120%;">
++            <a href="https://www.wolfssl.jp/">ホーム</a>
++            <a href="https://www.wolfssl.jp/products/">製品</a>
++            <a href="https://www.wolfssl.jp/download/">ダウンロード</a>
++            <a href="https://www.wolfssl.jp/license/">ライセンス</a>
++            <a href="https://www.wolfssl.jp/docs/">ドキュメント</a>
++            <a href="https://www.wolfssl.jp/contact/">ご質問</a>
++      </div>
++
+     {% if "search" in config["plugins"] %}
+       <label class="md-header__button md-icon" for="__search">
+         {% include ".icons/material/magnify.svg" %}
