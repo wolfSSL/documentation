@@ -19,7 +19,7 @@ jobs:
     - name: Download Japanese fonts
       run: curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Black.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Bold.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-DemiLight.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Light.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Medium.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Regular.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Thin.otf
     - name: Install Japanese fonts
-      run: sudo mkdir -p /usr/share/fonts/opentype; cp NotoSans* /usr/share/fonts/opentype/. && sudo fc-cache -f -v
+      run: sudo mkdir -p /usr/local/share/fonts; sudo cp NotoSans* /usr/local/share/fonts/. && sudo fc-cache -f -v
     - name: wget vcpkg
       working-directory: ./doxy 
       run: wget -O vcpkg.tar.gz https://github.com/microsoft/vcpkg/archive/master.tar.gz
