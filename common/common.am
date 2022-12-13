@@ -6,10 +6,12 @@ ifeq ($(DOC_LANG),JA)
     PATCH  = ../Custom-wolfSSL-theme-JA.patch
     SRC    = src-ja
     MKDOC  = mkdocs-ja.yml
+	CJK    = --variable CJKmainfont="Noto Sans CJK JP"
 else
     PATCH  = ../Custom-wolfSSL-theme.patch
     SRC    = src
     MKDOC  = mkdocs.yml
+	CJK    =
 endif
 
 .PHONY: builddir
@@ -49,7 +51,7 @@ pdf: pdf-setup pdf-prep
 		--variable mainfont="Noto Sans" \
 		--variable sansfont="Noto Sans" \
 		--variable monofont="Noto Sans Mono" \
-		--variable CJKmainfont="Noto Sans CJK JP" \
+		$(CJK) \
 		--variable papersize=letter \
 		--variable geometry="margin=2.5cm" \
 		--variable version=2.0 \
