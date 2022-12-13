@@ -64,3 +64,32 @@ To run a local HTML server (HTML is built to a temporary area for this):
 ```sh
 make serve
 ```
+
+## Localization
+
+By default, the built output documentation is in English. If you assign a language code to the DOC_LANG variable and call 'make' with it, the output will be localized in that specified language. As of now (end of 2022), the only supported language code is 'JA', which means 'Japanese'. Not all wolfSSL products documentation supports localization. 'make' with DOC_LANG variable for unsupported products is ignored and output in English.
+
+```sh
+make DOC_LANG=JA
+```
+
+### Pre-requisites
+
+For localization to work, the build environment must have the correct fonts installed for the specified language.
+
+#### Japanese font
+'Noto Sans CJK JP' font is used for Japanese localization. You can get the font files from the following Github repository:
+https://github.com/googlefonts/noto-cjk/tree/main/Sans/OTF/Japanese
+
+You can download the seven `NotoSansCJKjp-xxx.otf` files from there and put them into `/usr/local/share/fonts`. You may need 'sudo' for the operation. After coping font files, you need to update font cache by calling:
+
+```sh
+sudo fc-cache -fv
+```
+Then you can confirm the font cache includes the installed font files by 'fc-list'.
+
+```sh
+fc-list | grep NotoSansCJKjp
+```
+You will get the list of installed font files.
+
