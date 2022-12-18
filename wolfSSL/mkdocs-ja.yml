@@ -1,0 +1,164 @@
+site_name: wolfSSL Manual
+site_url: https://wolfssl.com/
+docs_dir: build/html/
+site_dir: html/ja
+copyright: Copyright © 2022 wolfSSL Inc.
+nav:
+    - "1. 序章": index.md
+    - "2. wolfSSLのビルド": chapter02.md
+    - "3. wolfSSL入門": chapter03.md
+    - "4. 機能": chapter04.md
+    - "5. ポータビリティ": chapter05.md
+    - "6. コールバク": chapter06.md
+    - "7. 鍵と証明書": chapter07.md
+    - "8. デバッグ": chapter08.md
+    - "9. ライブラリー設計方針": chapter09.md
+    - "10. wolfCrypt レファレンス": chapter10.md
+    - "11. SSLチュートリアル": chapter11.md
+    - "12. 組み込みシステムへの適用": chapter12.md
+    - "13. OpenSSL 互換": chapter13.md
+    - "14. ライセンス": chapter14.md
+    - "15. サポートとコンサルティング": chapter15.md
+    - "16. wolfSSLのアップデート": chapter16.md
+    - "A. wolfSSL API レファレンス":
+      - "証明書管理 API": group__CertManager.md
+      - "メモリー操作": group__Memory.md
+      - "OpenSSL API": group__openSSL.md
+      - "wolfSSL 証明書と鍵": group__CertsKeys.md
+      - "wolfSSL 接続、セッション、ネットワークI/O": group__IO.md
+      - "wolfSSL コンテクストの設定": group__Setup.md
+      - "wolfSSL エラーの扱いとレポート": group__Debug.md
+      - "wolfSSL 初期化": group__TLS.md
+    - "B. wolfCrypt API レファレンス":
+      - "ASN.1": group__ASN.md
+      - "ベースエンコード": group__Base__Encoding.md
+      - "圧縮": group__Compression.md
+      - "エラーレポート": group__Error.md
+      - "IoT-Safeモジュール": group__IoTSafe.md
+      - "鍵と証明書変換": group__Keys.md
+      - "ロギング": group__Logging.md
+      - "整数演算 API": group__Math.md
+      - "乱数生成": group__Random.md
+      - "署名 API": group__Signature.md
+      - "wolfCrypt 初期化とクリーンアップ": group__wolfCrypt.md
+      - "暗号アルゴリズム - 3DES": group__DES.md
+      - "暗号アルゴリズム - AES": group__AES.md
+      - "暗号アルゴリズム - ARC4": group__ARC4.md
+      - "暗号アルゴリズム - BLAKE2": group__BLAKE2.md
+      - "暗号アルゴリズム - Camellia": group__Camellia.md
+      - "暗号アルゴリズム - ChaCha": group__ChaCha.md
+      - "暗号アルゴリズム - ChaCha20_Poly1305": group__ChaCha20Poly1305.md
+      - "Algorithms - CMAC ": group__CMAC.md
+      - "コールバック - CryptoCb": group__Crypto.md
+      - "暗号アルゴリズム - Curve25519": group__Curve25519.md
+      - "暗号アルゴリズム - Curve448": group__Curve448.md
+      - "暗号アルゴリズム - DSA": group__DSA.md
+      - "暗号アルゴリズム - Diffie-Hellman": group__Diffie-Hellman.md
+      - "暗号アルゴリズム - ECC": group__ECC.md
+      - "暗号アルゴリズム - ED25519": group__ED25519.md
+      - "暗号アルゴリズム - ED448": group__ED448.md
+      - "ECCSI API レファレンス":
+        - "ECCSI概要": group__ECCSI__Overview.md
+        - "ECCSI鍵の設定": group__ECCSI__Setup.md
+        - "ECCSI鍵による署名、検証": group__ECCSI__Operations.md
+      - "SAKKE API レファレンス":
+        - "SAKKE鍵の概要": group__SAKKE__Overview.md
+        - "SAKKE鍵の設定": group__SAKKE__Setup.md
+        - "SAKKE RSK操作": group__SAKKE__RSK.md
+        - "SAKKE 鍵操作": group__SAKKE__Operations.md
+      - "暗号アルゴリズム - HMAC": group__HMAC.md
+      - "暗号アルゴリズム - MD2": group__MD2.md
+      - "暗号アルゴリズム - MD4": group__MD4.md
+      - "暗号アルゴリズム - MD5": group__MD5.md
+      - "暗号アルゴリズム - Password Based": group__Password.md
+      - "暗号アルゴリズム - PKCS7": group__PKCS7.md
+      - "暗号アルゴリズム - PKCS11": group__PKCS11.md
+      - "暗号アルゴリズム - Poly1305": group__Poly1305.md
+      - "暗号アルゴリズム - PSA": group__PSA.md
+      - "暗号アルゴリズム - RIPEMD": group__RIPEMD.md
+      - "暗号アルゴリズム - RSA": group__RSA.md
+      - "暗号アルゴリズム - SHA 128/224/256/384/512": group__SHA.md
+      - "暗号アルゴリズム - SipHash": group__SipHash.md
+      - "暗号アルゴリズム - SRP": group__SRP.md
+    - "C. API ヘッダーファイル":
+      - aes_8h.md
+      - arc4_8h.md
+      - asn_8h.md
+      - asn__public_8h.md
+      - blake2_8h.md
+      - bn_8h.md
+      - camellia_8h.md
+      - chacha20__poly1305_8h.md
+      - chacha_8h.md
+      - cmac_8h.md
+      - coding_8h.md
+      - compress_8h.md
+      - cryptocb_8h.md
+      - curve25519_8h.md
+      - curve448_8h.md
+      - des3_8h.md
+      - dh_8h.md
+      - doxygen__groups_8h.md
+      - doxygen__pages_8h.md
+      - dsa_8h.md
+      - ecc_8h.md
+      - eccsi_8h.md
+      - ed25519_8h.md
+      - ed448_8h.md
+      - error-crypt_8h.md
+      - evp_8h.md
+      - hash_8h.md
+      - hmac_8h.md
+      - iotsafe_8h.md
+      - logging_8h.md
+      - md2_8h.md
+      - md4_8h.md
+      - md5_8h.md
+      - memory_8h.md
+      - pem_8h.md
+      - pkcs11_8h.md
+      - pkcs7_8h.md
+      - poly1305_8h.md
+      - psa_8h.md
+      - pwdbased_8h.md
+      - quic_8h.md
+      - random_8h.md
+      - ripemd_8h.md
+      - rsa_8h.md
+      - sakke_8h.md
+      - sha256_8h.md
+      - sha512_8h.md
+      - sha_8h.md
+      - signature_8h.md
+      - siphash_8h.md
+      - srp_8h.md
+      - ssl_8h.md
+      - tfm_8h.md
+      - types_8h.md
+      - wc__encrypt_8h.md
+      - wc__port_8h.md
+      - wolfio_8h.md
+    - "D. SSL/TLS の概要": appendix04.md
+    - "E. RFC, 仕様および参照": appendix05.md
+    - "F. エラーコード": appendix06.md
+    - "G. ポスト量子暗号の実験": appendix07.md
+    - "H. wolfSSL 移植ガイド": appendix08.md
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: ja
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
+extra_css: [skin.css]
+extra:
+    generator: false
+use_directory_urls: false
