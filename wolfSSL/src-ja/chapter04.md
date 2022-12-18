@@ -4,7 +4,7 @@
 
 
 
-wolfSSL(以前のCYASSL)は、Cプログラミング言語をプライマリインターフェイスとしてサポートしていますが、Java、PHP、Perl、Pythonなどの他のいくつかのホスト言語([swig](http://swig.org/)インターフェイスを介して)もサポートしています。現在サポートされていない別のプログラミング言語でwolfSSLをホストすることに興味がある場合は、お問い合わせください。
+wolfSSL (以前の CyaSSL) は、主要なインターフェースとして C プログラミング言語をサポートしていますが、Java、PHP、Perl、Python など、他のいくつかのホスト言語もサポートしています ([SWIG](http://swig.org/) インターフェースを介して)。 . 現在サポートされていない別のプログラミング言語で wolfSSL をホストすることに関心がある場合は、お問い合わせください。
 
 
 この章では、ストリーム暗号、AES-NI、IPv6サポート、SSL検査(SNIFFER)サポートなど、wolfSSLのいくつかの機能について、より深く詳しく説明しています。
@@ -266,7 +266,7 @@ wolfSSLによってサポートされているTLS拡張機能のリストと、�
 次の暗号スイートは、wolfSSLによってサポートされています。暗号スイートは、TLSまたはSSLハンドシェイク中に使用される認証、暗号化、およびメッセージ認証コード(MAC)アルゴリズムの組み合わせで、接続のセキュリティ設定をネゴシエートします。
 
 
-各暗号スイートは、鍵交換アルゴリズム、バルク暗号化アルゴリズム、およびメッセージ認証コードアルゴリズム(MAC)を定義します。**鍵交換アルゴリズム**(RSA、DSS、DH、EDH)は、ハンドシェイクプロセス中にクライアントとサーバーがどのように認証するかを決定します。ブロック暗号やストリーム暗号を含む**バルク暗号化アルゴリズム**(DES、3DES、AES、ARC4)は、メッセージストリームを暗号化するために使用されます。**メッセージ認証コード(MAC)アルゴリズム**(MD2、MD5、SHA-1、SHA-256、SHA-512、RIPEMD)は、メッセージダイジェストの作成に使用されるハッシュ関数です。
+各暗号スイートは、キー交換アルゴリズム、一括暗号化アルゴリズム、およびメッセージ認証コード アルゴリズム (MAC) を定義します。 **キー交換アルゴリズム** (RSA、DSS、DH、EDH) は、ハンドシェイク プロセス中にクライアントとサーバーが認証する方法を決定します。 メッセージ ストリームの暗号化には、ブロック暗号とストリーム暗号を含む **一括暗号化アルゴリズム** (DES、3DES、AES、ARC4) が使用されます。 **メッセージ認証コード (MAC) アルゴリズム** (MD2、MD5、SHA-1、SHA-256、SHA-512、RIPEMD) は、メッセージ ダイジェストの作成に使用されるハッシュ関数です。
 
 
 以下の表は、`<wolfssl_root>/wolfssl/internal.h`(約706行から始まる)にある暗号スイート(およびカテゴリ)と一致しています。次のリストにない暗号スイートをお探しの場合は、wolfSSLに追加することについてお問い合わせください。
@@ -886,10 +886,7 @@ PKCS＃8：[https://tools.ietf.org/html/rfc5208](https://tools.ietf.org/html/rfc
 
 #### PKCS #7
 
-
-
-
-PKCS＃7は、包み込まれた証明書であろうと暗号化されていないが署名されたデータの文字列であろうと、データのバンドルを転送するように設計されています。機能は、Enableオプション([`--enable-pkcs7`](chapter02.md#--enable-pkcs7))を使用するか、Macro `HAVE_PKCS7`を使用してオンになっています。関数`wc_PKCS7_AllowDegenerate()`のオンとオフの縮退したケースを切り替えるには、呼び出されます。
+PKCS #7 は、エンベロープ証明書であれ、暗号化されていないが署名されたデータ文字列であれ、データのバンドルを転送するように設計されています。 この機能は、有効化オプション ([`--enable-pkcs7`](chapter02.md#--enable-pkcs7)) を使用するか、マクロ `HAVE_PKCS7` を使用してオンにします。 署名者の空のセットを持つ RFC に従って、デフォルトで縮退ケースが許可されることに注意してください。 関数 `wc_PKCS7_AllowDegenerate()` を呼び出して、縮退ケースのオンとオフを切り替えることができます。
 
 
 サポートされている機能は次のとおりです。
@@ -1056,10 +1053,7 @@ STM32F2標準周辺ライブラリのドキュメントは、次の文書にあ�
 ### Cavium Nitrox
 
 
-
-wolfSSLは、Marvell(以前のCavium)Nitrox(<https://www.marvell.com/products/security-solutions.html>)をサポートしています。wolfSSLをビルドするときにMarvell Nitroxのサポートを有効にするには、次の構成オプションを使用します。
-
-
+wolfSSL は Marvell (以前の Cavium) NITROX (<https://www.marvell.com/products/security-solutions.html>) をサポートしています。 wolfSSL のビルド時に Marvell NITROX サポートを有効にするには、次の構成オプションを使用します。
 
 ```sh
 ./configure --with-cavium=/home/user/cavium/software
@@ -1084,6 +1078,10 @@ wolfSSLは、ESP32-WROOM-32ハードウェアベースの暗号化を使用で�
 
 必要な定義については、`WOLFSSL_ESPWROOM32`を`settings.h`に定義してください。`WOLFSSL_ESPWROOM32`の定義は、デフォルトでESP32-WROOM-32ハードウェアクリプトとRNGサポートを有効にします。現在、wolfSSLは、Crypt層でRNG、AES、SHA、RSAプリミティブをサポートしています。TLSサーバー/クライアント、WolfCryptテスト、ベンチマークを含むプロジェクトの例は、ファイルを展開した後、ESP-IDFの/Examples/Protocols Directoryで見つけることができます。
 
+### ESP8266
+
+ESP32 とは異なり、ESP8266 で使用できるハードウェアベースの暗号化はありません。 「user_settings.h」の「WOLFSSL_ESP8266」定義を参照してください。
+または `./configure CFLAGS="-DWOLFSSL_ESP8266"` を使用して、組み込み ESP8266 ターゲット用にコンパイルします。
 
 
 ## SSL検査(Sniffer)

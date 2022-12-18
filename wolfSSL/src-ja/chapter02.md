@@ -844,7 +844,27 @@ RSA/DH 3072ビットシングルプレシジョン(SP)最適化を削除しま�
 
 SECP256R1のECCシングルプレシジョン(SP)最適化を削除します。`WOLFSSL_SP_MATH`にのみ適用されます。
 
+### 機能マクロの有効化 (デフォルトでオン)
 
+#### HAVE_TLS_EXTENSIONS
+
+ほとんどの TLS ビルドに必要な TLS 拡張機能のサポートを有効にします。 `./configure` でデフォルトで有効になっていますが、`WOLFSSL_USER_SETTINGS` でビルドする場合は手動で定義する必要があります。
+
+#### HAVE_SUPPORTED_CURVES
+
+TLS でサポートされている曲線と、TLS で使用されるキー共有拡張機能を有効にします。 ECC、Curve25519、および Curve448 で必要です。 `./configure` でデフォルトで有効になっていますが、`WOLFSSL_USER_SETTINGS` でビルドする場合は手動で定義する必要があります。
+
+#### HAVE_EXTENDED_MASTER
+
+TLS v1.2 以前で使用されるセッション キーの計算用に拡張マスター シークレット PRF を有効にします。 PRF 方式はデフォルトでオンになっており、より安全であると考えられています。 `./configure` を使用する場合、これはデフォルトでオンになっていますが、`WOLFSSL_USER_SETTINGS` でビルドする場合は手動で定義する必要があります。
+
+#### HAVE_ENCRYPT_THEN_MAC
+
+ブロック暗号による暗号化後に mac を実行するための encrypt-then-mac サポートを有効にします。 これがデフォルトで、セキュリティが向上します。 `./configure` を使用する場合、これはデフォルトでオンになっていますが、`WOLFSSL_USER_SETTINGS` でビルドする場合は手動で定義する必要があります。
+
+#### HAVE_ONE_TIME_AUTH
+
+Poly 認証を設定するために TLS v1.2 で Chacha20/Poly1305 を使用する場合に必要です。 `./configure` を使用する場合、これは ChaCha20/Poly1305 でデフォルトで有効になりますが、`WOLFSSL_USER_SETTINGS` でビルドする場合は手動で定義する必要があります。
 
 ### デフォルトでは機能を無効にすることができます
 
@@ -1157,7 +1177,7 @@ SHA3使用のビルドをオンにします。これは、SHA3-224、SHA3-256、
 
 
 
-#### WOLFSSL_ALT_CERT_CHAIN
+#### WOLFSSL_ALT_CERT_CHAINS
 
 
 
@@ -1367,6 +1387,9 @@ Sakkeペアリングベースのシングルプレシジョン(SP)サポート�
 
 暗号コールバックサポートを有効にします。この機能は、[`--enable-cryptocb`](#enable-cryptocb)を使用すると自動的に有効になります。
 
+#### WOLFSSL_DYN_CERT
+
+WOLFSSL_NO_MALLOC が設定されていても、証明書を解析するときに subjectCN および publicKey フィールドの割り当てを許可します。 RSA 証明書で WOLFSSL_NO_MALLOC オプションを使用する場合、ピアの証明書で証明書を検証するために、CA の公開鍵を保持する必要があります。 ca->publicKey が NULL であるため、これは ConfirmSignature エラー -173 BAD_FUNC_ARG として表示されます。
 
 
 #### WOLFSSL_USER_IO
@@ -1837,7 +1860,9 @@ ECC固定点キャッシュを有効にします。これにより、同じ秘�
 
 これにより、Intel QuickAssistやMarvell(Cavium)Nitrox Vなどのハードウェアベースのアダプターを使用した非同期暗号化のサポートが可能になります。非同期コードは公開コードに含まれておらず、facts@wolfssl.comでメールで連絡することで評価できます。
 
+#### WOLFSSL_NO_ASYNC_IO
 
+これにより、非同期 I/O ネットワークが無効になります。 非同期 I/O はデフォルトでオンになっており、ハンドシェーク プロセス中に最大で約 140 バイトかかる場合があります。 ネットワーク インターフェイスが書き込み時に SOCKET_EWOULDBLOCK または SOCKET_EAGAIN (またはカスタム I/O コールバックの場合は WOLFSSL_CBIO_ERR_WANT_WRITE) を返さない場合は、WOLFSSL_NO_ASYNC_IO を定義して、ハンドシェイク メッセージの作成中に wolfSSL が状態を保存しないようにすることができます。
 
 ### GCMパフォーマンスチューニング
 
@@ -2471,7 +2496,13 @@ Freertos Windows Simulator(<https://www.freertos.org>)用にビルドすると�
 
 EBSNET製品とRTIPを使用するときに定義できます。
 
+#### WOLFSSL_EMBOS
 
+SEGGER embOS (<https://www.segger.com/products/rtos/embos/>) のビルド時に定義できます。 emNET を使用する場合は、[`WOLFSSL_EMNET`](#wolfssl_emnet) も定義します。
+
+#### WOLFSSL_EMNET
+
+SEGGER emNET TCP/IP スタック (<https://www.segger.com/products/connectivity/emnet/>) のビルド時に定義できます。
 
 #### WOLFSSL_LWIP
 
@@ -3156,7 +3187,9 @@ wolfSSL SHA-512サポートを有効にします
 
 証明書生成機能を有効にします
 
+### `--enable-cert`
 
+証明書の拡張機能を有効にします (サポートされている拡張機能については、第 7 章を参照してください)
 
 ### `--enable-certreq`
 
@@ -4123,9 +4156,7 @@ wolf_crypto_cb_only_*オプションの使用には、例を無効にする必�
 ### `--enable-fastmath`
 
 
-
-x86\_64およびAarch64では、デフォルトで有効になっています。他のすべてのアーキテクチャでは、デフォルトはBig Integer Mathライブラリです。Single Precision(SP)数学が有効になっていると、FastMathとBig Integerライブラリの両方が無効になっています。
-
+FastMath の実装を有効にします。 単精度 (SP) 演算が有効な場合、FastMath と Big Integer ライブラリの両方が無効になります。
 
 use_fast_mathおよびBig Integer Math Libraryセクションを参照してください。
 
@@ -4148,14 +4179,35 @@ FastHugeMathの有効化にはFastMathライブラリのサポートが含まれ
 
 制限されたアルゴリズムスイートを使用した単一精度(SP)数学実装を有効にします。サポートされていないアルゴリズムは無効になっています。オーバーライド`--enable-sp`、`--enable-sp-math-all`、`--enable-fastmath`および`--enable-fasthugemath`。
 
+整数ライブラリーの実装を sp_int.c の実装に置き換えます。
+- 最小限の実装で、sp_int.c の一部を有効にしますが、すべてではありません。
+- --enable-sp と組み合わせて、sp_x86_64.c または sp_arm.c など (ターゲット システムに応じて以下のファイルのリスト) のソリューションをオンにして、RSA/ECC/DH 操作を実行できるようにする必要があります。
+- --enable-sp-math-all (下記) と組み合わせてはいけません
+
+FILE LIST (プラットフォームに依存、システムの仕様に基づいて構成によって選択されるか、
+Makefile/IDE ソリューションを使用する場合は手動で制御できます):
+- sp_arm32.c
+- sp_arm64.c
+- sp_armthumb.c
+- sp_cortexm.c
+- sp_dsp32.c
+- sp_x86_64.c
+- sp_x86_64_asm.S
+- sp_x86_64_asm.asm
 
 
 ### `--enable-sp-math-all`
 
 
 
-フルアルゴリズムスイートで単精度(SP)数学の実装を有効にします。サポートされていないアルゴリズムが有効になっていますが、オプション化されていません。オーバーライド`--enable-sp`,`--enable-fastmath` ,`--enable-fasthugemath`。
+デフォルトで有効。 完全なアルゴリズム スイートで単精度 (SP) 数学の実装を有効にします。 サポートされていないアルゴリズムが有効になっていますが、最適化されていません。 `--enable-sp`、`--enable-fastmath`、`--enable-fasthugemath` をオーバーライドします。
 
+- 数学の実装を sp_int.c の実装に置き換えます
+- 完全な実装であり、 --enable-sp の動作に依存しません
+- --enable-sp と組み合わせて、可能であれば、32 ビットの sp_c32.c または 64 ビットの sp_c64.c で移植可能な c アセンブリ (ハードウェア固有でないアセンブリ) で記述された実装を使用できるようにすることができます。 残りの時間 (不可能な場合) には、sp_int.c の実装が使用されます。 移植可能な C アセンブリは、ハードウェアの最適化が利用できないターゲットでパフォーマンスを大幅に向上させます。
+- --enable-sp-math (上記) と組み合わせてはいけません
+
+**注**: 鍵の長さがビット [256, 384, 521, 1024, 2048, 3072, 4096] の非対称暗号を使用している場合は、最大のパフォーマンスを得るために --enable-sp-math オプションの使用を検討する必要があります。 フットプリントのサイズが大きくなります。
 
 
 ### `--enable-sp-asm`
@@ -4176,7 +4228,15 @@ Intel x86 \ _64およびARMアーキテクチャを使用したアセンブリ�
 RSA、DH、およびECCの単一精度(SP)数学を有効にして、パフォーマンスを改善します。
 
 
-OPTには多くの可能な値があります。以下は、Enable-SPを呼び出す方法のリストと、結果として定義される結果のマクロです。これらはすべて、com睡分離リストに組み合わせることができます。たとえば、`--enable-sp=ec256,ec384`。定義されるマクロの意味は、[wolfSSL独自の単一精度(SP)数学サポート]セクションで上記で定義されています。
++OPT には多くの可能な値があります。 以下は、enable-sp を呼び出す方法と、結果として定義される結果のマクロのリストです。 これらはすべて、カンマ区切りのリストで組み合わせることができます。 たとえば、「--enable-sp=ec256,ec384」です。 定義されるマクロの意味は、上記の [wolfSSL 独自の単精度 (SP) 数学サポート] セクションで定義されています。
+
+
+**注**:
+1) "--enable-sp=small --enable-sp-math" は以下より小さくすることができます...
+
+2) "--enable-sp-math-all=small"...
+
+(1) には特定のキー サイズの実装しかありませんが、(2) にはすべてのキー サイズをサポートする実装があります。
 
 
 **注**：これはx86_64用で、他の構成フラグはありません。結果は、指定するアーキテクチャやその他の構成フラグによって異なる場合があります。たとえば、Wolfssl_sp_384およびWolfssl_sp_4096は、Intel X86_64に対してのみ有効になります。

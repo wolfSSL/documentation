@@ -21,9 +21,101 @@ wolfSSL(以前のCyassl)は、** pem **、および** der **証明書とキー�
 ** der **、または「区別されたエンコードルール」は、証明書のバイナリ形式です。derファイル拡張子には`.der`および`.cer`を含めることができ、テキストエディターでは表示できません。
 
 
-X.509証明書は、ASN.1形式を使用してエンコードされます。der形式はasn.1エンコーディングです。PEM形式は、Base64エンコードされており、人間の読み取り可能なヘッダーとフッターでラップされています。TLSはDER形式で証明書を送信します。
+X.509証明書は、ASN.1形式を使用してエンコードされます。der形式はASN.1エンコーディングです。PEM形式は、Base64エンコードされており、人間の読み取り可能なヘッダーとフッターでラップされています。TLSはDER形式で証明書を送信します。
+
+## サポートされている証明書の拡張子
 
 
+クリティカルとしてマークされたサポートされていない、または不明な拡張機能が見つかった場合、
+エラー メッセージが返されます。それ以外の場合は、サポートされていないか不明な拡張子が見つかりました
+は無視されます。 証明書拡張子の解析では、少なくとも
+`--enable-certext` (マクロ WOLFSSL_CERT_EXT) が使用された場合
+wolfSSL ライブラリのコンパイル。 これは証明書のハイレベルなリストです
+**解析**可能な拡張子と、すべてではないにしても少なくとも一部の拡張子
+ 使用されます。
+
+| [RFC 5280からの拡張](https://datatracker.ietf.org/doc/html/rfc5280#section-4.2) | サポート |
+| --- | --- |
+| 権限キー識別子 | はい |
+| サブジェクト キー識別子 | はい |
+| キーの使用法 | はい |
+| 証明書ポリシー | はい |
+| ポリシー マッピング | いいえ |
+| サブジェクトの別名 | はい |
+| 発行者の別名 | いいえ |
+| サブジェクト ディレクトリの属性 | いいえ |
+| 基本的な制約 | はい |
+| 名前の制約 | はい |
+| ポリシーの制約 | はい |
+| 拡張キー使用法 | はい |
+| CRL 配布ポイント | はい |
+| anyPolicy を禁止する | はい |
+| 最新の CRL | いいえ |
+
+| 追加拡張 | サポート |
+| --- | --- |
+| ネットスケープ | はい |
+| カスタム OID | はい |
+
+次のいくつかのセクションでは、個人のサポートについて詳しく説明します
+証明書拡張。
+
+#### 認証/サブジェクト キー ID
+
+デフォルトでは、キー ID はキーの SHA1 ハッシュです。 キーのSHA256ハッシュは
+もサポートされています。
+
+#### サブジェクトの別名
+
+
+| 別名タイプ | サポート |
+| --- | --- |
+| 電子メール | はい |
+| DNS 名 | はい |
+| IP アドレス | はい |
+| URI | はい |
+
+#### キーの使い方
+
+キーの使用法は、証明書の解析後に解析および取得できます
+完了。
+
+| キーの使用法 | サポート |
+| --- | --- |
+| デジタル署名 | はい |
+| 否認防止 | はい |
+| キー暗号化 | はい |
+| データ暗号化 | はい |
+| キー契約 | はい |
+| keyCertSign | はい |
+| cRLサイン| はい |
+| 暗号化のみ | はい |
+| 解読のみ | はい |
+
+#### 拡張キー使用法
+
+拡張キーの使用法が
+unknown/unsupported の場合は無視されます。 3.15.5 より前のバージョンの場合は不明
+拡張キー使用法 OID は解析エラーを引き起こします。
+
+| 拡張キー使用法 | サポート |
+| ----| ---|
+| 任意の拡張キー使用法 | はい |
+| id-kp-serverAuth | はい |
+| id-kp-clientAuth | はい |
+| id-kp-codeSigning | はい |
+| id-kp-emailProtection | はい |
+| id-kp-timeStamping | はい |
+| id-kp-OCSPSigning | はい |
+
+#### カスタム OID
+
+ カスタム OID インジェク
+ションと解析は wolfSSL バージョン 5.3.0 で導入されました。 の
+enable オプション --enable-certgen および --enable-asn=template を一緒に使用する必要があります
+マクロ付き; WOLFSSL_CUSTOM_OID および HAVE_OID_ENCODING を操作するため
+カスタム拡張。 これらの設定で wolfSSL を構築した後、関数
+wc_SetCustomExtension を使用して、Cert 構造体でカスタム拡張を設定できます。
 
 ## 証明書の読み込み
 
@@ -104,14 +196,48 @@ int wolfSSL_CTX_use_PrivateKey_file(WOLFSSL_CTX *ctx,
 ```
 
 
+| 拡張キー使用法 | サポート |
+| ------------------ | --------- |
+| 任意の拡張キー使用法 | はい |
+| id-kp-serverAuth | はい |
+| id-kp-clientAuth | はい |
+| id-kp-codeSigning | はい |
+| id-kp-emailProtection | はい |
+| id-kp-timeStamping | はい |
+| id-kp-OCSPSigning | はい |
+
+#### カスタム OID
+
+ カスタム OID インジェクションと解析は wolfSSL バージョン 5.3.0 で導入されました。 の
+enable オプション --enable-certgen および --enable-asn=template を一緒に使用する必要があります。
+マクロ付き; WOLFSSL_CUSTOM_OID および HAVE_OID_ENCODING を操作するため
+カスタム拡張。 これらの設定で wolfSSL を構築した後、関数
+wc_SetCustomExtension を使用して、Cert 構造体でカスタム拡張を設定できます。
+
 
 `keyFile`は秘密のキーファイルであり、`type`は秘密鍵の形式です(例：`SSL_FILETYPE_PEM`)。
 
 
+### 信頼できるピア証明書を読み込み
 
-### 信頼できるピア証明書を読み込みます
+| 拡張キー使用法 | サポート |
+| ------------------ | --------- |
+| 任意の拡張キー使用法 | はい |
+| id-kp-serverAuth | はい |
+| id-kp-clientAuth | はい |
+| id-kp-codeSigning | はい |
+| id-kp-emailProtection | はい |
+| id-kp-timeStamping | はい |
+| id-kp-OCSPSigning | はい |
 
+#### カスタム OID
 
+カスタム OID インジェクションと解析は wolfSSL バージョン 5.3.0 で導入されました。 の
+enable オプション --enable-certgen および --enable-asn=template を一緒に使用する必要があります。
+
+マクロ付き; WOLFSSL_CUSTOM_OID および HAVE_OID_ENCODING を操作するため
+カスタム拡張。 これらの設定で wolfSSL を構築した後、関数
+wc_SetCustomExtension を使用して、Cert 構造体でカスタム拡張を設定できます。
 
 使用する信頼できるピア証明書を読み込むことは、[`wolfSSL_CTX_trust_peer_cert()`](group__Setup.md#function-wolfssl_ctx_trust_peer_cert)で行うことができます。
 
@@ -401,7 +527,7 @@ CertNameは次のようになります。
 
 ```c
 typedef struct CertName {
-char country[CTC_NAME_SIZE];
+    char country[CTC_NAME_SIZE];
     char countryEnc;
     char state[CTC_NAME_SIZE];
     char stateEnc;

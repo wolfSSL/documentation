@@ -478,9 +478,7 @@ TestSuiteプログラムはそれを行いますが、クライアントとサ�
 wolfSSL/WolfCryptのSSLパフォーマンスを決定する際のwolfSSLユーザーと顧客を支援するために、wolfSSLにバンドルされているベンチマークアプリケーションが提供されています。wolfSSLは、デフォルトですべての暗号操作に対してwolfCrypt暗号化ライブラリを使用します。基礎となる暗号はSSL/TLSの非常にパフォーマンスが重要な側面であるため、ベンチマークアプリケーションはwolfCryptのアルゴリズムでパフォーマンステストを実行します。
 
 
-wolfCrypt/Benchmark(`./wolfcrypt/benchmark/benchmark`)にあるベンチマークユーティリティは、WolfCryptの暗号化機能をベンチマークするために使用できます。典型的な出力は次のように見えるかもしれません(この出力では、ECC、SHA-256、SHA-512、AES-GCM、AES-CCM、およびCAMELLIAなど、いくつかのオプションのアルゴリズム/暗号が有効になりました)：
-
-
+wolfcrypt/benchmark にあるベンチマーク ユーティリティ (`./wolfcrypt/benchmark/benchmark`) を使用して、wolfCrypt の暗号機能のベンチマークを行うことができます。 典型的な出力は次のようになります (この出力では、ECC、SHA-256、SHA-512、AES-GCM、AES-CCM、Camellia など、いくつかのオプションのアルゴリズム/暗号が有効になっています)。
 
 ```sh
 ./wolfcrypt/benchmark/benchmark

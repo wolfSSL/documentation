@@ -100,7 +100,7 @@ wolfSSLは、共有できない関数に入ったときにより積極的な（�
 
 2. wolfSSLのポインターを共有するだけでなく、ユーザーは[`wolfSSL_new()`](group__Setup.md#function-wolfssl_new)に渡す前に`WOLFSSL_CTX`を完全に初期化するように注意する必要があります。同じ`WOLFSSL_CTX`は複数の`WOLFSSL`構造体を作成できますが、`WOLFSSL_CTX`の作成中には[`wolfSSL_new()`](group__Setup.md#function-wolfssl_new)の作成中にのみ読み取られます(または`WOLFSSL_CTX`の将来の変化(または同時的な変化)`WOLFSSL`オブジェクトが作成されると、反映されません。
 
-
+3. 一部の最適化では、スレッドごとにメモリが割り当てられます。 固定小数点 ECC キャッシュが有効になっている場合 (`FP_ECC`)、スレッドは、スレッドが終了する前に `wc_ecc_fp_free()` を使用してキャッシュされたバッファを解放する必要があります。
 
 繰り返しになりますが、複数のスレッドは`WOLFSSL_CTX`への書き込みアクセスを同期させる必要があり、単一のスレッドが`WOLFSSL_CTX`を初期化して上述の同期および更新の問題を回避することをお勧めします。
 
