@@ -9,7 +9,14 @@ SOURCES = chapter01.md \
 		  chapter04.md \
           chapter05.md 
 
-PDF = wolfMQTT-Manual.pdf
+
+ifeq ($(DOC_LANG),JA)
+    DOXY = Doxyfile-ja
+    PDF  = wolfMQTT-Manual-jp.pdf
+else
+    DOXY = Doxyfile
+    PDF  = wolfMQTT-Manual.pdf
+endif
 
 wolfmqtt:
 	@git clone --depth 1 https://github.com/wolfSSL/wolfmqtt
@@ -22,7 +29,7 @@ wolfmqtt-update: wolfmqtt
 .PHONY: api
 api: wolfmqtt-update
 	@mkdir -p api/md
-	@doxygen
+	@doxygen $(DOXY)
 	@PATH=${DOXYBOOK_PATH}:${PATH} doxybook2 --input wolfmqtt/wolfmqtt/xml --output api/md --config doxybook.cfg
 
 # Need an index.md, so let's make it chapter01.
