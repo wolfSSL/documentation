@@ -1,7 +1,7 @@
 site_name: wolfSSL Manual
 site_url: https://wolfssl.com/
 docs_dir: build/html/
-site_dir: html
+site_dir: html/
 copyright: Copyright © 2022 wolfSSL Inc.
 nav:
     - "1. 序章": index.md
@@ -84,6 +84,7 @@ nav:
       - aes_8h.md
       - arc4_8h.md
       - asn_8h.md
+      - asn__public_8h.md
       - blake2_8h.md
       - bn_8h.md
       - camellia_8h.md
