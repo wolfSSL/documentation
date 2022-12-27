@@ -28,7 +28,15 @@ APPENDIX= appendix01.md \
 		  appendix07.md \
 		  appendix08.md
 
-PDF = wolfSSL-Manual.pdf
+ifeq ($(DOC_LANG),JA)
+    PDF  = wolfSSL-Manual-jp.pdf
+	HEADER_FILES = header_files-ja
+	DOXYFILE = Doxyfile-ja
+else
+    PDF  = wolfSSL-Manual.pdf
+	HEADER_FILES = header_files
+	DOXYFILE = Doxyfile
+endif
 
 wolfssl:
 	@git clone --depth 1 https://github.com/wolfSSL/wolfssl
@@ -40,7 +48,7 @@ wolfssl-update: wolfssl
 .PHONY: api
 api: wolfssl-update
 	@mkdir -p api/md
-	@cp Doxyfile wolfssl/doc
+	@cp $(DOXYFILE) wolfssl/doc/Doxyfile
 	@cd wolfssl/doc && doxygen Doxyfile
 	@PATH=${DOXYBOOK_PATH}:${PATH} doxybook2 --input wolfssl/doc/xml --output api/md --config doxybook.cfg
 
@@ -56,7 +64,7 @@ html-prep: api
 	@rm -f build/html/appendix01.md build/html/appendix02.md build/html/appendix03.md
 	@perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
 	@perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
-	@perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*
+	@perl -i -pe "s/dox_comments\/$(HEADER_FILES)\///" build/html/*8h*
 
 # Set input format to gfm to fix issues with converted API docs
 # Regexes:
@@ -78,7 +86,7 @@ pdf-prep: api
 	@perl -i -pe "s/^-(-)+$$//" build/pdf/group* build/pdf/*8h*
 	@perl -i -pe "s/^title:.*//" build/pdf/group* build/pdf/*8h*
 	@perl -i -pe "s/^Updated on.*//" build/pdf/group* build/pdf/*8h*
-	@perl -i -pe "s/dox_comments\/header_files\///" build/pdf/*8h*
+	@perl -i -pe "s/dox_comments\/$(HEADER_fFILES)\///" build/pdf/*8h*
 	@perl -i -pe "s/^\\\\//" build/pdf/group* build/pdf/*8h*
 	@perl -i -pe "s/\\\\par/par/g" build/pdf/group* build/pdf/*8h*
 	@perl -i -pe "s/group__.*.md//g" build/pdf/*8h* build/pdf/chapter*
