@@ -2,13 +2,13 @@
 
 wolfSSH is written with portability in mind and should generally be easy to build on most systems. If you have difficulty building, please don’t hesitate to seek support through our support forums, https://www.wolfssl.com/forums, or contact us directly at support@wolfssl.com.
 
-This section explains how to build wolfSSH on *nix-like and Windows environments, and provides guidance for building in a non-standard environment. You will find a getting started guide and example in section 3.
+This section explains how to build wolfSSH on Linux, un\*x-like (BSD, macOS) and Windows environments, and provides guidance for building in a non-standard environment. You will find a getting started guide and example in section 3.
 
-When using the autoconf/automake system to build, wolfSSH uses a single Makefile to build all parts and examples of the library, which is both simpler and faster than using Makefiles recursively.
+When using the autotools system to build, wolfSSH uses a single Makefile to build all parts and examples of the library, which is both simpler and faster than using Makefiles recursively.
 
 ##  Getting the Source Code
 
-The most recent, up to date version can be downloaded from the GitHub website here: https://github.com/wolfSSL/wolfSSH
+The most recent, up to date version can be downloaded from the GitHub website here: [https://github.com/wolfSSL/wolfssh](https://github.com/wolfSSL/wolfssh).
 
 Either click the “Download ZIP” button or use the following command in your terminal:
 ```
@@ -16,21 +16,26 @@ $ git clone https://github.com/wolfSSL/wolfssh.git
 ```
 ##  wolfSSH Dependencies
 
-Since wolfSSH is dependent on wolfCrypt, a configuration of wolfSSL is necessary. wolfSSL can be downloaded here: https://github.com/wolfSSL/wolfssl. The simplest configuration of wolfSSL required for wolfSSH is the default build that can be built from the root directory of wolfSSL with the following commands:
+Since wolfSSH is dependent on wolfCrypt, a configuration of wolfSSL is necessary. wolfSSL can be downloaded here: [https://github.com/wolfSSL/wolfssl](https://github.com/wolfSSL/wolfssl). The simplest configuration of wolfSSL required for wolfSSH is the default build that can be built from the root directory of wolfSSL with the following commands:
 
 ```
 $ ./autogen.sh (only if you cloned from GitHub)
-$ ./configure --enable-ssh
+$ ./configure --enable-wolfssh
 $ make check
 $ sudo make install
 ```
-To use the key generation function in wolfSSH, wolfSSL will need to be configured with keygen:` --enable-keygen`.
+To use the key generation function in wolfSSH, wolfSSL will need to be configured with keygen:
+```
+--enable-keygen
+```
+If the bulk of wolfSSL code isn't desired, wolfSSL can be configured with the crypto only option:
+```
+--enable-cryptonly
+```
 
-If the bulk of wolfSSL code isn't desired, wolfSSL can be configured with the crypto only option: `--enable-cryptonly`.
+##   Building with autotools
 
-##   Building on *nix
-
-When building on Linux, *BSD, OS X, Solaris, or other *nix-like environments, use the autoconf system. To build wolfSSH run the following commands:
+When building on Linux, BSD, macOS, Solaris, or other un\*x-like environments, use the autotools system. To build wolfSSH run the following commands:
 ```
 $ ./autogen.sh (only if you cloned from GitHub)
 $ ./configure
@@ -68,7 +73,7 @@ $ make src/libwolfssh.la
 ```
 ##  Building on Windows
 
-The visual studio project file can be found at: https://github.com/wolfSSL/wolfssh/blob/master/ide/winvs/wolfssh.sln
+The Visual Studio project file can be found in the directory *ide\\winvs*.
 
 The solution file, 'wolfssh.sln', facilitates building wolfSSH and its example and test programs. The solution provides both Debug and Release builds of Static and Dynamic 32- or 64-bit libraries. The file user_settings.h should be used in the wolfSSL build to configure it.
 
