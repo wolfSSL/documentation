@@ -38,6 +38,9 @@ These use different kinds of math from the conventional algorithms. They are des
 **Note**: KYBER KEM 90s variants were deprecated and removed as NIST is not
           considering them for standardization.
 
+**Note**: Dilithium Signature Scheme's AES variants were deprecated and removed
+          as NIST is not considering them for standardization.
+
 An explanation of lattice-based cryptography would fall outside the scope of this document but more information about these algorithms can be found in their NIST submissions at <https://csrc.nist.gov/projects/post-quantum-cryptography/round-3-submissions>.
 
 Unfortunately, it might come as a shock, but we do not actually know that these algorithms will resist attacks from quantum computers. In fact, we do not even know that these algorithms are safe against a conventional computer. Its getting less and less likely, but someone could break lattice-based cryptography. However, as security experts will tell you, this is how cryptography has always worked. Algorithms are good when we start using them, but weaknesses and vulnerabilities are discovered and technology gets better. The post-quantum algorithms are somewhat problematic in that they are relatively new and could use a bit more attention from the community.
@@ -103,9 +106,6 @@ FALCON_LEVEL5         |  FALCON1024
 DILITHIUM_LEVEL2      |  DILITHIUM2
 DILITHIUM_LEVEL3      |  DILITHIUM3
 DILITHIUM_LEVEL5      |  DILITHIUM5
-DILITHIUM_AES_LEVEL2  |  DILITHIUM2_AES
-DILITHIUM_AES_LEVEL3  |  DILITHIUM3_AES
-DILITHIUM_AES_LEVEL5  |  DILITHIUM5_AES
 SPHINCS_FAST_LEVEL1   |  SPHINCS+-SHAKE256-128f-simple
 SPHINCS_FAST_LEVEL3   |  SPHINCS+-SHAKE256-192f-simple
 SPHINCS_FAST_LEVEL5   |  SPHINCS+-SHAKE256-256f-simple
@@ -142,9 +142,6 @@ FALCON_LEVEL5         |  65038
 DILITHIUM_LEVEL2      |  65184
 DILITHIUM_LEVEL3      |  65187
 DILITHIUM_LEVEL5      |  65189
-DILITHIUM_AES_LEVEL2  |  65191
-DILITHIUM_AES_LEVEL3  |  65194
-DILITHIUM_AES_LEVEL5  |  65196
 KYBER_LEVEL1          |  570
 KYBER_LEVEL3          |  572
 KYBER_LEVEL5          |  573
@@ -161,9 +158,6 @@ FALCON_LEVEL5         |  1.3.9999.3.4
 DILITHIUM_LEVEL2      |  1.3.6.1.4.1.2.267.7.4.4
 DILITHIUM_LEVEL3      |  1.3.6.1.4.1.2.267.7.6.5
 DILITHIUM_LEVEL5      |  1.3.6.1.4.1.2.267.7.8.7
-DILITHIUM_AES_LEVEL2  |  1.3.6.1.4.1.2.267.11.4.4
-DILITHIUM_AES_LEVEL3  |  1.3.6.1.4.1.2.267.11.6.5
-DILITHIUM_AES_LEVEL5  |  1.3.6.1.4.1.2.267.11.8.7
 SPHINCS_FAST_LEVEL1   |  1.3.9999.6.7.4
 SPHINCS_FAST_LEVEL3   |  1.3.9999.6.8.3
 SPHINCS_FAST_LEVEL5   |  1.3.9999.6.9.3
@@ -184,9 +178,6 @@ FALCON_LEVEL5        | 1793            | 2305             | 1330
 DILITHIUM_LEVEL2     | 1312            | 2528             | 2420
 DILITHIUM_LEVEL3     | 1952            | 4000             | 3293
 DILITHIUM_LEVEL5     | 2592            | 4864             | 4595
-DILITHIUM_AES_LEVEL2 | 1312            | 2528             | 2420
-DILITHIUM_AES_LEVEL3 | 1952            | 4000             | 3293
-DILITHIUM_AES_LEVEL5 | 2592            | 4864             | 4595
 SPHINCS_FAST_LEVEL1  | 32              | 64               | 17088
 SPHINCS_FAST_LEVEL3  | 48              | 96               | 35664
 SPHINCS_FAST_LEVEL5  | 64              | 128              | 49856
@@ -264,9 +255,6 @@ TLS_AES_256_GCM_SHA384 | FALCON_LEVEL5        | P521_KYBER_LEVEL5     | 14257
 TLS_AES_256_GCM_SHA384 | DILITHIUM_LEVEL2     | ECC SECP256R1         | 7918
 TLS_AES_256_GCM_SHA384 | DILITHIUM_LEVEL3     | ECC SECP256R1         | 10233
 TLS_AES_256_GCM_SHA384 | DILITHIUM_LEVEL5     | ECC SECP256R1         | 13477
-TLS_AES_256_GCM_SHA384 | DILITHIUM_AES_LEVEL2 | ECC SECP256R1         | 7918
-TLS_AES_256_GCM_SHA384 | DILITHIUM_AES_LEVEL3 | ECC SECP256R1         | 10233
-TLS_AES_256_GCM_SHA384 | DILITHIUM_AES_LEVEL5 | ECC SECP256R1         | 13477
 
 ### Heap and Stack Usage
 
@@ -346,54 +334,6 @@ peak    Bytes    =     59829
 Client DILITHIUM_LEVEL5
 
 stack used = 40328
-total   Allocs   =       805
-total   Deallocs =       805
-total   Bytes    =    238167
-peak    Bytes    =     67049
-
-Server DILITHIUM_AES_LEVEL2
-
-stack used = 59400
-total   Allocs   =       243
-total   Deallocs =       243
-total   Bytes    =    128153
-peak    Bytes    =     50250
-
-Client DILITHIUM_AES_LEVEL2
-
-stack used = 45448
-total   Allocs   =       805
-total   Deallocs =       805
-total   Bytes    =    206412
-peak    Bytes    =     56299
-
-Server DILITHIUM_AES_LEVEL3
-
-stack used = 87048
-total   Allocs   =       243
-total   Deallocs =       243
-total   Bytes    =    140128
-peak    Bytes    =     55161
-
-Client DILITHIUM_AES_LEVEL3
-
-stack used = 66952
-total   Allocs   =       805
-total   Deallocs =       805
-total   Bytes    =    220633
-peak    Bytes    =     61245
-
-Server DILITHIUM_AES_LEVEL5
-
-stack used = 130056
-total   Allocs   =       243
-total   Deallocs =       243
-total   Bytes    =    152046
-peak    Bytes    =     59829
-
-Client DILITHIUM_AES_LEVEL5
-
-stack used = 102024
 total   Allocs   =       805
 total   Deallocs =       805
 total   Bytes    =    238167
@@ -664,12 +604,6 @@ DILITHIUM_level3 sign      10200 ops took 1.002 sec, avg 0.098 ms, 10179.570 ops
 DILITHIUM_level3 verify    27100 ops took 1.003 sec, avg 0.037 ms, 27017.485 ops/sec
 DILITHIUM_level5 sign       8400 ops took 1.009 sec, avg 0.120 ms, 8321.684 ops/sec
 DILITHIUM_level5 verify    17000 ops took 1.004 sec, avg 0.059 ms, 16933.788 ops/sec
-DILITHIUM_AES_level2 sign   2400 ops took 1.023 sec, avg 0.426 ms, 2346.733 ops/sec
-DILITHIUM_AES_level2 verify 6600 ops took 1.001 sec, avg 0.152 ms, 6590.957 ops/sec
-DILITHIUM_AES_level3 sign   1500 ops took 1.026 sec, avg 0.684 ms, 1461.933 ops/sec
-DILITHIUM_AES_level3 verify 3900 ops took 1.012 sec, avg 0.260 ms, 3851.921 ops/sec
-DILITHIUM_AES_level5 sign   1100 ops took 1.008 sec, avg 0.916 ms, 1091.518 ops/sec
-DILITHIUM_AES_level5 verify 2200 ops took 1.034 sec, avg 0.470 ms, 2127.939 ops/sec
 kyber_level1-kg           143608 ops took 1.000 sec, avg 0.007 ms, 143607.555 ops/sec
 kyber_level1-ed            64800 ops took 1.001 sec, avg 0.015 ms, 64725.835 ops/sec
 kyber_level3-kg            89790 ops took 1.000 sec, avg 0.011 ms, 89789.550 ops/sec
