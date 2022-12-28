@@ -800,6 +800,11 @@ extern time_t m2mb_xtime_ms(time_t * timer);
 #define XTIME_MS(tl) m2mb_xtime_ms((tl))
 ```
 
+#### WOLFSSL_CIPHER_TEXT_CHECK
+
+Define this to check for possible glitching attack against the AES encrypt
+operation during a TLS connection.
+
 ### Reducing Memory or Code Usage
 
 #### TFM_TIMING_RESISTANT
@@ -1359,11 +1364,17 @@ Enable all OpenSSL API.
 
 ### `--enable-maxstrength`
 
-Enable Max Strength build, allows TSLv1.2-AEAD-PFS ciphers only
+Enable Max Strength build, allows TSLv1.2-AEAD-PFS ciphers only. This is
+disabled by default because it can cause interoperability issues. It also
+enables glitching detection.
 
 ### `--disable-harden`
 
-Disable Hardened build, Enables Timing Resistance and Blinding
+Disable hardening, timing resistance and RSA blinding. Disabling this feature
+can give performance improvements.
+
+**NOTE** Hardening provides mitigations against side channel attacks. Only
+disable this feature after careful consideration.
 
 ### `--enable-ipv6`
 
