@@ -2,10 +2,10 @@
 
 ##  How to Get Support
 
-For general product support, wolfSSL (formerly CyaSSL) maintains an online forum for the wolfSSL product family. Please post to the forums or contact wolfSSL directly with any questions.
+For general product support, wolfSSL maintains an online forum for the wolfSSL product family. Please post to the forums or contact wolfSSL directly with any questions.
 
-**wolfSSL (yaSSL) Forums:** https://www.wolfssl.com/forums
-**Email Support:** support@wolfssl.com
+- wolfSSL Forums: [https://www.wolfssl.com/forums](https://www.wolfssl.com/forums)
+- Email Support: support@wolfssl.com
 
 For information regarding wolfSSL products, questions regarding licensing, or general comments, please contact wolfSSL by emailing **info@wolfssl.com**.
 

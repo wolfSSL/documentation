@@ -29,10 +29,10 @@ $ chmod 0600 ./keys/gretel-key-rsa.pem ./keys/hansel-key-rsa.pem \
 
 Authentication against the example echoserver can be done with a password or public key. To use a password the command line:
 ```
-$ ssh_client -p 22222 USER@localhost
+$ ssh -p 22222 USER@localhost
 ```
 
-Where the USER and password pairs are:
+Where the _USER_ and password pairs are:
 ```
 jill:upthehill
 jack:fetchapail
@@ -40,7 +40,7 @@ jack:fetchapail
 
 To use public key authentication use the command line:
 ```
-$ ssh_client -i ./keys/USER-key-TYPE.pem -p 22222 USER@localhost
+$ ssh -i ./keys/USER-key-TYPE.pem -p 22222 USER@localhost
 ```
 
 Where the _USER_ can be gretel or hansel, and TYPE is rsa or ecc.
@@ -58,7 +58,7 @@ The echoserver is the workhorse of wolfSSH. It originally only allowed one to au
 
 The option `-f` enables echo-only mode. From another terminal run:
 ```
-    $ ssh_client jill@localhost -p 22222
+    $ ssh jill@localhost -p 22222
 ```
 
 When prompted for a password, enter "upthehill". The server will send a canned
@@ -148,7 +148,7 @@ The scpclient tool accepts the following command line options:
     -S <from>:<to> copy from server to local
 ```
 
-# wolfSSH sftpclient
+### wolfSSH sftpclient
 
 The sftpclient, wolfsftp, establishes a connection to an SSH server and
 allows directory navigation, getting and putting files, making and removing
@@ -218,6 +218,55 @@ To recursively copy a directory FROM the server to the local client:
 
     $ scp -P 22222 -r jill@127.0.0.1:<remote_dir> <local_path>
 
+## SFTP
+
+wolfSSH provides server and client side support for SFTP version 3. This
+allows the user to set up an encrypted connection for managing file systems.
+
+To compile wolfSSH with SFTP support, use the `--enable-sftp` build option or
+define `WOLFSSH_SFTP`:
+
+```
+    $ ./configure --enable-sftp
+    $ make
+```
+
+For full API usage and implementation details, please see the wolfSSH User
+Manual.
+
+The SFTP client created is located in the directory examples/sftpclient/ and the
+server is ran using the same echoserver as with wolfSSH.
+
+```
+    src/wolfssh$ ./examples/sftpclient/wolfsftp
+```
+
+A full list of supported commands can be seen with typeing "help" after a
+connection.
+
+```
+    wolfSSH sftp> help
+
+    Commands :
+        cd  <string>                      change directory
+        chmod <mode> <path>               change mode
+        get <remote file> <local file>    pulls file(s) from server
+        ls                                list current directory
+        mkdir <dir name>                  creates new directory on server
+        put <local file> <remote file>    push file(s) to server
+        pwd                               list current path
+        quit                              exit
+        rename <old> <new>                renames remote file
+        reget <remote file> <local file>  resume pulling file
+        reput <remote file> <local file>  resume pushing file
+        <crtl + c>                        interrupt get/put cmd
+```
+An example of connecting to another system would be
+
+```
+    src/wolfssh$ ./examples/sftpclient/wolfsftp -p 22 -u user -h 192.168.1.111
+```
+
 ##  Shell Support
 
 wolfSSH's example echoserver can now fork a shell for the user trying to log in. This currently has only been tested on Linux and macOS. The file echoserver.c must be modified to have the user's credentials in the user authentication callback, or the user authentication callback needs to be changed to verify the provided password.
@@ -231,4 +280,111 @@ $ make
 By default, the echoserver will try to start a shell. To use the echo testing behavior, give the echoserver the command line option -f.
 ```
 $ ./examples/echoserver/echoserver -f
+```
+
+## Post-Quantum
+
+wolfSSH now supports the post-quantum algorithm Kyber. It uses the NIST
+submission's Level 1 parameter set implemented by liboqs via an integration
+with wolfSSH. It is hybridized with ECDHE over the P-256 ECC curve.
+
+In order be able to use liboqs, you must have it built and installed on your
+system. We support the 0.7.0 release of liboqs. You can download it from the
+following link:
+
+```
+    https://github.com/open-quantum-safe/liboqs/archive/refs/tags/0.7.0.tar.gz
+```
+
+Once unpacked, this would be sufficient:
+
+```
+    $ cd liboqs-0.7.0
+    $ mkdir build
+    $ cd build
+    $ cmake -DOQS_USE_OPENSSL=0 ..
+    $ make all
+    $ sudo make install
+```
+
+
+In order to enable support for Kyber Level1 hybridized with ECDHE over the P-256
+ECC curve in wolfSSH, use the `--with-liboqs` build option during configuration:
+
+```
+    $ ./configure --with-liboqs
+```
+
+The wolfSSH client and server will automatically negotiate using Kyber Level1
+hybridized with ECDHE over the P-256 ECC curve if this feature is enabled.
+
+```
+    $ ./examples/echoserver/echoserver -f
+
+    $ ./examples/client/client -u jill -P upthehill
+```
+
+On the client side, you will see the following output:
+
+```
+Server said: Hello, wolfSSH!
+```
+
+If you want to see inter-operability with OpenQauntumSafe's fork of OpenSSH, you
+can build and execute the fork while the echoserver is running. Download the
+release from here:
+
+```
+    https://github.com/open-quantum-safe/openssh/archive/refs/tags/OQS-OpenSSH-snapshot-2021-08.tar.gz
+```
+
+The following is sufficient for build and execution:
+
+```
+    $ tar xmvf openssh-OQS-OpenSSH-snapshot-2021-08.tar.gz
+    $ cd openssh-OQS-OpenSSH-snapshot-2021-08/
+    $ ./configure --with-liboqs-dir=/usr/local
+    $ make all
+    $ ./ssh -o"KexAlgorithms +ecdh-nistp256-kyber-512-sha256" \
+      -o"PubkeyAcceptedAlgorithms +ssh-rsa" \
+      -o"HostkeyAlgorithms +ssh-rsa" \
+      jill@localhost -p 22222
+```
+
+NOTE: when prompted, enter the password which is "upthehill".
+
+You can type a line of text and when you press enter, the line will be echoed
+back. Use CTRL-C to terminate the connection.
+
+
+## Certificate Support
+
+wolfSSH can accept X.509 certificates in place of just public keys when
+authenticating a user.
+
+To compile wolfSSH with X.509 support, use the `--enable-certs` build option
+or define `WOLFSSH_CERTS`:
+
+```
+    $ ./configure --enable-certs
+    $ make
+```
+
+To provide a CA root certificate to validate a user's certificate, give the
+echoserver the command line option `-a`.
+
+```
+    $ ./examples/echoserver/echoserver -a ./keys/ca-cert-ecc.pem
+```
+
+The echoserver and client have a fake user named "john" whose certificate
+will be used for authentication.
+
+An example echoserver/client connection using the example certificate
+john-cert.der would be:
+
+```
+    $ ./examples/echoserver/echoserver -a ./keys/ca-cert-ecc.pem -K john:./keys/john-cert.der
+
+    $ ./examples/client/client -u john -J ./keys/john-cert.der -i ./keys/john-key.der
 ```
