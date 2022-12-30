@@ -1,27 +1,65 @@
-#  wolfSSL JNI and wolfJSSE Compilation
+# wolfSSL JNI and wolfJSSE Compilation
 
-There are three ways to compile wolfJSSE listed in this section, including using the Unix Command Line, Android Studio Build and Generic IDE Build.
+There are three ways to compile wolfJSSE listed in this chapter, including
+using the Unix Command Line, Android Studio Build and Generic IDE Build.
 
-##  Unix Command Line
+## Unix Command Line
 
-Before following steps in this section, please ensure that the dependencies listed in Chapter 1 are installed. The “ java.sh ” script in the root package directory is used to compile the native JNI C source files into a shared library for either Unix/Linux or Mac. This script tries to auto-detect between OSX (Darwin) and Linux to set up include paths and shared library extension type. This script directly calls gcc on the JNI C source files, producing “./lib/libwolfssljni.so” or “./lib/libwolfssljni.dylib”
+Before following steps in this section, please ensure that the dependencies
+listed in Chapter 2 are installed.
+
+The `java.sh` script in the root package directory is used to compile the native
+JNI C source files into a shared library for either Unix/Linux or Mac OSX.
+This script tries to auto-detect between OSX (Darwin) and Linux to set up
+include paths and shared library extension type. This script directly calls gcc
+on the JNI C source files, producing `./lib/libwolfssljni.so` or
+`./lib/libwolfssljni.dylib`.
+
 ```
 $ ./java.sh
 
 Compiling Native JNI library:
-WOLFSSL_INSTALL_DIR = /usr/local
-Detected Linux host OS
-Generated ./lib/libwolfssljni.so
+    WOLFSSL_INSTALL_DIR = /usr/local
+    Detected Linux host OS
+        Linux x86_64
+    Java Home = /usr/lib/jvm/java-8-openjdk-amd64
+    Generated ./lib/libwolfssljni.so
 ```
-To compile the Java sources, “ ant ” is used:
+
+If linking against a native wolfSSL library not installed to `/usr/local`, one
+argument may be passed to `java.sh` which represents the wolfSSL installation
+location. For example:
+
+```
+$ ./java.sh /path/to/wolfssl/install
+```
+
+To compile the Java sources, `ant` is used:
+
 ```
 $ ant
 ```
-This will build the wolfJSSE jar and native code necessary to use wolfJSSE in a project. To compile and run tests the command “ ant test ”is used:
+
+Available build targets for `ant` are :
+
+- `ant` (only builds the jar necessary for an app to use)
+- `ant test` (builds the jar and tests then runs the tests, requires JUNIT setup)
+- `ant examples` (builds the jar and example cases)
+- `ant clean` (cleans all Java artifacts)
+- `ant cleanjni` (cleans native artifacts)
+
+These two commands will build the wolfJSSE jar and native code necessary to use
+wolfJSSE in a project. To compile and run JUnit tests the command `ant test`
+is used:
+
 ```
 $ ant test
 ```
-This will compile tests and the main wolfJSSE code and output with the results of the tests will be displayed along with a summary of total tests that passed at the end of the wolfJSSE testsuite and wolfSSL JNI testsuite. A successful build will display the message “BUILD SUCCESSFUL” at the end.
+
+This will compile tests and the main wolfJSSE code and output with the results
+of the tests will be displayed along with a summary of total tests that passed
+at the end of the wolfJSSE testsuite and wolfSSL JNI testsuite. A successful
+build will display the message “BUILD SUCCESSFUL” at the end.
 
 ```
 [junit] WolfSSLTrustX509 Class
@@ -30,35 +68,116 @@ This will compile tests and the main wolfJSSE code and output with the results o
 [junit] Testing parse all.jks ... passed
 [junit] Testing verify ... passed
 ...
-...
-...
 
 build:
 
 BUILD SUCCESSFUL
 Total time: 18 seconds
 ```
-To compile and run examples bundled with wolfJSSE the command “ ant examples ” is used:
+
+To compile and run examples bundled with wolfJSSE the command `ant examples`
+is used:
+
 ```
 $ ant examples
 ```
-##  Android Studio Build
 
-An example Android Studio project is located in the directory IDE/Android. To run the example Android Studio project use the following steps;
+## Android Studio Build
 
-1. On an Android device, BKS format key stores are expected. To convert the JKS example bundles to BKS use the following commands:
+An example Android Studio project is located in the directory `IDE/Android`.
+This is an example Android Studio project file for wolfssljni / wolfJSSE.
+This project should be used for reference only.
+
+More details on tool and version information used when testing can be found in
+the `wolfssljni/IDE/Android/README.md`. The following steps outline what is
+required to run this example on an Android device or emulator.
+
+### 1. Add Native wolfSSL Library Source Code to Project
+
+This example project is already set up to compile and build the native
+wolfSSL library source files, but the wolfSSL files themselves have not been
+included in this package. You must download or link an appropriate version
+of wolfSSL to this project using one of the options below.
+
+The project looks for the directory
+`wolfssljni/IDE/Android/app/src/main/cpp/wolfssl` for wolfSSL source code.
+This can added in multiple ways:
+
+- OPTION A: Download the latest wolfSSL library release from www.wolfssl.com,
+unzip it, rename it to `wolfssl`, and place it in the direcotry
+`wolfssljni/IDE/Android/app/src/main/cpp/`.
+
+```
+$ unzip wolfssl-X.X.X.zip
+$ mv wolfssl-X.X.X wolfssljni/IDE/Android/app/src/main/cpp/wolfssl
+```
+
+- OPTION B: Alternatively GitHub can be used to clone wolfSSL:
+
+```
+$ cd /IDE/Android/app/src/main/cpp/
+$ git clone https://github.com/wolfssl/wolfssl
+$ cp wolfssl/options.h.in wolfssl/options.h
+```
+
+- OPTION C: A symbolic link to a wolfssl directory on the system by using:
+
+```
+$ cd /IDE/Android/app/src/main/cpp/
+$ ln -s /path/to/local/wolfssl ./wolfssl
+```
+
+### 2. Update Java Symbolic Links (Only applies to Windows Users)
+
+The following Java source directory is a Unix/Linux symlink:
+
+```
+wolfssljni/IDE/Android/app/src/main/java/com/wolfssl
+```
+
+This will not work correctly on Windows, and a new Windows symbolic link needs
+to be created in this location. To do so:
+
+1) Open Windows Command Prompt (Right click, and "Run as Administrator")
+2) Navigate to `wolfssljni\IDE\Android\app\src\main\java\com`
+3) Delete the existing symlink file (it shows up as a file called "wolfssl")
+
+```
+del wolfssl
+```
+
+4) Create a new relative symbolic link with `mklink`:
+
+```
+mklink /D wolfssl ..\..\..\..\..\..\..\src\java\com\wolfssl\
+```
+
+### 3. Convert Example JKS files to BKS for Android Use
+
+On an Android device BKS format key stores are expected. To convert the
+JKS example bundles to BKS use the following commands. Note: you will need
+to download a version of the bcprov JAR from the Bouncy Castle website:
 
 ```
 cd examples/provider
 ./convert-to-bks.sh <path/to/provider>
 ```
-Example:
+
+For exmaple, when using bcprov-ext-jdk15on-169.jar:
+
 ```
 cd examples/provider
-./convert-to-bks.sh ~/Downloads/bcprov-jdk15on-161.jar
+./convert-to-bks.sh ~/Downloads/bcprov-ext-jdk15on-169.jar
 ```
 
-2. Push BKS bundles up to the device along with certificates. To do this, start up the emulator/device and use "adb push". An example of this would be the following commands from root wolfssljni directory:
+### 4. Push BKS files to Android Device or Emulator
+
+Push BKS bundles up to the device along with certificates. To do this start
+up the emulator/device and use `adb push`. An example of this would be the
+following commands from root wolfssljni directory. This step may be done
+after the starting Android Studio and compiling the project, but must be done
+before running the app or test cases.
+
 ```
 adb shell
 cd sdcard
@@ -68,35 +187,46 @@ mkdir examples/certs
 exit
 adb push ./examples/provider/*.bks /sdcard/examples/provider/
 adb push ./examples/certs/ /sdcard/examples/
+adb push ./examples/certs/intermediate/* /sdcard/examples/certs/intermediate/
 ```
 
-3. Add wolfSSL source code for compiling. The project looks for the directory wolfssljni/IDE/Android/app/src/main/cpp/wolfssl for wolfSSL source code. This can be done multiple ways one being to download the latest release from wolfSSL's website, unzip it, rename it to wolfssl, and place it in the directory wolfssljni/IDE/Android/app/src/main/cpp/. Alternatively GitHub can be used with "cd /IDE/Android/app/src/main/cpp/ && git clone https://github.com/wolfssl/wolfssl". And the final method to be mentioned in this document is by creating a symbolic link to a wolfssl directory on the system by using "cd /IDE/Android/app/src/main/cpp/ && ln -s /path/to/local/wolfssl ./wolfssl".
+### 5. Import and Build the Example Project with Android Studio
 
-4. Open the Android studio project by double clicking on the Android folder in wolfssljni/IDE/.
+1) Open the Android Studio project by double clicking on the `Android` folder
+in wolfssljni/IDE/. Or, from inside Android Studio, open the `Android` project
+located in the wolfssljni/IDE directory.
 
-5. Compile the project and run MainActivity from app -> java -> com ->example.wolfssl. This will ask for permissions to access the certificates in the
-    /sdcard/ directory and then print out the server certificate information on success.
+2) Build the project and run MainActivity from app -> java/com/example.wolfssl.
+This will ask for permissions to access the certificates in the /sdcard/
+directory and then print out the server certificate information on success.
 
-6. OPTIONAL : The androidTests can then be run after permissions have been given. app->java->com.wolfssl->provider.jsse.test->WolfSSLJSSETestSuite and
-    app->java->com.wolfssl->test->WolfSSLTestSuite.
-
-7. OPTIONAL : To build with TLS 1.3 enabled macros need added to IDE/Android/app/src/main/cpp/CMakeLists.txt. The macros needed to be defined
-    are; `HAVE_HKDF`, `WC_RSA_PSS`, `HAVE_FFDHE_2048`, `HAVE_SUPPORTED_CURVES`,`WOLFSSL_TLS13` and `HAVE_TLS_EXTENSION`. Each of those should be added to the “add_definitions” list in the CMakeLists.txt file.
+3) OPTIONAL: The androidTests can be run after permissions has been given.
+app->java->com.wolfssl->provider.jsse.test->WolfSSLJSSETestSuite and
+app->java->com.wolfssl->test->WolfSSLTestSuite
 
 ## Generic IDE Build
 
-For generic IDE builds create a new project in the IDE, then add source files from src/java. This will be the following packages:
+For generic IDE builds create a new project in the IDE, then add source files
+from `src/java`. This will be the following packages:
+
 ```
 com.wolfssl
 com.wolfssl.provider.jsse
 com.wolfssl.wolfcrypt
 ```
-Run java.sh from the command line or have the IDE execute "java.sh" to generate the native shim layer linking against wolfSSL.
 
-Add native library reference to the project. It should look in the lib directory for libwolfssl.jnilib (i.e. wolfssljni/lib/).
+Run java.sh from the command line or have the IDE execute `java.sh` to generate
+the native shim layer linking against wolfSSL.
+
+Add native library reference to the project. It should look in the lib
+directory for libwolfssl.jnilib (i.e. wolfssljni/lib/).
  
-To compile test cases add the packages com.wolfssl.provider.jsse.test and com.wolfssl.test from the directory src/test. The project will also need JUNIT5 to run the tests.
+To compile test cases add the packages `com.wolfssl.provider.jsse.test` and
+`com.wolfssl.test` from the directory `src/test`. The project will also need
+Junit to run the tests.
 
-If adding in optional examples then the source code in examples/provider/ can be added to the project. Optionally the IDE can execute examples/provider/ClientJSSE.sh. One of the difficult parts to adding in the examples is making sure the path to keystores is known to the IDE when it runs the examples, if trying to use the default keystores.
-
-
+If adding in optional examples then the source code in
+`examples/provider/` can be added to the project. Optionally the IDE can
+execute `examples/provider/ClientJSSE.sh`. One of the difficult parts to adding
+in the examples is making sure the path to keystores is known to the IDE when
+it runs the examples, if trying to use the default keystores.
