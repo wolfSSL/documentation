@@ -65,5 +65,11 @@ wolfengine: PDFFILE=wolfEngine-Manual.pdf
 wolfengine: build
 	@$(DOCKER_CMD)
 
+.PHONY: porting
+porting: MANPATH=wolfSSL-Porting
+porting: PDFFILE=wolfSSL-Porting-Guide.pdf
+porting: build
+	@$(DOCKER_CMD)
+
 clean:
 	rm -rf build
