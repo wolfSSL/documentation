@@ -3064,5 +3064,33 @@ TRNG fo0 r seeding the wolfSSL HASH-DRBG makes use of the NXP HSM library. This 
 
 ### IMXRT1170 (FreeRTOS)
 
-<Documentation available, not inserted here yet @TODO>
+Example IDE Setup for use with IMXRT1170 can be found in the directory IDE/MCUEXPRESSO/RT1170 \
+\
+
+#### Build Steps\
+
+- Open MCUEXPRESSO and set the workspace to wolfssl/IDE/MCUEXPRESSO/RT1170
+- File -> Open Projects From File System... -> Directory : and set the browse to wolfssl/IDE/MCUEXPRESSO/RT1170 directory then click "select directory"
+- Select wolfssl_cm7, wolfcrypt_test_cm7, CSR_example, PKCS7_example
+- Right click the projects -> SDK Management -> Refresh SDK Components and click "yes"
+- increase the size of configTOTAL_HEAP_SIZE in FreeRTOSConfig.h to be 60240 for CSR and PKCS7 example and around 100000 for wolfcrypt_test_cm7
+- (note board files need to be recreated .... this can be done by creating a new project that has the same settings and copying over the generated board/* files)
+- Build the projects
+
+
+#### Expanding RT1170 CAAM Driver\
+
+The files RT1170/fsl_caam_h.patch and RT1170/fsl_caam_c.patch include changes to
+the existing NXP CAAM driver for use with creating/opening Blobs and generating
+and using ECC black keys.
+
+To apply the patches first create a project that has the caam driver. This will
+generate the base fsl_caam.c and fsl_caam.h in the drivers directory. (i.e PKCS7_example_cm7/drivers/fls_caam.{c,h})
+. Once the base files are generated then 'cd' to the drivers directory and apply
+the patch (cd PKCS7_example_cm7/drivers/ && patch -p1 < ../../fsl_caam_c.patch && patch -p1 < ../../fsl_caam_h.patch)
+
+In the patch for fsl_caam.h there are macros defined for both the ECC and Blob
+expansion (CAAM_ECC_EXPANSION and CAAM_BLOB_EXPANSION). When wolfSSL code finds
+that these macros are defined (the patch has been applied) then it tries to
+compile in use of the expanded driver.
 
