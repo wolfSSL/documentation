@@ -20,6 +20,7 @@ To build the documentation you will need Docker running on your system. In this 
 * `make wolfsentry`
 * `make wolfssl-jni`
 * `make wolftpm`
+* `make porting`
 
 ## Contributing
 

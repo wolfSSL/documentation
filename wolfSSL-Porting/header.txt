@@ -1,0 +1,21 @@
+% wolfSSL Porting Guide ![](logo.png)
+
+---
+header-includes:
+    # Blank pages on new sections
+    - \usepackage{titlesec}
+    - \newcommand{\sectionbreak}{\clearpage}
+    # Fancy page headers
+    - \usepackage{fancyhdr}
+    - \pagestyle{fancy}
+    - \fancyfoot[LO,RE]{COPYRIGHT \copyright 2023 wolfSSL Inc.}
+    # Wrap long syntax highlighting code blocks
+    - \usepackage{fvextra}
+    - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+    # Wrap long non-sytax highlighted code blocks
+    - \usepackage{listings}
+    - \let\verbatim\undefined
+    - \let\verbatimend\undefined
+    - \lstnewenvironment{verbatim}{\lstset{breaklines,basicstyle=\ttfamily}}{}
+subparagraph: yes
+---
