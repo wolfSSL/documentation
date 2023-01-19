@@ -25,7 +25,7 @@ typedef void (*wolfSSL_Logging_cb)(const int logLevel,
 
 
 
-ログレベルは`wolfssl/wolfcrypt/logging.h`にあり、実装は`logging.c`にあります。デフォルトでは、wolfsslは`stderr`にログ`fprintf`です。
+ログレベルは`wolfssl/wolfcrypt/logging.h`にあり、実装は`logging.c`にあります。デフォルトでは、wolfsslは`stderr`に`fprintf`でロギングします。
 
 
 
