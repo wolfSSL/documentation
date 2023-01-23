@@ -1,0 +1,33 @@
+site_name: wolfTPM マニュアル
+site_url: https://wolfssl.com/
+docs_dir: build/html/
+site_dir: html/
+copyright: Copyright © 2022 wolfSSL Inc.
+nav:
+    - "1. 初めに": index.md
+    - "2. wolfTPMのビルド": chapter02.md
+    - "3. 始めましょう": chapter03.md
+    - "4. wolfTPM ライブラリデザイン": chapter04.md
+    - "5. API リファレンス":
+      - "TPM2 API": group__TPM2__Proprietary.md
+      - "TPM2 ラッパーAPI": group__wolfTPM2__Wrappers.md
+      - "TPM2 ヘッダーファイル": tpm2_8h.md
+      - "TPM2 ラッパーヘッダーファイル": tpm2__wrap_8h.md
+    - "6. 引用元": chapter06.md
+theme:
+  name: null 
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: roboto
+    code: roboto mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
+extra_css: [skin.css]
+use_directory_urls: false

@@ -11,7 +11,14 @@ SOURCES = chapter01.md \
           chapter05.md \
           chapter06.md 
 
-PDF = wolfTPM-Manual.pdf
+ifeq ($(DOC_LANG),JA)
+    DOXY = Doxyfile-ja
+    PDF  = wolfTPM-Manual-jp.pdf
+else
+    DOXY = Doxyfile
+    PDF  = wolfTPM-Manual.pdf
+endif
+
 
 wolftpm:
 	@git clone --depth 1 https://github.com/wolfSSL/wolftpm
@@ -36,8 +43,14 @@ api: wolftpm-update
 # 3. Fix the titles of the header files markdown
 .PHONY: html-prep
 html-prep: api
+  ifeq ($(DOC_LANG),JA)
+	@cp -a header-ja/group* build/html/
+	@cp -a header-ja/*8h* build/html/
+  else
 	@cp -a api/md/group* build/html/
 	@cp -a api/md/*8h* build/html/
+  endif
+
 	@rm -rf build/html/chapter05.md	
 	@perl -i -pe "s/\[(.*?)\]\(Classes\/.*?.md\)/\[\1\]\(#typedef-\1\)/g" build/html/group* build/html/*8h*     
 	@perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
@@ -72,4 +85,8 @@ pdf-prep: api
 	@perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md 	
 	@rm -rf build/pdf/chapter05.md
 	@echo '# API Reference' >> build/pdf/chapter05.md
+  ifeq ($(DOC_LANG),JA)
+	@cat header-ja/group__TPM2__Proprietary.md header-ja/tpm2_8h.md header-ja/tpm2__wrap_8h.md	header-ja/group__wolfTPM2__Wrappers.md >> build/pdf/chapter05.md
+  else
 	@cat api/md/group__TPM2__Proprietary.md api/md/tpm2_8h.md api/md/tpm2__wrap_8h.md	api/md/group__wolfTPM2__Wrappers.md >> build/pdf/chapter05.md
+  endif
