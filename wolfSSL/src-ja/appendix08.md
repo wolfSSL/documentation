@@ -2,7 +2,7 @@
 
 ## 目的
 
-このガイドは、wolfSSL 軽量 SSL/TLS ライブラリを新しい組み込みプラットフォーム、オペレーティング システム、またはトランスポート メディア (TCP/IP、Bluetooth など) に移植する開発者およびエンジニア向けのリファレンスを提供します。 これは、wolfSSL を移植する際に通常変更が必要な wolfSSL コードベースの領域を呼び出します。 これは「ガイド」と見なされるべきであり、そのため、進化する作業です。 不足しているものがある場合はお知らせください。ドキュメントに指示や説明を追加させていただきます。
+このガイドは、wolfSSL 軽量 SSL/TLS ライブラリを新しい組み込みプラットフォーム、オペレーティング システム、またはトランスポート メディア (TCP/IP、Bluetooth など) に移植する開発者およびエンジニア向けのリファレンスを提供します。 これは、wolfSSL を移植する際に通常変更が必要な wolfSSL コードベースの領域を呼び出します。 これは「ガイド」であり、更新・修正されより良いものになります。 不足しているものがある場合はお知らせください。ドキュメントに指示や説明を追加させていただきます。
 
 ## 対象読者
 
@@ -38,8 +38,8 @@ wolfSSL は、64 ビット タイプを使用できるため、速度が向上�
 
 ```c
 #ifdef MY_NEW_PLATFORM
-#定義 SIZEOF_LONG 4
-#定義 SIZEOF_LONG_LONG 8
+    #define SIZEOF_LONG 4
+    #define SIZEOF_LONG_LONG 8
 ...
 #endif
 ```
@@ -50,12 +50,12 @@ wolfSSL は、64 ビット タイプを使用できるため、速度が向上�
 
 ```c
 #ifndef WOLFSSL_TYPES
-#ifndef バイト
-     typedef unsigned char バイト。
+#ifndef byte
+     typedef unsigned char byte
 #endif
 typedef unsigned short word16;
      typedef unsigned int word32;
-     typedef バイト word24[3];
+     typedef byte word24[3];
 #endif
 ```
 
@@ -80,9 +80,9 @@ A: あなたのプラットフォームがビッグ エンディアンの場合�
 
 ```c
 #ifdef MY_NEW_PLATFORM
-...
-#BIG_ENDIAN_ORDER を定義
-...
+    ...
+    #define BIG_ENDIAN_ORDER
+    ...
 #endif
 ```
 
@@ -130,9 +130,9 @@ wolfSSL はファイルシステムを使用して、鍵と証明書を SSL セ�
 
 ```c
 #ifdef MY_NEW_PLATFORM
-...
-#NO_FILESYSTEM を定義
-...
+    ...
+    #define NO_FILESYSTEM
+    ...
 #endif
 ```
 
@@ -151,17 +151,17 @@ wolfSSL はファイルシステムを使用して、鍵と証明書を SSL セ�
 
 
 ```c
-#elif定義(MICRIUM)
+#elif defined(MICRIUM)
 #include <fs.h>
-#XFILE FS_FILE* の定義
-#XFOPEN fs_fopen を定義
-#XFSEEK の定義 fs_fseek
-#define XFTELL fs_ftell
-#XREWIND fs_rewind を定義
-#XFREAD fs_fread を定義
-#XFCLOSE fs_fclose の定義
-#XSEEK_END FS_SEEK_END を定義
-#XBADFILE NULL を定義
+#define XFILE      FS_FILE*
+#define XFOPEN     fs_fopen
+#define XFSEEK     fs_fseek
+#define XFTELL     fs_ftell
+#define XREWIND    fs_rewind
+#define XFREAD     fs_fread
+#define XFCLOSE    fs_fclose
+#define XSEEK_END  FS_SEEK_END
+#define XBADFILE   NULL
 ```
 
 ### スレッド化
@@ -200,7 +200,7 @@ big integer math ライブラリと fastmath ライブラリのリソース使�
 
 fastmath を有効にするには、「USE_FAST_MATH」を定義し、「./wolfcrypt/src/integer.c」の代わりに「./wolfcrypt/src/tfm.c」をビルドします。 fastmath を使用するとスタックメモリが大きくなる可能性があるため、 TFM_TIMING_RESISTANT も定義することをお勧めします。
 
-通常の `malloc()`、`free()`、およびおそらく `realloc()` 関数が利用できない場合は、`XMALLOC_USER` を定義し、`./wolfssl/wolfcrypt/types.h` でカスタム メモリ関数フックを提供します。 ターゲット環境に固有です。
+通常の `malloc()`、`free()`、場合によっては `realloc()` 関数が利用できない場合は、`XMALLOC_USER` を定義してから、ターゲット環境に固有の `./wolfssl/wolfcrypt/types.h` にカスタム メモリ関数フックを提供します。
 
 `XMALLOC_USER` の使用に関する詳細については、[セクション 5.1.1.1 を読む](chapter05.md#memory-use) を参照してください。
 
@@ -226,7 +226,7 @@ A: C 標準ライブラリが利用できない場合、またはカスタム �
 
 開発者に高いレベルの移植性と柔軟性を提供するために、C 標準ライブラリなしで wolfSSL を構築することができます。 その際、ユーザーは C 標準関数の代わりに使用したい関数をマップする必要があります。
 
-上記のセクション 7 では、メモリ機能について説明しました。 メモリ関数の抽象化に加えて、wolfSSL は文字列関数と数学関数も抽象化します。特定の関数は通常、`X<FUNC>` の形式で定義に抽象化されます。ここで、`<FUNC>` は対象となる関数の名前です。 抽象化。
+上記のセクション 7 では、メモリ機能について説明しました。 メモリ関数の抽象化に加えて、wolfSSL は文字列関数と数学関数も抽象化します。特定の関数は通常、`X<FUNC>` の形式で定義に抽象化されます。ここで、`<FUNC>` は対象となる関数の名前です。
 
 詳細については、[セクション 5.1](chapter05.md) をお読みください。
 
@@ -253,10 +253,10 @@ wolfSSL では、SSL/TLS レイヤーが公開鍵操作を行う必要がある�
 
 
 
-1. ECC サイン コールバック
-2. ECC ベリファイ コールバック
-3. RSA 署名のコールバック
-4. RSA 検証コールバック
+1. ECC 署名 コールバック
+2. ECC 検証 コールバック
+3. RSA 署名 コールバック
+4. RSA 検証 コールバック
 5. RSA 暗号化コールバック
 6. RSA 復号化コールバック
 
@@ -273,8 +273,8 @@ A: レコード レイヤーの独自の処理、特に MAC/暗号化および�
 
 ユーザーは 2 つの関数を定義する必要があります。
 
-1.MAC/暗号化コールバック機能
-2. コールバック関数の復号化/検証
+1.MAC/暗号化 コールバック関数
+2.復号化/検証コールバック関数
 
 詳細については、[セクション 6.3](chapter06.md#user-atomic-record-layer-processing) をお読みください。
 
