@@ -1,6 +1,6 @@
 
 
-## wolfSSL 統合の例
+## wolfSSLと統合したサンプルプログラム
 
 [the wolfSSL repository](https://github.com/wolfSSL/wolfssl) で、`WOLFSSL_WOLFSENTRY_HOOKS` でゲートされた `wolfsentry/test.h` のコードを参照してください。
 `wolfsentry_store_endpoints()`、`wolfSentry_NetworkFilterCallback()`、`wolfsentry_setup()`、および`tcp_connect_with_wolfSentry()`。 次のコードも参照してください。 
@@ -28,9 +28,9 @@ SSL curve name is SECP256R1
 I hear you fa shizzle!
 ```
 
-## wolfSentryの例
+## wolfSentryのサンプルプログラム
 
-例は wolfSentry rero、`<wolfSentry root>/examples` にあります。
+サンプルプログラムは wolfSentry rero、`<wolfSentry root>/examples` にあります。
 
 ### wolfSentry lwIP Echo テスト
 
@@ -63,7 +63,7 @@ sudo docker-compose -f docker-compose.yml log -f
 
 ##### ノードへのアクセス
 
-操作する 3 つのユーザー テスト ノードがあります。 それらは `linux-lwip-tester?-1` という名前で、`?` は 1、2、または 3 です。例として tester2 にログインするには:
+操作する 3 つのユーザー テスト ノードがあります。 それらは `linux-lwip-tester?-1` という名前で、`?` は 1、2、または 3 です。サンプルプログラムとして tester2 にログインするには:
 
 ```sh
 sudo docker exec -it linux-lwip-tester2-1 /bin/sh
@@ -262,11 +262,11 @@ sudo docker-compose -f docker-compose.yml down
 * `lwip-include/arch` ディレクトリは、`contrib/ports/unix/port/include/arch` の lwIP ディレクトリのコピーです。
 
 
-## wolfSentry STM32 LWIPの例
+## wolfSentry STM32 LWIPのサンプルプログラム
 
 これは、このコードベースの Linux の例と非常によく似たデモ アプリケーションです。 TCP エコー、ICMP ping、および MAC アドレスでフィルタリングできます。 OSにはFreeRTOS、ネットワークスタックにはLWIPを備えたSTM32を使用しています。
 
-この例は、STM32CubeMX および STM32CubeIDE で使用するように設計されています。
+このサンプルプログラムは、STM32CubeMX および STM32CubeIDE で使用するように設計されています。
 
 ### STM32CubeMX のセットアップ
 
@@ -340,7 +340,7 @@ STM32CubeIDE で、[プロジェクト] -> [プロパティ] をクリックし�
   ping_init();
 ```
 
-#### 歩哨.c
+#### sentry.c
 
 セントリー構成はファイルの先頭にあります。 ping、TCP、および MAC アドレスの構成を確認できます。 必要に応じて、これらのアドレス/プレフィックス範囲を編集します。
 
@@ -401,7 +401,7 @@ STM32CubeMX を使用してコードを再生成すると、上記の最後の�
 
 実行すると、ポート 11111 で TCP 接続できるようになり、そこに送信されたものはすべて `printf()` を介してエコーされます (ブロックされていない場合)。 フィルタリングは ping にも適用され、着信パケットは MAC アドレスに基づいてフィルタリングされます。
 
-## wolfSentry STM32 LWIP wolfSSL の例
+## wolfSentry STM32 LWIP wolfSSL のサンプルプログラム
 
 これは、非常に基本的な HTTPS サーバーを起動するデモ アプリケーションです。 特定の IP からポート 8080 で HTTPS 接続を受け入れるように設計されています。 他の IP からの接続はブロックされます。 wolfSSL 側では、データの送受信にネイティブ LWIP コードが使用されます。
 

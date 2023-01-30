@@ -8,26 +8,24 @@ wolfSentry の構築に問題がある場合は、遠慮なくサポート フ�
 
 wolfSentry の最新バージョンは、wolfSSL Web サイトから ZIP ファイルとしてダウンロードできます。
 
-<https://www.wolfssl.com/download>
+<https://wolfssl.jp/download/>
 
 ZIP ファイルをダウンロードしたら、「unzip」コマンドを使用してファイルを解凍します。 ネイティブの行末を使用するには、
-unzip を使用する場合は、`-a` 修飾子を有効にします。 unzip のマニュアル ページから、`-a` 修飾子の機能は次のとおりです。
-説明された：
+unzip を使用する場合は、`-a` 修飾子を有効にします。 unzip のマニュアル ページから、`-a` 修飾子の機能は次のように説明されています：
 
-> [...] -a オプションを指定すると、zip で識別されるファイルがテキスト ファイル (zipinfo で「t」ラベルが付いているファイル) として識別されます。
+> a オプションを指定すると、zip によってテキスト ファイルとして識別されるファイル (zipinfo リストで、'b' ではなく、't' ラベルが付いているファイル) が自動的に抽出され、行末、ファイル終了文字、文字が必要に応じて変換されます。
 > リスト、'b' ではなく) そのように自動的に抽出され、行末を変換し、end-
 > ファイルの文字と、必要に応じて文字セット自体。 [...]
 
 ## 依存関係
 
-デフォルトのビルドでは、wolfSentry は POSIX ランタイム、特にヒープ アロケータ、clock_gettime、stdio、セマフォ、および文字列 API に依存しています。 ただし、これらの依存関係は、さまざまなビルド時のオプションで回避できます。 特にレシピは
+デフォルトのビルドでは、wolfSentry は POSIX ランタイム、特にヒープ アロケータ、clock_gettime、stdio、セマフォ、および文字列 API に依存しています。 ただし、これらの依存関係は、さまざまなビルド時のオプションで回避できます。 特に、次の指定を用いると：
 
 ```sh
 make STATIC=1 SINGLETHREADED=1 NO_STDIO=1 EXTRA_CFLAGS='-DWOLFSENTRY_NO_CLOCK_BUILTIN -DWOLFSENTRY_NO_MALLOC_BUILTIN'
 ```
 
-少数の基本的な文字列関数のみに依存する libwolfsentry.a を生成します。 次に、アロケータと時間のコールバックを `struct で設定する必要があります
-`wolfsentry_init()` に供給される wolfsentry_host_platform_interface`。
+少数の基本的な文字列関数のみに依存する libwolfsentry.a を生成します。 次に、アロケータと時間のコールバックを wolfsentry_init() に渡される　wolfsentry_host_platform_interface構造体に`設定する必要があります。
 
 ## ビルドとテスト
 
@@ -84,22 +82,21 @@ make SINGLETHREADED=1 EXTRA_CFLAGS='-DWOLFSENTRY_NO_CLOCK_BUILTIN'
 [^2]: `VERSION として定義:= $(shell git rev-parse --short=8 HEAD 2>/dev/null || echo xxxxxxxx)$(shell git diff --quiet 2>/dev/null | | [ $$? -ne 1 ] || echo "-dirty")`
 
 
-```
-| | プリプロセッサ マクロ | 説明 |
-| | ------------------- | ----------- |
-| | `WOLFSENTRY_NO_STDIO` | プラットフォームに「STDIO」がありません |
-| | `WOLFSENTRY_NO_JSON` | JSON 構成サポートをコンパイルしないでください |
-| | `WOLFSENTRY_USER_SETTINGS_FILE` | インクルードする追加のヘッダー ファイル |
-| | `WOLFSENTRY_SINGLETHREADED` | シングル スレッドの使用にスレッド セーフ セマンティクスを使用しない |
-| | `CENTIJSON_USE_LOCALE` | JSON パーサーはロケール依存の文字を使用する必要があります |
-| | `WOLFSENTRY_NO_PROTOCOL_NAMES` | 構成ファイルのプロトコル名のサポートを無効にする |
-| | `DEBUG_JSON` | JSON パーサーにデバッグ `printf()` を追加 |
-| | `WOLFSENTRY_NO_ERROR_STRINGS` | エラー文字列関数へのエラー コードを無効にする |
-| | `WOLFSENTRY_NO_MALLOC_BUILTINS` | 組み込みの malloc 関数を無効にする |
-| | `WOLFSENTRY_HAVE_NONGNU_ATOMICS` | アトミックは非 GNU です (`SINGLETHREADED` が設定されている場合は無視されます) |
-| | `WOLFSENTRY_NO_CLOCK_BUILTIN` | Bulitin 時間関数を使用しないでください |
-| | `WOLFSENTRY_LWIP` | wolfSentry は BSD ソケットではなく LWIP に対して構築されています |
-| | `FREERTOS` | FreeRTOS サポートでビルド |
+| プリプロセッサ マクロ | 説明 |
+| --- | --- |
+|`WOLFSENTRY_NO_STDIO` | プラットフォームに「STDIO」がありません |
+|`WOLFSENTRY_NO_JSON` | JSON 構成サポートをコンパイルしないでください |
+|`WOLFSENTRY_USER_SETTINGS_FILE` | インクルードする追加のヘッダー ファイル |
+|`WOLFSENTRY_SINGLETHREADED` | シングル スレッドの使用にスレッド セーフ セマンティクスを使用しない |
+|`CENTIJSON_USE_LOCALE` | JSON パーサーはロケール依存の文字を使用する必要があります |
+|`WOLFSENTRY_NO_PROTOCOL_NAMES` | 構成ファイルのプロトコル名のサポートを無効にする |
+|`DEBUG_JSON` | JSON パーサーにデバッグ `printf()` を追加 |
+|`WOLFSENTRY_NO_ERROR_STRINGS` | エラー文字列関数へのエラー コードを無効にする |
+|`WOLFSENTRY_NO_MALLOC_BUILTINS` | 組み込みの malloc 関数を無効にする |
+|`WOLFSENTRY_HAVE_NONGNU_ATOMICS` | アトミックは非 GNU です (`SINGLETHREADED` が設定されている場合は無視されます) |
+|`WOLFSENTRY_NO_CLOCK_BUILTIN` | Bulitin 時間関数を使用しないでください |
+|`WOLFSENTRY_LWIP` | wolfSentry は BSD ソケットではなく LWIP に対して構築されています |
+|`FREERTOS` | FreeRTOS サポートでビルド |
 
 ### ビルドオプションの例
 
