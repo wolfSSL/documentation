@@ -431,7 +431,7 @@ wc_Arc4Process(&dec, plain, cipher, sizeof(cipher));
 
 
 
-### チャチャ
+### Chacha
 
 
 
@@ -474,7 +474,7 @@ wc_Chacha_Process(&enc, plain, cipher, sizeof(cipher));
 `plain` CipherTextから元の平文を含みます。
 
 
-[`wc_Chacha_SetKey`](group__ChaCha.md#function-wc_chacha_setkey)は1回だけ設定する必要がありますが、送信された情報のパケットごとに、New IV(Nonce)で呼び出す必要があります。暗号化/復号化プロセスを実行するときに異なるブロックから始動/暗号化することを可能にする引数として、カウンタは、暗号化/復号化プロセスを実行するときに異なるブロックから開始することを可能にするための引数として設定されますが、ほとんどの場合はMACアルゴリズムなしではChachaは使用しないでください(例えば。Poly1305、HMAC)。**
+[`wc_Chacha_SetKey`](group__ChaCha.md#function-wc_chacha_setkey)は1回だけ設定する必要がありますが、送信された情報のパケットごとに、New IV(Nonce)で呼び出す必要があります。Counter は、暗号化/復号化プロセスを実行するときに別のブロックから開始することによって、情報の部分的な復号化/暗号化を可能にする引数として設定されますが、ほとんどの場合、0 に設定されます。 **ChaCha は、MAC アルゴリズムなしで使用しないでください (例 Poly1305、hmac).**
 
 
 
@@ -488,7 +488,7 @@ wc_Chacha_Process(&enc, plain, cipher, sizeof(cipher));
 
 
 
-WolfCryptは、ヘッダー`wolfssl/wolfcrypt/rsa.h`を介してRSAのサポートを提供します。PublicとPrivateのRSAキーには2つのタイプがあります。公開キーを使用すると、誰でも秘密鍵の所有者だけが復号化できるものを暗号化できます。また、秘密キーホルダーが何かに署名することができ、公開キーを持っている人なら誰でも、プライベートキーホルダーのみが実際に署名したことを確認できます。使用法は通常次のようなものです。
+WolfCryptは、ヘッダー`wolfssl/wolfcrypt/rsa.h`を介してRSAのサポートを提供します。PublicとPrivateのRSAキーには2つのタイプがあります。RSA 鍵には、公開鍵と秘密鍵の 2 種類があります。 公開鍵を使用すると、秘密鍵の所有者だけが解読できるものを誰でも暗号化できます。 また、秘密鍵の所有者が何かに署名することもでき、公開鍵を持っている人は誰でも、秘密鍵の所有者だけが実際に署名したことを確認できます。使用法は通常次のようなものです。
 
 
 
@@ -512,10 +512,10 @@ word32 outLen=RsaPublicEncrypt(in, sizeof(in), out, sizeof(out), &rsaPublicKey, 
 
 
 
-現在、`out`は、プレーンテキスト`in`から暗号文を保持します。[`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt)は、エラーの場合に書き込まれたバイトまたは負の数の長さを返します。[`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt)暗号化装置が使用するパディングにはRNG(乱数ジェネレーター)が必要であり、使用する前に初期化する必要があります。出力バッファーが通過するのに十分な大きさであることを確認するには、最初に[`wc_RsaEncryptSize()`](group__RSA.md#function-wc_rsaencryptsize)を呼び出すことができます。
+現在、`out`は、プレーンテキスト`in`から暗号文を保持します。[`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt)は、エラーの場合に書き込まれたバイトまたは負の数の長さを返します。[`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt)暗号化装置が使用するパディングにはRNG(乱数ジェネレーター)が必要であり、使用する前に初期化する必要があります。出力バッファーが渡すのに十分な大きさであることを確認するには、最初に[`wc_RsaEncryptSize()`](group__RSA.md#function-wc_rsaencryptsize)を呼び出すことができます。
 
 
-エラーが発生した場合は、[`wc_RsaPublicEnrypt()`](group__RSA.md#function-wc_rsapublicencrypt)からの否定的なリターン、またはその問題については[`wc_RsaPublicKeyDecode()`](group__RSA.md#function-wc_rsapublickeydecode)から、発生したエラーを記述する文字列を取得できます。
+エラーが発生した場合、[`wc_RsaPublicEnrypt()`](group__RSA.md#function-wc_rsapublicencrypt)、または [`wc_RsaPublicKeyDecode()`](group__RSA.md#function-wc_rsapublickeydecode) からの負数リターンは、 [`wc_ErrorString()`](group__Error.md#function-wc_errorstring) を呼び出して、発生したエラーを説明する文字列を取得できます。
 
 
 
@@ -528,7 +528,7 @@ void wc_ErrorString(int error, char* buffer);
 バッファーが少なくとも`MAX_ERROR_SZ`バイトであることを確認してください(80)。
 
 
-今復号化するために：
+復号化するために：
 
 
 
@@ -549,7 +549,7 @@ word32 plainSz=wc_RsaPrivateDecrypt(out, outLen, plain,
 
 
 
-これで、PlainはPlainszバイトまたはエラーコードを保持します。wolfcryptの各タイプの完全な例については、ファイル`wolfcrypt/test/test.c`を参照してください。[`wc_RsaPrivateKeyDecode`](group__RSA.md#function-wc_rsaprivatekeydecode)関数は、raw `DER`形式のキーのみを受け入れることに注意してください。
+これで、`plain`は`plainSz`バイトまたはエラーコードを保持します。wolfcryptの各タイプの完全な例については、ファイル`wolfcrypt/test/test.c`を参照してください。[`wc_RsaPrivateKeyDecode`](group__RSA.md#function-wc_rsaprivatekeydecode)関数は、raw `DER`形式のキーのみを受け入れることに注意してください。
 
 
 
@@ -557,7 +557,7 @@ word32 plainSz=wc_RsaPrivateDecrypt(out, outLen, plain,
 
 
 
-WolfCryptは、Header `wolfssl/wolfrypt/dh.h`を通じてDiffie-Hellmanのサポートを提供します。Diffie-HellmanキーExchangeアルゴリズムにより、2つの関係者が共有秘密キーを確立できるようになります。使用は通常、次の例に似ています。ここで、** sidea ** and ** sideb **は2つのパーティを指定します。
+WolfCryptは、Header `wolfssl/wolfrypt/dh.h`を通じてDiffie-Hellmanのサポートを提供します。Diffie-HellmanキーExchangeアルゴリズムにより、2つの関係者が共有秘密キーを確立できるようになります。使用は通常、次の例に似ています。ここで、** sideA ** and ** sideB **は2つのパーティを指定します。
 
 
 次の例では、`dhPublicKey`には、認証局によって署名されたDiffie-Hellmanパブリックパラメータが含まれています(または自己署名)。`privA` SIDEAの生成された秘密鍵を保持し、`pubA`はSIDEAの生成された公開鍵を保持し、`agreeA`は両側が合意したとの相互鍵を保持しています。

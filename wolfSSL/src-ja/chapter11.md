@@ -36,7 +36,7 @@ wolfSSL(以前のCyassl)の組み込みSSLライブラリは、SSLとTLSを追�
 
 
 
-** TLS **(トランスポート層セキュリティ)と** SSL **(Secure Sockets Layer)は、さまざまなトランスポートプロトコルにわたって安全な通信を可能にする暗号プロトコルです。使用されるプライマリトランスポートプロトコルはTCP/IPです。SSL/TLSの最新バージョンはTLS 1.3です。wolfSSLは、DTLS 1.0と1.2に加えて、SSL 3.0、TLS 1.0,1.1,1.2,1.3をサポートしています。
+** TLS ** (トランスポート層セキュリティ) と** SSL ** (Secure Sockets Layer) は、さまざまなトランスポートプロトコルにわたって安全な通信を可能にする暗号プロトコルです。使用されるプライマリトランスポートプロトコルはTCP/IPです。SSL/TLSの最新バージョンはTLS 1.3です。wolfSSLは、DTLS 1.0と1.2に加えて、SSL 3.0、TLS 1.0,1.1,1.2,1.3をサポートしています。
 
 
 SSLとTLSは、OSIモデルの輸送層とアプリケーション層の間にあり、そこでは任意の数のプロトコル(TCP/IP、Bluetoothなどを含む)が基礎となる輸送媒体として機能する場合があります。アプリケーションプロトコルはSSLの上に階層化されており、HTTP、FTP、SMTPなどのプロトコルを含めることができます。SSLがOSIモデルにどのように適合するかの図と、SSLハンドシェイクプロセスの簡単な図は、付録Aにあります。
@@ -280,7 +280,7 @@ gcc -o echoserver ../lib/*.c tcpserv04.c -I ../include
 
 
 
-EchoServerとEchoClientの両方の実行を行うと、EchoServerはEchoClientから受け取る入力をエコーバックバックバックする必要があります。EchoServerまたはEchoClientのいずれかを終了するには、_CTRL + C_を使用してアプリケーションを終了します。現在、これらの2つの例の間で前後に反映されているデータは、クライアントとサーバーの間に少しスキルを持っている人を簡単に注入し、コミュニケーションを聞くことができます。
+EchoServerとEchoClientの両方の実行を行うと、EchoServerはEchoClientから受け取る入力をエコーバックする必要があります。EchoServerまたはEchoClientのいずれかを終了するには、_CTRL + C_を使用してアプリケーションを終了します。現在、これら 2 つの例の間でやり取りされるデータは平文で送信されており、少しのスキルがあれば誰でも簡単にクライアントとサーバーの間に自分自身を挿入して通信を聞くことができます。
 
 
 
@@ -337,7 +337,7 @@ gcc -o echoserver ../lib/*.c tcpserv04.c -I ../include -lm -lwolfssl
 新しい`WOLFSSL_CTX`を作成するには、[`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new)を使用します。この関数には、クライアントまたはサーバーが使用するSSLまたはTLSプロトコルを定義する引数が必要です。目的のプロトコルを選択するためのいくつかのオプションがあります。wolfSSLは現在、SSL 3.0、TLS 1.0、TLS 1.1、TLS 1.2、DTLS 1.0、およびDTLS 1.2をサポートしています。これらの各プロトコルには、[`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new)の引数として使用できる対応する関数があります。可能なクライアントとサーバーのプロトコルオプションを以下に示します。SSL 2.0は、数年間不安定であるため、wolfSSLによってサポートされていません。
 
 
-エコーコイエント：
+エコークライアント：
 
 
 
@@ -389,7 +389,7 @@ gcc -o echoserver ../lib/*.c tcpserv04.c -I ../include -lm -lwolfssl
 
 
 
-EchoSoClientがEchoServerに接続すると、CA(認証局)証明書を`WOLFSSL_CTX`にロードする必要があります。サーバーの身元を確認することができます。CA証明書を`WOLFSSL_CTX`にロードするには、[`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)を使用します。この関数には、`WOLFSSL_CTX`ポインタ、証明書ファイル、およびパス値の3つの引数が必要です。パス値は、PEM形式でCA証明書を含むべきディレクトリを指します。証明書を検索するとき、wolfsslはパスの場所を見る前に証明書ファイルの値を調べます。この場合、CAファイルを1つ指定するため、証明書パスを指定する必要はありません - パス引数に値0を使用します。[`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)関数は`SSL_SUCCESS`または`SSL_FAILURE`のいずれかを返します。
+EchoClientがEchoServerに接続すると、CA(認証局)証明書を`WOLFSSL_CTX`にロードする必要があります。サーバーの身元を確認することができます。CA証明書を`WOLFSSL_CTX`にロードするには、[`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)を使用します。この関数には、`WOLFSSL_CTX`ポインタ、証明書ファイル、およびパス値の3つの引数が必要です。パス値は、PEM形式でCA証明書を含むべきディレクトリを指します。証明書を検索するとき、wolfsslはパスの場所を見る前に証明書ファイルの値を調べます。この場合、CAファイルを1つ指定するため、証明書パスを指定する必要はありません - パス引数に値0を使用します。[`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)関数は`SSL_SUCCESS`または`SSL_FAILURE`のいずれかを返します。
 
 
 
@@ -508,7 +508,7 @@ Connect(sockfd, (SA *) &servaddr, sizeof(servaddr));
 
 
 
-接続直後に、[`wolfSSL_new()`](group__Setup.md#function-wolfssl_new)関数を使用して新しい`WOLFSSL`オブジェクトを作成します。この関数は、失敗した場合に成功した場合、`WOLFSSL`オブジェクトへのポインタを返します。その後、ソケットファイル記述子(`sockfd`)を新しい`WOLFSSL`オブジェクト(`ssl`)に関連付けることができます。
+接続直後に、[`wolfSSL_new()`](group__Setup.md#function-wolfssl_new)関数を使用して新しい`WOLFSSL`オブジェクトを作成します。ここの関数は、成功した場合は `WOLFSSL` オブジェクトへのポインタを返し、失敗した場合は `NULL` を返します。その後、ソケットファイル記述子(`sockfd`)を新しい`WOLFSSL`オブジェクト(`ssl`)に関連付けることができます。
 
 
 
@@ -526,7 +526,7 @@ wolfSSL_set_fd(ssl, sockfd);
 
 
 
-ここに気付くのは、[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)関数に電話をかけていないことです。[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)サーバーとのSSL/TLSハンドシェイクを開始し、以前に呼び出されていなかった場合は[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)の間呼び出されます。私たちの場合、私たちは私たちの最初の[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)を私たちのためにそれをするので、私たちは明示的に[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)と呼ばないでください。
+ここで注目すべきことの 1 つは、[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) 関数を呼び出していないことです。[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)はサーバーとのSSL/TLSハンドシェイクを開始し、以前に呼び出されていなかった場合は[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)の処理中で呼び出されます。この例の場合、[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)がそれを行ってくれるので、明示的に[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)を呼びません。
 
 
 
@@ -555,7 +555,7 @@ wolfSSL_set_fd(ssl, connfd);
 各TCP Connectの後にwolfSSLオブジェクトを作成する必要があり、ソケットファイル記述子をセッションに関連付ける必要があります。
 
 
-[`wolfSSL_new()`](group__Setup.md#function-wolfssl_new)関数を使用して、新しいwolfSSLオブジェクトを作成します。この関数は、失敗の場合に成功した場合、または成功した場合、`WOLFSSL`オブジェクトへのポインターを返します。その後、ソケットファイル記述子(`sockfd`)を新しい`WOLFSSL`オブジェクト(`ssl`)に関連付けることができます。
+[`wolfSSL_new()`](group__Setup.md#function-wolfssl_new)関数を使用して、新しいwolfSSLオブジェクトを作成します。この関数は、成功した場合は `WOLFSSL` オブジェクトへのポインタを返し、失敗した場合は `NULL` を返します。その後、ソケットファイル記述子(`sockfd`)を新しい`WOLFSSL`オブジェクト(`ssl`)に関連付けることができます。
 
 
 
@@ -583,7 +583,7 @@ wolfSSL_set_fd(ssl, sockfd);
 
 
 
-次のステップは安全にデータの送信を開始することです。EchoClientの例では、`main()`関数は送信および受信側の機能を`str_cli()`に駆除します.`str_cli()`関数は、私たちの関数の置き換えが行われます。最初に`str_cli()`のオブジェクトにアクセスする必要があるため、別の引数を追加してSSL変数を`str_cli()`に渡します.`WOLFSSL`オブジェクトは`str_cli()`関数の内部で使用されるため、`sockfd`パラメーターを削除します。この変更後の新しい`str_cli()`関数シグネチャを以下に示します。
+次のステップは安全にデータの送信を開始することです。echoclient の例では、`main()` 関数が送受信作業を `str_cli()` に渡すことに注意してください。`str_cli()`関数は、私たちの関数で置き換えが行われます。最初に`str_cli()`のオブジェクトにアクセスする必要があるため、別の引数を追加してSSL変数を`str_cli()`に渡します.`WOLFSSL`オブジェクトは`str_cli()`関数の内部で使用されるため、`sockfd`パラメーターを削除します。この変更後の新しい`str_cli()`関数シグネチャを以下に示します。
 
 
 
@@ -635,7 +635,7 @@ str_cli(FILE *fp, WOLFSSL* ssl)
 
 
 
-最後のことは、完全にそれを完全に行われたときに`WOLFSSL`オブジェクトを無料で行います。`main()`関数では、`WOLFSSL_CTX`を解放する前の行の直前に、[`wolfSSL_free()`](group__Setup.md#function-wolfssl_free)に電話してください。
+最後に行うことは、WOLFSSL オブジェクトの使用が完全に終わったら、オブジェクトを解放することです。`main()`関数では、`WOLFSSL_CTX`を解放する前の行の直前に、[`wolfSSL_free()`](group__Setup.md#function-wolfssl_free)を呼び出します。
 
 
 
@@ -654,7 +654,7 @@ wolfSSL_Cleanup();      /* Free wolfSSL */
 
 
 
-Echoサーバーは、`str_echo()`に電話をかけて読み書きを処理します(クライアントは`str_cli()`に電話をかけました)。クライアントと同様に、sockfdパラメーターを関数シグネチャの`WOLFSSL`オブジェクト(`ssl`)パラメーターに置き換えて、`str_echo()`を変更します。
+エコー サーバーは読み書きを処理するために `str_echo()` を呼び出します (一方、クライアントは `str_cli()` を呼び出します)。クライアントと同様に、sockfdパラメーターを関数シグネチャの`WOLFSSL`オブジェクト(`ssl`)パラメーターに置き換えて、`str_echo()`を変更します。
 
 
 
@@ -716,7 +716,7 @@ Close(connfd);
 
 
 
-ecoclientおよびecheCoserverでは、「Ctrl+C」を使用してユーザーがアプリを閉じるときの信号ハンドラーを追加する必要があります。Echoサーバーは、ループで継続的に実行されています。このため、ユーザーが「Ctrl+C」を押すと、そのループを破る方法を提供する必要があります。これを行うには、最初に行う必要があることは、exit変数(クリーンアップ)がtrueに設定されたときに終了する場合に、ループを時間ループに変更することです。
+ecoclientおよびecheCoserverでは、「Ctrl+C」を使用してユーザーがアプリを閉じるときの信号ハンドラーを追加する必要があります。Echoサーバーは、ループで継続的に実行されています。このため、ユーザーが「Ctrl+C」を押すと、そのループを抜け出す方法を提供する必要があります。これを行うには、最初に行う必要があることは、exit変数(クリーンアップ)がtrueに設定されたときに終了する場合に、ループを時間ループに変更することです。
 
 
 まず、`#include`ステートメントの直後に、`tcpserv04.c`の上部にあるクリーンアップという新しい静的INT変数を定義します。
@@ -793,10 +793,10 @@ void sig_handler(const int sig)
 
 
 
-* wolfSSLヘッダーが含まれています
+* wolfSSLのヘッダーをインクルードします
 
 
-* 初期化されたWolfssl
+* wolfSSLを初期化します
 
 
 * 使用したいプロトコルを選択した`WOLFSSL_CTX`構造を作成しました
@@ -808,7 +808,7 @@ void sig_handler(const int sig)
 * [`wolfSSL_write()`](group__IO.md#function-wolfssl_write)および[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)に`Writen()`および`Readline()`に通話を置き換えました
 
 
-* Freed `WOLFSSL`、`WOLFSSL_CTX`
+* `WOLFSSL`及び`WOLFSSL_CTX`を開放します
 
 
 * シグナルハンドラでクライアントとサーバーのシャットダウンを処理していることを確認してください
@@ -837,7 +837,7 @@ SSL接続の動作を設定および制御するための多くの局面や方�
 
 
 
-このチュートリアルは、wolfSSL埋め込みSSLライブラリを簡単なクライアントおよびサーバーアプリケーションに統合するプロセスを進めました。この例は単純ですが、SSLまたはTLSを独自のアプリケーションに追加するために同じ原則を適用することができます。wolfSSL組み込みSSLライブラリは、サイズと速度の両方で最適化されたコンパクトで効率的なパッケージで必要なすべての機能を提供します。
+このチュートリアルは、wolfSSL組み込みSLライブラリを簡単なクライアントおよびサーバーアプリケーションに統合するプロセスを進めました。この例は単純ですが、SSLまたはTLSを独自のアプリケーションに追加するために同じ原則を適用することができます。wolfSSL組み込みSSLライブラリは、サイズと速度の両方で最適化されたコンパクトで効率的なパッケージで必要なすべての機能を提供します。
 
 
 GPLV2および標準的な商用ライセンスの下でデュアルライセンスを取得しているため、wolfSSLソースコードを当社のWebサイトから直接ダウンロードできます。サポートフォーラム(<https://www.wolfssl.com/forums>)にお気軽に投稿してください。当社の製品の詳細については、[info@wolfssl.com](mailto:info@wolfssl.com)にお問い合わせください。

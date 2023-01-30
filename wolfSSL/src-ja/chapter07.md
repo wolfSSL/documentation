@@ -12,7 +12,7 @@ X.509証明書の紹介と、SSLおよびTLSでの使用方法については、
 
 
 
-wolfSSL(以前のCyassl)は、** pem **、および** der **証明書とキーのフォーマット、およびPKCS＃8プライベートキー(PKCS＃5またはPKCS＃12暗号化)をサポートしています。
+wolfSSL(以前のCyassl)は、** pem **、および ** der ** 証明書とキーのフォーマット、およびPKCS＃8プライベートキー(PKCS＃5またはPKCS＃12暗号化)をサポートしています。
 
 
 ** PEM **、または「プライバシー強化されたメール」は、証明書が証明書当局によって発行される最も一般的な形式です。PEMファイルは、複数のサーバー証明書、中間証明書、およびプライベートキーを含むことができるBase64エンコードASCIIファイルであり、通常`.pem`、`.crt`、`.cer`、または`.key`ファイル拡張子を備えています。PEMファイル内の証明書は、「`-----BEGIN CERTIFICATE-----`」および「`-----END CERTIFICATE-----`」ステートメントに包まれています。
@@ -57,8 +57,7 @@ wolfSSL ライブラリのコンパイル。 これは証明書のハイレベ�
 | ネットスケープ | はい |
 | カスタム OID | はい |
 
-次のいくつかのセクションでは、個人のサポートについて詳しく説明します
-証明書拡張。
+次の 2 つのセクションでは、個々の証明書拡張機能のサポートについて詳しく説明します。
 
 #### 認証/サブジェクト キー ID
 
@@ -77,8 +76,7 @@ wolfSSL ライブラリのコンパイル。 これは証明書のハイレベ�
 
 #### キーの使い方
 
-キーの使用法は、証明書の解析後に解析および取得できます
-完了。
+キーの使用法は、証明書の解析が完了した後に解析および取得できます。
 
 | キーの使用法 | サポート |
 | --- | --- |
@@ -110,12 +108,8 @@ unknown/unsupported の場合は無視されます。 3.15.5 より前のバー�
 
 #### カスタム OID
 
- カスタム OID インジェク
-ションと解析は wolfSSL バージョン 5.3.0 で導入されました。 の
-enable オプション --enable-certgen および --enable-asn=template を一緒に使用する必要があります
-マクロ付き; WOLFSSL_CUSTOM_OID および HAVE_OID_ENCODING を操作するため
-カスタム拡張。 これらの設定で wolfSSL を構築した後、関数
-wc_SetCustomExtension を使用して、Cert 構造体でカスタム拡張を設定できます。
+カスタム OID インジェクションと解析は、wolfSSL バージョン 5.3.0 で導入されました。 有効化オプション --enable-certgen および --enable-asn=template は、マクロとともに使用する必要があります。 カスタム拡張機能を操作するための WOLFSSL_CUSTOM_OID および HAVE_OID_ENCODING。 これらの設定で wolfSSL を構築した後、関数 wc_SetCustomExtension を使用して証明書構造体にカスタム拡張を設定できます。
+
 
 ## 証明書の読み込み
 
@@ -125,7 +119,7 @@ wc_SetCustomExtension を使用して、Cert 構造体でカスタム拡張を�
 
 
 
-### CA証明書をロードする**
+### CA証明書をロードする
 
 
 
@@ -144,7 +138,7 @@ int wolfSSL_CTX_load_verify_locations(WOLFSSL_CTX *ctx,
 CA Loadingは、PEM形式で`CAfile`をできるだけ多くのCERTで渡して、上記の機能を使用してファイルごとの複数のCA証明書を解析することもできます。これにより、初期化が簡単になり、クライアントが起動時に複数のルートCA証明書をロードする必要がある場合に役立ちます。これにより、wolfSSLはCA証明書用の単一のファイルを使用できるようにするツールに移植するのを簡単にします。
 
 
-**注**：ルーツのチェーンと中間証明書をロードする必要がある場合は、信頼の順にロードする必要があります。最初にルートCAをロードした後、中間体1に続いて中間体2などが続きます。CERTがロードされるごとに[`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)を呼び出すか、CERTを順番に含むファイルを1回(ファイルの上部にルートと信頼のチェーンによって注文した証明書)を使用できます。
+**注**：ルーツのチェーンと中間証明書をロードする必要がある場合は、信頼の順にロードする必要があります。最初にルートCAをロードした後、中間体1に続いて中間体2などが続きます。CERTがロードされるごとに[`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)を呼び出すか、CERTを順番に含むファイルを1回(フファイルの先頭にあるルートと信頼チェーンによって順序付けられた証明書)を使用できます。
 
 
 
@@ -170,7 +164,7 @@ int wolfSSL_CTX_use_certificate_file(WOLFSSL_CTX *ctx,
 サーバーとクライアントは、[`wolfSSL_CTX_use_certificate_chain_file()`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_chain_file)関数を使用して証明書チェーンを送信できます。証明書チェーンファイルはPEM形式である必要があり、被験者の証明書(実際のクライアントまたはサーバー証明書)から始まり、その後、中間証明書が続き、(オプションでは)最上位のルートCA証明書で終了する必要があります。サンプルサーバー(`/examples/server/server.c`)は、この機能を使用します。
 
 
-**注意**：これは証明書チェーンをロードするときに必要な順序の正確な逆です。このシナリオのファイルの内容は、ファイルの上部のエンティティ証明書とそれに続くファイルの下部にあるルートCAを使用して、その後のCERT UP CHAREを実行します。
+**注意**：これは、検証のために証明書チェーンをロードするときに必要な順序とはまったく逆です! このシナリオでのファイルの内容は、ファイルの先頭にエンティティ証明書があり、その後にチェーンの次の証明書が続き、ファイルの末尾にルート CA が続きます。
 
 
 
@@ -206,14 +200,6 @@ int wolfSSL_CTX_use_PrivateKey_file(WOLFSSL_CTX *ctx,
 | id-kp-timeStamping | はい |
 | id-kp-OCSPSigning | はい |
 
-#### カスタム OID
-
- カスタム OID インジェクションと解析は wolfSSL バージョン 5.3.0 で導入されました。 の
-enable オプション --enable-certgen および --enable-asn=template を一緒に使用する必要があります。
-マクロ付き; WOLFSSL_CUSTOM_OID および HAVE_OID_ENCODING を操作するため
-カスタム拡張。 これらの設定で wolfSSL を構築した後、関数
-wc_SetCustomExtension を使用して、Cert 構造体でカスタム拡張を設定できます。
-
 
 `keyFile`は秘密のキーファイルであり、`type`は秘密鍵の形式です(例：`SSL_FILETYPE_PEM`)。
 
@@ -230,17 +216,8 @@ wc_SetCustomExtension を使用して、Cert 構造体でカスタム拡張を�
 | id-kp-timeStamping | はい |
 | id-kp-OCSPSigning | はい |
 
-#### カスタム OID
-
-カスタム OID インジェクションと解析は wolfSSL バージョン 5.3.0 で導入されました。 の
-enable オプション --enable-certgen および --enable-asn=template を一緒に使用する必要があります。
-
-マクロ付き; WOLFSSL_CUSTOM_OID および HAVE_OID_ENCODING を操作するため
-カスタム拡張。 これらの設定で wolfSSL を構築した後、関数
-wc_SetCustomExtension を使用して、Cert 構造体でカスタム拡張を設定できます。
 
 使用する信頼できるピア証明書を読み込むことは、[`wolfSSL_CTX_trust_peer_cert()`](group__Setup.md#function-wolfssl_ctx_trust_peer_cert)で行うことができます。
-
 
 
 ```c
@@ -258,7 +235,7 @@ int wolfSSL_CTX_trust_peer_cert(WOLFSSL_CTX *ctx,
 
 
 
-wolfSSLは、証明書チェーンを検証するために信頼できる証明書としてロードされるチェーン内の上位または「ルート」証明書だけを必要とします。これは、証明書チェーン(A  -  \> B  -  \> C)を持っている場合、ここでCがBによって署名され、Bが署名されている場合、wolfSSLは証明書Aを信頼できる証明書としてロードする必要があることを意味します。チェーン全体を確認します(a  -  \> b  -  \> c)。
+wolfSSL では、証明書チェーンを検証するために、チェーンのトップまたは「ルート」証明書のみを信頼できる証明書としてロードする必要があります。これは、証明書チェーン (A -> B -> C) がある場合、C は B によって署名され、B は A によって署名される場合、wolfSSL は、チェーン全体 (A->B->C) を検証するために、証明書 A を信頼できる証明書としてロードすることのみを必要とします。
 
 
 たとえば、サーバー証明書チェーンが次のように見える場合
@@ -270,7 +247,7 @@ wolfSSLは、証明書チェーンを検証するために信頼できる証明�
 wolfSSLクライアントには、少なくともルート証明書(a)が信頼できるルート([`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations))としてロードされている必要があります。クライアントがサーバーCERTチェーンを受信すると、Aの署名を使用してBを検証し、Bが以前に信頼できるルートとしてwolfSSLにロードされていなかった場合、BはwolfSSLの内部CERTチェーンに保存されます(wolfSSLは必要なものを保存します証明書の確認：一般名ハッシュ、公開キー、キータイプなど)。Bが有効な場合、Cを確認するために使用されます。
 
 
-このモデルに従って、ルート証明書「A」がwolfSSLサーバーに信頼できるルートとしてロードされている限り、サーバーが送信する場合、サーバー証明書チェーンを確認することができます(A- \> B  -  \> C)、または(b- \> c)。サーバーが中間証明書ではなく(c)を送信するだけの場合、wolfSSLクライアントが既にBを信頼できるルートとしてロードしていない限り、チェーンを検証することはできません。
+このモデルに従って、ルート証明書「A」がwolfSSLサーバーに信頼できるルートとしてロードされている限り、サーバーが送信する場合、サーバー証明書チェーンを確認することができます(A -> B  -> C)、または(b -> c)。サーバーが中間証明書ではなく(c)を送信するだけの場合、wolfSSLクライアントが既にBを信頼できるルートとしてロードしていない限り、チェーンを検証することはできません。
 
 
 
@@ -278,7 +255,7 @@ wolfSSLクライアントには、少なくともルート証明書(a)が信頼�
 
 
 
-wolfSSLには、サーバー証明書のドメインを自動的にチェックするクライアントに拡張機能があります。OpenSSLモードでは、これを実行するにはほぼ12の関数呼び出しが必要です。wolfSSLは、証明書の日付が範囲にあることをチェックし、署名を検証し、[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)を呼び出す前に[`wolfSSL_check_domain_name(WOLFSSL* ssl, const char* dn)`](group__Setup.md#function-wolfssl_check_domain_name)を呼び出す場合、ドメインをさらに検証します。。名前が[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)が正常に進行する場合、名前の不一致がある場合、[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)は致命的なエラーを返し、[`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error)は`DOMAIN_NAME_MISMATCH`を返します。
+wolfSSLには、サーバー証明書のドメインを自動的にチェックするクライアントに拡張機能があります。OpenSSLモードでは、これを実行するにはほぼ1ダースの関数呼び出しが必要です。wolfSSLは、証明書の日付が範囲にあることをチェックし、署名を検証し、[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)を呼び出す前に[`wolfSSL_check_domain_name(WOLFSSL* ssl, const char* dn)`](group__Setup.md#function-wolfssl_check_domain_name)を呼び出す場合、ドメインをさらに検証します。名前が一致する場合[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)は正常に処理されますが、名前の不一致がある場合、[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)は致命的なエラーを返し、[`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error)は`DOMAIN_NAME_MISMATCH`を返します。
 
 
 証明書のドメイン名を確認することは、サーバーが実際にあると主張しているのかを確認する重要な手順です。この拡張は、チェックを実行する負担を軽減することを目的としています。
@@ -489,7 +466,7 @@ _dertopem()_の最後の引数は、通常`PRIVATEKEY_TYPE`または`CERT_TYPE`�
 RSA秘密鍵には公開鍵も含まれています。秘密鍵は、test.cで使用されるwolfSSLによってプライベートキーと公開鍵の両方として使用できます。秘密鍵と公開鍵(証明書の形式)は、SSLに通常必要なものすべてです。
 
 
-必要に応じて、rsapublickeydecode()関数を使用して、別の公開キーを手動でwolfSSLにロードできます。さらに、[`wc_RsaKeyToPublicDer()`](group__RSA.md#function-wc_rsakeytopublicder)関数を使用して、パブリックRSAキーをエクスポートできます。
+必要に応じて、RsaPublicKeyDecode()関数を使用して、別の公開キーを手動でwolfSSLにロードできます。さらに、[`wc_RsaKeyToPublicDer()`](group__RSA.md#function-wc_rsakeytopublicder)関数を使用して、パブリックRSAキーをエクスポートできます。
 
 
 
@@ -547,7 +524,7 @@ typedef struct CertName {
 
 
 
-件名情報に記入する前に、初期化機能を次のように呼び出す必要があります。
+サブジェクト情報を入力する前に、次のように初期化関数を呼び出す必要があります。
 
 
 
@@ -557,8 +534,7 @@ InitCert(&myCert);
 ```
 
 
-
-`InitCert()`は、デフォルトとして、バージョンを** 3 **(0x02)に設定し、** 0 **(ランダムに生成された)にシリアル番号を設定するなど、sigtypeを`CTC_SHAwRSA`、daysvalid を ** 500 **、selfSigned を** 1 **(true)に設定します。
+`InitCert()` は、バージョンを **3** (0x02) に、シリアル番号を **0** (ランダムに生成) に、sigType を `CTC_SHAwRSA` に、daysValid を **500** に、selfSigned を **1** (TRUE) に設定するなど、いくつかの変数のデフォルトを設定します。
 
 サポートされている署名タイプは次のとおりです。
 
@@ -598,7 +574,7 @@ InitCert(&myCert);
 
 
 
-これで、ユーザーは`wolfcrypt/test/test.c`からこの例のような主題情報を初期化できます。
+これで、ユーザーは`wolfcrypt/test/test.c`からこの例のようなサブジェクト情報を初期化できます。
 
 
 
@@ -726,7 +702,7 @@ if (pemCertSz < 0)
 これで、バッファ`pemCert<`が証明書のPEM形式を保持します。
 
 
-CA署名証明書を作成する場合は、いくつかの手順が必要です。以前のように件名情報を記入した後、CA証明書から発行者情報を設定する必要があります。これは、このように`SetIssuer()`で行うことができます。
+CA署名証明書を作成する場合は、いくつかの手順が必要です。以前のようにサブジェクト情報を記入した後、CA証明書から発行者情報を設定する必要があります。これは、このように`SetIssuer()`で行うことができます。
 
 
 
@@ -738,7 +714,7 @@ if (ret < 0)
 
 
 
-その後、証明書を作成してから署名する2ステップのプロセスを実行する必要があります(`MakeSelfCert()`は両方とも1段階で行います)。発行者(`caKey`)と件名(`key`)の両方から秘密鍵が必要です。完全な使用法については`test.c`の例をご覧ください。
+その後、証明書を作成してから署名する2ステップのプロセスを実行する必要があります(`MakeSelfCert()`は両方とも1段階で行います)。発行者(`caKey`)とサブジェクト(`key`)の両方から秘密鍵が必要です。完全な使用法については`test.c`の例をご覧ください。
 
 
 
@@ -774,7 +750,7 @@ CSRを生成する前に、ユーザーは証明書の主題に関する情報�
 CERTおよびCERTNAME構造の詳細については、上記の[証明書生成](#certificat-generation)を参照してください。
 
 
-件名情報に記入する前に、初期化機能を次のように呼び出す必要があります。
+サブジェクト情報に記入する前に、初期化機能を次のように呼び出す必要があります。
 
 
 
@@ -784,8 +760,7 @@ InitCert(&request);
 ```
 
 
-
-`InitCert()`はデフォルトとして、バージョンを** 3 **(0x02)、シリアル番号を** 0 **(ランダムに生成された)、sigtypeを`CTC_SHAwRSA`、daysvalid を ** 500 **、selfSigned を** 1 **(true)に設定します。
+`InitCert()` は、バージョンを **3** (0x02) に、シリアル番号を **0** (ランダムに生成) に、sigType を `CTC_SHAwRSA` に、daysValid を **500** に、selfSigned を **1** (TRUE) に設定するなど、いくつかの変数のデフォルトを設定します。
 
 サポートされている署名タイプは次のとおりです。
 
@@ -825,7 +800,7 @@ InitCert(&request);
 
 
 
-これで、ユーザーは<https://github.com/wolfssl/wolfssl-examples/blob/master/certgen/csr_example.c>からこの例のような主題情報を初期化できます。
+これで、ユーザーは<https://github.com/wolfssl/wolfssl-examples/blob/master/certgen/csr_example.c>からこの例のようなサブジェクト情報を初期化できます。
 
 
 
