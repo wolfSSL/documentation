@@ -7,9 +7,6 @@
 
 wolfSSLは、お客様が新しい環境にwolfSSLを移植できるためのサポートパッケージとコンサルティングサービスを提供しています。
 
-
-wolfSSLは、お客様が新しい環境にwolfSSLを移植できるためのサポートパッケージとコンサルティングサービスを提供しています。
-
 - Support Packages:  https://wolfssl.jp/license/support-packages/
 - Consulting Services: https://www.wolfssl.com/wolfSSL/wolfssl-consulting.html
 - General Inquiries: info@wolfssl.com

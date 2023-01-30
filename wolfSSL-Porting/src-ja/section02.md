@@ -15,7 +15,7 @@ wolfSSLは、64ビットタイプが利用可能の場合、スピードに恩�
 #endif
 ```
 
-There are two additional data types used by wolfSSL and wolfCrypt, called “word32” and “word16”.  The default type mappings for these are:
+「word32」と「word16」と呼ばれる、wolfSSL と wolfCrypt で使用される二つの追加のデータ型があります。 これらのデフォルトのタイプ マッピングは次のとおりです:
 
 ```
 #ifndef WOLFSSL_TYPES
@@ -34,7 +34,7 @@ wolfSSL の fastmath ライブラリは、「fp_digit」および「fp_word」�
 
 「fp_word」は「fp_digit」の 2 倍のサイズにする必要があります。 デフォルトのケースがプラットフォームに当てはまらない場合は、settings.h または user_settings.h で WOLFSSL_BIGINT_TYPES を定義し、fp_word および fp_digit に独自のカスタム typedef を割り当てる必要があります。
 
-一部の操作で利用可能な場合、wolfSSL は 64 ビット型を使用します。 wolfSSL ビルドは、SIZEOF_LONG と SIZEOF_LONG_LONG の設定に基づいて、word64 の正しい基本データ型を検出して設定しようとします。 2 つの 32 ビット型が一緒に使用される、真の 64 ビット型を持たない一部のプラットフォームでは、パフォーマンスが低下する可能性があります。 64 ビット型の使用をコンパイルするには、NO_64BIT を定義します。
+一部の操作で利用可能な場合、wolfSSL は 64 ビット型を使用します。 wolfSSL ビルドは、SIZEOF_LONG と SIZEOF_LONG_LONG の設定に基づいて、word64 の正しい基本データ型を検出して設定しようとします。 2 つの 32 ビット型が一緒に使用される、真の 64 ビット型を持たない一部のプラットフォームでは、パフォーマンスが低下する可能性があります。 64 ビット型を使用しないでコンパイルするには、NO_64BIT を定義します。
 
 ## エンディアン
 
@@ -136,9 +136,9 @@ wolfSSLをマルチスレッド環境で使用する必要がある場合は、w
 Q：どういう場合このセクションが必要ですか？<br>
 A：/dev/randomまたは/dev/urandomのいずれかが利用できないか、RNGハードウェアを統合したい場合です。
 
-デフォルトでは、wolfSSLは/dev/urandomまたは/dev/randomを使用してRNGシードを生成します。 NO_DEV_RANDOMの定義は、デフォルトのwc_GenerateSeed（）関数を無効にするwときにビルド時に指定します。これが指定されている場合は、ターゲットプラットフォームに固有の./wolfcrypt/src/random.cにカスタムwc_GenerateSeed（）関数を記述する必要があります。これにより、ハードウェアベースのランダムエントロピーソースがあれば、wolfSSLのPRNGにシードすることができます。
+デフォルトでは、wolfSSLは/dev/urandomまたは/dev/randomを使用してRNGシードを生成します。 NO_DEV_RANDOMの定義は、デフォルトのwc_GenerateSeed（）関数を無効にするときにビルド時に指定します。これが指定されている場合は、ターゲットプラットフォームに固有の./wolfcrypt/src/random.cにカスタムwc_GenerateSeed（）関数を記述する必要があります。これにより、ハードウェアベースのランダムエントロピーソースがあれば、wolfSSLのPRNGにシードすることができます。
 
-Wc_GenerateSeed関数をどのように記述する必要があるかの例については、wolfSSLの既存のwc_GenerateSeed関数の実装を./wolfcrypt/src/random.cで参照してください。
+wc_GenerateSeed関数をどのように記述する必要があるかの例については、wolfSSLの既存のwc_GenerateSeed関数の実装を./wolfcrypt/src/random.cで参照してください。
 
 
 
@@ -205,7 +205,7 @@ A：wolfSSLで独自の公開鍵実装を使用したいとします。
 
 wolfSSLを使用すると、SSL / TLS層が公開鍵操作を行う必要があるときに呼び出される独自の公開鍵コールバックをユーザーが書くことができます。ユーザーはオプションで6つの関数を定義できます。
 
-- ECC符号コールバック
+- ECC復号コールバック
 - ECC検証コールバック
 - RSA署名コールバック
 - RSA検証コールバック
