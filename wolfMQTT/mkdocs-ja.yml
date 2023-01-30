@@ -1,0 +1,32 @@
+site_name: wolfMQTT マニュアル
+site_url: https://wolfssl.com/
+docs_dir: build/html/
+site_dir: html/
+copyright: Copyright © 2022 wolfSSL Inc.
+nav:
+    - "1. イントロダクション": index.md
+    - "2. wolfMQTTのビルド": chapter02.md
+    - "3. 始めましょう": chapter03.md
+    - "4. ライブラリデザイン": chapter04.md
+    - "5. APIリファレンス":
+      - "Mqtt client": mqtt__client_8h.md
+      - "Mqtt packet": mqtt__packet_8h.md
+      - "Matt socket": mqtt__socket_8h.md
+      - "Mqtt types": mqtt__types_8h.md  
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
+extra_css: [skin.css]
+use_directory_urls: false
