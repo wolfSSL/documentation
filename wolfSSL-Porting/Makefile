@@ -8,7 +8,14 @@ SOURCES = section01.md \
 		  section03.md \
 		  section04.md
 
-PDF = wolfSSL-Porting-Guide.pdf
+ifeq ($(DOC_LANG),JA)
+    PDF  = wolfSSL-Porting-Guide-ja.pdf
+	DOXYFILE = Doxyfile-ja
+else
+    PDF  = wolfSSL-Porting-Guide.pdf
+	DOXYFILE = Doxyfile
+endif
+
 
 .PHONY: html-prep
 html-prep:
