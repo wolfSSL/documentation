@@ -7,8 +7,11 @@ SOURCES = Intro.md \
 		  build.md \
 		  command_list.md \
 		  bench.md \
+		  ca.md \
           crl.md \
+		  dsaparam.md \
           dgst.md \
+		  dhparam.md \
           ecparam.md \
           enc.md \
 		  genkey.md \
@@ -19,11 +22,16 @@ SOURCES = Intro.md \
 		  rand.md \
 		  req.md \
 		  rsa.md \
+		  sha.md \
 		  s_client.md \
 		  verify.md \
 		  x509.md
 
-PDF = wolfCLU-Manual.pdf
+ifeq ($(DOC_LANG),JA)
+    PDF  = wolfCLU-Manual-jp.pdf
+else
+    PDF  = wolfCLU-Manual.pdf
+endif
 
 .PHONY: html-prep
 html-prep:

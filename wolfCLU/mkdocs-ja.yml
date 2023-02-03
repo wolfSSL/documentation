@@ -1,0 +1,49 @@
+site_name: wolfCLU マニュアル
+site_url: https://wolfssl.com/
+docs_dir: build/html/
+site_dir: html/
+copyright: wolfSSL Inc. 2022
+nav:
+    - "1. イントロダクション": index.md
+    - "2. wolfCLUのビルド": build.md
+    - "3. コマンド":
+      - "コマンドリスト": command_list.md
+      - "BENCH コマンド": bench.md
+      - "CA コマンド": ca.md
+      - "CRL コマンド": crl.md
+      - "DSAPARAM コマンド": dsaparam.md
+      - "DGST コマンド": dgst.md
+      - "DHPARAM コマンド": dhparam.md
+      - "ECPARAM コマンド": ecparam.md
+      - "ENC コマンド": enc.md
+      - "GENKEY コマンド": genkey.md
+      - "HASH コマンド": hash.md
+      - "MD5 コマンド": md5.md
+      - "PKCS12 コマンド": pkcs12.md
+      - "PKEY コマンド": pkey.md
+      - "RAND コマンド": rand.md
+      - "REQ コマンド": req.md
+      - "RSA コマンド": rsa.md
+      - "SHA コマンド": sha.md
+      - "S_CLIENT コマンド": s_client.md
+      - "VERIFY コマンド": verify.md
+      - "X509 コマンド": x509.md
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
+extra_css: [skin.css]
+extra:
+    generator: false
+use_directory_urls: false
