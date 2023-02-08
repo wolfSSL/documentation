@@ -12,7 +12,11 @@ SOURCES = chapter01.md \
           chapter07.md \
           chapter08.md 
 
-PDF = wolfSSL-JNI-JSSE-Manual.pdf
+ifeq ($(DOC_LANG),JA)
+    PDF = wolfSSL-JNI-JSSE-Manual-jp.pdf
+else
+    PDF = wolfSSL-JNI-JSSE-Manual.pdf
+endif
 
 .PHONY: html-prep
 html-prep:
