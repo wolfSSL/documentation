@@ -12,7 +12,11 @@ SOURCES = chapter01.md \
           chapter07.md \
           chapter08.md 
 
-PDF = wolfCrypt-JNI-JCE-Manual.pdf
+ifeq ($(DOC_LANG),JA)
+    PDF  = wolfCrypt-JNI-JCE-Manual-jp.pdf
+else
+    PDF  = wolfCrypt-JNI-JCE-Manual.pdf
+endif
 
 .PHONY: html-prep
 html-prep:
