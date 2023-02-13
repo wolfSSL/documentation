@@ -48,6 +48,8 @@ jobs:
       working-directory: ./doxy
       run: cp build/src/DoxybookCli/doxybook2 ../..
     - uses: actions/checkout@master
+    - name: Update apt sources
+      run:  sudo apt-get update
     - name: Install Dependencies
       run:  sudo apt install pandoc texlive-full mkdocs doxygen
     - name: wolfssl html
