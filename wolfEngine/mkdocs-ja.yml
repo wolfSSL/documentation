@@ -1,0 +1,34 @@
+site_name: wolfEngine マニュアル
+site_url: https://wolfssl.com/
+docs_dir: build/html/
+site_dir: html/
+copyright: Copyright © 2022 wolfSSL Inc.
+nav:
+    - "1. イントロダクション": index.md
+    - "2. OpenSSL版との互換性": chapter02.md
+    - "3. wolfEngineのビルド": chapter03.md
+    - "4. FIPS 140-2 のサポート": chapter04.md
+    - "5. Engine コントロールコマンド": chapter05.md
+    - "6. ロギング": chapter06.md
+    - "7. 移植性": chapter07.md
+    - "8. wolfEngineのロード": chapter08.md
+    - "9. wolfEngineの設計": chapter09.md
+    - "10. オープンソース統合に関する注意事項": chapter10.md
+    - "11. サポートとOpenSSLバージョン追加": chapter11.md
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: roboto
+    code: roboto mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
+extra_css: [skin.css]
+use_directory_urls: false
