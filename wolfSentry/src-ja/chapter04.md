@@ -158,22 +158,23 @@ linux-lwip-tester2-1 ログの例:
 ```sh
 $ sudo docker exec -it linux-lwip-tester2-1 /bin/sh
 / # ping 172.20.20.3 -c 3
-PING 172.20.20.3 (172.20.20.3): 56 データ バイト
-172.20.20.3 からの 64 バイト: seq=0 ttl=64 time=0.230 ms
-172.20.20.3 からの 64 バイト: seq=1 ttl=64 time=0.608 ms
-172.20.20.3 からの 64 バイト: seq=2 ttl=64 time=0.323 ms
+PING 172.20.20.3 (172.20.20.3): 56 data bytes
+64 bytes from 172.20.20.3: seq=0 ttl=64 time=0.230 ms
+64 bytes from 172.20.20.3: seq=1 ttl=64 time=0.608 ms
+64 bytes from 172.20.20.3: seq=2 ttl=64 time=0.323 ms
 
---- 172.20.20.3 ping 統計 ---
-3 パケット送信、3 パケット受信、0% パケットロス
-往復最小/平均/最大 = 0.230/0.387/0.608 ミリ秒
+
+--- 172.20.20.3 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.230/0.387/0.608 ms
 / # ping 172.20.20.5 -c 3
-PING 172.20.20.5 (172.20.20.5): 56 データ バイト
+PING 172.20.20.5 (172.20.20.5): 56 data bytes
 ^C
---- 172.20.20.5 ping 統計 ---
-3 パケット送信、0 パケット受信、100% パケットロス
+--- 172.20.20.5 ping statistics ---
+3 packets transmitted, 0 packets received, 100% packet loss
 / # nc -v 172.20.20.5 11111
-172.20.20.5 (172.20.20.5:11111) オープン
-こんにちは
+172.20.20.5 (172.20.20.5:11111) open
+hello
 ^C
 
 / #
@@ -182,29 +183,23 @@ PING 172.20.20.5 (172.20.20.5): 56 データ バイト
 linux-lwip-echoserver-1 ログの例:
 
 ```sh
-// PING を拒否
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1107 を返しました
-linux-lwip-echoserver-1 | Sentry が受け入れた MAC アドレス DE:C0:DE:03:02:02
-linux-lwip-echoserver-1 | PING Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1116 を返しました
-linux-lwip-echoserver-1 | 172.20.20.20 からの ping が拒否されました
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1107 を返しました
-linux-lwip-echoserver-1 | Sentry が受け入れた MAC アドレス DE:C0:DE:03:02:02
-...
-// TCP を受け入れる
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1107 を返しました
-linux-lwip-echoserver-1 | Sentry が受け入れた MAC アドレス DE:C0:DE:03:02:02
-linux-lwip-echoserver-1 | 着信接続: 172.20.20.20
-linux-lwip-echoserver-1 | TCP Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1107 を返しました
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1107 を返しました
-linux-lwip-echoserver-1 | Sentry が受け入れた MAC アドレス DE:C0:DE:03:02:02
-linux-lwip-echoserver-1 | 接続元: 172.20.20.20 ポート: 36737
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1107 を返しました
-linux-lwip-echoserver-1 | Sentry が受け入れた MAC アドレス DE:C0:DE:03:02:02
-linux-lwip-echoserver-1 | 得：こんにちは
-linux-lwip-echoserver-1 |
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1107 を返しました
-linux-lwip-echoserver-1 | Sentry が受け入れた MAC アドレス DE:C0:DE:03:02:02
+// Accept PING
+linux-lwip-echoserver-1  | Ping accepted from 172.20.20.10
+linux-lwip-echoserver-1  | MAC Sentry action returned code 0 (OK, operation succeeded), src 4 (routes.c), line 1107
+linux-lwip-echoserver-1  | Sentry accepted MAC address DE:C0:DE:03:02:01
+linux-lwip-echoserver-1  | PING Sentry action returned code 0 (OK, operation succeeded), src 4 (routes.c), line 1107
+linux-lwip-echoserver-1  | Ping accepted from 172.20.20.10
+linux-lwip-echoserver-1  | MAC Sentry action returned code 0 (OK, operation succeeded), src 4 (routes.c), line 1107
+linux-lwip-echoserver-1  | Sentry accepted MAC address DE:C0:DE:03:02:01
 
+....
+// Reject TCP
+linux-lwip-echoserver-1  | Sentry rejected connection from: 172.20.20.10
+linux-lwip-echoserver-1  | MAC Sentry action returned code 0 (OK, operation succeeded), src 4 (routes.c), line 1107
+linux-lwip-echoserver-1  | Sentry accepted MAC address DE:C0:DE:03:02:01
+linux-lwip-echoserver-1  | Incomming connection from: 172.20.20.10
+linux-lwip-echoserver-1  | TCP Sentry action returned code 0 (OK, operation succeeded), src 4 (routes.c), line 1064
+linux-lwip-echoserver-1  | Sentry rejected connection from: 172.20.20.10
 ```
 
 ##### テスター 3
@@ -219,33 +214,33 @@ linux-lwip-tester3-1 ログの例:
 ```sh
 $ sudo docker exec -it linux-lwip-tester3-1 /bin/sh
 / # ping 172.20.20.5 -c 3
-PING 172.20.20.5 (172.20.20.5): 56 データ バイト
+PING 172.20.20.5 (172.20.20.5): 56 data bytes
 ^C
---- 172.20.20.5 ping 統計 ---
-3 パケット送信、0 パケット受信、100% パケットロス
+--- 172.20.20.5 ping statistics ---
+3 packets transmitted, 0 packets received, 100% packet loss
 / # nc -v 172.20.20.5 11111
-nc: 172.20.20.5 (172.20.20.5:11111): ホストに到達できません
+nc: 172.20.20.5 (172.20.20.5:11111): Host is unreachable
 
 ```
 
 linux-lwip-echoserver-1 ログの例:
 
 ```sh
-// PING を拒否
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1116 を返しました
-linux-lwip-echoserver-1 | Sentry が拒否した MAC アドレス DE:C0:DE:03:03:01
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1116 を返しました
-linux-lwip-echoserver-1 | Sentry が拒否した MAC アドレス DE:C0:DE:03:03:01
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1116 を返しました
-linux-lwip-echoserver-1 | Sentry が拒否した MAC アドレス DE:C0:DE:03:03:01
+// Reject PING
+linux-lwip-echoserver-1  | MAC Sentry action returned code 0 (OK, operation succeeded), src 4 (routes.c), line 1116
+linux-lwip-echoserver-1  | Sentry rejected MAC address DE:C0:DE:03:03:01
+linux-lwip-echoserver-1  | MAC Sentry action returned code 0 (OK, operation succeeded), src 4 (routes.c), line 1116
+linux-lwip-echoserver-1  | Sentry rejected MAC address DE:C0:DE:03:03:01
+linux-lwip-echoserver-1  | MAC Sentry action returned code 0 (OK, operation succeeded), src 4 (routes.c), line 1116
+linux-lwip-echoserver-1  | Sentry rejected MAC address DE:C0:DE:03:03:01
 
-// TCP を拒否
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1116 を返しました
-linux-lwip-echoserver-1 | Sentry が拒否した MAC アドレス DE:C0:DE:03:03:01
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1116 を返しました
-linux-lwip-echoserver-1 | Sentry が拒否した MAC アドレス DE:C0:DE:03:03:01
-linux-lwip-echoserver-1 | MAC Sentry アクションがコード 0 (OK、操作は成功しました)、src 4 (routes.c)、行 1116 を返しました
-linux-lwip-echoserver-1 | Sentry が拒否した MAC アドレス DE:C0:DE:03:03:01
+// Rject TCP
+linux-lwip-echoserver-1  | MAC Sentry action returned code 0 (OK, operation succeeded), src 4 (routes.c), line 1116
+linux-lwip-echoserver-1  | Sentry rejected MAC address DE:C0:DE:03:03:01
+linux-lwip-echoserver-1  | MAC Sentry action returned code 0 (OK, operation succeeded), src 4 (routes.c), line 1116
+linux-lwip-echoserver-1  | Sentry rejected MAC address DE:C0:DE:03:03:01
+linux-lwip-echoserver-1  | MAC Sentry action returned code 0 (OK, operation succeeded), src 4 (routes.c), line 1116
+linux-lwip-echoserver-1  | Sentry rejected MAC address DE:C0:DE:03:03:01
 
 ```
 
@@ -443,9 +438,9 @@ STM32CubeIDE で、[プロジェクト] -> [プロパティ] をクリックし�
 #ifndef WOLFSENTRY_OPTIONS_H
 #define WOLFSENTRY_OPTIONS_H
 
-#FREERTOS の定義
-#定義 WOLFSENTRY_SINGLETHREADED
-#WOLFSENTRY_LWIP を定義
+#define FREERTOS
+#define WOLFSENTRY_SINGLETHREADED
+#define WOLFSENTRY_LWIP
 #define WOLFSENTRY_NO_PROTOCOL_NAMES
 #define WOLFSENTRY_NO_POSIX_MEMALIGN
 #endif /* WOLFSENTRY_OPTIONS_H */
