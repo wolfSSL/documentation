@@ -10,6 +10,14 @@ SOURCES = chapter01.md \
 		  
 PDF = wolfSentry-Manual.pdf
 
+ifeq ($(DOC_LANG),JA)
+    PDF  = wolfSentry-Manual-jp.pdf
+	DOXYFILE = Doxyfile-ja
+else
+    PDF  = wolfSentry-Manual.pdf
+	DOXYFILE = Doxyfile
+endif
+
 .PHONY: html-prep
 html-prep:
 
