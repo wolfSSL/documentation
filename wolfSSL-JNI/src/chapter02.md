@@ -22,14 +22,14 @@ project included, under `IDE/Android` has been tested on both Linux and Windows.
 
 In order to run the unit tests, JUnit 4 is required to be installed on the
 development system. JUnit can be downloaded from the project website at
-[www.junit.org]().
+[www.junit.org](http://www.junit.org).
 
 To install JUnit on a Unix/Linux/OSX system:
 
 1) Download “ **junit-4.13.2.jar** ” and “ **hamcrest-all-1.3.jar** ”from [junit.org/junit4/](). At the time of writing, the above mentioned .jar files could be downloaded from the following links:
 
-[junit-4.13.jar](https://search.maven.org/search?q=g:junit%20AND%20a:junit) <br/>
-[hamcrest-all-1.3.jar](https://search.maven.org/artifact/org.hamcrest/hamcrest-all/1.3/jar)
+[junit-4.13.2.jar](https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar)<br/>
+[hamcrest-all-1.3.jar](https://repo1.maven.org/maven2/org/hamcrest/hamcrest-all/1.3/hamcrest-all-1.3.jar)
 
 2) Place these JAR files on your system and set **JUNIT_HOME** to point to that location. Ex:
 
