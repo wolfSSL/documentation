@@ -2494,7 +2494,7 @@ Versions of software used:\
 
 
 #### Supported Algorithms\
-List the supported algorithms and any restrictions
+Supported algorithms, modes, and operations include:
 
 - AES (ECB, CBC, CCM, GCM)
 - AES CMAC
@@ -2596,7 +2596,7 @@ Add the desired modules and libraries to the local conf file.\
 > ```
 
 \
-In this build had added debugging tools and an SSH server, which are not necessary if looking to trim down on size. The important items to add are “cryptodev-module and cryptodev-linux”. “eckey” is a demo tool from NXP for encapsulating and decapsulating blobs.
+In this build, we had added debugging tools and an SSH server, which are not necessary if looking to trim down on size. The important items to add are “cryptodev-module and cryptodev-linux”. “eckey” is a demo tool from NXP for encapsulating and decapsulating blobs.
 \
 [Optional]
 To add the auto loading of cryptodev module add the following line to conf/local.conf.
@@ -2611,7 +2611,7 @@ Otherwise the module will need to be loaded after each power cycle using “modp
 \
 
 ##### Build and Deploy\
-To kick off the build of the image use the command. Then if using an sdcard, flash it to the card.
+To kick off the build of the image use the following command. Then if using an sdcard, flash it to the card.
 \
 
 > ```
@@ -2922,7 +2922,7 @@ For generation of any AES encrypt and decrypt operations the key can be generate
 
 ###### ***AES (ECB/CBC)***\
 
-Alternatively to generate AES ECB/CBC keys, if the Aes structure has been initialized with WOLFSLS_SECO_DEVID the function wc_AesSetKey can be called with a plain text key passed to it. The API wc_AesSetKey will then try to encrypt the key using the unique KEK and import it into the SECO HSM. If imported successfully, the value of 0 will be returned and the key ID will be set in the Aes structure.
+Alternatively to generate AES ECB/CBC keys, if the Aes structure has been initialized with WOLFSSL_SECO_DEVID the function wc_AesSetKey can be called with a plain text key passed to it. The API wc_AesSetKey will then try to encrypt the key using the unique KEK and import it into the SECO HSM. If imported successfully, the value of 0 will be returned and the key ID will be set in the Aes structure.
 \
 
 - CBC encrypt would be done with wc_AesCbcEncrypt, decrypt with wc_AesCbcDecrypt.
