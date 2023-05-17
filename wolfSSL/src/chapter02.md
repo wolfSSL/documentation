@@ -454,7 +454,13 @@ Enables encrypt-then-mac support to perform mac after encryption with block ciph
 Required if using Chacha20/Poly1305 with TLS v1.2 for setting up Poly authentication. This is on by default with ChaCha20/Poly1305 if using `./configure`, but needs to be manually defined if building with `WOLFSSL_USER_SETTINGS`.
 
 #### WOLFSSL_ASN_TEMPLATE
-Enables newer version of ASN parsing code for most internal ASN operations. This is on by default if using `./configure`, but needs to be manually defined if building with `WOLFSSL_USER_SETTINGS`.
+Enables the new version of ASN parsing code that uses template-based ASN.1 processing. This parsing adheres to standard ASN.1 rules and uses a template structure to dictate encoding and decoding, allowing the parser code to generalize across templates. This is on by default if using `./configure`, but needs to be manually defined if building with `WOLFSSL_USER_SETTINGS`.
+
+#### WOLFSSL_DEBUG_ASN_TEMPLATE
+Enables debugging output when using ASN.1 templates. Only relevant when used with `WOLFSSL_ASN_TEMPLATE`.
+
+#### WOLFSSL_ASN_TEMPLATE_TYPE_CHECK
+Use ASN functions to better test compiler type issues for testing. Only relevant when used with `WOLFSSL_ASN_TEMPLATE`
 
 ### Enabling Features Disabled by Default
 
