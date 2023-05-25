@@ -13,7 +13,7 @@ JNI C source files into a shared library for either Unix/Linux or Mac OSX.
 This script tries to auto-detect between OSX (Darwin) and Linux to set up
 include paths and shared library extension type. This script directly calls gcc
 on the JNI C source files, producing `./lib/libwolfssljni.so`,
-`./lib/libwolfssljni.dylib`, or `./lib/wolfssljni.dylib`.
+`./lib/libwolfssljni.dylib`, or `./lib/libwolfssljni.jnilib`.
 
 ```
 $ ./java.sh
