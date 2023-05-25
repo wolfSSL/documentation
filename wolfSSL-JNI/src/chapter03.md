@@ -12,8 +12,8 @@ The `java.sh` script in the root package directory is used to compile the native
 JNI C source files into a shared library for either Unix/Linux or Mac OSX.
 This script tries to auto-detect between OSX (Darwin) and Linux to set up
 include paths and shared library extension type. This script directly calls gcc
-on the JNI C source files, producing `./lib/libwolfssljni.so`,
-`./lib/libwolfssljni.dylib`, or `./lib/libwolfssljni.jnilib`.
+on the JNI C source files, producing `./lib/libwolfssljni.so` or
+`./lib/libwolfssljni.jnilib`.
 
 ```
 $ ./java.sh

@@ -39,8 +39,7 @@ classes.
 Once wolfSSL JNI and wolfJSSE have been compiled, there are two JAR files and
 one native shared library that have been generated. These are located in the
 `./lib` directory. The native shared library could also be named
-`libwolfssljni.dylib` or `libwolfssljni.jnilib` depending on the operating
-system.
+`libwolfssljni.jnilib` depending on the operating system.
 
 ```
 lib/
