@@ -54,7 +54,7 @@ for (Provider prov:providers) {
 
 To install the wolfJSSE provider at the system/OS level, copy the `wolfssl.jar`
 and/or `wolfssl-jsse.jar` into the correct Java installation directory for your
-OS and verify the `libwolfssljni.so` or `libwolfssljni.jnilib` shared library 
+OS and verify the `libwolfssljni.so` or `libwolfssljni.jnilib` shared library
 is on your library search path.
 
 Add the JAR files (`wolfssl.jar`, `wolfssl-jsse.jar`) and shared library
