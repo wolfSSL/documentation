@@ -481,6 +481,14 @@ For necessary defines, see the `WOLFSSL_ESPWROOM32` define in `settings.h`. The 
 Unlike the ESP32, there's no hardware-based cryptography available for the ESP8266. See the `WOLFSSL_ESP8266` define in `user_settings.h`
 or use `./configure CFLAGS="-DWOLFSSL_ESP8266"` to compile for the embedded ESP8266 target.
 
+### ERF32
+
+wolfSSL is able to use the ERF32 family of devices for hardware-based cryptography.
+
+To enable support define `WOLFSSL_SILABS_SE_ACCEL` in user_settings.h. wolfSSL currently supports the hardware acceleration of RNG, AES-CBC, AES-GCM, AES-CCM, SHA-1, SHA-2, ECDHE, and ECDSA on the EFR32 platform.
+
+More details and benchmarks are available in the README.md in wolfcrypt/src/port/silabs of the wolfSSL repository tree.
+
 ## SSL Inspection (Sniffer)
 
 Beginning with the wolfSSL 1.5.0 release, wolfSSL has included a build option allowing it to be built with SSL Sniffer (SSL Inspection) functionality. This means that you can collect SSL traffic packets and with the correct key file, are able to decrypt them as well. The ability to “inspect” SSL traffic can be useful for several reasons, some of which include:

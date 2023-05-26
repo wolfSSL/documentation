@@ -938,11 +938,13 @@ Fast Math Library is a good option. It is implemented using both C and assembly.
 
 Single Precision (SP) Math Library is our recommended library. It is implemented using both C and assembly. As such, it has optimizations for specific architectures. All math variables are instanciated on the stack; minimal heap usage. It is always timing resistant. It is generally optimized for speed at the cost of code size, but is highly configurable to compile out unneeded code. We have taken it through DO-178C certifications.
 
-#### Big Integer Math Library
+#### Big Integer Math Library (Deprecation Planned)
+
+This library is planned to be deprecated and removed from the wolfSSL/wolfCrypt library by the end of 2023. If desired this can be enabled with `--enable-heapmath` or `CFLAGS=-DUSE_INTEGER_HEAP_MATH`.
 
 Forked from public domain LibTomMath library. For more information about LibTomMath, please see <https://www.libtom.net/LibTomMath/>. Please note that our fork is considerably more active and secure than the original public domain code.
 
-If built without configuration nor modification to any macros, for example for an embedded target, the macros will use this implementation. This is generally the most portable and generally easiest to get going with. The negatives to the normal big integer library are that it is slower, it uses a lot of heap memory as all memory is allocated from the heap, requires an `XREALLOC()` implementation and is not timing resistant. The implementation can be found in `integer.c`.
+This is generally the most portable and generally easiest to get going with. The negatives to the normal big integer library are that it is slower, it uses a lot of heap memory as all memory is allocated from the heap, requires an `XREALLOC()` implementation and is not timing resistant. The implementation can be found in `integer.c`.
 
 #### Fast Math
 
@@ -1007,7 +1009,7 @@ Speed optimization for montgomery reduction of smaller numbers on Intel architec
 
 #### Proprietary Single Precision (SP) Math Support
 
-SP math is our recommended option and has been taken through DO-178C certifications, but not yet on by default. Use these to speed up public key operations for specific keys sizes and curves that are common. Make sure to include the correct code files such as:
+SP math is our recommended default option and has been taken through DO-178C certifications. Use these to speed up public key operations for specific keys sizes and curves that are common. Make sure to include the correct code files such as:
 
 * `sp_c32.c`
 * `sp_c64.c`
@@ -2044,6 +2046,10 @@ The following two defines can be used with `--enable-cryptocb` to complie out RS
 * WOLF_CRYPTO_CB_ONLY_ECC - compiles out ECC software crypto fallback
 
 Use of the WOLF_CRYPTO_CB_ONLY_* options requires disabling the examples. See [`--disable-examples`](#disable-examples)
+
+### `--enable-reproducible-build`
+
+Suppresses the binary jitter (timestamps and other non-functional metadata) to allow generation of bitwise-identical binary packages with identical hashes.
 
 ## Special Math Optimization Flags
 
