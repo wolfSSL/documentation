@@ -90,7 +90,7 @@ numbers on the other providers listed in the java.security file. The highest
 priority is `1`.
 
 ```
-security.provider.1=com.wolfssl.provider.jce.WolfSSLProvider
+security.provider.1=com.wolfssl.provider.jsse.WolfSSLProvider
 ```
 
 ###  Android OSP (AOSP)
