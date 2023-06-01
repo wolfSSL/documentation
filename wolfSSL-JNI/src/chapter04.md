@@ -73,7 +73,7 @@ On Ubuntu with OpenJDK this path may be similar to:
 Next, add an entry to the `java.security` file similar to the following:
 
 ```
-security.provider.N=com.wolfssl.provider.jce.WolfSSLProvider
+security.provider.N=com.wolfssl.provider.jsse.WolfSSLProvider
 ```
 
 The java.security file will be located at:
