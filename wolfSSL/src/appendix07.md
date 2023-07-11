@@ -975,16 +975,16 @@ However, the nature of stateful HBS schemes requires that significant care is gi
 
 Instead, because of these unique strengths and characteristics, and NIST and NSA backing, stateful HBS schemes such as LMS/HSS are of particular interest for offline firmware authentication and signature verification, especially on embedded or constrained systems that are expected to have a long operational lifetime and thus need to be resilient against a cryptographically relevant quantum computer.
 
-### LMS and HSS signatures
+### LMS/HSS signatures
 
-wolfSSL is adding support for the LMS and HSS hash-based signature schemes to our wolfCrypt embedded crypto engine. This will be achieved by experimental integration with the hash-sigs LMS/HSS library (<https://github.com/cisco/hash-sigs>), similar to our previous libOQS integration.
+wolfSSL is adding support for the LMS/HSS hash-based signature scheme to our wolfCrypt embedded crypto engine. This will be achieved by experimental integration with the hash-sigs LMS/HSS library (<https://github.com/cisco/hash-sigs>), similar to our previous libOQS integration.
 
-Leighton-Micali Signatures (LMS), and its multi-tree variant, the Hierarchical Signature System (HSS), are both post-quantum, stateful hash-based signature schemes. They are noted for having small public and private keys, and fast signing and verifying. Their signature sizes are larger, but are tunable via their Winternitz parameter. See these two links from RFC8554 for more details:
+Leighton-Micali Signatures (LMS), and its multi-tree variant, the Hierarchical Signature System (HSS), is a post-quantum, stateful hash-based signature scheme. It is noted for having small public and private keys, and fast signing and verifying. Its signature sizes are larger, but are tunable via its Winternitz parameter. See these two links from RFC8554 for more details:
 
 - LMS: <https://datatracker.ietf.org/doc/html/rfc8554>
 - HSS: <https://datatracker.ietf.org/doc/html/rfc8554#section-6>
 
-As previously discussed, LMS/HSS signature systems consist of a finite number of one-time signature (OTS) keys, and thus may only safely generate a finite number of signatures. However the number of signatures, and the signature size, are tunable via a set of defined parameters, which will be discussed next.
+As previously discussed, the LMS/HSS signature system consists of a finite number of one-time signature (OTS) keys, and thus may only safely generate a finite number of signatures. However the number of signatures, and the signature size, are tunable via a set of defined parameters, which will be discussed next.
 
 #### Supported Parameters
 
@@ -1046,42 +1046,51 @@ Please see the wolfSSL repo's INSTALL file (https://github.com/wolfSSL/wolfssl/b
 
 #### Benchmark Data
 
-The following benchmark data was taken on an 8-core Intel i7-8700 CPU @ 3.20GHz, on Fedora 38 (`6.2.9-300.fc38.x86_64`).
+The following benchmark data was taken on an 8-core Intel i7-8700 CPU @ 3.20GHz, on Fedora 38 (`6.2.9-300.fc38.x86_64`). The multi-threaded example used 4 worker threads and 4 cores, while the single-threaded example used only a single core.
 
 As discussed in item 17 of the INSTALL file, the hash-sigs lib offers two static libraries:
 - `hss_lib.a`: a single-threaded version.
 - `hss_lib_thread.a`: a multi-threaded version.
 
-The multi-threaded version will spawn worker threads to accelerate cpu intensive tasks, such as key generation. It will by default spawn up to 16 worker threads.
-This will mainly speedup key generation and signing for all parameter values, and to a lesser extent will speedup verifying for larger levels values.
+The multi-threaded version will spawn worker threads to accelerate cpu intensive tasks, such as key generation.  This will mainly speedup key generation and signing for all parameter values, and to a lesser extent will speedup verifying for larger levels values.
 
-**multi-threaded**
-
-The following is benchmark data obtained when built against the multi-threaded `hss_lib_thread.a`, which uses up to 16 worker threads to parallelize intensive tasks, and will use up to 8 cores.
+For reference, wolfSSL was built with the following to obtain both benchmarks:
 
 ```text
-$ ./wolfcrypt/benchmark/benchmark  -lms_hss
+  ./configure \
+    --enable-static \
+    --disable-shared \
+    --enable-lms=yes \
+    --with-liblms=<path to hash sigs install>
+```
+
+**multi-threaded benchmark**
+
+The following is benchmark data obtained when built against the multi-threaded `hss_lib_thread.a`, which used 4 worker threads to parallelize intensive tasks, and used 4 cores.
+
+```text
+./wolfcrypt/benchmark/benchmark -lms_hss
 ------------------------------------------------------------------------------
  wolfSSL version 5.6.3
 ------------------------------------------------------------------------------
 Math: 	Multi-Precision: Wolf(SP) word-size=64 bits=4096 sp_int.c
 wolfCrypt Benchmark (block bytes 1048576, min 1.0 sec each)
-LMS/HSS L2_H10_W2  9300     sign      2000 ops took 1.016 sec, avg 0.508 ms, 1968.180 ops/sec
-LMS/HSS L2_H10_W2  9300   verify      4700 ops took 1.019 sec, avg 0.217 ms, 4612.266 ops/sec
-LMS/HSS L2_H10_W4  5076     sign      1400 ops took 1.068 sec, avg 0.763 ms, 1310.692 ops/sec
-LMS/HSS L2_H10_W4  5076   verify      2700 ops took 1.036 sec, avg 0.384 ms, 2605.459 ops/sec
-LMS/HSS L3_H5_W4  7160     sign      1400 ops took 1.040 sec, avg 0.743 ms, 1345.573 ops/sec
-LMS/HSS L3_H5_W4  7160   verify      2300 ops took 1.009 sec, avg 0.439 ms, 2278.541 ops/sec
-LMS/HSS L3_H5_W8  3992     sign       300 ops took 1.362 sec, avg 4.540 ms, 220.247 ops/sec
-LMS/HSS L3_H5_W8  3992   verify       400 ops took 1.040 sec, avg 2.600 ms, 384.575 ops/sec
-LMS/HSS L3_H10_W4  7640     sign      1300 ops took 1.004 sec, avg 0.772 ms, 1295.443 ops/sec
-LMS/HSS L3_H10_W4  7640   verify      2300 ops took 1.018 sec, avg 0.443 ms, 2258.225 ops/sec
-LMS/HSS L4_H5_W8  5340     sign       300 ops took 1.352 sec, avg 4.507 ms, 221.886 ops/sec
-LMS/HSS L4_H5_W8  5340   verify       400 ops took 1.060 sec, avg 2.649 ms, 377.531 ops/sec
+LMS/HSS L2_H10_W2  9300     sign      1500 ops took 1.075 sec, avg 0.717 ms, 1394.969 ops/sec
+LMS/HSS L2_H10_W2  9300   verify      5200 ops took 1.002 sec, avg 0.193 ms, 5189.238 ops/sec
+LMS/HSS L2_H10_W4  5076     sign       800 ops took 1.012 sec, avg 1.265 ms, 790.776 ops/sec
+LMS/HSS L2_H10_W4  5076   verify      2500 ops took 1.003 sec, avg 0.401 ms, 2493.584 ops/sec
+LMS/HSS L3_H5_W4  7160     sign      1500 ops took 1.051 sec, avg 0.701 ms, 1427.485 ops/sec
+LMS/HSS L3_H5_W4  7160   verify      2700 ops took 1.024 sec, avg 0.379 ms, 2636.899 ops/sec
+LMS/HSS L3_H5_W8  3992     sign       300 ops took 1.363 sec, avg 4.545 ms, 220.030 ops/sec
+LMS/HSS L3_H5_W8  3992   verify       400 ops took 1.066 sec, avg 2.664 ms, 375.335 ops/sec
+LMS/HSS L3_H10_W4  7640     sign       900 ops took 1.090 sec, avg 1.211 ms, 825.985 ops/sec
+LMS/HSS L3_H10_W4  7640   verify      2400 ops took 1.037 sec, avg 0.432 ms, 2314.464 ops/sec
+LMS/HSS L4_H5_W8  5340     sign       300 ops took 1.310 sec, avg 4.367 ms, 228.965 ops/sec
+LMS/HSS L4_H5_W8  5340   verify       400 ops took 1.221 sec, avg 3.053 ms, 327.599 ops/sec
 Benchmark complete
 ```
 
-**single-threaded**
+**single-threaded benchmark**
 
 The following is benchmark data obtained when built against the single-threaded `hss_lib.a`,
 which will use only a single core.
@@ -1106,14 +1115,4 @@ LMS/HSS L3_H10_W4  7640   verify      1500 ops took 1.052 sec, avg 0.701 ms, 142
 LMS/HSS L4_H5_W8  5340     sign       100 ops took 1.066 sec, avg 10.665 ms, 93.768 ops/sec
 LMS/HSS L4_H5_W8  5340   verify       200 ops took 1.478 sec, avg 7.388 ms, 135.358 ops/sec
 Benchmark complete
-```
-
-For reference, wolfSSL was built with the following to obtain this benchmark:
-
-```text
-  ./configure \
-    --enable-static \
-    --disable-shared \
-    --enable-lms=yes \
-    --with-liblms=<path to hash sigs install>
 ```
