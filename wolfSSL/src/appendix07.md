@@ -961,19 +961,19 @@ This section covers post-quantum stateful hash-based signature (HBS) schemes suc
 
 ### Motivation
 
-HBS schemes are of growing interest for a number of reasons.
-The primary motivation for HBS schemes is post-quantum security. As discussed previously in this appendix, Shor's algorithm would allow a quantum computer to efficiently factorize large integers and compute discrete logarithms, thus completely breaking public-key cryptography schemes such as RSA and ECC.
+Stateful HBS schemes are of growing interest for a number of reasons.
+The primary motivation for stateful HBS schemes is post-quantum security. As discussed previously in this appendix, Shor's algorithm would allow a quantum computer to efficiently factorize large integers and compute discrete logarithms, thus completely breaking public-key cryptography schemes such as RSA and ECC.
 
-In contrast, HBS schemes are founded on the security of their underlying hash functions and Merkle trees (typically implemented with SHA256), which are not expected to be broken by the advent of large quantum computers. For these reasons they have been recommended by NIST SP 800-208 and the NSA's CNSA 2.0 suite. See these two links for more info:
+In contrast, stateful HBS schemes are founded on the security of their underlying hash functions and Merkle trees (typically implemented with SHA256), which are not expected to be broken by the advent of cryptographically relevant quantum computers. For these reasons they have been recommended by NIST SP 800-208 and the NSA's CNSA 2.0 suite. See these two links for more info:
 
 - <https://csrc.nist.gov/publications/detail/sp/800-208/final>
 - <https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF>
 
-Furthermore, the CNSA 2.0 timeline has specified that post-quantum HBS schemes should be used exclusively by 2030, and adoption should begin _immediately_. In fact, adoption of LMS is the earliest requirement in the CNSA 2.0 suite timeline.
+Furthermore, the CNSA 2.0 timeline has specified that post-quantum stateful HBS schemes should be used exclusively by 2030, and adoption should begin _immediately_. In fact, adoption of LMS is the earliest requirement in the CNSA 2.0 suite timeline.
 
-However, the stateful nature of HBS schemes requires that significant care is given to their use and tracking their state. In an HBS system, the private key is actually a finite set of one-time signature (OTS) keys, which may never be reused. If the same OTS key were used to sign two different messages, it would be possible for an attacker to fabricate signatures, and the security of the entire scheme would unravel. Therefore, HBS schemes are not suitable for general use such as the public internet.
+However, the nature of stateful HBS schemes requires that significant care is given to their use and tracking their state. In a stateful HBS system, the private key is actually a finite set of one-time signature (OTS) keys, which may never be reused. If the same OTS key were used to sign two different messages, it would be possible for an attacker to fabricate signatures, and the security of the entire scheme would unravel. Therefore, stateful HBS schemes are not suitable for general use such as the public internet.
 
-Instead, because of these unique strengths and characteristics, and NIST and NSA backing, HBS schemes such as LMS/HSS are of particular interest for offline firmware authentication and signature verification, especially on embedded or constrained systems that are expected to have a long operational lifetime and thus need to be resilient against a post-quantum future.
+Instead, because of these unique strengths and characteristics, and NIST and NSA backing, stateful HBS schemes such as LMS/HSS are of particular interest for offline firmware authentication and signature verification, especially on embedded or constrained systems that are expected to have a long operational lifetime and thus need to be resilient against a cryptographically relevant quantum computer.
 
 ### LMS and HSS signatures
 
@@ -1040,13 +1040,24 @@ As can be seen from the tables, signature sizes are primarily determined by the 
 
 Key generation time is strongly determined by the height of the first level tree. A 3 level, 5 height tree is much faster than 1 level, 15 height at initial key gen, even if the number of available signatures is the same.
 
-### LMS/HSS Build Instructions
+#### LMS/HSS Build Instructions
 
 Please see the wolfSSL repo's INSTALL file (https://github.com/wolfSSL/wolfssl/blob/master/INSTALL). Item 17 (Building with hash-sigs lib for LMS/HSS support [EXPERIMENTAL]) has instructions on how to configure and build wolfSSL and the hash-sigs LMS/HSS library.
 
 #### Benchmark Data
 
 The following benchmark data was taken on an 8-core Intel i7-8700 CPU @ 3.20GHz, on Fedora 38 (`6.2.9-300.fc38.x86_64`).
+
+As discussed in item 17 of the INSTALL file, the hash-sigs lib offers two static libraries:
+- `hss_lib.a`: a single-threaded version.
+- `hss_lib_thread.a`: a multi-threaded version.
+
+The multi-threaded version will spawn worker threads to accelerate cpu intensive tasks, such as key generation. It will by default spawn up to 16 worker threads.
+This will mainly speedup key generation and signing for all parameter values, and to a lesser extent will speedup verifying for larger levels values.
+
+**multi-threaded**
+
+The following is benchmark data obtained when built against the multi-threaded `hss_lib_thread.a`, which uses up to 16 worker threads to parallelize intensive tasks, and will use up to 8 cores.
 
 ```text
 $ ./wolfcrypt/benchmark/benchmark  -lms_hss
@@ -1067,6 +1078,33 @@ LMS/HSS L3_H10_W4  7640     sign      1300 ops took 1.004 sec, avg 0.772 ms, 129
 LMS/HSS L3_H10_W4  7640   verify      2300 ops took 1.018 sec, avg 0.443 ms, 2258.225 ops/sec
 LMS/HSS L4_H5_W8  5340     sign       300 ops took 1.352 sec, avg 4.507 ms, 221.886 ops/sec
 LMS/HSS L4_H5_W8  5340   verify       400 ops took 1.060 sec, avg 2.649 ms, 377.531 ops/sec
+Benchmark complete
+```
+
+**single-threaded**
+
+The following is benchmark data obtained when built against the single-threaded `hss_lib.a`,
+which will use only a single core.
+
+```text
+$ ./wolfcrypt/benchmark/benchmark -lms_hss
+------------------------------------------------------------------------------
+ wolfSSL version 5.6.3
+------------------------------------------------------------------------------
+Math: 	Multi-Precision: Wolf(SP) word-size=64 bits=4096 sp_int.c
+wolfCrypt Benchmark (block bytes 1048576, min 1.0 sec each)
+LMS/HSS L2_H10_W2  9300     sign       800 ops took 1.115 sec, avg 1.394 ms, 717.589 ops/sec
+LMS/HSS L2_H10_W2  9300   verify      4500 ops took 1.001 sec, avg 0.223 ms, 4493.623 ops/sec
+LMS/HSS L2_H10_W4  5076     sign       500 ops took 1.239 sec, avg 2.478 ms, 403.519 ops/sec
+LMS/HSS L2_H10_W4  5076   verify      2100 ops took 1.006 sec, avg 0.479 ms, 2087.944 ops/sec
+LMS/HSS L3_H5_W4  7160     sign       800 ops took 1.079 sec, avg 1.349 ms, 741.523 ops/sec
+LMS/HSS L3_H5_W4  7160   verify      1600 ops took 1.012 sec, avg 0.632 ms, 1581.686 ops/sec
+LMS/HSS L3_H5_W8  3992     sign       100 ops took 1.042 sec, avg 10.420 ms, 95.971 ops/sec
+LMS/HSS L3_H5_W8  3992   verify       200 ops took 1.220 sec, avg 6.102 ms, 163.894 ops/sec
+LMS/HSS L3_H10_W4  7640     sign       400 ops took 1.010 sec, avg 2.526 ms, 395.864 ops/sec
+LMS/HSS L3_H10_W4  7640   verify      1500 ops took 1.052 sec, avg 0.701 ms, 1426.284 ops/sec
+LMS/HSS L4_H5_W8  5340     sign       100 ops took 1.066 sec, avg 10.665 ms, 93.768 ops/sec
+LMS/HSS L4_H5_W8  5340   verify       200 ops took 1.478 sec, avg 7.388 ms, 135.358 ops/sec
 Benchmark complete
 ```
 
