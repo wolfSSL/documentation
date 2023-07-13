@@ -221,7 +221,7 @@ wolfSSL:
             CFLAGS="-Os"
 ```
 
-**Note**: We are primarily benchmarking the post-quantum algorithms, but leave some conventional algorithms for comparisson purposes.
+**Note**: We are primarily benchmarking the post-quantum algorithms, but leave some conventional algorithms for comparison purposes.
 
 ### Runtime Binary Sizes
 
@@ -954,3 +954,165 @@ Technical documentation and other resources such as known answer tests can be fo
 For more algorithm-specific benchmarking information, the OQS Project has benchmarking information at their website:
 
 <https://openquantumsafe.org/benchmarking/>
+
+## Post-Quantum Stateful Hash-Based Signatures
+
+This section covers post-quantum stateful hash-based signature (HBS) schemes such as LMS/HSS, for which wolfSSL has recently added support.
+
+### Motivation
+
+Stateful HBS schemes are of growing interest for a number of reasons.
+The primary motivation for stateful HBS schemes is post-quantum security. As discussed previously in this appendix, Shor's algorithm would allow a quantum computer to efficiently factorize large integers and compute discrete logarithms, thus completely breaking public-key cryptography schemes such as RSA and ECC.
+
+In contrast, stateful HBS schemes are founded on the security of their underlying hash functions and Merkle trees (typically implemented with SHA256), which are not expected to be broken by the advent of cryptographically relevant quantum computers. For these reasons they have been recommended by NIST SP 800-208 and the NSA's CNSA 2.0 suite. See these two links for more info:
+
+- <https://csrc.nist.gov/publications/detail/sp/800-208/final>
+- <https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF>
+
+Furthermore, the CNSA 2.0 timeline has specified that post-quantum stateful HBS schemes should be used exclusively by 2030, and adoption should begin _immediately_. In fact, adoption of LMS is the earliest requirement in the CNSA 2.0 suite timeline.
+
+However, the nature of stateful HBS schemes requires that significant care is given to their use and tracking their state. In a stateful HBS system, the private key is actually a finite set of one-time signature (OTS) keys, which may never be reused. If the same OTS key were used to sign two different messages, it would be possible for an attacker to fabricate signatures, and the security of the entire scheme would unravel. Therefore, stateful HBS schemes are not suitable for general use such as the public internet.
+
+Instead, because of these unique strengths and characteristics, and NIST and NSA backing, stateful HBS schemes such as LMS/HSS are of particular interest for offline firmware authentication and signature verification, especially on embedded or constrained systems that are expected to have a long operational lifetime and thus need to be resilient against a cryptographically relevant quantum computer.
+
+### LMS/HSS signatures
+
+wolfSSL is adding support for the LMS/HSS hash-based signature scheme to our wolfCrypt embedded crypto engine. This will be achieved by experimental integration with the hash-sigs LMS/HSS library (<https://github.com/cisco/hash-sigs>), similar to our previous libOQS integration.
+
+Leighton-Micali Signatures (LMS), and its multi-tree variant, the Hierarchical Signature System (HSS), is a post-quantum, stateful hash-based signature scheme. It is noted for having small public and private keys, and fast signing and verifying. Its signature sizes are larger, but are tunable via its Winternitz parameter. See these two links from RFC8554 for more details:
+
+- LMS: <https://datatracker.ietf.org/doc/html/rfc8554>
+- HSS: <https://datatracker.ietf.org/doc/html/rfc8554#section-6>
+
+As previously discussed, the LMS/HSS signature system consists of a finite number of one-time signature (OTS) keys, and thus may only safely generate a finite number of signatures. However the number of signatures, and the signature size, are tunable via a set of defined parameters, which will be discussed next.
+
+#### Supported Parameters
+
+LMS/HSS signatures are defined by 3 parameters:
+- levels: number of levels of Merkle trees.
+- height: height of an individual Merkle tree.
+- Winternitz: number of bits from hash used in a Winternitz chain. Used as a space-time tradeoff for the signature size.
+
+wolfSSL supports all LMS/HSS parameters defined in RFC8554:
+
+- levels = {1..8}
+- height = {5, 10, 15, 20, 25}
+- Winternitz = {1, 2, 4, 8}
+
+The number of available signatures is:
+- N = 2 ** (levels * height)
+
+For convenience some parameter sets have been predefined in the enum `wc_LmsParm`. Its values are shown in the table below:
+
+parameter set |  description
+--------------------  |  ---------------------------
+WC_LMS_PARM_NONE      | Not set, use default (WC_LMS_PARM_L1_H15_W2)
+WC_LMS_PARM_L1_H15_W2 | 1 level Merkle tree of 15 height, Winternitz 2
+WC_LMS_PARM_L1_H15_W4 | same as above, Winternitz 4
+WC_LMS_PARM_L2_H10_W2 | 2 level Merkle tree of 10 height, Winternitz 4
+WC_LMS_PARM_L2_H10_W4 | same as above, Winternitz 4
+WC_LMS_PARM_L2_H10_W8 | same as above, Winternitz 8
+WC_LMS_PARM_L3_H5_W2  | 3 level Merkle tree of 5 height, Winternitz 2
+WC_LMS_PARM_L3_H5_W4  | same as above, Winternitz 4
+WC_LMS_PARM_L3_H5_W8  | same as above, Winternitz 8
+WC_LMS_PARM_L3_H10_W4 | 3 level Merkle tree of 10 height, Winternitz 4
+WC_LMS_PARM_L4_H5_W8  | 4 level Merkle tree of 5 height, Winternitz 8
+
+The signature size and number of signatures is shown with respect to the parameter set here:
+
+parameter set |  signature size | number of signatures
+--------------------  | -------------------- | --------------------
+WC_LMS_PARM_L1_H15_W2 | 4784 | 32768
+WC_LMS_PARM_L1_H15_W4 | 2672 | 32768
+WC_LMS_PARM_L2_H10_W2 | 9300 | 1048576
+WC_LMS_PARM_L2_H10_W4 | 5076 | 1048576
+WC_LMS_PARM_L2_H10_W8 | 2964 | 1048576
+WC_LMS_PARM_L3_H5_W2  | 13496 | 32768
+WC_LMS_PARM_L3_H5_W4  | 7160 | 32768
+WC_LMS_PARM_L3_H5_W8  | 3992 | 32768
+WC_LMS_PARM_L3_H10_W4 | 7640 | 1073741824
+WC_LMS_PARM_L4_H5_W8  | 5340 | 1048576
+
+As can be seen from the tables, signature sizes are primarily determined by the levels and Winternitz parameters, and height to a lesser extent:
+- Larger levels values increase signature size significantly.
+- Larger height values increase signature size modestly.
+- Larger winternitz values will reduce the signature size, at the expense of longer key generation and sign/verify times.
+
+Key generation time is strongly determined by the height of the first level tree. A 3 level, 5 height tree is much faster than 1 level, 15 height at initial key gen, even if the number of available signatures is the same.
+
+#### LMS/HSS Build Instructions
+
+Please see the wolfSSL repo's INSTALL file (https://github.com/wolfSSL/wolfssl/blob/master/INSTALL). Item 17 (Building with hash-sigs lib for LMS/HSS support [EXPERIMENTAL]) has instructions on how to configure and build wolfSSL and the hash-sigs LMS/HSS library.
+
+#### Benchmark Data
+
+The following benchmark data was taken on an 8-core Intel i7-8700 CPU @ 3.20GHz, on Fedora 38 (`6.2.9-300.fc38.x86_64`). The multi-threaded example used 4 worker threads and 4 cores, while the single-threaded example used only a single core.
+
+As discussed in item 17 of the INSTALL file, the hash-sigs lib offers two static libraries:
+- `hss_lib.a`: a single-threaded version.
+- `hss_lib_thread.a`: a multi-threaded version.
+
+The multi-threaded version will spawn worker threads to accelerate cpu intensive tasks, such as key generation.  This will mainly speedup key generation and signing for all parameter values, and to a lesser extent will speedup verifying for larger levels values.
+
+For reference, wolfSSL was built with the following to obtain both benchmarks:
+
+```text
+  ./configure \
+    --enable-static \
+    --disable-shared \
+    --enable-lms=yes \
+    --with-liblms=<path to hash sigs install>
+```
+
+**multi-threaded benchmark**
+
+The following is benchmark data obtained when built against the multi-threaded `hss_lib_thread.a`, which used 4 worker threads to parallelize intensive tasks, and used 4 cores.
+
+```text
+./wolfcrypt/benchmark/benchmark -lms_hss
+------------------------------------------------------------------------------
+ wolfSSL version 5.6.3
+------------------------------------------------------------------------------
+Math: 	Multi-Precision: Wolf(SP) word-size=64 bits=4096 sp_int.c
+wolfCrypt Benchmark (block bytes 1048576, min 1.0 sec each)
+LMS/HSS L2_H10_W2  9300     sign      1500 ops took 1.075 sec, avg 0.717 ms, 1394.969 ops/sec
+LMS/HSS L2_H10_W2  9300   verify      5200 ops took 1.002 sec, avg 0.193 ms, 5189.238 ops/sec
+LMS/HSS L2_H10_W4  5076     sign       800 ops took 1.012 sec, avg 1.265 ms, 790.776 ops/sec
+LMS/HSS L2_H10_W4  5076   verify      2500 ops took 1.003 sec, avg 0.401 ms, 2493.584 ops/sec
+LMS/HSS L3_H5_W4  7160     sign      1500 ops took 1.051 sec, avg 0.701 ms, 1427.485 ops/sec
+LMS/HSS L3_H5_W4  7160   verify      2700 ops took 1.024 sec, avg 0.379 ms, 2636.899 ops/sec
+LMS/HSS L3_H5_W8  3992     sign       300 ops took 1.363 sec, avg 4.545 ms, 220.030 ops/sec
+LMS/HSS L3_H5_W8  3992   verify       400 ops took 1.066 sec, avg 2.664 ms, 375.335 ops/sec
+LMS/HSS L3_H10_W4  7640     sign       900 ops took 1.090 sec, avg 1.211 ms, 825.985 ops/sec
+LMS/HSS L3_H10_W4  7640   verify      2400 ops took 1.037 sec, avg 0.432 ms, 2314.464 ops/sec
+LMS/HSS L4_H5_W8  5340     sign       300 ops took 1.310 sec, avg 4.367 ms, 228.965 ops/sec
+LMS/HSS L4_H5_W8  5340   verify       400 ops took 1.221 sec, avg 3.053 ms, 327.599 ops/sec
+Benchmark complete
+```
+
+**single-threaded benchmark**
+
+The following is benchmark data obtained when built against the single-threaded `hss_lib.a`,
+which will use only a single core.
+
+```text
+$ ./wolfcrypt/benchmark/benchmark -lms_hss
+------------------------------------------------------------------------------
+ wolfSSL version 5.6.3
+------------------------------------------------------------------------------
+Math: 	Multi-Precision: Wolf(SP) word-size=64 bits=4096 sp_int.c
+wolfCrypt Benchmark (block bytes 1048576, min 1.0 sec each)
+LMS/HSS L2_H10_W2  9300     sign       800 ops took 1.115 sec, avg 1.394 ms, 717.589 ops/sec
+LMS/HSS L2_H10_W2  9300   verify      4500 ops took 1.001 sec, avg 0.223 ms, 4493.623 ops/sec
+LMS/HSS L2_H10_W4  5076     sign       500 ops took 1.239 sec, avg 2.478 ms, 403.519 ops/sec
+LMS/HSS L2_H10_W4  5076   verify      2100 ops took 1.006 sec, avg 0.479 ms, 2087.944 ops/sec
+LMS/HSS L3_H5_W4  7160     sign       800 ops took 1.079 sec, avg 1.349 ms, 741.523 ops/sec
+LMS/HSS L3_H5_W4  7160   verify      1600 ops took 1.012 sec, avg 0.632 ms, 1581.686 ops/sec
+LMS/HSS L3_H5_W8  3992     sign       100 ops took 1.042 sec, avg 10.420 ms, 95.971 ops/sec
+LMS/HSS L3_H5_W8  3992   verify       200 ops took 1.220 sec, avg 6.102 ms, 163.894 ops/sec
+LMS/HSS L3_H10_W4  7640     sign       400 ops took 1.010 sec, avg 2.526 ms, 395.864 ops/sec
+LMS/HSS L3_H10_W4  7640   verify      1500 ops took 1.052 sec, avg 0.701 ms, 1426.284 ops/sec
+LMS/HSS L4_H5_W8  5340     sign       100 ops took 1.066 sec, avg 10.665 ms, 93.768 ops/sec
+LMS/HSS L4_H5_W8  5340   verify       200 ops took 1.478 sec, avg 7.388 ms, 135.358 ops/sec
+Benchmark complete
+```
