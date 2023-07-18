@@ -18,15 +18,15 @@ wolfSSL JNI/JSSE のビルド システムは、現時点でMicrosoft Windows �
 
 ##  JUnit
 
-ユニットテストを実行するには、開発システムに JUnit 4 がインストールされている必要があります。JUnit は、プロジェクトの Web サイト[www.junit.org]()
+ユニットテストを実行するには、開発システムに JUnit 4 がインストールされている必要があります。JUnit は、プロジェクトの Web サイト[www.junit.org](http://www.junit.org)
 からダウンロードできます。
 
 Unix/Linux/OSX システムに JUnit をインストールするには:
 
 1) [junit.org/junit4/]() から "**junit-4.13.2.jar**" と " **hamcrest-all-1.3.jar**" をダウンロードします。 執筆時点では、上記の .jar ファイルは次のリンクからダウンロードできます。
 
-    [junit-4.13.jar](https://search.maven.org/search?q=g:junit%20AND%20a:junit) <br/>
-    [hamcrest-all-1.3.jar](https://search.maven.org/artifact/org.hamcrest/hamcrest-all/1.3/jar)
+    [junit-4.13.2.jar](https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar) <br/>
+    [hamcrest-all-1.3.jar](https://repo1.maven.org/maven2/org/hamcrest/hamcrest-all/1.3/hamcrest-all-1.3.jar)
 
 
 

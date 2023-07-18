@@ -5069,11 +5069,11 @@ wolfsSLのクロスコンパイルに関する追加のヒントやフィード�
 
 
 
-## 2.7ビルディングポート
+## 移植向けビルド
 
 
 
-wolfSSLは多くの環境やデバイスに移植されています。これらのポートの一部とそれらのマニュアルはディレクトリ`wolfssl-X.X.X/IDE`にあります。ここで、x.x.xは現在のwolfSSLバージョン番号です。このディレクトリには、環境用のwolfSSLをビルドするために使用されているIDEの有用な情報とコードも含まれています。
+wolfSSLは多くの環境やデバイスに移植（ポート）されています。これらのポートの一部とそれらのマニュアルはディレクトリ`wolfssl-X.X.X/IDE`にあります。ここで、x.x.xは現在のwolfSSLバージョン番号です。このディレクトリには、環境用のwolfSSLをビルドするために使用されているIDEの有用な情報とコードも含まれています。
 
 
 ポートリスト：
@@ -5152,4 +5152,552 @@ wolfSSLは多くの環境やデバイスに移植されています。これら�
 
 
 * INTIME-RTOS
+
+## NXP CAAMのビルド
+
+### i.MX8(Linux)
+#### 既知の障害
+- HSMセッション(wc_SECO_CloseHSMおよびwolfSSL_CLeanupまたはwolfCrypt_Cleanup)を閉じる前に、開いているHSMキーストアセッションを終了すると、次回NVMを起動したときにセグメンテーションフォールトが発生します。 これを回避するには、電源を入れ直す必要があります。
+
+#### 制限事項
+- 多量の入力（１MByte）を扱うSECOでのAES操作は”シェアードメモリに十分なスペースがありません”とエラーになります。
+- 2つの鍵ストアを生成した後3番目を生成しようとすると失敗します。鍵ストアをリセットするためには　"rm -rf /etc/seco_hsm"を実行し電源を再投入してください。
+
+#### イントロ
+i.MX8デバイスでは、セキュリティ強化のために利用できるSECOハードウェアモジュールがあります。このモジュールは、AES操作とキーストレージ、限定的なECC操作とキーストレージを処理し、RNGを提供します。wolfSSLは、可能な限りSECOを使用できるように拡張しました。一部のアルゴリズムについては、i.MX8のCAAMはサポートしていますが、SECOモジュールはまだサポートしていません。このような場合、wolfSSLは/dev/cryptoを通じて、CAAMのジョブを直接作成するLinux CAAMドライバーへの呼び出しを行います。NXP Linux CAAMドライバーではデフォルトでサポートされるアルゴリズムがいくつかありますが、CAAMがサポートするすべてのアルゴリズムがサポートされるわけではありません。wolfSSLは、Linux CAAMドライバーを拡張して、追加のアルゴリズムのサポートを追加しました。同じアプリケーションからCAAMにアクセスする両方の手段を使用するには、異なるコードパスに関連付けられた「devId」（WOLFSSL_CAAM_DEVID または WOLFSSL_SECO_DEVID）を設定できます。 これらの ID は、構造体を最初に初期化するときに使用され、構造体の存続期間全体にわたってどのコードパスが使用されるかを設定します。ソフトウェアのみを使用する場合は、デフォルトのINVALID_DEVIDを設定する必要があります。例外は、キー ストアを使用しない SECO アイテム：TRNG とハッシュです。
+
+
+ソフトウエアが使用されるバージョン：
+
+- imx-seco-libs ブランチ　imx_5.4.24_2.1.0
+- NXP "repo"ツールとYocto ビルド。Yoctoセットアップに関するドキュメントはここにあります。
+- wolfSSL 5.2.0 以降（5.2.0リリース以降に開発されたので）
+
+#### サポートされるアルゴリズム\
+サポートされるアルゴリズム、モード、オペレーションは以下を含みます：
+
+- AES (ECB, CBC, CCM, GCM)
+- AES CMAC
+- SHA256, SHA384
+- ECC 256/384 (keygen, sign, verify, ecdh)
+- RSA 3072 (keygen, sign, verify)
+- HMAC
+- Curve25519
+- TRNG
+
+#### イメージのビルド
+##### "repo"セットアップ
+NXP "repo" コマンドツールのUbuntu 18.04 LTSでのセットアップは
+
+```sh
+sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib
+sudo apt-get install build-essential chrpath socat cpio python python3 python3-pip
+sudo apt-get install python3-pexpect xz-utils debianutils iputils-ping python3-git
+sudo apt-get install python3-jinja2 libegl1-mesa libsdl1.2-dev pylint3 xterm curl
+sudo apt-get install ca-certificates
+```
+
+
+```sh
+mkdir ~/bin
+curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+chmod a+x ~/bin/repo
+export PATH=~/bin:$PATH
+
+git config --global user.name "Your Git Name"
+git config --global user.email "Your Email"
+```
+
+
+2022年1月11日現在、GitHubは認証されていないGit接続を許可しなくなりました。このドキュメントが作成された時点 (2022年3月) では、NXPのリポジトリツールはこれをまだ考慮していません。この問題を回避するには、次のコマンドを使用してgit://github.com/ を https://github.com/ にリダイレクトしてください。
+
+
+```sh
+git config --global url."https://github.com/".insteadOf git://github.com/
+```
+
+ビルド用の所望のディレクトリを作成します：
+
+```sh
+mkdir imx-yocto-bsp
+cd imx-yocto-bsp/
+```
+
+NXPの"repo"コマンドツールをセットアップした後、希望のバージョンのLinuxでディレクトリをsyncします。この場合は、5.4.24_2.1.0.
+
+```sh
+repo init -u https://source.codeaurora.org/external/imx/imx-manifest -b imx-linux-zeus -m imx-5.4.24-2.1.0.xml
+repo sync
+
+DISTRO=fsl-imx-wayland MACHINE=imx8qxpc0mek source imx-setup-release.sh -b build-xwayland
+```
+
+##### 追加のYocto CAAM レイヤー
+次にCAAMドライバー拡張レイヤーをダウンロードして、cryptodev-module、cryptodev-linux と　"linux-imx/drivers/crypto/caam/*"ファイルにパッチを適用します。ベースBlobとECDSA（署名/検証/鍵生成）はここ(https://source.codeaurora.org/external/imxsupport/imx_sec_apps/)で取得できます。RSAブラックキー、ECDH、Curve25519などのサポートにさらに拡張するレイヤーがmeta-imx-expand-caamです。これら両ディレクトリを他の既存のmeta-\* ディレクトリの隣のsourcesディレクトリに配置します。
+
+
+```sh
+#直前のコマンドのbuild-xwayland ディレクトリに居る想定
+
+#クローンするかあるいはzipファイルを解凍
+git clone -b caam_expansion https://github.com/JacobBarthelmeh/imx_sec_apps
+cp -r imx_sec_apps/meta-imx-ecdsa-sec ../sources/
+cp -r imx_sec_apps/meta-imx-expand-caam ../sources/
+
+
+# あるいは
+
+git clone https://source.codeaurora.org/external/imxsupport/imx_sec_apps.git
+
+#"meta-imx-expand-caam" はwolfSSL由来
+unzip meta-imx-expand-caam.zip
+
+cp -r imx_sec_apps/meta-imx-ecdsa-sec ../sources/
+mv meta-imx-expand-caam ../sources/
+```
+
+それらレイヤーをビルドに加えます。ecdsaを最初に加え、次にCAAM拡張を加えます：
+
+```sh
+vim conf/local.conf
+EXTRA_IMAGE_FEATURES_append = " dev-pkgs tools-sdk tools-debug ssh-server-openssh "
+IMAGE_INSTALL_append = " cryptodev-module cryptodev-linux eckey "
+```
+
+このビルドでは、デバッグツールとSSHサーバーを追加しましたが、サイズを削減する必要がある場合はこれらは必要ありません。追加する重要な項目は"cryptodev-module と cryptodev-linux"です。 "eckey"は、BLOBのカプセル化とカプセル化解除を行うためのNXPのデモツールです。
+
+[オプション]
+cryptodevモジュールの自動ロードを追加するには、次の行をconf/local.confに追加します:
+
+```sh
+KERNEL_MODULE_AUTOLOAD += "cryptodev"
+```
+
+それ以外の場合は、電源を入れ直すたびに"modprobe cryptodev"を使用してモジュールをロードする必要があります。
+
+##### ビルドとデプロイ
+イメージのビルドの開始には次のコマンドを使います。そのあとで、もしSDカードを使っているならばカードに書き込みます：
+
+```sh
+bitbake core-image-base
+
+cd tmp/deploy/images/imx8qxpc0mek/
+bzcat core-image-base-imx8qxpc0mek.sdcard.bz2 | sudo dd of=/dev/diskX bs=5m
+```
+注: 5mはMac OSの場合に使用し、Linuxの場合は5Mを使用します。diskXはsdcardの場所、つまりMacのdisc2またはLinuxのsdbXに置き換える必要があります。実行する前に、SDカードのディスク番号を確認してください。
+
+後で wolfssl/examples のビルドに使用するために、次のコマンドを使用してインストール ディレクトリをエクスポートします:
+
+```sh
+export CRYPTODEV_DIR=`pwd`/tmp/sysroots-components/aarch64/cryptodev-linux/usr/include/
+```
+
+クロスコンパイルのためにツールチェーンをインストールするには次のYoctoコマンドを使います：
+
+```sh
+bitbake meta-toolchain
+sudo ./tmp/deploy/sdk/<version>.sh
+```
+
+#### NXP HSMのビルド
+##### zlibのビルド
+
+いくつかの方法がありますが、ひとつの方法はYoctoビルドに含めてしまう方法があります。また、他の方法としてはbitbakeを使って次のようにビルドする方法も取れます：
+
+```sh
+cd build-xwayland
+bitbake zlib
+```
+
+このコマンドは実行結果をtmp/sysroots-components/aarch64/zlib/usr/ディレクトリに配置します。wolfssl/examples で後に使用するのでインストールディレクトリを次のコマンドでエクスポートします：
+
+```sh
+export ZLIB_DIR=`pwd`/tmp/sysroots-components/aarch64/zlib/usr/
+```
+
+##### NXP HSM libのビルド
+NXP HSM ライブラリをダウンロードして必要なzlibが見つかるようにMakefileや環境変数を調整します。
+
+```sh
+git clone https://github.com/NXP/imx-seco-libs.git
+cd imx-seco-libs
+git checkout imx_5.4.24_2.1.0
+```
+
+```sh
+vim Makefile
+
+
+CFLAGS = -O1 -Werror -fPIC -I$(ZLIB_DIR)/include -L$(ZLIB_DIR)/lib
+```
+
+さらに
+
+```sh
+make
+make install
+```
+
+後で wolfssl/examples のビルドに使用するために、次のコマンドを使用してインストール ディレクトリをエクスポートします:
+
+```sh
+export HSM_DIR=`pwd`/export/usr/
+```
+
+Make install を行うとデフォルトで結果を"export"サブディレクトリに配置します。
+
+#### wolfSSLのビルド
+##### Autoconfを使ってのビルド
+
+開発ツールを使用してYoctoイメージをセットアップすると、wolfSSLをシステム上に直接構築できます。より最小限のアプローチとして、クロスコンパイルを使用できます。デバッグメッセージは –enable-debug で有効にできます。SECO作業に固有の追加のデバッグメッセージは、マクロ DEBUG_SECOを定義し、/dev/crypto呼び出しのDEBUG_DEVCRYPTOを定義することで有効にできます。どちらの追加のデバッグメッセージもprintfを使用し、stdoutパイプに出力します。
+SECOで使用するための重要な有効化オプションがいくつかあります。 --enable-caam=seco、--enable-devcrypto=seco、--with-seco=/hsm-lib/exportなどです。
+
+HSM SECO のみを使用したビルド例 (追加アルゴリズムの devcrypto サポートなし)
+
+```sh
+source /opt/fsl-imx-wayland/5.4-zeus/environment-setup-aarch64-poky-linux
+
+# wolfSSLのビルドで依存しているコンポーネントをインストール
+sudo apt-get install autoconf automake libtool
+
+./autogen.sh
+./configure --host=aarch64-poky-linux --with-libz=$ZLIB_DIR --with-seco=$HSM_DIR \ --enable-caam=seco --enable-cmac --enable-aesgcm --enable-aesccm --enable-keygen \
+CPPFLAGS="-DHAVE_AES_ECB"
+make
+```
+
+HSM SECOと追加のdevcryptoサポートを使ってのビルド例。インクルードパスとしてcrypto/cryptpdev.hを指定する必要があります。
+
+```sh
+./configure --host=aarch64-poky-linux --with-libz=$ZLIB_DIR --with-seco=$HSM_DIR \
+--enable-caam=seco --enable-cmac --enable-aesgcm --enable-aesccm --enable-keygen \
+CPPFLAGS="-DHAVE_AES_ECB -I$CRYPTODEV_DIR" --enable-devcrypto=seco \
+--enable-curve25519
+make
+```
+
+wolfCrypt_Init/wolfSSL_Init関数呼び出しの早い段階でエラーを発生させるフェイルセーフがあります。1つのケースは、cryptodevモジュールがロードされていないか、必要な操作に利用できるサポートがない場合です。もう1つのケースはinitです。NXP HSMをセットアップできない場合、操作は失敗します。アプリケーションの初期化に失敗した場合、wolfSSLビルドに --enable-debug を追加し、wolfSSL の初期化前に関数呼び出し wolfSSL_Debugging_ON()を実行すると、失敗の理由に関する有用なデバッグメッセージが出力されます。
+
+デバッグオプションを有効にしてビルドする例：
+
+```sh
+./configure --host=aarch64-poky-linux --with-libz=$ZLIB_DIR --with-seco=$HSM_DIR \
+--enable-caam=seco --enable-cmac --enable-aesgcm --enable-aesccm --enable-keygen \
+CPPFLAGS="-DHAVE_AES_ECB -I$CRYPTODEV_DIR -DDEBUG_SECO -DDEBUG_DEVCRYPTO" \
+--enable-devcrypto=seco --enable-curve25519
+```
+
+##### user_settings.hを使ってのビルド
+autotoolsを使用する代わりに有効化できるマクロが各種用意されています。
+
+***CAAM***
+- WOLFSSL_CAAM - CAAM サポートを有効にするメインのマクロスイッチ。
+- WOLF_CRYPTO_CB - CAAM サポートはcrypto callbacksを使用します。
+- WOLFSSL_SECO_CAAM - SECO HSMをCAAMと共に使用することを有効にする(AES-GCMが平文の鍵をHSMにインポートする際に使用される)。
+- WOLFSSL_HASH_KEEP - SHA256 などのアルゴリズムを使用してハッシュする場合、メッセージを構築し、Final への呼び出し時にのみハッシュされるように送信します。
+- WOLFSSL_CAAM_ECC - CAAM ECCサポートを有効にします。
+- WOLFSSL_CAAM_CMAC - CAAM CMACサポートを有効にします。
+- WOLFSSL_CAAM_CIPHER - CAAM AESサポートを有効にします。
+- WOLFSSL_CAAM_HMAC - CAAM HMACサポートを有効にします。
+- WOLFSSL_CAAM_HASH - CAAM hashingサポートを有効にします。
+- WOLFSSL_CAAM_CURVE25519 - CAAM Curve25519サポートを有効にします。
+
+***cryptodev-linux***
+- WOLFSSL_DEVCRYPTO - cryptodev-linuxサポートを有効にするメインのマクロスイッチ。
+- WOLFSSL_DEVCRYPTO_HMAC - HMAC with cryptodev-linuxを使ったHMACサポートを有効にします。
+- WOLFSSL_DEVCRYPTO_RSA - cryptodev-linuxを使ったRSAサポートを有効にします。
+- WOLFSSL_DEVCRYPTO_CURVE25519 - cryptodev-linuxを使ったCurve25519サポートを有効にします。
+- WOLFSSL_DEVCRYPTO_ECDSA - cryptodev-linuxを使ったECDSAサポートを有効にします。
+- WOLFSSL_DEVCRYPTO_HASH_KEEP - cryptodev-linuxを使ったハッシュ値の保持サポートを有効にします。
+
+***CAAM サポートに必要なコンパイルすべき追加のファイル:***
+
+- wolfssl/wolfcrypt/src/port/caam/wolfcaam_aes.c
+- wolfssl/wolfcrypt/src/port/caam/wolfcaam_cmac.c
+- wolfssl/wolfcrypt/src/port/caam/wolfcaam_rsa.c
+- wolfssl/wolfcrypt/src/port/caam/wolfcaam_ecdsa.c
+- wolfssl/wolfcrypt/src/port/caam/wolfcaam_x25519.c
+- wolfssl/wolfcrypt/src/port/caam/wolfcaam_hash.c
+- wolfssl/wolfcrypt/src/port/caam/wolfcaam_hmac.c
+- wolfssl/wolfcrypt/src/port/caam/wolfcaam_init.c
+- wolfssl/wolfcrypt/src/port/caam/wolfcaam_seco.c
+- wolfssl/wolfcrypt/src/port/devcrypto/devcrypto_ecdsa.c
+- wolfssl/wolfcrypt/src/port/devcrypto/devcrypto_x25519.c
+- wolfssl/wolfcrypt/src/port/devcrypto/devcrypto_rsa.c
+- wolfssl/wolfcrypt/src/port/devcrypto/devcrypto_hmac.c
+- wolfssl/wolfcrypt/src/port/devcrypto/devcrypto_hash.c
+- wolfssl/wolfcrypt/src/port/devcrypto/devcrypto_aes.c
+- wolfssl/wolfcrypt/src/port/devcrypto/wc_devcrypto.c
+- wolfssl/wolfcrypt/src/cryptocb.c
+
+#### サンプルプログラム
+##### Testwolfcryptの実行
+
+wolfSSLにバンドルされている単体テストは、wolfcrypt/test/test.cにあります。デバイス上でテストを構築して実行する例は次のとおりです。これはWOLFSSL_CAAM_DEVIDを使用するため、NXP HSMライブラリではなくcryptodevモジュールを使用していることに注意してください。
+
+```sh
+./configure --host=aarch64-poky-linux --with-libz=$ZLIB_DIR \
+--with-seco=$HSM_DIR --enable-caam=seco --enable-cmac --enable-aesgcm \
+--enable-aesccm --enable-keygen CPPFLAGS="-DHAVE_AES_ECB -I$CRYPTODEV_DIR" \
+--enable-devcrypto=seco --enable-curve25519 --enable-sha224 --enable-static \
+--disable-shared --disable-filesystem
+make
+
+scp wolfcrypt/test/testwolfcrypt root@192.168.0.14:/tmp
+ssh root@192.168.0.14
+root@imx8qxpc0mek:~# /tmp/testwolfcrypt
+------------------------------------------------------------------------------
+ wolfSSL version 5.2.0
+------------------------------------------------------------------------------
+error	test passed!
+MEMORY   test passed!
+base64   test passed!
+asn  	test passed!
+RANDOM   test passed!
+MD5  	test passed!
+SHA  	test passed!
+SHA-224  test passed!
+SHA-256  test passed!
+SHA-384  test passed!
+SHA-512  test passed!
+SHA-3	test passed!
+Hash 	test passed!
+HMAC-MD5 test passed!
+HMAC-SHA test passed!
+HMAC-SHA224 test passed!
+HMAC-SHA256 test passed!
+HMAC-SHA384 test passed!
+HMAC-SHA512 test passed!
+HMAC-SHA3   test passed!
+HMAC-KDF	test passed!
+GMAC 	test passed!
+Chacha   test passed!
+POLY1305 test passed!
+ChaCha20-Poly1305 AEAD test passed!
+AES  	test passed!
+AES192   test passed!
+AES256   test passed!
+AES-GCM  test passed!
+AES-CCM  test passed!
+RSA  	test passed!
+DH   	test passed!
+PWDBASED test passed!
+ECC  	test passed!
+ECC buffer test passed!
+CURVE25519 test passed!
+CMAC 	test passed!
+COMPRESS test passed!
+logging  test passed!
+time test passed!
+mutex	test passed!
+memcb	test passed!
+crypto callback test passed!
+Test complete
+Exiting main with return code: 0
+root@imx8qxpc0mek:~#
+```
+
+そのほかのサンプルプログラムをwolfssl-examplesレポジトリのcaam/secoディレクトリ以下に用意しています。
+
+```sh
+git clone https://github.com/wolfssl/wolfssl-examples
+cd wolfssl-examples/caam/seco
+make
+```
+
+##### ソースコードをコンパイル[user_settings.hを使って]
+
+wolfSSLにリンクする単一のソースファイルを構築するには、次のコマンドを使用できます。前のステップの環境変数はまだ設定されています。
+
+```sh
+source /opt/fsl-imx-xwayland/5.4-zeus/environment-setup-aarch64-poky-linux
+
+$CC -DWOLFSSL_USER_SETTINGS -I /path/to/user_settings.h \
+-I $CRYPTODEV_DIR -I $HSM_DIR/include -I ./wolfssl server-dtls.c \
+libwolfssl.a $HSM_DIR/lib/hsm_lib.a $HSM_DIR/lib/seco_nvm_manager.a \
+$ZLIB_DIR/lib/libz.a -lpthread -lm
+```
+
+#### API
+##### 追加されたAPI
+
+***追加APIリスト***
+
+- void wc_SECO_AesSetKeyID(Aes* aes, int keyId);<br>
+この関数はSECOキーIDをAes構造体にセットする際に使用します。Aes構造体が初期化された後で、暗号化/復号操作に使用される前に呼び出される必要があります。
+- int wc_SECO_AesGetKeyID(Aes* aes);<br>
+Aes構造体にセットされているSECOキーIDのゲッター関数です。
+- void wc_SECO_CMACSetKeyID(Cmac* cmac, int keyId);<br>
+wc_SECO_AesSetKeyID関数と似ていますが対象がCmac構造体になっています。
+- int wc_SECO_CMACGetKeyID(Cmac* cmac);<br>
+Cmac構造体にセットされているSECOキーIDのゲッター関数です。
+- int wc_SECO_OpenHSM(word32 keyStoreId, word32 nonce, word16 maxUpdates, byte flag);<br>
+この関数はキーストアが必要となるどの操作（ECCやAES）の前に呼び出される必要があります。最初の引数はキーストアID,"nonce"は特定の32ビットの連番で、キーストアを新規に作成する場合や、既存のキーストアをアンロックするのに使用されます。“maxUpdates”はキーストアが更新できる最大回数を指定します。“flag”はオプショナルフラグで、キーストアが生成されているのかを示すために使用されます。HSMキーストアを生成するためにはflagはCAAM_KEYSTORE_CREATEでなければなりません、CAAM_KEYSTORE_UPDATEは既存のキーストアをオープンし更新します。
+- int wc_SECO_CloseHSM(void);<br>
+この関数は、キーストアの使用が完了したとき、wolfCrypt_Cleanup/wolfSSL_Cleanup を呼び出す前に呼び出す必要があります。現在オープンしているキーストアを閉じます。
+- int wc_SECO_GenerateKey(int flags, int group, byte* out, int outSz, int keyType, int keyInfo, unsigned int* keyIdOut);<br>
+この関数は、SECOで新しいキーを生成するために使用できます。キー生成の場合、フラグはCAAM_GENERATE_KEYである必要があります。キーを更新する場合、フラグは CAAM_UPDATE_KEYである必要があります。keyIdOut引数は、キーの作成時に設定される入出力引数であり、キーの更新時に入力として設定する必要があります。キーを更新する場合は、一時的なタイプである必要があり、更新のためにグループを0に設定する必要があります。
+一時的なタイプは keyInfo 引数として設定されます。keyInfo と KeyTypes の可能なオプションは次のとおりです：
+    - CAAM_KEY_TRANSIENT (keyInfo)
+    - CAAM_KEY_PERSISTENT (keyInfo)
+    - CAAM_KEYTYPE_ECDSA_P256 (keyType)
+    - CAAM_KEYTYPE_ECDSA_P384 (keyType)
+    - CAAM_KEYTYPE_AES128 (keyType)
+- int wc_SECO_DeleteKey(unsigned int keyId, int group, int keyTypeIn);<br>
+キーストアから鍵を削除するのに使用されます。
+
+##### CAAM をサポートするネイティブwolfSSL API
+
+これは、このドキュメントで概説されているSECOビルドでCAAMサポートを備えたネイティブwolfSSL APIのリストです。
+
+AES暗号化および復号操作に使う鍵を生成する場合、次のプロセスを使用します。wc_SECO_GenerateKey の使用(CAAM_GENERATE_KEY, groupID, pubOut, 0, CAAM_KEYTPE_AES128, CAAM_KEY_PERSISTENT, &keyIdOut); ここで、groupID は指定されたグループ番号、pubOut は32バイトのバッファーであり、変数 keyIdOut は生成された新しいキーIDに設定されます。生成されたこの新しいキーIDは、wc_SECO_AesSetKeyID(Aes, keyIdOut)を使用してAes構造体に設定できます。キーIDが構造内に設定され、Aes構造がWOLFSSL_SECO_DEVIDタイプとして初期化されると、すべての暗号化および復号操作にそのキーID が使用されます。
+
+###### ***AES (ECB/CBC)***
+
+AES ECB/CBC鍵を生成する代わりに、Aes構造体が WOLFSSL_SECO_DEVIDで初期化されている場合は、プレーンテキストキーを渡して関数 wc_AesSetKeyを呼び出すことができます。次に、API wc_AesSetKeyは、一意のKEKを使用して鍵を暗号化し、SECO HSMにインポートしようとします。インポートが成功すると、値0が返され、鍵IDがAes構造体に設定されます。
+
+- CBC暗号化はwc_AesCbcEncryptで行われ,復号はwc_AesCbcDecryptで行われます。
+- ECB暗号化はwc_AesEcbEncryptで行われ,復号はwc_AesEcbDecryptで行われます。
+
+Aes構造体の使用が完了したら、wc_AesFree(Aes)を使用して解放する必要があります。
+
+###### ***AES-GCM***
+- GCM暗号化はwc_AesGcmEncrypt, 復号はwc_AesGcmDecryptで行われます。
+
+AES-GCM暗号化関数は、Aes構造体、出力バッファ、入力バッファ、入力バッファサイズ、ノンス、ノンスサイズ (12バイト必要)、MACまたはタグとして知られる、タグサイズ (16 バイトが必要)、追加データ、追加データサイズ（4バイト）を引数として取ります。暗号化の場合、入力バッファは暗号化され、タグバッファは作成されたMACで埋められます。
+
+AES-GCM復号の場合、関数は Aes構造体、プレーンテキスト出力バッファ、暗号テキスト入力バッファ、入力バッファ サイズ、ノンス、ノンスサイズ(12バイト)、暗号化呼び出しで以前に作成されたタグ、タグバッファサイズ、追加データ、 追加のデータサイズを引数として取ります。復号化時にタグバッファがチェックされ、メッセージの整合性が検証されます。
+
+Aes構造体の使用が完了したら、wc_AesFree(Aes)を使用して解放する必要があります。
+
+###### ***AES-CCM***
+
+- CCM号化はwc_AesCcmEncrypt, 復号はwc_AesCcmDecryptで行われます。
+
+AES-CCM暗号化関数は、Aes構造体、出力バッファ、入力バッファ、入力バッファサイズ、ノンス、ノンスサイズ (12 バイトが必要)、MACまたはタグとして知られる、タグサイズ(16バイト必要)、 追加データ、追加データサイズ（0バイト）。追加のデータバッファは NULLにする必要があり、NXP HSMライブラリではサイズ 0 が必要です。 暗号化の場合、入力バッファは暗号化され、タグ バッファは作成された MACで埋められます。
+
+AES-CCM復号の場合、関数はAes構造体、プレーンテキスト出力バッファ、暗号テキスト入力バッファ、入力バッファサイズ、ノンス、ノンスサイズ(12バイト)、暗号化呼び出しで以前に作成されたタグ、タグバッファサイズ、追加データ、 追加のデータサイズを引数に取ります。 暗号化関数と同様に、追加のデータバッファーは NULLである必要があります。 復号時にタグバッファがチェックされ、メッセージの整合性が検証されます。
+
+Aes構造体の使用が完了したら、wc_AesFree(Aes)を使用して解放する必要があります。
+
+###### ***AES CMAC***
+
+AES CMAC操作の場合、wc_SECO_GenerateKey(CAAM_GENERATE_KEY, groupID, pubOut, 0, CAAM_KEYTPE_AES128, CAAM_KEY_PERSISTENT, &keyIdOut); を使用してAES鍵を生成できます。ここで、groupIDは指定されたグループ番号、pubOutは32バイトのバッファーであり、変数keyIdOutは生成された新しいキーIDに設定されます。生成されたこの新しいキーID は、wc_SECO_CMACSetKeyID(Cmac, keyIdOut) を使用して Aes構造体に設定できます。キーIDが構造内に設定され、Aes構造体がWOLFSSL_SECO_DEVIDタイプとして初期化されると、すべての暗号化および復号化操作にそのキーIDが使用されます。
+
+SMライブラリはシングル ショットタイプであるため、wc_CmacUpdateを呼び出すたびに入力が内部バッファに保存されます。その後、wc_CmacFinalが呼び出されると、MACを作成するためにバッファ全体がハードウェアに渡されます。
+
+###### ***RSA***
+
+RSA操作では、cryptodev-linuxモジュールが使用されます。これには、AES-ECBで暗号化された黒の秘密鍵のサポートが含まれます。これは、WOLFSSL_CAAM_DEVIDで初期化された場合のデフォルトです。
+
+cryptodev-linuxモジュールで使用されるネイティブwolfSSL APIの例は次のとおりです：
+
+```lang-c
+wc_InitRsaKey_ex(key, heap-hint (can be NULL), WOLFSSL_CAAM_DEVID);
+wc_MakeRsaKey(key, 3072, WC_RSA_EXPONENT, &rng);
+wc_RsaSSL_Sign or wc_RsaPublicEncrypt
+wc_RsaSSL_Verify or wc_RsaPrivateDecrypt
+wc_FreeRsaKey(key)
+```
+
+###### ***ECC***
+
+ECC署名および検証操作では、cryptodev-linuxモジュールまたは NXP HSMライブラリのいずれかを使用できます。共有シークレットを作成するためのECDH操作は、cryptodev-linuxモジュールを使用してのみ実行できます。
+
+SECOで使用する場合 (NXP HSMライブラリを使用)、ecc_key構造体を初期化するときに WOLFSSL_SECO_DEVIDのdev IDフラグを使用する必要があります。cryptodev-linuxモジュールで使用するには、dev IDフラグ WOLFSSL_CAAM_DEVIDを使用する必要があります。関数 wc_ecc_init_ec(key, heap-hint (NULL 可), dev ID) による初期化後、どちらのユースケースも、署名と検証を行うためのネイティブの wolfSSL関数呼び出しの同じ関数に従います。
+
+ecc_key 構造体の初期化後の関数呼び出しの例は次のようになります：
+
+```lang-c
+wc_ecc_make_key(&rng, ECC_P256_KEYSIZE, key);
+wc_ecc_sign_hash(hash, hashSz, sigOut, sigOutSz, &rng, key);
+wc_ecc_verify_hash(sig, sigSz, hash, hashSz, &result, key);
+```
+
+また、cryptodev-linuxモジュール(WOLFSSL_CAAM_DEVID)を使用すると、ECDH関数を使用できます。
+
+```lang-c
+wc_ecc_shared_secret(keyA, keyB, sharedSecret, sharedSecretSz);
+```
+
+###### ***Hash (Sha256, Sha384, HMAC)***
+
+SHA256およびSHA384の操作では、NXP HSMライブラリを使用します。HMAC操作では、cryptodev-linuxモジュールが使用されます。
+
+デフォルトでは、SHA操作は NXP HSMライブラリを利用しようとしますが、明示的にdev IDに設定すると、WOLFSSL_SECO_DEVIDを使用できます。
+
+```lang-c
+wc_InitSha256_ex(sha256, heap-hint, WOLFSSL_SECO_DEVID);
+wc_InitSha384_ex(sha384, heap-hint, WOLFSSL_SECO_DEVID);
+```
+
+NXP HSMライブラリはハッシュのシングルショット操作をサポートしているため、"update"を呼び出すたびに"final"関数が呼び出されるまでバッファが保存され、その後ハッシュダイジェストを作成するためにバッファ全体がハードウェアに渡されます。
+HMACが cryptodev-linuxを使用する場合、Hmac構造体はdev ID WOLFSSL_CAAM_DEVID を使用して初期化する必要があります。
+
+```lang-c
+wc_HmacInit(hmac, heap-hint, WOLFSSL_CAAM_DEVID);
+```
+その後、通常のネイティブwolfSSL APIと同じように使用できます：
+
+```lang-c
+wc_HmacSetKey(hmac, hash-type, key, keySz);
+wc_HmacUpdate(hmac, input, inputSz);
+wc_HmacFinal(hmac, digestOut);
+```
+
+###### ***Curve25519***
+Curve25519ポイント乗算は、cryptodev-linuxモジュールを使用して行われ、ハードウェアで使用するためにdev ID WOLFSSL_CAAM_DEVIDで初期化する必要があります。
+
+API 呼び出しの例は次のようになります:
+
+```lang-c
+wc_curve25519_init_ex(key, heap-hint, WOLFSSL_CAAM_DEVID);
+wc_curve25519_make_key(&rng, CURVE25519_KEYSIZE,  key);
+wc_curve25519_shared_secret(key, keyB, sharedSecretOut, sharedSecretOutSz);
+```
+
+###### ***RNG***
+
+wolfSSL HASH-DRBGに乱数シードを与えるために使われるTRNGでは、NXP HSMライブラリを利用します。これは、wolfSSL が --enable-caam=seco でビルドされるときに、wolfcrypt/src/random.c ファイルにコンパイルされます。 wolfSSLのすべてのRNG初期化では、シードにTRNGが使用されます。標準のRNG API呼び出しは次のようになります:
+
+```lang-c
+wc_InitRng(rng);
+wc_RNG_GenerateBlock(rng, output, outputSz);
+wc_FreeRng(rng);
+```
+
+### i.MX8 (QNX)
+
+### i.MX6 (QNX)
+
+### IMXRT1170 (FreeRTOS)
+
+IMXRT1170で使用するIDEセットアップの例は、IDE/MCUEXPRESSO/RT117 ディレクトリにあります。
+
+#### ビルド手順
+
+- MCUEXPRESSOを開き、ワークスペースをwolfssl/IDE/MCUEXPRESSO/RT1170に設定します。
+- ファイル -> ファイル システムからプロジェクトを開く... -> ディレクトリ : 参照先を wolfssl/IDE/MCUEXPRESSO/RT1170 ディレクトリに設定し、「ディレクトリの選択」をクリックします。
+- wolfssl_cm7、wolfcrypt_test_cm7、CSR_example、PKCS7_exampleを選択します
+- プロジェクトを右クリック -> SDK 管理 -> SDK コンポーネントを更新し、「はい」をクリックします。
+- FreeRTOSConfig.h の configTOTAL_HEAP_SIZE のサイズを、CSR および PKCS7 の例では 60240、wolfcrypt_test_cm7 では約 100000 に増やします。
+- (ノートボードファイルを再作成する必要があります。これは、同じ設定を持つ新しいプロジェクトを作成し、生成されたboard/*ファイルをコピーすることで実行できます)
+- プロジェクトをビルドする
+
+#### RT1170 CAAM ドライバーを拡張
+
+ファイルRT1170/fsl_caam_h.patchおよびRT1170/fsl_caam_c.patchには、Blobの作成/オープン、および ECC ブラックキーの生成と使用のための既存のNXP CAAMドライバーへの変更が含まれています。
+
+パッチを適用するには、まずcaamドライバーを含むプロジェクトを作成します。これにより、ドライバーディレクトリにベースとなるfsl_caam.cとfsl_caam.hが生成されます(つまり、PKCS7_example_cm7/drivers/fls_caam.{c,h})
+。 基本ファイルが生成されたら、ドライバー ディレクトリに"cd"してパッチを適用します：
+```
+cd PKCS7_example_cm7/drivers/
+patch -p1 < ../../fsl_caam_c.patch
+patch -p1 < ../../fsl_caam_h.patch
+```
+
+fsl_caam.hのパッチには、ECCとBlobの両方に定義されたマクロがあります。
+拡張 (CAAM_ECC_EXPANSION および CAAM_BLOB_EXPANSION)。 wolfSSL コードが見つかったとき
+これらのマクロが定義されている (パッチが適用されている) ことを確認してから、
+拡張されたドライバーを使用してコンパイルします。
 
