@@ -89,7 +89,7 @@ wolfSSL サンプル サーバーに接続するための使用例は次のと�
 
 ```
 $ ./examples/provider/ClientSSLSocket.sh 127.0.0.1 11111 \
-  ./examples/provider/client.jks ./examples/provider/client.jks
+  ./examples/provider/client.jks ./examples/provider/ca-server.jks
 ```
 
 client.jksのパスワード は: "wolfSSL test"
