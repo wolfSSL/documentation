@@ -47,7 +47,7 @@ for (Provider prov:providers) {
 
 ###  Unix/Linux
 
-システム/OS レベルで wolfJSSE プロバイダーをインストールするには、"wolfssl.jar"および/または"wolfssl-jsse.jar"を OS の正しい Java インストール ディレクトリにコピーし、"libwolfssljni.so"または"libwolfssljni.dylib" 共有ライブラリがライブラリ検索パスに存在することを確認します。
+システム/OS レベルで wolfJSSE プロバイダーをインストールするには、"wolfssl.jar"および/または"wolfssl-jsse.jar"を OS の正しい Java インストール ディレクトリにコピーし、"libwolfssljni.so"または"libwolfssljni.jnilib" 共有ライブラリがライブラリ検索パスに存在することを確認します。
 
 JAR ファイル (`wolfssl.jar`、`wolfssl-jsse.jar`) と共有ライブラリ(`libwolfssljni.so`)を次のディレクトリに追加します：
 

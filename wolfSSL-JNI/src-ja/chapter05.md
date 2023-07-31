@@ -30,7 +30,7 @@ wolfssljni/
 
 **wolfSSL JNI** ラッパーは `src/java/com/wolfssl` ディレクトリにあり、"**com.wolfssl**" Java パッケージの一部です。 このパッケージは wolfJSSE クラスによって利用されるため、JSSE のユーザーはこのパッケージを直接使用する必要はありません。
 
-wolfSSL JNI と wolfJSSE がコンパイルされると、2 つの JAR ファイルと 1 つのネイティブ共有ライブラリが`./lib` ディレクトリに生成されます。
+wolfSSL JNI と wolfJSSE がコンパイルされると、2 つの JAR ファイルと 1 つのネイティブ共有ライブラリが`./lib` ディレクトリに生成されます。オペレーティングシステムに応じて異なりますが、ネイティブ共有ライブラリには`libwolfssljni.jnilib`と名前をつけることもできます。
 
 
 ```

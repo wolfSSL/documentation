@@ -10,7 +10,7 @@ Unix コマンドライン、Android Studio ビルド、汎用 IDE ビルドを�
 
 パッケージのルートフォルダの `java.sh` スクリプトは、ネイティブのJNI C ソース ファイルをコンパイルしてUnix/Linux または Mac OSX 用の共有ライブラリとするために使用されます。
 
-このスクリプトは、OSX (Darwin) から Linux までのOSを自動検出してインクルード パスと共有ライブラリ拡張タイプをセットアップしようとします。さらに、このスクリプトはJNI C ソース ファイルに対して gcc を直接呼び出して、`./lib/libwolfssljni.so` または`./lib/libwolfssljni.dylib`を生成します。
+このスクリプトは、OSX (Darwin) から Linux までのOSを自動検出してインクルード パスと共有ライブラリ拡張タイプをセットアップしようとします。さらに、このスクリプトはJNI C ソース ファイルに対して gcc を直接呼び出して、`./lib/libwolfssljni.so` または`./lib/libwolfssljni.jnilib`を生成します。
 
 
 ```
