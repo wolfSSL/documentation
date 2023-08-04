@@ -66,7 +66,7 @@ OpenJDK を使用する Ubuntu では、このパスは次のようになりま�
 
 
 ```
-security.provider.N=com.wolfssl.provider.jce.WolfSSLProvider
+security.provider.N=com.wolfssl.provider.jsse.WolfSSLProvider
 ```
 
 java.security ファイルは次の場所にあります:
@@ -78,7 +78,7 @@ $JAVA_HOME /jre/lib/security/java.security
 
 
 ```
-security.provider.1=com.wolfssl.provider.jce.WolfSSLProvider
+security.provider.1=com.wolfssl.provider.jsse.WolfSSLProvider
 ```
 
 ###  Android OSP (AOSP)
