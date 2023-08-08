@@ -1083,6 +1083,10 @@ wolfSSLは、ESP32-WROOM-32ハードウェアベースの暗号化を使用で�
 ESP32 とは異なり、ESP8266 で使用できるハードウェアベースの暗号化はありません。 「user_settings.h」の「WOLFSSL_ESP8266」定義を参照してください。
 または `./configure CFLAGS="-DWOLFSSL_ESP8266"` を使用して、組み込み ESP8266 ターゲット用にコンパイルします。
 
+### ERF32
+
+wolfSSLはERF32ファミリーのハードウェアベースの暗号化を使用できます。
+user_settings.hに`WOLFSSL_SILABS_SE_ACCEL`を定義してください。現在wolfSSLは、RNG、AES-CBC、AES-GCM、AES-CCM、SHA-1、SHA-2、ECDHEとECDSAのハードウェアアクセラレーションをサポートしています。さらに詳細な情報とベンチマーク結果はwolfSSLレポジトリツリーのwolfcrypt/src/port/silabsのREADME.mdを参照してください。
 
 ## SSL検査(Sniffer)
 
