@@ -1090,3 +1090,168 @@ wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P521_KYBER_90S_LE
 アルゴリズム固有のベンチマーク情報については、OQS プロジェクトの Web サイトにベンチマーク情報があります。
 
 <https://openquantumsafe.org/benchmarking/>
+
+## ポスト量子ステートフルハッシュベース署名
+
+このセクションでは最近wolfSSLがサポートを開始したLMS/HSSなどのポスト量子ステートフルハッシュベース署名（HBS)スキームをカバーしています。
+
+### 動機づけ
+
+ステートフルHBSスキームには、さまざまな理由から関心が高まっています。ステートフルHBSスキームの主な動機はポスト量子セキュリティです。この付録で以前に説明したように、Shorのアルゴリズムを使用すると、量子コンピュータが大きな整数を効率的に因数分解し、離散対数を計算できるため、RSAやECCなどの公開鍵暗号化スキームを完全に突破できます。
+
+対照的に、ステートフルHBSスキームは、その基礎となるハッシュ関数とマークルツリー(通常はSHA256で実装される) のセキュリティに基づいており、暗号に関連する量子コンピューターの出現によって破られるとは予想されていません。これらの理由により、これらはNIST SP 800-208およびNSAのCNSA 2.0スイートによって推奨されています。詳細については、次の2つのリンクを参照してください：
+
+- <https://csrc.nist.gov/publications/detail/sp/800-208/final>
+- <https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF>
+
+さらに、CNSA 2.0タイムラインでは、ポスト量子ステートフルHBSスキームを2030年までに独占的に使用し、採用を「直ちに」開始する必要があると指定しています。実際LMSの導入は、CNSA 2.0スイートのスケジュールにおける最も早い要件です。
+
+ただし、ステートフルHBSスキームの性質上、その使用と状態の追跡には十分な注意が必要です。ステートフルHBSシステムでは、秘密鍵は実際にはワンタイム署名 (OTS)鍵の有限セットであり、再利用することはできません。同じOTS鍵を使用して2つの異なるメッセージに署名すると、攻撃者が署名を偽造することが可能になり、スキーム全体のセキュリティが崩れてしまいます。したがって、ステートフルHBSスキームは、公共のインターネットなどの一般的な用途には適していません。
+
+代わりに、これらの独自の強みと特性、およびNISTおよびNSAの支援により、LMS/HSSなどのステートフルHBSスキームは、オフラインファームウェア認証と署名検証、特に長期間の運用が予想される組み込みシステムまたは制約付きシステムで特に重要です。 したがって、暗号化に関連する量子コンピューターに対する耐性が必要です。
+
+
+### LMS/HSS署名
+
+wolfSSLは、wolfCrypt組み込み暗号エンジンにLMS/HSSハッシュベースの署名スキームのサポートを追加しています。これは、以前のlibOQS統合と同様に、hash-sigsLMS/HSSライブラリ(<https://github.com/cisco/hash-sigs>)との実験的な統合によって実現されます。
+
+Leighton-Micali Signatures(LMS)とそのマルチツリーのバリアントであるHierarchical Signature System(HSS)は、ポスト量子、ステートフルハッシュベース署名スキームです。公開鍵と秘密鍵が小さく、署名と検証が速いことで知られています。シグネチャのサイズは大きくなりますが、Winternitzパラメーターを介して調整できます。詳細については、RFC8554の次の2つのリンクを参照してください：
+
+- LMS: <https://datatracker.ietf.org/doc/html/rfc8554>
+- HSS: <https://datatracker.ietf.org/doc/html/rfc8554#section-6>
+
+前述したように、LMS/HSS署名システムは有限数のワンタイム署名(OTS)鍵で構成されているため、有限数の署名しか安全に生成できません。ただし、署名の数と署名のサイズは、次に説明する一連の定義済みパラメーターを介して調整できます。
+
+#### サポートしているパラメータ
+
+LMS/HSS署名は3つのパラメータによって定義されます。
+- levels: マークルツリーのレベル数
+- height: 個々のマークルツリーの高さ
+- Winternitz: ウィンターニッツチェーンで使用されるハッシュのビット数。 署名サイズの時空間トレードオフとして使用されます。
+
+wolfSSLは、RFC8554で定義されているすべてのLMS/HSSパラメータをサポートします：
+
+- levels = {1..8}
+- height = {5, 10, 15, 20, 25}
+- Winternitz = {1, 2, 4, 8}
+
+利用可能な署名の数:
+- N = 2 ** (levels * height)
+
+便宜上、一部のパラメータセットは列挙型 `wc_LmsParm` で事前定義されています。 その値を以下の表に示します：
+
+パラメータセット |  意味
+--------------------  |  ---------------------------
+WC_LMS_PARM_NONE      | 設定されていません。デフォルトを使用します (WC_LMS_PARM_L1_H15_W2)
+WC_LMS_PARM_L1_H15_W2 | level:1, height:15, Winternitz:2
+WC_LMS_PARM_L1_H15_W4 | level:1, height:15, Winternitz:4
+WC_LMS_PARM_L2_H10_W2 | level:2, height:10, Winternitz:2
+WC_LMS_PARM_L2_H10_W4 | level:2, height:10, Winternitz:4
+WC_LMS_PARM_L2_H10_W8 | level:2, height:10, Winternitz:8
+WC_LMS_PARM_L3_H5_W2  | level:3, height:5, Winternitz:2
+WC_LMS_PARM_L3_H5_W4  | level:3, height:5, Winternitz:4
+WC_LMS_PARM_L3_H5_W8  | level:3, height:5, Winternitz:8
+WC_LMS_PARM_L3_H10_W4 | level:3, height:10, Winternitz:4
+WC_LMS_PARM_L4_H5_W8  | level:4, height:5, Winternitz:8
+
+ここで設定したパラメータに対する署名のサイズと署名の数を表示します：
+
+
+パラメータセット |  署名サイズ | 署名数
+--------------------  | -------------------- | --------------------
+WC_LMS_PARM_L1_H15_W2 | 4784 | 32768
+WC_LMS_PARM_L1_H15_W4 | 2672 | 32768
+WC_LMS_PARM_L2_H10_W2 | 9300 | 1048576
+WC_LMS_PARM_L2_H10_W4 | 5076 | 1048576
+WC_LMS_PARM_L2_H10_W8 | 2964 | 1048576
+WC_LMS_PARM_L3_H5_W2  | 13496 | 32768
+WC_LMS_PARM_L3_H5_W4  | 7160 | 32768
+WC_LMS_PARM_L3_H5_W8  | 3992 | 32768
+WC_LMS_PARM_L3_H10_W4 | 7640 | 1073741824
+WC_LMS_PARM_L4_H5_W8  | 5340 | 1048576
+
+表からわかるように、署名のサイズは主にレベルとウィンターニッツパラメーター、および程度は低いですが高さによって決まります。
+- レベル値を大きくすると、シグネチャサイズが大幅に増加します。
+- 高さの値を大きくすると、署名のサイズが適度に増加します。
+- Winternitz 値を大きくすると、署名のサイズが小さくなりますが、鍵の生成と署名/検証にかかる時間が長くなります。
+
+鍵の生成時間は、第1レベルのツリーの高さによって大きく決まります。使用可能な署名の数が同じであっても、レベル３、高さ5 のツリーは、初期鍵生成時にレベル１、高さ15 のツリーよりもはるかに高速です
+
+#### LMS/HSSビルド方法
+
+wolfSSLリポジトリのINSTALLファイル(https://github.com/wolfSSL/wolfssl/blob/master/INSTALL)を参照してください。 項目17(LMS/HSSサポートのためのhash-sigsライブラリを使用した構築 [実験]) には、wolfSSLとhash-sigs LMS/HSSライブラリを設定および構築する方法についての手順が記載されています。
+
+#### ベンチマークデータ
+次のベンチマークデータは、Fedora 38(`6.2.9-300.fc38.x86_64`)上の8コアIntel i7-8700 CPU@3.20GHzで取得されました。マルチスレッドの例では4スレッドと4コアが使用されましたが、シングルスレッドの例では1コアのみが使用されました。
+
+INSTALLファイルの項目17で説明したように、hash-sigsライブラリは2つの静的ライブラリを提供します。
+- `hss_lib.a`: シングルスレッドバージョン。
+- `hss_lib_thread.a`: マルチスレッドバージョン。
+
+マルチスレッドバージョンではワーカースレッドが生成され、鍵生成などのCPUを集中的に使用するタスクが高速化されます。これにより、主にすべてのパラメータ値に対する鍵の生成と署名が高速化され、程度は低いですが、より大きなレベル値の検証が高速化されます。
+
+参考までに、wolfSSLは両方のベンチマークを取得するために次のようにして構築されました。
+
+
+```text
+  ./configure \
+    --enable-static \
+    --disable-shared \
+    --enable-lms=yes \
+    --with-liblms=<path to hash sigs install>
+```
+
+**マルチスレッドベンチマーク**
+
+以下は、集中的なタスクを並列化するために4スレッドを使用し、4コアを使用したマルチスレッド `hss_lib_thread.a` と共にビルドして取得したベンチマークデータです。
+
+
+```text
+./wolfcrypt/benchmark/benchmark -lms_hss
+------------------------------------------------------------------------------
+ wolfSSL version 5.6.3
+------------------------------------------------------------------------------
+Math: 	Multi-Precision: Wolf(SP) word-size=64 bits=4096 sp_int.c
+wolfCrypt Benchmark (block bytes 1048576, min 1.0 sec each)
+LMS/HSS L2_H10_W2  9300     sign      1500 ops took 1.075 sec, avg 0.717 ms, 1394.969 ops/sec
+LMS/HSS L2_H10_W2  9300   verify      5200 ops took 1.002 sec, avg 0.193 ms, 5189.238 ops/sec
+LMS/HSS L2_H10_W4  5076     sign       800 ops took 1.012 sec, avg 1.265 ms, 790.776 ops/sec
+LMS/HSS L2_H10_W4  5076   verify      2500 ops took 1.003 sec, avg 0.401 ms, 2493.584 ops/sec
+LMS/HSS L3_H5_W4  7160     sign      1500 ops took 1.051 sec, avg 0.701 ms, 1427.485 ops/sec
+LMS/HSS L3_H5_W4  7160   verify      2700 ops took 1.024 sec, avg 0.379 ms, 2636.899 ops/sec
+LMS/HSS L3_H5_W8  3992     sign       300 ops took 1.363 sec, avg 4.545 ms, 220.030 ops/sec
+LMS/HSS L3_H5_W8  3992   verify       400 ops took 1.066 sec, avg 2.664 ms, 375.335 ops/sec
+LMS/HSS L3_H10_W4  7640     sign       900 ops took 1.090 sec, avg 1.211 ms, 825.985 ops/sec
+LMS/HSS L3_H10_W4  7640   verify      2400 ops took 1.037 sec, avg 0.432 ms, 2314.464 ops/sec
+LMS/HSS L4_H5_W8  5340     sign       300 ops took 1.310 sec, avg 4.367 ms, 228.965 ops/sec
+LMS/HSS L4_H5_W8  5340   verify       400 ops took 1.221 sec, avg 3.053 ms, 327.599 ops/sec
+Benchmark complete
+```
+
+**シングルスレッドベンチマーク**
+
+以下は、シングルスレッドの`hss_lib.a`と共にビルドして取得したベンチマークデータです
+これは単一のコアのみを使用します。
+
+
+```text
+$ ./wolfcrypt/benchmark/benchmark -lms_hss
+------------------------------------------------------------------------------
+ wolfSSL version 5.6.3
+------------------------------------------------------------------------------
+Math: 	Multi-Precision: Wolf(SP) word-size=64 bits=4096 sp_int.c
+wolfCrypt Benchmark (block bytes 1048576, min 1.0 sec each)
+LMS/HSS L2_H10_W2  9300     sign       800 ops took 1.115 sec, avg 1.394 ms, 717.589 ops/sec
+LMS/HSS L2_H10_W2  9300   verify      4500 ops took 1.001 sec, avg 0.223 ms, 4493.623 ops/sec
+LMS/HSS L2_H10_W4  5076     sign       500 ops took 1.239 sec, avg 2.478 ms, 403.519 ops/sec
+LMS/HSS L2_H10_W4  5076   verify      2100 ops took 1.006 sec, avg 0.479 ms, 2087.944 ops/sec
+LMS/HSS L3_H5_W4  7160     sign       800 ops took 1.079 sec, avg 1.349 ms, 741.523 ops/sec
+LMS/HSS L3_H5_W4  7160   verify      1600 ops took 1.012 sec, avg 0.632 ms, 1581.686 ops/sec
+LMS/HSS L3_H5_W8  3992     sign       100 ops took 1.042 sec, avg 10.420 ms, 95.971 ops/sec
+LMS/HSS L3_H5_W8  3992   verify       200 ops took 1.220 sec, avg 6.102 ms, 163.894 ops/sec
+LMS/HSS L3_H10_W4  7640     sign       400 ops took 1.010 sec, avg 2.526 ms, 395.864 ops/sec
+LMS/HSS L3_H10_W4  7640   verify      1500 ops took 1.052 sec, avg 0.701 ms, 1426.284 ops/sec
+LMS/HSS L4_H5_W8  5340     sign       100 ops took 1.066 sec, avg 10.665 ms, 93.768 ops/sec
+LMS/HSS L4_H5_W8  5340   verify       200 ops took 1.478 sec, avg 7.388 ms, 135.358 ops/sec
+Benchmark complete
+```
