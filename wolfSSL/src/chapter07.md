@@ -100,10 +100,10 @@ extended key usage OID will cause a parsing error.
 #### Custom OID
     
 Custom OID injection and parsing was introduced in wolfSSL version 5.3.0. The 
-enable options `--enable-certgen` and `--enable-asn-template` must be used along 
-with the macros; `WOLFSSL_CUSTOM_OID` and `HAVE_OID_ENCODING` for working with 
-custom extensions. After building wolfSSL with these settings the function
-wc_SetCustomExtension can be used to set a custom extension in a Cert struct.
+enable options `--enable-certgen` must be used along with the macros
+`WOLFSSL_CUSTOM_OID` and `HAVE_OID_ENCODING` for working with custom extensions.
+After building wolfSSL with these settings the function wc_SetCustomExtension()
+can be used to set a custom extension in a Cert struct.
 
 ## Certificate Loading
 
