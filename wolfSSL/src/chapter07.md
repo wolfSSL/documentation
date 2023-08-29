@@ -97,13 +97,19 @@ extended key usage OID will cause a parsing error.
 | id-kp-timeStamping | Yes |
 | id-kp-OCSPSigning | Yes |
     
-#### Custom OID
+#### Custom OID Extensions
     
-Custom OID injection and parsing was introduced in wolfSSL version 5.3.0. The 
-enable options `--enable-certgen` must be used along with the macros
-`WOLFSSL_CUSTOM_OID` and `HAVE_OID_ENCODING` for working with custom extensions.
-After building wolfSSL with these settings the function wc_SetCustomExtension()
-can be used to set a custom extension in a Cert struct.
+Custom OID X.509 extension injection and parsing was introduced in wolfSSL
+version 5.3.0. The enable options `--enable-certgen` must be used along with the
+macros `WOLFSSL_ASN_TEMPLATE`, `WOLFSSL_CUSTOM_OID` and `HAVE_OID_ENCODING` to
+enable custom extensions. `WOLFSSL_ASN_TEMPLATE` is defined by default when
+using `./configure` but needs to be manually defined if building with
+`WOLFSSL_USER_SETTINGS`.
+
+After building wolfSSL with these settings the function
+`wc_SetCustomExtension()` can be used to set a custom extension in a `Cert`
+struct and `wc_SetUnknownExtCallback()` can be used to register a callback for
+handling unknown extension OIDs in a `DecodedCert` struct.
 
 ## Certificate Loading
 
