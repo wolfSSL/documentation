@@ -1365,6 +1365,14 @@ Enable Max Strength build, allows TSLv1.2-AEAD-PFS ciphers only
 
 Disable Hardened build, Enables Timing Resistance and Blinding
 
+To disable via user_settings.h the equivalent settings would be:
+
+* `#define WC_NO_CACHE_RESISTANT`
+* `#define WC_NO_HARDEN`
+* Remove the setting `WC_RSA_BLINDING` if present or un-define it
+* Remove the setting `ECC_TIMING_RESISTANT` if present or un-define it
+* Remove the setting `TFM_TIMING_RESISTANT` if present or un-define it
+
 ### `--enable-ipv6`
 
 Enable testing of IPv6, wolfSSL proper is IP neutral

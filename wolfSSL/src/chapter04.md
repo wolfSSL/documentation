@@ -696,7 +696,7 @@ See also: [`--disable-harden`](chapter02.md#--disable-harden)
 
 Timing resistance and cache resistance defines enabled with `--enable-harden`:
 
-* `WOLFSSL_SP_CACHE_RESISTANT`: Enables logic to mask the address used.
+* DEPRECATED: `WOLFSSL_SP_CACHE_RESISTANT`: Always on by default, see [`--disable-harden`](chapter02.md#--disable-harden) to disable default cache resistance.
 * `WC_RSA_BLINDING`: Enables blinding mode, to prevent timing attacks.
 * `ECC_TIMING_RESISTANT`: ECC specific timing resistance.
 * `TFM_TIMING_RESISTANT`: Fast math specific timing resistance.
