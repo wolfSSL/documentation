@@ -9,7 +9,7 @@ nav:
     - "3. wolfSSL入門": chapter03.md
     - "4. 機能": chapter04.md
     - "5. ポータビリティ": chapter05.md
-    - "6. コールバク": chapter06.md
+    - "6. コールバック": chapter06.md
     - "7. 鍵と証明書": chapter07.md
     - "8. デバッグ": chapter08.md
     - "9. ライブラリー設計方針": chapter09.md
@@ -31,7 +31,7 @@ nav:
       - "wolfSSL 初期化": group__TLS.md
     - "B. wolfCrypt API レファレンス":
       - "ASN.1": group__ASN.md
-      - "ベースエンコード": group__Base__Encoding.md
+      - "ベースエンコーディング": group__Base__Encoding.md
       - "圧縮": group__Compression.md
       - "エラーレポート": group__Error.md
       - "IoT-Safeモジュール": group__IoTSafe.md
@@ -48,7 +48,7 @@ nav:
       - "暗号アルゴリズム - Camellia": group__Camellia.md
       - "暗号アルゴリズム - ChaCha": group__ChaCha.md
       - "暗号アルゴリズム - ChaCha20_Poly1305": group__ChaCha20Poly1305.md
-      - "Algorithms - CMAC ": group__CMAC.md
+      - "暗号アルゴリズム - CMAC ": group__CMAC.md
       - "コールバック - CryptoCb": group__Crypto.md
       - "暗号アルゴリズム - Curve25519": group__Curve25519.md
       - "暗号アルゴリズム - Curve448": group__Curve448.md

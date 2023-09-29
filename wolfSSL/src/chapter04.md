@@ -540,6 +540,190 @@ Statistics collecting with the sniffer can be compiled in with defining the macr
 * `sslKeyMatches`
 * `sslEncryptedConns`
 
+## Static Buffer Allocation Option
+
+
+By default, wolfSSL assumes that the execution environment provides dynamic memory allocation, i.e., buffers can be allocated/freed with the malloc/free functions. The wolfCrypt cryptography library, which wolfSSL uses internally for underlying cryptography operations, can alternatively be configured to not use dynamic memory. This can be helpful for environments without dynamic memory support, or safety-critical applications where dynamic memory use is disallowed.
+
+### Basic Operation of Static Buffer Allocation
+
+“Dynamic memory allocation” is a management method that dynamically finds/allocates and provides a buffer of a “specified size (variable length)”. Buffer usage efficiency is high, but processing is relatively complicated. On the other hand, the “static buffer allocation” provided by wolfSSL is a memory management model that searches for a buffer close to the requested size from among several types of buffers prepared in advance (statically) and provides it back to the caller. A memory block larger than the requested size may be allocated and returned to the requester of the buffer (thus reducing the efficiency of use). Although not as precise in memory management, it is simple and simulates dynamic memory allocation that dynamically allocates a memory block of any size.
+
+Using static-buffer-allocation is equivalent in API to using dynamic memory with wolfSSL. This functional equivalency is achieved in wolfSSL by abstracting memory allocation/free into XMALLOC/XFREE function calls. Once static-buffer-allocation is set, wolfSSL will use it from then on to allocate buffers and other structures used internally. Since this feature is set for WOLFSSL_CTX, it will continue to work for the lifetime of the context object.
+
+The static-buffer-allocation set in a WOLFSSL_CTX is thread-safe. Even if the same WOLFSSL_CTX is shared by different threads, buffer allocation/free is used under exclusive control inside wolfSSL.
+In comparison to a memory pool functionality offered by an RTOS implementation, memory functionality in an RTOS will commonly suspend a thread (task) if an unused memory block cannot be found when requested until a free block becomes available. wolfSSL’s static memory functionality has no such synchronization capability.
+
+### Specifying Static Buffer Use
+
+With static-buffer-allocation in wolfSSL, it is possible to divide memory between two purposes. It’s possible to allocate and free buffers separately between general purposes and I/O use cases. The buffer used for I/O is set relatively large (about 17KB) to accommodate the maximum TLS fragment size of up to 2^16 bytes. This is different from the buffer sizes for other general uses. Additionally, when setting the buffer configuration the user can limit the maximum number of WOLFSSL objects that can be created simultaneously. If the maximum number of WOLFSSL sessions is limited, each use of the wolfSSL_new() function will check the number of WOLFSSL objects that can be created and will error out if the limit is exceeded.
+
+### Enabling Static Buffer Allocation
+
+Enable the static-buffer-allocation option when building wolfSSL. For systems built using Autoconf, specify “--enable-staticmemory” as follows:
+
+```
+$ ./configure --enable-staticmemory
+```
+Or if you are using a user_settings.h header, add the following macro definition:
+
+```
+user_settings.h
+
+　　#define WOLFSSL_STATIC_MEMORY
+```
+
+The static-buffer-allocation option is implemented by default to additionally call the standard function malloc() without returning NULL when the memory block allocated from the given buffer is exhausted. If the environment does not provide dynamic memory management functionality, a link error will occur. Therefore, also define the **WOLFSSL_NO_MALLOC** macro to disable this feature if needed:
+
+```
+user_settings.h
+
+　　#define WOLFSSL_STATIC_MEMORY
+    #define WOLFSSL_NO_MALLOC
+```
+
+### Using Static Buffer Allocation
+
+This can be helpful for environments without dynamic memory support, or safety-critical applications where dynamic memory use is disallowed.
+
+#### Static buffer setup function and its arguments
+
+This can be helpful for environments without dynamic memory support, or safety-critical applications where dynamic memory use is disallowed.
+
+```
+
+int wolfSSL_CTX_load_static_memory(
+      WOLFSSL_CTX** ctx, /* address of the variable to hold WOLFSSL_CTX */
+      wolfSSL_method_func method,/* method pointer */
+      unsigned char* buf,   /* pointer to the buffer to use as heap */
+      unsigned int sz,      /* buffer size */
+      int flag,              /* heap usage */
+      int max);              /* maximum number of objects allowed */
+
+```
+
+* parameter **ctx** specifies the address of a variable that receives a pointer to the generated WOLFSSL_CTX structure.
+
+* parameter **method** specifies a function pointer with "_ex", such as wolfSSLv23_client_method_ex(). The functions that can be used are listed in a later chapter.
+
+* parameter **buf** and **sz** specify the address and size of the buffer used for the heap, respectively. For information on determining the buffer size to be set, see “**Obtaining the Required Buffer Size**”.
+
+* parameter **flag** is a flag that specifies the usage of the buffer. You can also specify whether to track the allocation status. When specifying for general use, specify "**0**" or **WOLFMEM_GENERAL**. For I/O use, specify **WOLFMEM_IO_POOL** or **WOLFMEM_IO_POOL_FIXED**. When tracking the allocation status of static buffers, **OR** the value specifying the usage with **WOLFMEM_TRACK_STATS**.
+
+* parameter **max** is related to the use of the buffer specified by the argument flag. If the buffer is for general use, you may want to set the maximum number of WOLFSSL objects that can be generated simultaneously (the number of objects that can exist at the same time). Specify **0** if there is **no need to limit**. If you specify a limit value other than 0, subsequent calls to wolfSSL_new() will fail if the number of concurrent WOLFSSL objects created exceeds the set value.
+
+#### How to call the static buffer setup function
+
+When using the static-buffer-allocation option, call the wolfSSL_CTX_load_static_memory() function **twice**. The first sets up a buffer for general use, and then uses that buffer to allocate a WOLFSSL_CTX structure. The second call sets up the I/O buffer:
+
+```
+WOLFSSL_CTX* ctx = NULL; /* pass NULL to generate WOLFSSL_CTX */
+int ret;
+
+#define MAX_CONCURRENT_TLS  0
+#define MAX_CONCURRENT_IO   0
+
+unsigned char GEN_MEM[GEN_MEM_SIZE];
+unsigned char IO_MEM[IO_MEM_SIZE];　
+
+  /* set up a general-purpose buffer and generate WOLFSSL_CTX from it on the first call. */
+   ret = wolfSSL_CTX_load_static_memory(
+           &ctx,                               /* set NULL to ctx */
+           wolfSSLv23_client_method_ex(),  /* use function with "_ex" */
+           GEN_MEM, GEN_MEM_SIZE,            /* buffer and its size */
+           WOLFMEM_GENERAL,                  /* general purpose */
+           MAX_CONCURRENT_TLS);              /* max concurrent objects */
+
+   /* set up a I/O-purpose buffer on the second call. */
+   ret = wolfSSL_CTX_load_static_memory(
+           &ctx,                /* make sure ctx is holding the object */
+           NULL,                           /* pass it to NULL this time */
+           IO_MEM, IO_MEM_SIZE,                /* buffer and its size */
+           WOLFMEM_IO_FIXED,                             /* I/O purpose */
+           MAX_CONCURRENT_IO);               /* max concurrent objects */
+
+```
+
+After this, when you are done using the WOLFSSL_CTX structure, free it with the usual wolfSSL_CTX_free().
+
+### Adjustment of Static Buffer Allocation
+
+The static-buffer-allocation option provided by wolfSSL manages the specified buffer by dividing it into multiple areas called "buckets" as shown in the following diagram. Multiple memory blocks of the same size are linked within a bucket. The figure below omits the structure that manages the memory block, but a buffer with a size that includes the omitted structure is required.
+
+![Alt text](buckets.png)
+
+#### Macros for General Use Buffers
+
+Each bucket varies in size depending on the number of memory blocks it contains and their size. 
+
+The memory block size and number of blocks for each area to be used are defined in /wolfssl/wolfcrypt/memory.h with the following macros:
+
+```
+/wolfssl/wolfcrypt/memory.h
+
+   #define WOLFSSL_STATIC_ALIGN 16  /* alignment 16 bytes by default*/
+   #define WOLFMEM_MAX_BUCKETS  9　　/* number of buckets */
+ 　#define WOLFMEM_IO_SZ         16992   /* buffer size for I/O  */
+   #define LARGEST_MEM_BUCKET   16128   /* the max block size */   
+   #define WOLFMEM_BUCKETS      64,128,256,512,1024,2432,3456,
+                                                   4544,LARGEST_MEM_BUCKET
+   #define WOLFMEM_DIST         49,10,6,14,5,6,9,1,1
+
+```
+
+* **WOLFSSL_STATIC_ALIGN** specifies the buffer alignment size. 16 bytes by default. You need to change it according to the alignment size of your MCU.
+* **WOLFMEM_MAX_BUCKETS** shows the number of buckets. This means using 9 different bucket sizes.
+* **WOLFMEM_BUCKETS** specifies the number of bytes in blocks in each bucket, separated by commas, from smallest to largest. This definition applies to general purpose buffers.
+
+* **WOLFMEM_DIST** specifies the number of same-sized blocks in each bucket, separated by commas, corresponding to each block in WOLFMEM_BUCKETS. This definition applies to general purpose buffers.
+
+In the example above, a bucket with a block size of 64 bytes is the minimum size, and that bucket would have 49 memory blocks. The next larger bucket means 10 memory blocks with a block size of 128 bytes. The above defined values can be used as default values, but the size of each bucket and the number of memory blocks it contains may need to be adjusted when used in an actual environment.
+
+#### Macros for I/O Use Buffers
+
+For TLS client
+
+- `wolfTLSv1_3_client_method_ex`
+- `wolfTLSv1_2_client_method_ex`
+- `wolfTLSv1_1_client_method_ex`
+- `wolfSSLv23_client_method_ex`
+
+For TLS server
+- `wolfTLSv1_3_server_method_ex`
+- `wolfTLSv1_2_server_method_ex`
+- `wolfTLSv1_1_server_method_ex`
+- `wolfSSLv23_server_method_ex`
+
+For DTLS client
+
+- `wolfDTLSv1_3_client_method_ex`
+- `wolfTLSv1_2_client_method_ex`
+- `wolfTLSv1_1_client_method_ex`
+- `wolfSSLv23_client_method_ex`
+
+For DTLS server
+
+- `wolfDTLSv1_3_server_method_ex`
+- `wolfTLSv1_2_server_method_ex`
+- `wolfTLSv1_1_server_method_ex`
+- `wolfSSLv23_server_method_ex`
+
+#### APIs for Static Buffer Allocation
+
+
+|API|description|
+|:---|:---|
+|`wolfSSL_CTX_load_static_memory`|Set buffer for WOLFSSL_CTX as a heap memory.
+|`wolfSSL_CTX_is_static_memory`|Returns whether "Static buffer Allocation" is used. If it is the case, gets usage report. 
+|`wolfSSL_is_static_memory`|Returns whether "Static buffer Allocation" is used. If it is the case, gets usage report. |
+|[`wolfSSL_StaticBufferSz`](group__Memory.md#function-wolfssl_staticbuffersz)| Calculate required buffer size for "Static buffer Allocation" based on the macros defined in /wolfssl/wolfcrypt/memory.h. |
+
+
+
+
+
+
+
 ## Compression
 
 wolfSSL supports data compression with the **zlib** library. The `./configure` build system detects the presence of this library, but if you're building in some other way define the constant `HAVE_LIBZ` and include the path to zlib.h for your includes.
