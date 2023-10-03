@@ -4,10 +4,10 @@ docs_dir: build/html/
 site_dir: html/
 copyright: Copyright © 2022 wolfSSL Inc.
 nav:
-    - "1. Introduction": index.md
-    - "2. Building wolfSentry": chapter02.md
-    - "3. wolfSentry API": chapter03.md
-    - "4. wolfSentry Examples": chapter04.md
+    - "1. Introduction and Build Basics": index.md
+    - "2. Building and Initializing wolfSentry for an application on FreeRTOS/lwIP": freertos-lwip-app.md
+    - "3. Configuring wolfSentry using a JSON document": json_configuration.md
+    - "4. wolfSentry Release History and Change Log": ChangeLog.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material

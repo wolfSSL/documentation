@@ -6,8 +6,7 @@ copyright: Copyright © 2022 wolfSSL Inc.
 nav:
     - "1. はじめに": index.md
     - "2. wolfSentryのビルド": chapter02.md
-    - "3. wolfSentry API": chapter03.md
-    - "4. wolfSentry の使用例": chapter04.md
+    - "3. wolfSentry の使用例": chapter04.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
