@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The wolfSSL (formerly CyaSSL) embedded SSL library can easily be integrated into your existing application or device to provide enhanced communication security through the addition of SSL and TLS. wolfSSL has been targeted at embedded and RTOS environments, and as such, offers a minimal footprint while maintaining excellent performance. Minimum build sizes for wolfSSL range between 20-100kB depending on the selected build options and platform being used.
+The wolfSSL embedded SSL/TLS library can easily be integrated into your existing application or device to provide enhanced communication security through the addition of SSL and TLS. wolfSSL has been targeted at embedded and RTOS environments, and as such, offers a minimal footprint while maintaining excellent performance. Minimum build sizes for wolfSSL range between 20-100kB depending on the selected build options and platform being used.
 
 The goal of this tutorial is to walk through the integration of SSL and TLS into a simple application. Hopefully the process of going through this tutorial will also lead to a better understanding of SSL in general. This tutorial uses wolfSSL in conjunction with simple echoserver and echoclient examples to keep things as simple as possible while still demonstrating the general procedure of adding SSL support to an application. The echoserver and echoclient examples have been taken from the popular book titled [Unix Network Programming, Volume 1, 3rd Edition](http://www.unpbook.com/) by Richard Stevens, Bill Fenner, and Andrew Rudoff.
 
@@ -75,11 +75,11 @@ Please note that in these source code examples, certain functions will be capita
 
 ## Building and Installing wolfSSL
 
-Before we begin, download the example code (`echoserver` and `echoclient`) from the [Getting the Source Code](chapter03.md#getting-the-source-code) section, above. This section will explain how to download, configure, and install the wolfSSL embedded SSL library on your system.
+Before we begin, download the example code (`echoserver` and `echoclient`) from the [Getting the Source Code](chapter03.md#getting-the-source-code) section, above. This section will explain how to download, configure, and install the wolfSSL embedded SSL/TLS library on your system.
 
-You will need to download and install the most recent version of wolfSSL from the wolfSSL [download page](https://wolfssl.com/yaSSL/download/downloadForm.php).
+You will need to download and install the most recent version of wolfSSL from the wolfSSL [download page](https://www.wolfssl.com/download/).
 
-For a full list of available build options, see the [Building wolfSSL](https://www.yassl.com/yaSSL/Docs-cyassl-manual-2-building-cyassl.html) guide. wolfSSL was written with portability in mind, and should generally be easy to build on most systems. If you have difficulty building wolfSSL, please feel free to ask for support on the wolfSSL [product support forums](https://www.wolfssl.com/forums).
+For a full list of available build options, see the [Building wolfSSL](https://www.wolfssl.com/documentation/manuals/wolfssl/chapter02.html) guide. wolfSSL was written with portability in mind, and should generally be easy to build on most systems. If you have difficulty building wolfSSL, please feel free to ask for support on the wolfSSL [product support forums](https://www.wolfssl.com/forums).
 
 When building wolfSSL on Linux, *BSD, OS X, Solaris, or other *nix like systems, you can use the autoconf system. For Windows-specific instructions, please refer to the [Building wolfSSL](chapter02.md#building-wolfssl) section of the wolfSSL Manual. To configure and build wolfSSL, run the following two commands from the terminal. Any desired build options may be appended to `./configure` (ex: `./configure -–enable-opensslextra`):
 
@@ -265,7 +265,7 @@ When loading certificates into the `WOLFSSL_CTX`, the server certificate and key
        exit(EXIT_FAILURE);
   }
 
-  /* Load CA certificates into CYASSL_CTX */
+  /* Load CA certificates into WOLFSSL_CTX */
   if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", 0) !=
            SSL_SUCCESS) {
        fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
@@ -529,8 +529,8 @@ For production applications, you should obtain correct and legitimate certificat
 
 ## Conclusion
 
-This tutorial walked through the process of integrating the wolfSSL embedded SSL library into a simple client and server application. Although this example is simple, the same principles may be applied for adding SSL or TLS into your own application. The wolfSSL embedded SSL library provides all the features you would need in a compact and efficient package that has been optimized for both size and speed.
+This tutorial walked through the process of integrating the wolfSSL embedded SSL/TLS library into a simple client and server application. Although this example is simple, the same principles may be applied for adding SSL or TLS into your own application. The wolfSSL embedded SSL/TLS library provides all the features you would need in a compact and efficient package that has been optimized for both size and speed.
 
 Being dual licensed under GPLv2 and standard commercial licensing, you are free to download the wolfSSL source code directly from our website. Feel free to post to our support forums (<https://www.wolfssl.com/forums>) with any questions or comments you might have. If you would like more information about our products, please contact [info@wolfssl.com](mailto:info@wolfssl.com).
 
-We welcome any feedback you have on this SSL tutorial. If you believe it could be improved or enhanced in order to make it either more useful, easier to understand, or more portable, please let us know at [support@wolfssl.com](mailto:support@yassl.com).
+We welcome any feedback you have on this SSL tutorial. If you believe it could be improved or enhanced in order to make it either more useful, easier to understand, or more portable, please let us know at [support@wolfssl.com](mailto:support@wolfssl.com).
