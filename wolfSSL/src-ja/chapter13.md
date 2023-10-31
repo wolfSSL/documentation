@@ -44,7 +44,7 @@ OpenSSL互換性のための私達のテストベッドはStunnelとLighttpdで�
 
 
 
-## WolfsslとOpenSSLの違い
+## wolfSSLとOpenSSLの違い
 
 
 
@@ -54,7 +54,7 @@ OpenSSL互換性のための私達のテストベッドはStunnelとLighttpdで�
 
 
 
-1. 2ビルド サイズが 20 ～ 100 kB の wolfSSL は、OpenSSL の最大 20 分の 1 です。 wolfSSL は、すべてのバイトが重要なリソースに制約のある環境に適しています。
+1. wolfSSL のビルドサイズは大体20～100kB で、条件がそろえばOpenSSLの20分の1ほどの大きさになります。wolfSSLはリソースに制約の厳しい環境に適した選択肢です。
 
 
 2. Wolfsslは、DTLSを使用したTLS 1.3の最新規格に対応しています。wolfSSL チームは、wolfSSL を現在の標準に合わせて継続的に最新の状態に保つことに専念しています。
