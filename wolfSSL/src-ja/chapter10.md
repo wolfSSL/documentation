@@ -295,6 +295,9 @@ const byte iv[]={ /*some 16 byte iv*/ };
 byte plain[32];   /*an increment of 16, fill with data*/
 byte cipher[32];
 
+wc_AesInit(&enc, HEAP_HINT, INVALID_DEVID);
+wc_AesInit(&dec, HEAP_HINT, INVALID_DEVID);
+
 /*encrypt*/
 wc_AesSetKey(&enc, key, sizeof(key), iv, AES_ENCRYPTION);
 wc_AesCbcEncrypt(&enc, cipher, plain, sizeof(plain));
