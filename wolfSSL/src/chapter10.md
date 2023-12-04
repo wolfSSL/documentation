@@ -180,6 +180,8 @@ wc_Poly1305Final(&pmac, pmacDigest);
 
 wolfCrypt provides support for AES with key sizes of 16 bytes (128 bits), 24 bytes (192 bits), or 32 bytes (256 bits). Supported AES modes include CBC, CTR, GCM, and CCM-8.
 
+**NOTE**: [`wc_AesInit()`](group__AES.md#function-wc_aesinit) should always be called first to initialize the `Aes` structure, before calling other `Aes` API functions such as [`wc_AesSetKey()`](group__AES.md#function-wc_aessetkey), and [`wc_AesGcmSetKey()`](group__AES.md#function-wc_aesgcmsetkey).
+
 CBC mode is supported for both encryption and decryption and is provided through the [`wc_AesSetKey()`](group__AES.md#function-wc_aessetkey), [`wc_AesCbcEncrypt()`](group__AES.md#function-wc_aescbcencrypt) and [`wc_AesCbcDecrypt()`](group__AES.md#function-wc_aescbcdecrypt) functions. Please include the header `wolfssl/wolfcrypt/aes.h` to use AES. AES has a block size of 16 bytes and the IV should also be 16 bytes. Function usage is usually as follows:
 
 ```c
@@ -191,6 +193,9 @@ const byte iv[] = { /*some 16 byte iv*/ };
 
 byte plain[32];   /*an increment of 16, fill with data*/
 byte cipher[32];
+
+wc_AesInit(&enc, HEAP_HINT, INVALID_DEVID);
+wc_AesInit(&dec, HEAP_HINT, INVALID_DEVID);
 
 /*encrypt*/
 wc_AesSetKey(&enc, key, sizeof(key), iv, AES_ENCRYPTION);
