@@ -1,0 +1,27 @@
+site_name: FIPS Ready User Guide
+site_url: https://wolfssl.com/
+docs_dir: build/html/
+site_dir: html/
+copyright: Copyright © 2023 wolfSSL Inc.
+nav:
+    - "1. Overview of FIPS Ready": index.md
+    - "2. Building wolfSSL as FIPS Ready": section02.md
+    - "3. Changes Since FIPS 140-2 Ready": section03.md
+    - "4. wolfCrypt FIPS Ready API": section04.md
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: roboto
+    code: roboto mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
+extra_css: [skin.css]
+use_directory_urls: false
