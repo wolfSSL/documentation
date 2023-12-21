@@ -21,6 +21,7 @@ To build the documentation you will need Docker running on your system. In this 
 * `make wolfssl-jni`
 * `make wolftpm`
 * `make porting`
+* `make fips-ready`
 
 ## Contributing
 
