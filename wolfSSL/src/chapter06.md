@@ -185,3 +185,158 @@ These contexts may be pointers to any user-specified context, which will then in
 Example callbacks can be found in `wolfssl/test.h`, under `myEccSign()`, `myEccVerify()`, `myEccSharedSecret()`, `myRsaSign()`, `myRsaVerify()`, `myRsaEnc()`, and `myRsaDec()`.  Usage can be seen in the wolfSSL example client (`examples/client/client.c`), when using the `-P` command line option.
 
 To use Atomic Record Layer callbacks, wolfSSL needs to be compiled using the [`--enable-pkcallbacks`](chapter02.md#--enable-pkcallbacks) configure option, or by defining the `HAVE_PK_CALLBACKS` preprocessor flag.
+
+
+## Crypto Callbacks (cryptocb)
+
+The Crypto callback framework in wolfSSL/wolfCrypt enables users to override the default implementation of select cryptographic algorithms and provide their own custom implementations at runtime. The most common use case for crypto callbacks is to offload an algorithm to custom hardware acceleration,  however it could also be used to add additional logging/introspection, retrieve keys from secure storage, to call crypto from another library for standards compliance reasons, or even to perform a remote procedure call. 
+
+### Using Crypto callbacks
+
+The high level steps use crypto callbacks are:
+
+1. Compile wolfSSL with crypto callback support
+2. Register a callback and unique device ID (`devId`) with wolfCrypt
+3. Pass the `devId` as an argument to a wolfCrypt API function
+4. (TLS only): associate the `devId` with a wolfSSL context
+
+
+#### 1. Compile wolfSSL with crypto callback support
+Support for crypto callbacks is enabled in wolfSSL via the `–enable-cryptocb` configure option, or `#define WOLF_CRYPTO_CB`.
+
+#### 2. Register your callback and unique devID with wolfCrypt
+
+To use crypto callbacks, the user must register a top-level cryptographic callback function with wolfCrypt and provide a device ID (`devId`), which is an integer ID that uniquely identifies this particular callback function to wolfCrypt. This allows multiple crypto callbacks to be registered with wolfCrypt at once. The appropriate callback function will then be invoked internally by every wolfCrypt function that takes a `devId` parameter, or by wolfSSL when associated with a `WOLFSSL_CTX` or `WOLFSSL` structure.
+
+To register a cryptographic callback function with wolfCrypt, use the `wc_CryptoCb_RegisterDevice` API. This takes a (`devId`), the callback function, and an optional user context that will be passed through to the callback when it is invoked.
+
+```
+typedef int (*CryptoDevCallbackFunc)(int devId, wc_CryptoInfo* info, void* ctx);
+
+WOLFSSL_API int wc_CryptoCb_RegisterDevice(int devId,
+                                           CryptoDevCallbackFunc cb,
+                                           void* ctx);
+```
+
+
+#### 3. Pass the `devId` as an argument to a wolfCrypt API function
+
+For wolfCrypt API’s use the init functions that accept `devId` such as:
+```
+wc_InitRsaKey_ex
+wc_ecc_init_ex
+wc_AesInit
+wc_InitSha256_ex
+wc_InitSha_ex
+wc_HmacInit
+wc_InitCmac_ex
+```
+This is not an exhaustive list. Please refer to the wolfCrypt API documentation to see if a particular algorithm supports crypto callbacks. 
+
+#### 4. (TLS only): associate the devId with a wolfSSL context
+To enable use of a crypto callback when using TLS, you must supply the `devId` arguments on initialization of a `WOLFSSL_CTX` or `WOLFSSL` struct.
+```
+wolfSSL_CTX_SetDevId(ctx, devId);
+wolfSSL_SetDevId(ssl, devId);
+```
+All relevant crypto for TLS connections associated with those structures will now invoke the crypto callback.
+
+### Writing your crypto callback
+
+When a crypto callback is invoked, it will need to know what cryptographic operation has been requested, as well as the location of the input and output data and how to communicate success/failure back to wolfCrypt. This information is relayed to the callback through the `wc_CryptoInfo* info` argument.
+
+At a high level, a crypto callback should determine if it supports the requested operation, act on the input data, update the `wc_CryptoInfo *info` argument with any relevant output data, and return a valid wolfCrypt error code.
+
+#### Determining the Type of Request
+
+The `wc_CryptoInfo` structure contains a union of different structures (some of which are unions themselves), each corresponding to a specific type of cryptographic operation. The type of operation to be performed is determined by `info->algo_type`, which should be a variant of `enum wc_AlgoType` defined in `wolfssl/wolfcrypt/types.h`.  Based on this `algo_type`, the appropriate union element within `wc_CryptoInfo` can be accessed to get or set parameters specific to the operation. We can refer to this top-level union as the "algo type union".
+
+To determine the type of cryptographic request and process it accordingly, one would typically use a switch-case statement on the `algo_type` field of the `wc_CryptoInfo` structure. Each case within the switch would correspond to a different cryptographic operation, such as a symmetric cipher, hashing, public key operations, etc. There is a one-to-one mapping between `wc_AlgoType` and the corresponding algo type union, which are commented in the `wc_CryptoInfo` struct definition in
+`wolfssl/wolfcrypt/cryptocb.h`.
+
+The crypto callback should return zero on success, or a valid wolfCrypt error code on failure. For unsupported algorithms, the callback should return `CRYPTOCB_UNAVAILABLE`, which will cause wolfCrypt to fall back to the internal implementation.
+
+Here's a simplified example to illustrate this:
+
+```
+int myCryptoCallback(int devId, wc_CryptoInfo* info, void* ctx)
+{
+    int ret = CRYPTOCB_UNAVAILABLE;
+
+    switch (info->algo_type) {
+        case WC_ALGO_TYPE_HASH:
+            /* Handle hashing, using algo type union: info->hash */
+            ret = 0; /* or wolfCrypt error code */
+            break;
+
+        case WC_ALGO_TYPE_PK:
+            /* Handle public key operations, using algo type union: info->pk */
+            ret = 0; /* or wolfCrypt error code */
+            break;
+
+        case WC_ALGO_TYPE_CIPHER:
+            /* Handle cipher operations, using algo type union: info->cipher */
+            ret = 0; /* or wolfCrypt error code */
+            break;
+
+        /* and so on for other algo types... */
+    }
+
+    return ret; // Return success or an appropriate error code
+}
+```
+
+Some of the simpler algo type unions, such as the RNG and seed unions, require no further processing and can be immediately acted on. However, more complicated operations like cipher or public key types have multiple union variants unto themselves that must be conditionally interpreted in the same manner. The variants and levels of hierarchy of each union are specific to each category of algorithm type, the full definitions of which can be found in the definition of the `wc_CryptoInfo` structure. As a general rule, each level that is a union will contain some sort of type indicator informing how the rest of the union should be dereferenced.
+
+Here is a simplified example for a complex algo type union with multiple levels of union decoding. The callback contains support for random number generation, as well as ECC key agreement, sign, and verify.
+
+```
+int myCryptoCallback(int devId, wc_CryptoInfo* info, void* ctx)
+{
+    int ret = CRYPTOCB_UNAVAILABLE;
+
+    switch (info->algo_type) {
+        case WC_ALGO_TYPE_PK:
+            /* Handle public key operations, using algo type union: info->pk */
+            switch (info->pk.type) { /* pk type is of type wc_PkType */
+                case WC_PK_TYPE_ECDH:
+                    /* use info->pk.ecdh */
+                    ret = 0; /* or wolfCrypt error code */
+                    break;
+
+                case WC_PK_TYPE_ECDSA_SIGN:
+                    /* use info->pk.eccsign */
+                    ret = 0; /* or wolfCrypt error code */
+                    break;
+
+                case WC_PK_TYPE_ECDSA_VERIFY:
+                    /* use info->pk.eccverify */
+                    ret = 0; /* or wolfCrypt error code */
+                    break;
+            }
+            break;
+
+        case WC_ALGO_TYPE_RNG:
+            /* use info->rng */
+            ret = 0; /* or wolfCrypt error code */
+            break;
+    }
+
+    return ret;
+}
+```
+
+### Handling the request
+
+The data structure for each type of request generally contains a pointer and associated size for input and output data. Depending on the request it may include additional data including cryptographic keys, nonces, or further configuration. The crypto callback should operate on the input data and write relevant output data back to the appropriate variant of the algo type union. Writing data to a union variant that does not correspond to the algorithm type in question (e.g. using `info->cipher` when `info->algo_type == WC_ALGO_TYPE_RNG` is a memory error and can result in undefined behavior.
+
+
+### Examples
+
+Full examples of crypto callbacks can be found in the following locations
+
+    VaultIC Crypto Callbacks: https://github.com/wolfSSL/wolfssl-examples/blob/master/ccb_vaultic/ccb_vaultic.c
+    STSAFE-A100 ECC Crypto Callbacks: https://github.com/wolfSSL/wolfssl/blob/master/wolfcrypt/src/port/st/stsafe.c
+    TPM 2.0 wolfTPM Crypto Callbacks: https://github.com/wolfSSL/wolfTPM/blob/master/src/tpm2_wrap.c
+    Generic wolfCrypt tests: https://github.com/wolfSSL/wolfssl/blob/master/wolfcrypt/test/test.c
+
