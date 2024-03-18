@@ -58,7 +58,7 @@ Again, no dynamic memory is used for this structure since a maximum number of SS
 ```c
 typedef struct packetInfo_st {
     char           packetName[MAX_PACKETNAME_SZ + 1]; /* SSL name */
-    Timeval        timestamp;                  /* when it occured */
+    Timeval        timestamp;                  /* when it occurred */
     unsigned char  value[MAX_VALUE_SZ];     /* if fits, it's here */
     unsigned char* bufferValue;         /* otherwise here (non 0) */
     int            valueSz;              /* sz of value or buffer */
@@ -189,7 +189,7 @@ To use Atomic Record Layer callbacks, wolfSSL needs to be compiled using the [`-
 
 ## Crypto Callbacks (cryptocb)
 
-The Crypto callback framework in wolfSSL/wolfCrypt enables users to override the default implementation of select cryptographic algorithms and provide their own custom implementations at runtime. The most common use case for crypto callbacks is to offload an algorithm to custom hardware acceleration,  however it could also be used to add additional logging/introspection, retrieve keys from secure storage, to call crypto from another library for standards compliance reasons, or even to perform a remote procedure call. 
+The Crypto callback framework in wolfSSL/wolfCrypt enables users to override the default implementation of select cryptographic algorithms and provide their own custom implementations at runtime. The most common use case for crypto callbacks is to offload an algorithm to custom hardware acceleration,  however it could also be used to add additional logging/introspection, retrieve keys from secure storage, to call crypto from another library for standards compliance reasons, or even to perform a remote procedure call.
 
 ### Using Crypto callbacks
 
@@ -210,7 +210,7 @@ To use crypto callbacks, the user must register a top-level cryptographic callba
 
 To register a cryptographic callback function with wolfCrypt, use the `wc_CryptoCb_RegisterDevice` API. This takes a (`devId`), the callback function, and an optional user context that will be passed through to the callback when it is invoked.
 
-```
+```c
 typedef int (*CryptoDevCallbackFunc)(int devId, wc_CryptoInfo* info, void* ctx);
 
 WOLFSSL_API int wc_CryptoCb_RegisterDevice(int devId,
@@ -218,10 +218,12 @@ WOLFSSL_API int wc_CryptoCb_RegisterDevice(int devId,
                                            void* ctx);
 ```
 
+Note: A registered `devId` can be any value other than `-2`, which is reserved for the special `INVALID_DEVID` enum value. Passing `devId == INVALID_DEVID` as an argument into a wolfCrypt API indicates that no callback should be invoked and to use the default internal implementation instead.
 
 #### 3. Pass the `devId` as an argument to a wolfCrypt API function
 
-For wolfCrypt API’s use the init functions that accept `devId` such as:
+For wolfCrypt API’s, use the init functions that accept `devId` such as:
+
 ```
 wc_InitRsaKey_ex
 wc_ecc_init_ex
@@ -231,11 +233,12 @@ wc_InitSha_ex
 wc_HmacInit
 wc_InitCmac_ex
 ```
-This is not an exhaustive list. Please refer to the wolfCrypt API documentation to see if a particular algorithm supports crypto callbacks. 
+
+This will cause wolfCrypt to invoke the crypto callback in place of the default implementation. This is not an exhaustive API list. Please refer to the wolfCrypt API documentation to see if a particular algorithm supports crypto callbacks.
 
 #### 4. (TLS only): associate the devId with a wolfSSL context
 To enable use of a crypto callback when using TLS, you must supply the `devId` arguments on initialization of a `WOLFSSL_CTX` or `WOLFSSL` struct.
-```
+```c
 wolfSSL_CTX_SetDevId(ctx, devId);
 wolfSSL_SetDevId(ssl, devId);
 ```
@@ -258,7 +261,7 @@ The crypto callback should return zero on success, or a valid wolfCrypt error co
 
 Here's a simplified example to illustrate this:
 
-```
+```c
 int myCryptoCallback(int devId, wc_CryptoInfo* info, void* ctx)
 {
     int ret = CRYPTOCB_UNAVAILABLE;
@@ -290,7 +293,7 @@ Some of the simpler algo type unions, such as the RNG and seed unions, require n
 
 Here is a simplified example for a complex algo type union with multiple levels of union decoding. The callback contains support for random number generation, as well as ECC key agreement, sign, and verify.
 
-```
+```c
 int myCryptoCallback(int devId, wc_CryptoInfo* info, void* ctx)
 {
     int ret = CRYPTOCB_UNAVAILABLE;
@@ -328,15 +331,21 @@ int myCryptoCallback(int devId, wc_CryptoInfo* info, void* ctx)
 
 ### Handling the request
 
-The data structure for each type of request generally contains a pointer and associated size for input and output data. Depending on the request it may include additional data including cryptographic keys, nonces, or further configuration. The crypto callback should operate on the input data and write relevant output data back to the appropriate variant of the algo type union. Writing data to a union variant that does not correspond to the algorithm type in question (e.g. using `info->cipher` when `info->algo_type == WC_ALGO_TYPE_RNG` is a memory error and can result in undefined behavior.
+The data structure for each type of request generally contains a pointer and associated size for input and output data. Depending on the request it may include additional data including cryptographic keys, nonces, or further configuration. The crypto callback should operate on the input data and write relevant output data back to the appropriate variant of the algo type union. Writing data to a union variant that does not correspond to the algorithm type in question (e.g. using `info->cipher`
+when `info->algo_type == WC_ALGO_TYPE_RNG` is a memory error and can result in undefined behavior.
+
+### Troubleshooting
+
+Some older compilers don't allow "anonymous inline aggregates", which wolfCrypt uses when defining the nested `wcCryptoInfo` anonymous unions in order to save space. To disable the use of anonymous inline aggregates, define the `HAVE_ANONYMOUS_INLINE_AGGREGATES` preprocessor macro as `0`. This will allow crypto callbacks to be used, but will dramatically increase the size of the `wcCryptoInfo` structure.
 
 
 ### Examples
 
 Full examples of crypto callbacks can be found in the following locations
 
-    VaultIC Crypto Callbacks: https://github.com/wolfSSL/wolfssl-examples/blob/master/ccb_vaultic/ccb_vaultic.c
-    STSAFE-A100 ECC Crypto Callbacks: https://github.com/wolfSSL/wolfssl/blob/master/wolfcrypt/src/port/st/stsafe.c
-    TPM 2.0 wolfTPM Crypto Callbacks: https://github.com/wolfSSL/wolfTPM/blob/master/src/tpm2_wrap.c
-    Generic wolfCrypt tests: https://github.com/wolfSSL/wolfssl/blob/master/wolfcrypt/test/test.c
+* [VaultIC Crypto Callbacks](https://github.com/wolfSSL/wolfssl-examples/blob/master/ccb_vaultic/ccb_vaultic.c)
+* [STSAFE-A100 ECC Crypto Callbacks](https://github.com/wolfSSL/wolfssl/blob/master/wolfcrypt/src/port/st/stsafe.c)
+* [TPM 2.0 wolfTPM Crypto Callbacks](https://github.com/wolfSSL/wolfTPM/blob/master/src/tpm2_cryptocb.c)
+* [Generic wolfCrypt tests](https://github.com/wolfSSL/wolfssl/blob/master/wolfcrypt/test/test.c)
+
 
