@@ -58,7 +58,7 @@ invalid username
 invalid password
 invalid public key
 ```
-The library indicates only _success_ or _failure_ to the client, the specific failure type is only used for logging.
+The library indicates only _success_ or _failure_ to the client, the specific failure type is only used for logging. The library will also indicate _partial-success_ to the client, necessitating an additional authentication.
 
 ```
 WOLFSSH_USERAUTH_SUCCESS
@@ -66,6 +66,7 @@ WOLFSSH_USERAUTH_FAILURE
 WOLFSSH_USERAUTH_INVALID_USER
 WOLFSSH_USERAUTH_INVALID_PASSWORD
 WOLFSSH_USERAUTH_INVALID_PUBLICKEY
+WOLFSSH_USERAUTH_PARTIAL_SUCCESS
 ```
 
 ##  Callback Function Data Types
