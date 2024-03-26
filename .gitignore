@@ -8,3 +8,6 @@ wolfSSL/api/
 wolfSSL/wolfssl/
 wolfTPM/api/
 wolfTPM/wolftpm/
+
+# Exclude Visual Studio Debris
+**/.vs
