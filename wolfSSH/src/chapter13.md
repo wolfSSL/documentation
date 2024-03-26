@@ -1606,7 +1606,7 @@ based on the availability of algorithms in the wolfCrypt library used.
 Provided are some accessor functions to see which algorithms are available
 to use and to see the algorithm lists used in the KEX. The accessor functions
 come in sets of four: set or get from CTX object, and set or get from SSH
-object. All SSH objects made with a CTX inheirit the CTX's algorithm lists,
+object. All SSH objects made with a CTX inherit the CTX's algorithm lists,
 and they may be provided their own.
 
 By default, any algorithms using SHA-1 are disabled but may be re-enabled
@@ -1647,7 +1647,7 @@ WOLFSSH_CTX object, _ctx_. They have default values set at compile time. The
 specified value is used instead. Note, the library does not copy this string,
 it is owned by the application and it is up to the application to free it
 when the CTX is deallocated by the application. When creating an SSH object
-using a CTX, the SSH object inheirits the CTX's strings. The SSH object
+using a CTX, the SSH object inherits the CTX's strings. The SSH object
 algorithm lists may be overridden.
 
 `Kex` specifies the key exchange algorithm list. `Key` specifies the server
