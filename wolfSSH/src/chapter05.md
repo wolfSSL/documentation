@@ -58,7 +58,12 @@ invalid username
 invalid password
 invalid public key
 ```
-The library indicates only _success_ or _failure_ to the client, the specific failure type is only used for logging.
+The server indicates _success_ or _failure_ to the client, the specific
+failure type is only used for logging. There is a special success and failure
+response the callback can return to the library, _partial-success_. This means
+the authentication type was successful, but another authentication type is
+still required to fully authenticate. The server will send a user
+authentication failure message with the partial-success flag set to client.
 
 ```
 WOLFSSH_USERAUTH_SUCCESS
@@ -66,6 +71,7 @@ WOLFSSH_USERAUTH_FAILURE
 WOLFSSH_USERAUTH_INVALID_USER
 WOLFSSH_USERAUTH_INVALID_PASSWORD
 WOLFSSH_USERAUTH_INVALID_PUBLICKEY
+WOLFSSH_USERAUTH_PARTIAL_SUCCESS
 ```
 
 ##  Callback Function Data Types

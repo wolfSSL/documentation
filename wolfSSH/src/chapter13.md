@@ -1521,3 +1521,228 @@ WOLFSSH_CHANNEL* channel );
 ```
 
 
+##  Key Load Functions
+
+
+### wolfSSH_ReadKey_buffer()
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+
+int wolfSSH_ReadKey_buffer(const byte* in, word32 inSz,
+        int format, byte** out, word32* outSz,
+        const byte** outType, word32* outTypeSz,
+        void* heap);
+```
+
+**Description**
+
+Reads a key file from the buffer _in_ of size _inSz_ and tries to decode it
+as a _format_ type key. The _format_ can be **WOLFSSH_FORMAT_ASN1**,
+**WOLFSSH_FORMAT_PEM**, **WOLFSSH_FORMAT_SSH**, or **WOLFSSH_FORMAT_OPENSSH**.
+The key ready for use by `wolfSSH_UsePrivateKey_buffer()` is stored in the
+buffer pointed to by _out_, of size _outSz_. If _out_ is NULL, _heap_ is used
+to allocate a buffer for the key. The type string of the key is stored in
+_outType_, with its string length in _outTypeSz_.
+
+**Return Values**
+
+* **WS_SUCCESS** - read key is successful
+* **WS_BAD_ARGUMENT** - parameter has a bad value
+* **WS_MEMORY_E** - failure allocating memory
+* **WS_BUFFER_E** - buffer not large enough for indicated size
+* **WS_PARSE_E** - problem parsing the key file
+* **WS_UNIMPLEMENTED_E** - key type not supported
+* **WS_RSA_E** - something wrong with RSA (PKCS1) key
+* **WS_ECC_E** - something wrong with ECC (X9.63) key
+* **WS_KEY_AUTH_MAGIC_E** - OpenSSH key auth magic value bad
+* **WS_KEY_FORMAT_E** - OpenSSH key format incorrect
+* **WS_KEY_CHECK_VAL_E** - OpenSSH key check value corrupt
+
+
+### wolfSSH_ReadKey_file()
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+
+int wolfSSH_ReadKey_file(const char* name,
+        byte** out, word32* outSz,
+        const byte** outType, word32* outTypeSz,
+        byte* isPrivate, void* heap);
+```
+
+**Description**
+
+Reads the key from the file _name_. The format is guessed based on data in
+the file. The key buffer _out_, the key type _outType_, and their sizes
+are passed to `wolfSSH_ReadKey_buffer()`. The flag _isPrivate_ is set
+as appropriate. Any memory allocations use the specified _heap_.
+
+**Return Values**
+
+* **WS_SUCCESS** - read key is successful
+* **WS_BAD_ARGUMENT** - parameter has a bad value
+* **WS_BAD_FILE_E** - problem reading the file
+* **WS_MEMORY_E** - failure allocating memory
+* **WS_BUFFER_E** - buffer not large enough for indicated size
+* **WS_PARSE_E** - problem parsing the key file
+* **WS_UNIMPLEMENTED_E** - key type not supported
+* **WS_RSA_E** - something wrong with RSA (PKCS1) key
+* **WS_ECC_E** - something wrong with ECC (X9.63) key
+* **WS_KEY_AUTH_MAGIC_E** - OpenSSH key auth magic value bad
+* **WS_KEY_FORMAT_E** - OpenSSH key format incorrect
+* **WS_KEY_CHECK_VAL_E** - OpenSSH key check value corrupt
+
+
+## Key Exchange Algorithm Configuration
+
+wolfSSH sets up a set of algorithm lists used during the Key Exchange (KEX)
+based on the availability of algorithms in the wolfCrypt library used.
+
+Provided are some accessor functions to see which algorithms are available
+to use and to see the algorithm lists used in the KEX. The accessor functions
+come in sets of four: set or get from CTX object, and set or get from SSH
+object. All SSH objects made with a CTX inherit the CTX's algorithm lists,
+and they may be provided their own.
+
+By default, any algorithms using SHA-1 are disabled but may be re-enabled
+using one of the following functions. If SHA-1 is disabled in wolfCrypt, then
+SHA-1 cannot be used.
+
+
+### wolfSSH Set Algo Lists
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+
+int wolfSSH_CTX_SetAlgoListKex(WOLFSSH_CTX* ctx, const char* list);
+int wolfSSH_CTX_SetAlgoListKey(WOLFSSH_CTX* ctx, const char* list);
+int wolfSSH_CTX_SetAlgoListCipher(WOLFSSH_CTX* ctx, const char* list);
+int wolfSSH_CTX_SetAlgoListMac(WOLFSSH_CTX* ctx, const char* list);
+int wolfSSH_CTX_SetAlgoListKeyAccepted(WOLFSSH_CTX* ctx, const char* list);
+
+int wolfSSH_SetAlgoListKex(WOLFSSH* ssh, const char* list);
+int wolfSSH_SetAlgoListKey(WOLFSSH* ssh, const char* list);
+int wolfSSH_SetAlgoListCipher(WOLFSSH* ssh, const char* list);
+int wolfSSH_SetAlgoListMac(WOLFSSH* ssh, const char* list);
+int wolfSSH_SetAlgoListKeyAccepted(WOLFSSH* ssh, const char* list);
+```
+
+**Description**
+
+These functions act as setters for the various algorithm lists set in the
+wolfSSH _ctx_ or _ssh_ objects. The strings are sent to the peer during the
+KEX Initialization and are used to compare against when the peer sends its
+KEX Initialization message. The KeyAccepted list is used for user
+authentication.
+
+The CTX versions of the functions set the algorithm list for the specified
+WOLFSSH_CTX object, _ctx_. They have default values set at compile time. The
+specified value is used instead. Note, the library does not copy this string,
+it is owned by the application and it is up to the application to free it
+when the CTX is deallocated by the application. When creating an SSH object
+using a CTX, the SSH object inherits the CTX's strings. The SSH object
+algorithm lists may be overridden.
+
+`Kex` specifies the key exchange algorithm list. `Key` specifies the server
+public key algorithm list. `Cipher` specifies the bulk encryption algorithm
+list. `Mac` specifies the message authentication code algorithm list.
+`KeyAccepted` specifies the public key algorithms allowed for user
+authentication.
+
+**Return Values**
+
+* **WS_SUCCESS** - successful
+* **WS_SSH_CTX_NULL_E** - provided CTX was null
+* **WS_SSH_NULL_E** - provide SSH was null
+
+
+### wolfSSH Get Algo List
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+
+const char* wolfSSH_CTX_GetAlgoListKex(WOLFSSH_CTX* ctx);
+const char* wolfSSH_CTX_GetAlgoListKey(WOLFSSH_CTX* ctx);
+const char* wolfSSH_CTX_GetAlgoListCipher(WOLFSSH_CTX* ctx);
+const char* wolfSSH_CTX_GetAlgoListMac(WOLFSSH_CTX* ctx);
+const char* wolfSSH_CTX_GetAlgoListKeyAccepted(WOLFSSH_CTX* ctx);
+
+const char* wolfSSH_GetAlgoListKex(WOLFSSH* ssh);
+const char* wolfSSH_GetAlgoListKey(WOLFSSH* ssh);
+const char* wolfSSH_GetAlgoListCipher(WOLFSSH* ssh);
+const char* wolfSSH_GetAlgoListMac(WOLFSSH* ssh);
+const char* wolfSSH_GetAlgoListKeyAccepted(WOLFSSH* ssh);
+```
+
+**Description**
+
+These functions act as getters for the various algorithm lists set in the
+wolfSSH _ctx_ or _ssh_ objects.
+
+`Kex` specifies the key exchange algorithm list. `Key` specifies the server
+public key algorithm list. `Cipher` specifies the bulk encryption algorithm
+list. `Mac` specifies the message authentication code algorithm list.
+`KeyAccepted` specifies the public key algorithms allowed for user
+authentication.
+
+**Return Values**
+
+These functions return a pointer to either the default value set at compile
+time or the value set at run time with the setter functions. If the _ctx_
+or `ssh` parameters are NULL the functions return NULL.
+
+
+### wolfSSH_CheckAlgoName
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+
+int wolfSSH_CheckAlgoName(const char* name);
+```
+
+**Description**
+
+Given a single algorithm _name_ checks to see if it is valid.
+
+**Return Values**
+
+* **WS_SUCCESS** - _name_ is a valid algorithm name
+* **WS_INVALID_ALGO_ID** - _name_ is an invalid algorithm name
+
+
+### wolfSSH Query Algorithms
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+
+const char* wolfSSH_QueryKex(word32* index);
+const char* wolfSSH_QueryKey(word32* index);
+const char* wolfSSH_QueryCipher(word32* index);
+const char* wolfSSH_QueryMac(word32* index);
+```
+
+**Description**
+
+Returns the name string for a valid algorithm of the particular type: Kex,
+Key, Cipher, or Mac. Note, Key types are also used for the user authentication
+accepted key types. The value passed as _index_ must be initialized to 0,
+the passed in on each call to the function. At the end of the list, the
+_index_ is invalid.
+
+**Return Values**
+
+Returns a constant string with the name of an algorithm. Null indicates the
+end of the list.
