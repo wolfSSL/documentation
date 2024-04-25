@@ -1556,7 +1556,7 @@ Enable session cert storing
 
 ### `--enable-keygen`
 
-Enable key generation
+Enable key generation (applies to RSA key generation only)
 
 ### `--enable-certgen`
 
