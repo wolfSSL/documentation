@@ -646,6 +646,20 @@ unsigned char IO_MEM[IO_MEM_SIZE];　
 
 After this, when you are done using the WOLFSSL_CTX structure, free it with the usual wolfSSL_CTX_free().
 
+#### Setting a Global Heap Hint
+
+A global heap hint can be set using the API `void* wolfSSL_SetGlobalHeapHint(void* heap)`.
+When a global heap hint is set all calls to XMALLOC and XFREE using a NULL pointer as the
+heap hint will be redirected to use the global heap hint set. This is useful in cases where
+no system malloc is available to fall back to and NULL heap hint pointers are being used.
+The function wolfSSL_SetGlobalHeapHint returns the current global heap hint set, and is NOT
+considered to be thread safe.
+
+The getter function `void* wolfSSL_GetGlobalHeapHint(void)` can be used to get the current
+global heap hint set.
+
+This functionality was added in versions of wolfSSL after version 5.7.0.
+
 ### Adjustment of Static Buffer Allocation
 
 The static-buffer-allocation option provided by wolfSSL manages the specified buffer by dividing it into multiple areas called "buckets" as shown in the following diagram. Multiple memory blocks of the same size are linked within a bucket. The figure below omits the structure that manages the memory block, but a buffer with a size that includes the omitted structure is required.
