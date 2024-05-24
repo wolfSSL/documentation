@@ -29,6 +29,7 @@ The downloaded ZIP file has the following structure:
 
 ```text
 /finished_src
+    /certs  (Certificate files)
     /echoclient (Completed echoclient code)
     /echoserver (Completed echoserver code)
     /include    (Modified unp.h)
@@ -186,7 +187,7 @@ gcc -o echoserver ../lib/*.c tcpserv04.c -I ../include -lm -lwolfssl
 
 ## Headers
 
-The first thing we will need to do is include the wolfSSL native API header in both the client and the server. In the `tcpcli01.c` file for the client and the tcpserv04.c file for the server add the following line near the top:
+The first thing we will need to do is include the wolfSSL native API header in both the client and the server. In the `tcpcli01.c` file for the client and the `tcpserv04.c` file for the server add the following line near the top:
 
 ```c
 #include <wolfssl/ssl.h>
@@ -231,23 +232,23 @@ Putting these things together (library initialization, protocol selection, and C
 EchoClient:
 
 ```c
-  WOLFSSL_CTX* ctx;
+    WOLFSSL_CTX* ctx;
 
-  wolfSSL_Init();/* Initialize wolfSSL */
+    wolfSSL_Init();/* Initialize wolfSSL */
 
-  /* Create the WOLFSSL_CTX */
-  if ( (ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method())) == NULL){
-       fprintf(stderr, "wolfSSL_CTX_new error.\n");
-       exit(EXIT_FAILURE);
-  }
+    /* Create the WOLFSSL_CTX */
+    if ( (ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method())) == NULL) {
+        fprintf(stderr, "wolfSSL_CTX_new error.\n");
+        exit(EXIT_FAILURE);
+    }
 
-  /* Load CA certificates into WOLFSSL_CTX */
-  if (wolfSSL_CTX_load_verify_locations(ctx,"../certs/ca-cert.pem",0) !=
-      SSL_SUCCESS) {
-      fprintf(stderr, "Error loading ../certs/ca-cert.pem, please check
-              the file.\n");
-      exit(EXIT_FAILURE);
-  }
+    /* Load CA certificates into WOLFSSL_CTX */
+    if (wolfSSL_CTX_load_verify_locations(ctx,"../certs/ca-cert.pem",0) !=
+        SSL_SUCCESS) {
+        fprintf(stderr, "Error loading ../certs/ca-cert.pem, please check"
+            "the file.\n");
+        exit(EXIT_FAILURE);
+    }
 ```
 
 EchoServer:
@@ -255,39 +256,39 @@ EchoServer:
 When loading certificates into the `WOLFSSL_CTX`, the server certificate and key file should be loaded in addition to the CA certificate. This will allow the server to send the client its certificate for identification verification:
 
 ```c
-  WOLFSSL_CTX* ctx;
+WOLFSSL_CTX* ctx;
 
-  wolfSSL_Init();  /* Initialize wolfSSL */
+wolfSSL_Init();  /* Initialize wolfSSL */
 
-  /* Create the WOLFSSL_CTX */
-  if ( (ctx = wolfSSL_CTX_new(wolfTLSv1_2_server_method())) == NULL){
-       fprintf(stderr, "wolfSSL_CTX_new error.\n");
-       exit(EXIT_FAILURE);
-  }
+/* Create the WOLFSSL_CTX */
+if ( (ctx = wolfSSL_CTX_new(wolfTLSv1_2_server_method())) == NULL) {
+    fprintf(stderr, "wolfSSL_CTX_new error.\n");
+    exit(EXIT_FAILURE);
+}
 
-  /* Load CA certificates into WOLFSSL_CTX */
-  if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", 0) !=
-           SSL_SUCCESS) {
-       fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
-           "please check the file.\n");
-       exit(EXIT_FAILURE);
-  }
+/* Load CA certificates into WOLFSSL_CTX */
+if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", 0) !=
+         SSL_SUCCESS) {
+    fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
+        "please check the file.\n");
+    exit(EXIT_FAILURE);
+}
 
 /* Load server certificates into WOLFSSL_CTX */
-  if (wolfSSL_CTX_use_certificate_file(ctx,"../certs/server-cert.pem",
-        SSL_FILETYPE_PEM) != SSL_SUCCESS){
-      fprintf(stderr, "Error loading ../certs/server-cert.pem, please
-        check the file.\n");
-      exit(EXIT_FAILURE);
-  }
+if (wolfSSL_CTX_use_certificate_file(ctx,"../certs/server-cert.pem",
+        SSL_FILETYPE_PEM) != SSL_SUCCESS) {
+    fprintf(stderr, "Error loading ../certs/server-cert.pem, please"
+        "check the file.\n");
+    exit(EXIT_FAILURE);
+}
 
-  /* Load keys */
-  if (wolfSSL_CTX_use_PrivateKey_file(ctx,"../certs/server-key.pem",
-        SSL_FILETYPE_PEM) != SSL_SUCCESS){
-      fprintf(stderr, "Error loading ../certs/server-key.pem, please check
-        the file.\n");
-      exit(EXIT_FAILURE);
-  }
+/* Load keys */
+if (wolfSSL_CTX_use_PrivateKey_file(ctx,"../certs/server-key.pem",
+        SSL_FILETYPE_PEM) != SSL_SUCCESS) {
+    fprintf(stderr, "Error loading ../certs/server-key.pem, please check"
+        "the file.\n");
+    exit(EXIT_FAILURE);
+}
 ```
 
 The code shown above should be added to the beginning of `tcpcli01.c` and `tcpserv04.c`, after both the variable definitions and the check that the user has started the client with an IP address (client). A version of the finished code is included in the SSL tutorial ZIP file for reference.
@@ -340,22 +341,6 @@ if ( (ssl = wolfSSL_new(ctx)) == NULL) {
 }
 
 wolfSSL_set_fd(ssl, connfd);
-```
-
-A WOLFSSL object needs to be created after each TCP Connect and the socket file descriptor needs to be associated with the session.
-
-Create a new WOLFSSL object using the [`wolfSSL_new()`](group__Setup.md#function-wolfssl_new) function. This function returns a pointer to the `WOLFSSL` object if successful or `NULL` in the case of failure. We can then associate the socket file descriptor (`sockfd`) with the new `WOLFSSL` object (`ssl`):
-
-```c
-/* Create WOLFSSL object */
-WOLFSSL* ssl;
-
-if( (ssl = wolfSSL_new(ctx)) == NULL) {
-    fprintf(stderr, "wolfSSL_new error.\n");
-    exit(EXIT_FAILURE);
-}
-
-wolfSSL_set_fd(ssl, sockfd);
 ```
 
 ## Sending/Receiving Data
