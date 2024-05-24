@@ -49,7 +49,7 @@ The following is a list of modifications that were made to the original echoserv
 
 ### Modifications to the echoserver (tcpserv04.c)
 
-* Removed call to the `Fork()` function because `fork()` is not supported by Windows. The result of this is an echoserver which only accepts one client simultaneously. Along with this removal, Signal handling was removed.
+* Removed call to the `fork()` function because `fork()` is not supported by Windows. The result of this is an echoserver which only accepts one client simultaneously. Along with this removal, Signal handling was removed.
 * Moved `str_echo()` function from `str_echo.c` file into `tcpserv04.c` file
 * Added a printf statement to view the client address and the port we have connected through:
 
@@ -196,9 +196,11 @@ The first thing we will need to do is include the wolfSSL native API header in b
 
 Before we can use wolfSSL in our code, we need to initialize the library and the `WOLFSSL_CTX`. wolfSSL is initialized by calling [`wolfSSL_Init()`](group__TLS.md#function-wolfssl_init). This must be done first before anything else can be done with the library.
 
+## WOLFSSL_CTX Factory
+
 The `WOLFSSL_CTX` structure (wolfSSL Context) contains global values for each SSL connection, including certificate information. A single `WOLFSSL_CTX` can be used with any number of `WOLFSSL` objects created. This allows us to load certain information, such as a list of trusted CA certificates only once.
 
-To create a new `WOLFSSL_CTX`, use [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new). This function requires an argument which defines the SSL or TLS protocol for the client or server to use. There are several options for selecting the desired protocol. wolfSSL currently supports SSL 3.0, TLS 1.0, TLS 1.1, TLS 1.2, DTLS 1.0, and DTLS 1.2. Each of these protocols have a corresponding function that can be used as an argument to [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new). The possible client and server protocol options are shown below. SSL 2.0 is not supported by wolfSSL because it has been insecure for several years.
+To create a new `WOLFSSL_CTX`, use [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new). This function requires an argument which defines the SSL or TLS protocol for the client or server to use. There are several options for selecting the desired protocol. wolfSSL currently supports SSL 3.0, TLS 1.0, TLS 1.1, TLS 1.2, TLS 1.3, DTLS 1.0, DTLS 1.2, and DTLS 1.3. Each of these protocols have a corresponding function that can be used as an argument to [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new). The possible client and server protocol options are shown below. SSL 2.0 is not supported by wolfSSL because it has been insecure for several years.
 
 EchoClient:
 
@@ -206,19 +208,23 @@ EchoClient:
 * [`wolfTLSv1_client_method();`](group__Setup.md#function-wolftlsv1_client_method) - TLS 1.0
 * [`wolfTLSv1_1_client_method();`](group__Setup.md#function-wolftlsv1_1_client_method) - TLS 1.1
 * [`wolfTLSv1_2_client_method();`](group__Setup.md#function-wolftlsv1_2_client_method) - TLS 1.2
-* [`wolfSSLv23_client_method();`](group__Setup.md#function-wolfsslv23_client_method) - Use highest version possible from SSLv3 - TLS 1.2
+* [`wolfTLSv1_3_client_method();`](group__Setup.md#function-wolftlsv1_3_client_method) - TLS 1.3
+* [`wolfSSLv23_client_method();`](group__Setup.md#function-wolfsslv23_client_method) - Use highest version possible from SSL 3.0 - TLS 1.3
 * [`wolfDTLSv1_client_method();`](group__Setup.md#function-wolfdtlsv1_client_method) - DTLS 1.0
 * [`wolfDTLSv1_2_client_method_ex();`](ssl_8h.md#function-wolfdtlsv1_2_client_method_ex) - DTLS 1.2
+* [`wolfDTLSv1_3_client_method_ex();`](ssl_8h.md#function-wolfdtlsv1_3_client_method_ex) - DTLS 1.3
 
 EchoServer:
 
-* [`wolfSSLv3_server_method();`](group__Setup.md#function-wolfsslv3_server_method) - SSLv3
-* [`wolfTLSv1_server_method();`](group__Setup.md#function-wolftlsv1_server_method) - TLSv1
-* [`wolfTLSv1_1_server_method();`](group__Setup.md#function-wolftlsv1_1_server_method) - TLSv1.1
-* [`wolfTLSv1_2_server_method();`](group__Setup.md#function-wolftlsv1_2_server_method) - TLSv1.2
-* [`wolfSSLv23_server_method();`](group__Setup.md#function-wolfsslv23_server_method) - Allow clients to connect with TLSv1+
-* [`wolfDTLSv1_server_method();`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS
+* [`wolfSSLv3_server_method();`](group__Setup.md#function-wolfsslv3_server_method) - SSL 3.0
+* [`wolfTLSv1_server_method();`](group__Setup.md#function-wolftlsv1_server_method) - TLS 1.0
+* [`wolfTLSv1_1_server_method();`](group__Setup.md#function-wolftlsv1_1_server_method) - TLS 1.1
+* [`wolfTLSv1_2_server_method();`](group__Setup.md#function-wolftlsv1_2_server_method) - TLS 1.2
+* [`wolfTLSv1_3_server_method();`](group__Setup.md#function-wolftlsv1_3_server_method) - TLS 1.3
+* [`wolfSSLv23_server_method();`](group__Setup.md#function-wolfsslv23_server_method) - Allow clients to connect with TLS 1.0+
+* [`wolfDTLSv1_server_method();`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS 1.0
 * [`wolfDTLSv1_2_server_method();`](ssl_8h.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
+* [`wolfDTLSv1_3_server_method();`](ssl_8h.md#function-wolfdtlsv1_3_server_method) - DTLS 1.3
 
 We need to load our CA (Certificate Authority) certificate into the `WOLFSSL_CTX` so that the when the echoclient connects to the echoserver, it is able to verify the server’s identity. To load the CA certificates into the `WOLFSSL_CTX`, use [`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations). This function requires three arguments: a `WOLFSSL_CTX` pointer, a certificate file, and a path value. The path value points to a directory which should contain CA certificates in PEM format. When looking up certificates, wolfSSL will look at the certificate file value before looking in the path location. In this case, we don’t need to specify a certificate path because we will specify one CA file - as such we use the value 0 for the path argument. The [`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations) function returns either `SSL_SUCCESS` or `SSL_FAILURE`:
 
