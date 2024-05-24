@@ -215,7 +215,7 @@ gcc -o echoserver ../lib/*.c tcpserv04.c -I ../include -lm -lwolfssl
 
 ## Headers
 
-The first thing we will need to do is include the wolfSSL native API header in both the client and the server. In the `tcpcli01.c` file for the client and the tcpserv04.c file for the server add the following line near the top:
+The first thing we will need to do is include the wolfSSL native API header in both the client and the server. In the `tcpcli01.c` file for the client and the `tcpserv04.c` file for the server add the following line near the top:
 
 ```c
 #include <wolfssl/ssl.h>
@@ -411,7 +411,7 @@ str_cli(stdin, ssl);
 
 Inside the `str_cli()` function, `Writen()` and `Readline()` are replaced with calls to [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) and [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) functions, and the `WOLFSSL` object (`ssl`) is used instead of the original file descriptor(`sockfd`). The new `str_cli()` function is shown below. Notice that we now need to check if our calls to [`wolfSSL_write`](group__IO.md#function-wolfssl_write) and [`wolfSSL_read`](group__IO.md#function-wolfssl_read) were successful.
 
-The authors of the Unix Programming book wrote error checking into their `Writen()` function which we must make up for after it has been replaced. We add a new int variable, `n`, to monitor the return value of [`wolfSSL_read`](group__IO.md#function-wolfssl_read) and before printing out the contents of the buffer, recvline, the end of our read data is marked with a `\0`:
+The authors of the Unix Programming book wrote error checking into their `Writen()` function which we must make up for after it has been replaced. We add a new int variable, `n`, to monitor the return value of [`wolfSSL_read`](group__IO.md#function-wolfssl_read) and before printing out the contents of the buffer, `recvline`, the end of our read data is marked with a `\0`:
 
 ```c
 void
@@ -493,7 +493,7 @@ We will free the `ctx` and cleanup before the call to exit.
 
 In the echoclient and echoserver, we will need to add a signal handler for when the user closes the app by using “Ctrl+C”. The echo server is continually running in a loop. Because of this, we need to provide a way to break that loop when the user presses “Ctrl+C”. To do this, the first thing we need to do is change our loop to a while loop which terminates when an exit variable (cleanup) is set to true.
 
-First, define a new static int variable called cleanup at the top of `tcpserv04.c` right after the `#include` statements:
+First, define a new static int variable called `cleanup` at the top of `tcpserv04.c` right after the `#include` statements:
 
 ```c
 static int cleanup;  /* To handle shutdown */
