@@ -23,7 +23,7 @@ SSL and TLS sit between the Transport and Application layers of the OSI model, w
 
 All of the source code used in this tutorial can be downloaded from the wolfSSL website, specifically from the following location. The download contains both the original and completed source code for both the echoserver and echoclient used in this tutorial. Specific contents are listed below the link.
 
-<https://www.wolfssl.com/documentation/ssl-tutorial-2.4.zip>
+<https://www.wolfssl.com/documentation/ssl-tutorial-2.5.zip>
 
 The downloaded ZIP file has the following structure:
 
@@ -285,6 +285,8 @@ EchoClient:
   }
 ```
 
+The code above will go into `tcpcli01.c` after the variable definitions and the check for that the user has started the client with an IP address in `main()`.
+
 EchoServer:
 
 When loading certificates into the `WOLFSSL_CTX`, the server certificate and key file should be loaded in addition to the CA certificate. This will allow the server to send the client its certificate for identification verification:
@@ -325,7 +327,7 @@ When loading certificates into the `WOLFSSL_CTX`, the server certificate and key
   }
 ```
 
-The code shown above should be added to the beginning of `tcpcli01.c` and `tcpserv04.c`, after both the variable definitions and the check that the user has started the client with an IP address (client). A version of the finished code is included in the SSL tutorial ZIP file for reference.
+The above code will go into `tcpserv04.c` after the variable definitions in `main()`. A version of the finished code is included in the SSL tutorial ZIP file for reference.
 
 Now that wolfSSL and the `WOLFSSL_CTX` have been initialized, make sure that the `WOLFSSL_CTX` object and the wolfSSL library are freed when the application is completely done using SSL/TLS. In both the client and the server, the following two lines should be placed at the end of the `main()` function (in the client right before the call to `exit()`):
 
