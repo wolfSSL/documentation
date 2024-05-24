@@ -23,7 +23,7 @@ SSL and TLS sit between the Transport and Application layers of the OSI model, w
 
 All of the source code used in this tutorial can be downloaded from the wolfSSL website, specifically from the following location. The download contains both the original and completed source code for both the echoserver and echoclient used in this tutorial. Specific contents are listed below the link.
 
-<https://www.wolfssl.com/documentation/ssl-tutorial-2.3.zip>
+<https://www.wolfssl.com/documentation/ssl-tutorial-2.4.zip>
 
 The downloaded ZIP file has the following structure:
 
@@ -103,39 +103,68 @@ This will install wolfSSL headers into `/usr/local/include/wolfssl` and the wolf
 A set of tests will be run on wolfCrypt and wolfSSL to verify it has been installed correctly. After a successful run of the testsuite application, you should see output similar to the following:
 
 ```text
+------------------------------------------------------------------------------
+ wolfSSL version 5.7.0
+------------------------------------------------------------------------------
+error    test passed!
+MEMORY   test passed!
+base64   test passed!
+asn      test passed!
+RANDOM   test passed!
 MD5      test passed!
 SHA      test passed!
 SHA-224  test passed!
 SHA-256  test passed!
 SHA-384  test passed!
 SHA-512  test passed!
+SHA-512/224  test passed!
+SHA-512/256  test passed!
+SHA-3    test passed!
+Hash     test passed!
 HMAC-MD5 test passed!
 HMAC-SHA test passed!
 HMAC-SHA224 test passed!
 HMAC-SHA256 test passed!
 HMAC-SHA384 test passed!
 HMAC-SHA512 test passed!
+HMAC-SHA3   test passed!
+HMAC-KDF    test passed!
+PRF         test passed!
+TLSv1.3 KDF test passed!
 GMAC     test passed!
 Chacha   test passed!
 POLY1305 test passed!
 ChaCha20-Poly1305 AEAD test passed!
 AES      test passed!
+AES192   test passed!
+AES256   test passed!
 AES-GCM  test passed!
-RANDOM   test passed!
 RSA      test passed!
 DH       test passed!
+PWDBASED test passed!
 ECC      test passed!
+logging  test passed!
+time     test passed!
+mutex    test passed!
+memcb    test passed!
+Test complete
+
+Running simple test
+SSL version is TLSv1.2
 SSL version is TLSv1.2
 SSL cipher suite is TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-SSL version is TLSv1.2
+SSL curve name is SECP256R1
 SSL cipher suite is TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+SSL curve name is SECP256R1
 Client message: hello wolfssl!
-Server response: I hear you fa shizzle!
+I hear you fa shizzle!
+
+Running TLS test
 sending server shutdown command: quit!
 client sent quit command: shutting down!
-ciphers = DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305-OLD:ECDHE-ECDSA-CHACHA20-POLY1305-OLD:DHE-RSA-CHACHA20-POLY1305-OLD
+ciphers = TLS13-AES128-GCM-SHA256:TLS13-AES256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305-OLD:ECDHE-ECDSA-CHACHA20-POLY1305-OLD:DHE-RSA-CHACHA20-POLY1305-OLD
 33bc1a4570f4f1abccd5c48aace529b01a42ab51293954a297796e90d20970f0  input
-33bc1a4570f4f1abccd5c48aace529b01a42ab51293954a297796e90d20970f0  /tmp/output-N0Xq9c
+33bc1a4570f4f1abccd5c48aace529b01a42ab51293954a297796e90d20970f0  /var/folders/dy/888x7r7d6dgcqw4840l32tpw0000gp/T//testsuite-output-9Ymbuv
 
 All tests passed!
 ```
