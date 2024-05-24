@@ -285,7 +285,7 @@ EchoClient:
   }
 ```
 
-The code above will go into `tcpcli01.c` after the variable definitions and the check for that the user has started the client with an IP address in `main()`.
+Add the above code to `tcpcli01.c` in `main()` after the variable definitions and the check that the user has started the client with an IP address.
 
 EchoServer:
 
@@ -327,7 +327,7 @@ When loading certificates into the `WOLFSSL_CTX`, the server certificate and key
   }
 ```
 
-The above code will go into `tcpserv04.c` after the variable definitions in `main()`. A version of the finished code is included in the SSL tutorial ZIP file for reference.
+The code shown above should be added to the beginning of `tcpserv04.c` after the variable definitions in `main()`. A version of the finished code is included in the SSL tutorial ZIP file for reference.
 
 Now that wolfSSL and the `WOLFSSL_CTX` have been initialized, make sure that the `WOLFSSL_CTX` object and the wolfSSL library are freed when the application is completely done using SSL/TLS. In both the client and the server, the following two lines should be placed at the end of the `main()` function (in the client right before the call to `exit()`):
 
