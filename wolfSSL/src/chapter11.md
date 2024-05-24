@@ -343,6 +343,8 @@ if ( (ssl = wolfSSL_new(ctx)) == NULL) {
 wolfSSL_set_fd(ssl, connfd);
 ```
 
+Again, a WOLFSSL object needs to be created after each TCP Connect and the socket file descriptor needs to be associated with the session.
+
 ## Sending/Receiving Data
 
 ### Sending with EchoClient
