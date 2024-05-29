@@ -23,7 +23,7 @@ SSL and TLS sit between the Transport and Application layers of the OSI model, w
 
 All of the source code used in this tutorial can be downloaded from the wolfSSL website, specifically from the following location. The download contains both the original and completed source code for both the echoserver and echoclient used in this tutorial. Specific contents are listed below the link.
 
-<https://www.wolfssl.com/documentation/ssl-tutorial-2.4.zip>
+<https://www.wolfssl.com/documentation/ssl-tutorial-2.5.zip>
 
 The downloaded ZIP file has the following structure:
 
@@ -286,6 +286,8 @@ EchoClient:
     }
 ```
 
+Add the above code to `tcpcli01.c` in `main()` after the variable definitions and the check that the user has started the client with an IP address.
+
 EchoServer:
 
 When loading certificates into the `WOLFSSL_CTX`, the server certificate and key file should be loaded in addition to the CA certificate. This will allow the server to send the client its certificate for identification verification:
@@ -326,7 +328,7 @@ if (wolfSSL_CTX_use_PrivateKey_file(ctx,"../certs/server-key.pem",
 }
 ```
 
-The code shown above should be added to the beginning of `tcpcli01.c` and `tcpserv04.c`, after both the variable definitions and the check that the user has started the client with an IP address (client). A version of the finished code is included in the SSL tutorial ZIP file for reference.
+The code shown above should be added to the beginning of `tcpserv04.c` after the variable definitions in `main()`. A version of the finished code is included in the SSL tutorial ZIP file for reference.
 
 Now that wolfSSL and the `WOLFSSL_CTX` have been initialized, make sure that the `WOLFSSL_CTX` object and the wolfSSL library are freed when the application is completely done using SSL/TLS. In both the client and the server, the following two lines should be placed at the end of the `main()` function (in the client right before the call to `exit()`):
 
@@ -398,7 +400,7 @@ str_cli(stdin, ssl);
 
 Inside the `str_cli()` function, `Writen()` and `Readline()` are replaced with calls to [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) and [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) functions, and the `WOLFSSL` object (`ssl`) is used instead of the original file descriptor(`sockfd`). The new `str_cli()` function is shown below. Notice that we now need to check if our calls to [`wolfSSL_write`](group__IO.md#function-wolfssl_write) and [`wolfSSL_read`](group__IO.md#function-wolfssl_read) were successful.
 
-The authors of the Unix Programming book wrote error checking into their `Writen()` function which we must make up for after it has been replaced. We add a new int variable, `n`, to monitor the return value of [`wolfSSL_read`](group__IO.md#function-wolfssl_read) and before printing out the contents of the buffer, recvline, the end of our read data is marked with a `\0`:
+The authors of the Unix Programming book wrote error checking into their `Writen()` function which we must make up for after it has been replaced. We add a new int variable, `n`, to monitor the return value of [`wolfSSL_read`](group__IO.md#function-wolfssl_read) and before printing out the contents of the buffer, `recvline`, the end of our read data is marked with a `\0`:
 
 ```c
 void
@@ -480,7 +482,7 @@ We will free the `ctx` and cleanup before the call to exit.
 
 In the echoclient and echoserver, we will need to add a signal handler for when the user closes the app by using “Ctrl+C”. The echo server is continually running in a loop. Because of this, we need to provide a way to break that loop when the user presses “Ctrl+C”. To do this, the first thing we need to do is change our loop to a while loop which terminates when an exit variable (cleanup) is set to true.
 
-First, define a new static int variable called cleanup at the top of `tcpserv04.c` right after the `#include` statements:
+First, define a new static int variable called `cleanup` at the top of `tcpserv04.c` right after the `#include` statements:
 
 ```c
 static int cleanup;  /* To handle shutdown */
