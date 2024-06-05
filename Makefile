@@ -77,6 +77,11 @@ fips-ready: PDFFILE=wolfSSL-FIPS-Ready.pdf
 fips-ready: build
 	@$(DOCKER_CMD)
 
+.PHONY: tuning
+tuning: MANPATH=wolfSSL-Tuning
+tuning: PDFFILE=wolfSSL-Tuning-Guide.pdf
+tuning: build
+	@$(DOCKER_CMD)
 
 clean:
 	rm -rf build
