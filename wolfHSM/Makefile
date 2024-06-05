@@ -8,32 +8,35 @@ SOURCES = chapter01.md \
 		  chapter02.md \
 		  chapter03.md \
 		  chapter04.md \
-          chapter05.md \
-          chapter06.md \
+		  chapter05.md \
+		  chapter06.md \
 		  chapter07.md \
 		  chapter08.md
 APPENDIX= appendix01.md
 
 ifeq ($(DOC_LANG),JA)
-    DOXY = Doxyfile-ja
-    PDF  = wolfHSM-Manual-jp.pdf
+	DOXY = Doxyfile-ja
+	PDF  = wolfHSM-Manual-jp.pdf
 else
-    DOXY = Doxyfile
-    PDF  = wolfHSM-Manual.pdf
+	DOXY = Doxyfile
+	PDF  = wolfHSM-Manual.pdf
 endif
 
 
 wolfhsm:
-	@git clone --depth 1 https://github.com/wolfSSL/wolfhsm
+	$(Q)git clone --depth 1 https://github.com/wolfSSL/wolfHSM wolfhsm
 
 
 .PHONY: wolfhsm-update
 wolfhsm-update: wolfhsm
-	@cd wolfhsm && git pull --ff-only
+	$(Q)cd wolfhsm && git pull --ff-only
 
 .PHONY: api
 api: wolfhsm-update
-
+	$(Q)mkdir -p api/md
+	$(Q)cd wolfhsm && doxygen ../Doxyfile
+	$(Q)cd ..
+	$(Q)doxybook2 --input docs/xml --output api/md --config doxybook.cfg
 
 # Need an index.md, so let's make it chapter01.
 # Perl regex to fix two things:
@@ -42,7 +45,16 @@ api: wolfhsm-update
 # 3. Fix the titles of the header files markdown
 .PHONY: html-prep
 html-prep: api
+	$(Q)cp -a api/md/group* build/html/
+	$(Q)cp -a api/md/*8h* build/html/
 
+	$(Q)perl -i -pe "s/\[(.*?)\]\(Classes\/.*?.md\)/\[\1\]\(#typedef-\1\)/g" build/html/group* build/html/*8h*
+	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
+	$(Q)perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
+	$(Q)perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
+	$(Q)perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
+	$(Q)perl -i -pe "s/\/tpm2_/tpm2_/g" build/html/group* build/html/*8h*
+	$(Q)perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*
 
 # Set input format to gfm to fix issues with converted API docs
 # Regexes:
@@ -54,3 +66,16 @@ html-prep: api
 # 6. Two regexes to handle bad Doxygen that didn't convert and the LaTeX processor thinks is LaTeX commands
 .PHONY: pdf-prep
 pdf-prep: api
+	$(Q)perl -i -pe "s/# /## /g" api/md/*.md
+	$(Q)perl -i -pe "s/(\/group_.*|Classes\/struct.*|\/.*8h)\.md//g" api/md/*.md
+	$(Q)perl -i -pe "s/^-(-)+$$//" api/md/*.md
+	$(Q)perl -i -pe "s/^title:.*//" api/md/*.md
+	$(Q)perl -i -pe "s/^Updated on.*//" api/md/*.md
+	$(Q)perl -i -pe "s/^summary.*//" api/md/*.md
+	$(Q)perl -i -pe "s/dox_comments\/header_files\///" api/md/*.md
+	$(Q)perl -i -pe "s/^\\\\//" api/md/*.md
+	$(Q)perl -i -pe "s/\\\\par/par/g" api/md/*.md
+	$(Q)perl -i -pe "s/\[(.*?)\]\(Classes\/.*?.md\)/\[\1\]\(#typedef-\1\)/g" api/md/*.md
+	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
+	$(Q)perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
+	$(Q)perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md

@@ -26,15 +26,17 @@ COPY . .
 FROM builder AS wolfssl-stage1
 ARG MANPATH
 ARG PDFFILE
+ARG V
 WORKDIR /src/wolfssl/${MANPATH}
-RUN make pdf
+RUN make pdf V=${V}
 
 # Build wolfSSL HTML
 FROM wolfssl-stage1 AS wolfssl-stage2
 ARG MANPATH
 ARG PDFFILE
+ARG V
 WORKDIR /src/wolfssl/${MANPATH}
-RUN make html
+RUN make html V=${V}
 
 # Build both wolfSSL HTML and PDF
 FROM scratch AS manual
