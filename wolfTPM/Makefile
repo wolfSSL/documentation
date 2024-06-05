@@ -9,7 +9,7 @@ SOURCES = chapter01.md \
 		  chapter03.md \
 		  chapter04.md \
           chapter05.md \
-          chapter06.md 
+          chapter06.md
 
 ifeq ($(DOC_LANG),JA)
     DOXY = Doxyfile-ja
@@ -51,13 +51,13 @@ html-prep: api
 	@cp -a api/md/*8h* build/html/
   endif
 
-	@rm -rf build/html/chapter05.md	
-	@perl -i -pe "s/\[(.*?)\]\(Classes\/.*?.md\)/\[\1\]\(#typedef-\1\)/g" build/html/group* build/html/*8h*     
+	@rm -rf build/html/chapter05.md
+	@perl -i -pe "s/\[(.*?)\]\(Classes\/.*?.md\)/\[\1\]\(#typedef-\1\)/g" build/html/group* build/html/*8h*
 	@perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
 	@perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
-	@perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*	
+	@perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
 	@perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
-	@perl -i -pe "s/\/tpm2_/tpm2_/g" build/html/group* build/html/*8h*    
+	@perl -i -pe "s/\/tpm2_/tpm2_/g" build/html/group* build/html/*8h*
 	@perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*
 
 # Set input format to gfm to fix issues with converted API docs
@@ -70,23 +70,23 @@ html-prep: api
 # 6. Two regexes to handle bad Doxygen that didn't convert and the LaTeX processor thinks is LaTeX commands
 .PHONY: pdf-prep
 pdf-prep: api
-	@perl -i -pe "s/# /## /g" api/md/*.md                                 
+	@perl -i -pe "s/# /## /g" api/md/*.md
 	@perl -i -pe "s/(\/group_.*|Classes\/struct.*|\/.*8h)\.md//g" api/md/*.md
-	@perl -i -pe "s/^-(-)+$$//" api/md/*.md 
-	@perl -i -pe "s/^title:.*//" api/md/*.md 
+	@perl -i -pe "s/^-(-)+$$//" api/md/*.md
+	@perl -i -pe "s/^title:.*//" api/md/*.md
 	@perl -i -pe "s/^Updated on.*//" api/md/*.md
-	@perl -i -pe "s/^summary.*//" api/md/*.md  
-	@perl -i -pe "s/dox_comments\/header_files\///" api/md/*.md 
-	@perl -i -pe "s/^\\\\//" api/md/*.md 
-	@perl -i -pe "s/\\\\par/par/g" api/md/*.md 
+	@perl -i -pe "s/^summary.*//" api/md/*.md
+	@perl -i -pe "s/dox_comments\/header_files\///" api/md/*.md
+	@perl -i -pe "s/^\\\\//" api/md/*.md
+	@perl -i -pe "s/\\\\par/par/g" api/md/*.md
 	@perl -i -pe "s/\[(.*?)\]\(Classes\/.*?.md\)/\[\1\]\(#typedef-\1\)/g" api/md/*.md
 	@perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
 	@perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
-	@perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md 	
+	@perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
 	@rm -rf build/pdf/chapter05.md
 	@echo '# API Reference' >> build/pdf/chapter05.md
   ifeq ($(DOC_LANG),JA)
-	@cat header-ja/group__TPM2__Proprietary.md header-ja/tpm2_8h.md header-ja/tpm2__wrap_8h.md	header-ja/group__wolfTPM2__Wrappers.md >> build/pdf/chapter05.md
+	@cat header-ja/group__TPM2__Proprietary.md header-ja/tpm2_8h.md header-ja/tpm2__wrap_8h.md header-ja/group__wolfTPM2__Wrappers.md >> build/pdf/chapter05.md
   else
-	@cat api/md/group__TPM2__Proprietary.md api/md/tpm2_8h.md api/md/tpm2__wrap_8h.md	api/md/group__wolfTPM2__Wrappers.md >> build/pdf/chapter05.md
+	@cat api/md/group__TPM2__Proprietary.md api/md/tpm2_8h.md api/md/tpm2__wrap_8h.md api/md/tpm__io_8h.md api/md/group__wolfTPM2__Wrappers.md >> build/pdf/chapter05.md
   endif
