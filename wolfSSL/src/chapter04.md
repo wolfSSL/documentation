@@ -576,7 +576,7 @@ user_settings.h
 　　#define WOLFSSL_STATIC_MEMORY
 ```
 
-The static-buffer-allocation option is implemented by default to additionally call the standard function malloc() without returning NULL when the memory block allocated from the given buffer is exhausted. If the environment does not provide dynamic memory management functionality, a link error will occur. Therefore, also define the **WOLFSSL_NO_MALLOC** macro to disable this feature if needed:
+The static-buffer-allocation option is implemented by default to fall back to the standard malloc() function when a NULL heap hint is passed in. If a heap hint is passed in and the memory associated with it is exhausted, an error will occur. If the environment does not provide dynamic memory management functionality, a link error will occur. Therefore, also define the **WOLFSSL_NO_MALLOC** macro to disable this feature if needed:
 
 ```
 user_settings.h
