@@ -1,6 +1,6 @@
 # wolfHSM Client Library
 
-The client library API is the primary mechanism through which users will interact with wolfHSM. Refer to the [API documentation](appendix01-api-reference.md) for a full list of available functions and their descriptions.
+The client library API is the primary mechanism through which users will interact with wolfHSM. Refer to the [API documentation](appendix01.md) for a full list of available functions and their descriptions.
 
 ## Table of Contents
 
@@ -196,7 +196,7 @@ byte myUpdate[]	= “This is my update.”
 whClient_NvmAddObject(&clientCtx, &myMeta, sizeof(myUpdate), myUpdate);
 ```
 
-For objects that should not be copied and sent over the transport, there exist DMA versions of the `NvmAddObject` functions. These pass the data to the server by reference rather than by value, allowing the server to access the data in memory directly. Note that if your platform requires custom address translation or cache invalidation before the server may access client addresses, you will need to implement a [DMA callback](TODO).
+For objects that should not be copied and sent over the transport, there exist DMA versions of the `NvmAddObject` functions. These pass the data to the server by reference rather than by value, allowing the server to access the data in memory directly. Note that if your platform requires custom address translation or cache invalidation before the server may access client addresses, you will need to implement a [DMA callback](./chapter07#DMA-Callbacks).
 
 ```
 whNvmMetadata myMeta = {
@@ -248,7 +248,7 @@ int wh_Client_NvmList(whClientContext* c,
         int32_t *out_rc, whNvmId *out_count, whNvmId *out_id);
 ```
 
-For a full description of all the NVM API functions, please refer to the [API documentation](todo).
+For a full description of all the NVM API functions, please refer to the [API documentation](./appendix01.md).
 
 ## Key Management
 

@@ -46,11 +46,11 @@ ST SPC58NN
 - 1x 100MHz e200z0 PowerPC HSM core with NVM
 - Crypto offload: TRNG, AES128
 
-### Posix
+### POSIX
 
-The Posix port provides multiple and fully functional implementations of different wolfHSM abstractions that can be used to better understand the exact functionality expected for different hardware abstractions.
+The POSIX port provides multiple and fully functional implementations of different wolfHSM abstractions that can be used to better understand the exact functionality expected for different hardware abstractions.
 
-The Posix port provides:
+The POSIX port provides:
 - Memory buffer transport
 - TCP transport
 - Unix domain transport

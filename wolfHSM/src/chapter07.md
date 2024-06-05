@@ -13,7 +13,7 @@ The wolfHSM library has a number of build options that can be turned on or off t
 
 An example `wh_config.h` is distributed with every wolfHSM port providing a known good configuration.
 
-For a full list of wolfHSM configuration settings that can be defined in `wh_config.h`, refer to the [API documentation](appendix01-api-reference.md).
+For a full list of wolfHSM configuration settings that can be defined in `wh_config.h`, refer to the [API documentation](appendix01.md).
 
 ## DMA Callbacks
 

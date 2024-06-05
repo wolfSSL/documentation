@@ -75,9 +75,9 @@ The communication layer of wolfHSM is designed to provide reliable, bidirectiona
 - Comms layer: Defines the format and structure of messages exchanged between clients and servers, and provides an abstract interface to the underlying transport layer implementation, exposing a consistent interface for sending and receiving messages.
 - Transport Layer: Concrete implementations of the underlying transport. Defines how data is actually transported between client and server.
 
-### Client/Server APIs:
+### Client/Server APIs
 
-High level client and server APIs (defined in [wh_client.h](wolfhsm/wh_client.h) and [wh_server.h](wolfhsm/wh_server.h)) are the primary interface for communication. These functions abstract the low level communications details from the caller, providing a simple split transaction interface for logical operations.
+High-level client and server APIs (defined in `wolfhsm/wh_client.h` and `wolfhsm/wh_server.h`) are the primary interface for communication. These functions abstract the low level communications details from the caller, providing a simple split transaction interface for logical operations.
 
 For example, using the client API to send an echo request to the server:
 
@@ -247,7 +247,7 @@ Currently, wolfHSM only supports one NVM back-end provider: the NVM flash module
 
 ## Key Management
 
-The wolfHSM library provides comprehensive key management capabilities, including storing, loading, and exporting keys from non-volatile memory, caching of frequently used keys in RAM for fast access, and interacting with hardware-exclusive device keys. Keys are stored in non-volatile memory along side other NVM objects with corresponding access protections. wolfHSM will automatically load keys into the necessary cryptographic hardware when the key is selected for use with a specific consumer. More information on the key management API can be found in the [client library](./chapter05-client-library.md) and [API documentation](./appendix01-api-reference.md) sections.
+The wolfHSM library provides comprehensive key management capabilities, including storing, loading, and exporting keys from non-volatile memory, caching of frequently used keys in RAM for fast access, and interacting with hardware-exclusive device keys. Keys are stored in non-volatile memory along side other NVM objects with corresponding access protections. wolfHSM will automatically load keys into the necessary cryptographic hardware when the key is selected for use with a specific consumer. More information on the key management API can be found in the [client library](./chapter05.md) and [API documentation](./appendix01.md) sections.
 
 ## Cryptographic Operations
 

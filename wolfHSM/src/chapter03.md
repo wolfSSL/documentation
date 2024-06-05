@@ -4,7 +4,7 @@ The most common use case for wolfHSM is adding HSM-enabled functionality to an e
 
 The first step required to run wolfHSM on a device is to follow the steps in the specific wolfHSM port to get the reference server running on the HSM core. Once the wolfHSM server app is loaded on the device and boots, client applications can link against the wolfHSM client library, configure an instance of the wolfHSM client structure, and interact with the HSM through the wolfHSM client API and through the wolfCrypt API.
 
-Each wolfHSM port contains a client demo app showing how to set up the default communication channel and interact with the server. The server reference implementation can also be customized through [server callbacks](./chapter07-customizing-wolfHSM.md) to extend its functionality, which can be invoked through client requests.
+Each wolfHSM port contains a client demo app showing how to set up the default communication channel and interact with the server. The server reference implementation can also be customized through [server callbacks](./chapter07.md) to extend its functionality, which can be invoked through client requests.
 
 ## Basic Client Configuration
 
@@ -79,60 +79,32 @@ if ((recvLen != sendLen ) ||
 }
 ```
 
-While there are indeed a large number of nested configurations and structures to set up, designing wolfHSM this way allowed for different transport implementations to be swapped in and out easily without changing the client code. For example, in order to switch from the shared memory transport to a TCP transport, only the transport configuration and callback structures need to be changed, and the rest of the client code remains the same (everything after step 2 in the sequence above).
-
-```c
-#include <string.h> /* for memcmp() */
-#include "wolfhsm/client.h"  /* Client API (includes comm config) */
-#include "port/posix_transport_tcp.h" /* transport implementation */
-
-/* Step 1: Allocate and initialize the posix TCP transport configuration */
-/* Client configuration/contexts */
-whTransportClientCb posixTransportTcpCb = {PTT_CLIENT_CB};
-posixTransportTcpClientContext posixTranportTcpCtx = {0};
-posixTransportTcpConfig posixTransportTcpCfg = {
-    /* IP and port configuration */
-};
-
-/* Step 2: Allocate client comm configuration and bind to the transport */
-/* Configure the client comms to use the selected transport configuration */
-whCommClientConfig commClientCfg = {
-             .transport_cb      = posixTransportTcpCb,
-             .transport_context = (void*)posixTransportTcpCtx,
-             .transport_config  = (void*)posixTransportTcpCfg,
-             .client_id         = 123, /* unique client identifier */
-};
-
-/* Subsequent steps remain the same... */
-```
-
-Note that the echo request in step 6 is just a simple usage example. Once the connection to the server is set up, any of the client APIs are available for use.
+For more information, refer to [Chapter 5: Client Library](./chapter05.md).
 
 ## Basic Server Configuration
 
-*Note: A wolfHSM port comes with a referenc
-e server application that is already configured to run on the HSM core and so manual server configuration is not required.*
+*Note: A wolfHSM port comes with a reference server application that is already configured to run on the HSM core and so manual server configuration is not required.*
 
 Configuring a wolfHSM server involves allocating a server context structure and initializing it with a valid client configuration that enables it to perform the requested operations. These operations usually include client communication, cryptographic operations, managing keys, and non-volatile object storage. Depending on the required functionality, not all of these configuration components need to be initialized.
 
 
 The steps required to configure a server that supports client communication, NVM object storage using the NVM flash configuration, and local crypto (software only) are:
 
-1. Initialize the server comms configuration
-    1. Allocate and initialize a transport configuration structure, context, and callback implementation for the desired transport
-    2. Allocate and initialize a comm server configuration structure using the transport configuration from step 1.1
-2. Initialize the server NVM context
-    1. Allocate and initialize a config, context, and callback structure for the low-level flash storage drivers (the implementation of these structures is provided by the port)
-    2. Allocate and initialize an NVM flash config, context, and callback strucure and bind the port flash configuration from step 2.1 to them
-    3. Allocate an NVM context structure and initialize it with the configuration from step 2.2 using `wh_Nvm_Init()`
+1. Initialize the server comms configuration  
+    1\. Allocate and initialize a transport configuration structure, context, and callback implementation for the desired transport  
+    2\. Allocate and initialize a comm server configuration structure using the transport configuration from step 1.1
+2. Initialize the server NVM context  
+    1\. Allocate and initialize a config, context, and callback structure for the low-level flash storage drivers (the implementation of these structures is provided by the port)  
+    2\. Allocate and initialize an NVM flash config, context, and callback strucure and bind the port flash configuration from step 2.1 to them  
+    3\. Allocate an NVM context structure and initialize it with the configuration from step 2.2 using `wh_Nvm_Init()`  
 3.  Allocate and initialize a crypto context structure for the server
 4. Initialize wolfCrypt (before initializing the server)
 5. Allocate and initialize a server config structure and bind the comm server configuration, NVM context, and crypto context to it
 6. Allocate a server context structure and initialize it with the server configuration using `wh_Server_Init()`
-7. Set the server connection state to connected using `wh_Server_SetConnected()` when the underlying transport is ready to be used for client communication (see [TODO](todo) for more information)
+7. Set the server connection state to connected using `wh_Server_SetConnected()` when the underlying transport is ready to be used for client communication (see [wolfHSM Examples](https://github.com/wolfSSL/wolfHSM-examples) for more information)
 8. Process client requests using `wh_Server_HandleRequestMessage()`
 
-The server may be configured to support NVM object storage using NVM flash configuration. Include the steps to [initialize NVM](./chapter04-functional-components.md#NVM-Architecture) on the server after step 1.
+The server may be configured to support NVM object storage using NVM flash configuration. Include the steps to [initialize NVM](./chapter04.md#NVM-Architecture) on the server after step 1.
 
 ```c
 #include <string.h> /* for memcmp() */
