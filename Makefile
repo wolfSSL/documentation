@@ -1,6 +1,6 @@
 DOCKER_CMD=DOCKER_BUILDKIT=1 docker build -t doc_build --build-arg MANPATH=$(MANPATH) --build-arg PDFFILE=$(PDFFILE) --target=manual --output=build -f Dockerfile .
 
-all: wolfssl wolfssh wolfboot wolfclu wolfcrypt-jni wolfmqtt wolfsentry wolfssl-jni wolftpm wolfengine fips-ready
+all: wolfssl wolfssh wolfboot wolfclu wolfcrypt-jni wolfmqtt wolfsentry wolfssl-jni wolftpm wolfengine fips-ready tuning porting
 
 build:
 	@mkdir -p build
