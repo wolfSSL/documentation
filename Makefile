@@ -17,13 +17,13 @@ wolfssl: build
 	$(Q)$(DOCKER_CMD)
 
 .PHONY: wolfssh
-wolfssh: MANPATH=wolfSSH V=$(V)
+wolfssh: MANPATH=wolfSSH
 wolfssh: PDFFILE=wolfSSH-Manual.pdf
 wolfssh: build
 	$(Q)$(DOCKER_CMD)
 
 .PHONY: wolfboot
-wolfboot: MANPATH=wolfBoot V=$(V)
+wolfboot: MANPATH=wolfBoot
 wolfboot: PDFFILE=wolfBoot-Manual.pdf
 wolfboot: build
 	$(Q)$(DOCKER_CMD)

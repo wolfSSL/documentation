@@ -45,7 +45,6 @@ api: wolfhsm-update
 # 3. Fix the titles of the header files markdown
 .PHONY: html-prep
 html-prep: api
-	$(Q)cp -a api/md/group* build/html/
 	$(Q)cp -a api/md/*8h* build/html/
 
 	$(Q)perl -i -pe "s/\[(.*?)\]\(Classes\/.*?.md\)/\[\1\]\(#typedef-\1\)/g" build/html/group* build/html/*8h*
