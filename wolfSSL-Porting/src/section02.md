@@ -149,7 +149,7 @@ To enable fastmath, define USE_FAST_MATH and build in ./wolfcrypt/src/tfm.c inst
 If the normal malloc(), free(), and possibly realloc() functions are not available, define XMALLOC_USER, then provide custom memory function hooks in ./wolfssl/wolfcrypt/types.h specific to the target environment.  
 
 Please read section 5.1.1.1 of the wolfSSL Manual for details about using XMALLOC_USER:
-https://wolfssl.com/wolfSSL/Docs-wolfssl-manual-5-portability.html
+[Section 5.1.1.1](https://wolfssl.com/wolfSSL/Docs-wolfssl-manual-5-portability.html)
 
 ## Time
 
@@ -172,7 +172,7 @@ wolfSSL can be built without the C standard library to provide a higher level of
 Section 2.8, above, covered memory functions.  In addition to memory function abstraction, wolfSSL also abstracts string function and math functions, where the specific functions are typically abstracted to a define in the form of X<FUNC>, where <FUNC> is the name of the function being abstracted.
 
 Please read Section 5.1 of the wolfSSL Manual for details:
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-5-portability.html
+[Section 5.1](https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-5-portability.html)
 
 ## Logging
 
@@ -184,7 +184,7 @@ By default, wolfSSL provides debug output through stderr.  In order for debug me
 For environments which do not have stderr available, or wish to output debug messages over a different output stream or in a different format, wolfSSL allows applications to register a logging callback.
 
 Please read Section 8.1 of the wolfSSL Manual for details:
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-8-debugging.html
+[Section 8.1](https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-8-debugging.html)
 
 ## Public Key Operations
 
@@ -201,7 +201,7 @@ RSA encrypt callback
 RSA decrypt callback
 
 For full details, please read Section 6.4 of the wolfSSL Manual:
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-6-callbacks.html
+[Section 6.4](https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-6-callbacks.html)
 
 ## Atomic Record Layer Processing
 
@@ -215,7 +215,7 @@ MAC/encrypt callback function
 Decrypt/verify callback function
 
 For full details, please read Section 6.3 of the wolfSSL Manual:
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-6-callbacks.html
+[Section 6.3](https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-6-callbacks.html)
 
 ## Features
 
@@ -223,4 +223,4 @@ Q:  When do I need to read this section?
 A:  When you want to disable features.
 
 Features can be disabled when building wolfSSL by using the appropriate defines.  For a list of defines available, please refer to Chapter 2 of the wolfSSL Manual:
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-2-building-wolfssl.html
+[Chapter 2](https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-2-building-wolfssl.html)
