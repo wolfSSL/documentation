@@ -551,7 +551,10 @@ By default, wolfSSL assumes that the execution environment provides dynamic memo
 
 Using static-buffer-allocation is equivalent in API to using dynamic memory with wolfSSL. This functional equivalency is achieved in wolfSSL by abstracting memory allocation/free into XMALLOC/XFREE function calls. Once static-buffer-allocation is set, wolfSSL will use it from then on to allocate buffers and other structures used internally. Since this feature is set for WOLFSSL_CTX, it will continue to work for the lifetime of the context object.
 
-The static-buffer-allocation set in a WOLFSSL_CTX is thread-safe. Even if the same WOLFSSL_CTX is shared by different threads, buffer allocation/free is used under exclusive control inside wolfSSL.
+The static-buffer-allocation set in a WOLFSSL_CTX is thread-safe. Even if the same WOLFSSL_CTX is shared by different threads, buffer allocation/free is used under exclusive control inside wolfSSL. The following is a visual representation of the CTX structure, the arrows indicate passing a pointer to the heap and "..." references all structs and not to the ones listed.
+
+![Alt text](CTX_structure.png)
+
 In comparison to a memory pool functionality offered by an RTOS implementation, memory functionality in an RTOS will commonly suspend a thread (task) if an unused memory block cannot be found when requested until a free block becomes available. wolfSSL’s static memory functionality has no such synchronization capability.
 
 ### Specifying Static Buffer Use
@@ -573,13 +576,43 @@ user_settings.h
 　　#define WOLFSSL_STATIC_MEMORY
 ```
 
-The static-buffer-allocation option is implemented by default to additionally call the standard function malloc() without returning NULL when the memory block allocated from the given buffer is exhausted. If the environment does not provide dynamic memory management functionality, a link error will occur. Therefore, also define the **WOLFSSL_NO_MALLOC** macro to disable this feature if needed:
+The static-buffer-allocation option is implemented by default to fall back to the standard malloc() function when a NULL heap hint is passed in. If a heap hint is passed in and the memory associated with it is exhausted, an error will occur. If the environment does not provide dynamic memory management functionality, a link error will occur. Therefore, also define the **WOLFSSL_NO_MALLOC** macro to disable this feature if needed:
 
 ```
 user_settings.h
 
 　　#define WOLFSSL_STATIC_MEMORY
     #define WOLFSSL_NO_MALLOC
+```
+
+In addition there are two build configurations. `--enable-staticmemory=small` which is a
+smaller version that has smaller struct sizes and less supporting API's available. The other build
+configuration is `--enable-staticmemory=debug` that enables the ability to set a callback function. This is
+useful in cases where printf() is not available for determining what is being allocated and what
+bucket sizes are being used. Here is what the example client output looks like with example
+callback:
+
+```
+./examples/client/client
+...
+...
+...
+Free'ing : 16128
+OUT BUFFER: Alloc'd 6 bytes using bucket size 16992
+Alloc'd 848 bytes using bucket size 1024
+OUT BUFFER: Alloc'd 150 bytes using bucket size 16992
+Alloc'd 13 bytes using bucket size 64
+Alloc'd 12 bytes using bucket size 64
+Alloc'd 848 bytes using bucket size 1024
+IN BUFFER: Alloc'd 40 bytes using bucket size 16992
+Alloc'd 13 bytes using bucket size 64
+Alloc'd 12 bytes using bucket size 64
+Free'ing : 1024
+Free'ing : 512
+
+...
+...
+...
 ```
 
 ### Using Static Buffer Allocation
@@ -727,9 +760,10 @@ For DTLS server
 
 |API|description|
 |:---|:---|
-|`wolfSSL_CTX_load_static_memory`|Set buffer for WOLFSSL_CTX as a heap memory.
-|`wolfSSL_CTX_is_static_memory`|Returns whether "Static buffer Allocation" is used. If it is the case, gets usage report. 
-|`wolfSSL_is_static_memory`|Returns whether "Static buffer Allocation" is used. If it is the case, gets usage report. |
+|[`wolfSSL_CTX_load_static_memory`](group__Memory.md#function-wolfSSL_CTX_static_memory)| Set buffer for WOLFSSL_CTX as a heap memory. |
+|[`wolfSSL_CTX_is_static_memory`](group__Memory.md#function-wolfSSL_CTX_is_static_memory)| Returns whether "Static buffer Allocation" is used. If it is the case, gets usage report. |
+|[`wolfSSL_is_static_memory`](group__Memory.md#function-wolfSSL_is_static_memory)| Returns whether "Static buffer Allocation" is used. If it is the case, gets usage report. |
+|[`wc_LoadStaticMemory`](group__Memory.md#function-wc_LoadStaticMemory)| Used to set aside static memory for wolfCrypt use. |
 |[`wolfSSL_StaticBufferSz`](group__Memory.md#function-wolfssl_staticbuffersz)| Calculate required buffer size for "Static buffer Allocation" based on the macros defined in /wolfssl/wolfcrypt/memory.h. |
 
 
