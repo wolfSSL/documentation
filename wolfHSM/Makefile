@@ -11,8 +11,7 @@ SOURCES = chapter01.md \
           chapter05.md \
           chapter06.md \
 		  chapter07.md \
-		  chapter08.md \
-		  SUMMARY.md		  
+		  chapter08.md
 APPENDIX= appendix01.md
 
 ifeq ($(DOC_LANG),JA)
@@ -34,7 +33,7 @@ wolfhsm-update: wolfhsm
 
 .PHONY: api
 api: wolfhsm-update
-	
+
 
 # Need an index.md, so let's make it chapter01.
 # Perl regex to fix two things:
