@@ -1,7 +1,7 @@
 # WolfHSM Porting
 
-This porting section aims to provide you with wolfHSM porting-related material and information. 
-We will cover the following: 
+This porting section aims to provide you with wolfHSM porting-related material and information.
+We will cover the following:
 
 - WolfHSM Porting Overview
 - WolfHSM Ports
@@ -29,7 +29,7 @@ Official ports of wolfHSM are provided for various supported architectures, with
 ### Infineon Aurix TC3XX
 
 (Port in progress)
-The distribution of this  port is restricted by the vendor. Please contact support@wolfssl.com for access. 
+The distribution of this  port is restricted by the vendor. Please contact support@wolfssl.com for access.
 
 Infineon Aurix TC3xx
 - Up to 6x 300MHz TriCore application cores
@@ -39,7 +39,7 @@ Infineon Aurix TC3xx
 ### ST SPC58NN
 
 (Port in progress)
-The distribution of this  port is restricted by the vendor. Please contact support@wolfssl.com for access. 
+The distribution of this  port is restricted by the vendor. Please contact support@wolfssl.com for access.
 
 ST SPC58NN
 - 3x 200MHz e200z4256 PowerPC application cores
@@ -56,7 +56,7 @@ The POSIX port provides:
 - Unix domain transport
 - RAM-based and file-based NVM flash simulators
 
-### Skeleton 
+### Skeleton
 
 The Skeleton port source code provides a non-functioning layout to be used as a starting point for future hardware/platform ports.  Each function provides the basic description and expected flow with error cases explained so that ports can be used interchangeably with consistent results.
 
