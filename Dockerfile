@@ -14,9 +14,9 @@ RUN apt-get -y install pandoc mkdocs doxygen git build-essential cmake libfmt-de
 RUN git clone --depth=1 https://github.com/pantor/inja
 RUN cd inja && cmake . -DBUILD_TESTING=OFF -DBUILD_BENCHMARK=OFF && make install
 
-RUN git clone https://github.com/matusnovak/doxybook2
+RUN git clone https://github.com/dgarske/doxybook2
 # Checkout to working version of doxybook2
-RUN cd doxybook2 && git checkout 187dc2991dabe65f808263
+RUN cd doxybook2 && git checkout master
 RUN cd doxybook2 && cmake . && make install
 # Copy the source files into Docker, this and any subsequent steps won't be cached
 WORKDIR /src/wolfssl
@@ -26,15 +26,17 @@ COPY . .
 FROM builder AS wolfssl-stage1
 ARG MANPATH
 ARG PDFFILE
+ARG V
 WORKDIR /src/wolfssl/${MANPATH}
-RUN make pdf
+RUN make pdf V=${V}
 
 # Build wolfSSL HTML
 FROM wolfssl-stage1 AS wolfssl-stage2
 ARG MANPATH
 ARG PDFFILE
+ARG V
 WORKDIR /src/wolfssl/${MANPATH}
-RUN make html
+RUN make html V=${V}
 
 # Build both wolfSSL HTML and PDF
 FROM scratch AS manual

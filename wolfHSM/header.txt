@@ -1,4 +1,4 @@
-% wolfSSH Documentation  ![](logo.png)
+% wolfHSM Documentation  ![](logo.png)
 
 ---
 header-includes:

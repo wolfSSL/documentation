@@ -1,0 +1,32 @@
+site_name: wolfHSM Manual
+site_url: https://wolfssl.com/
+docs_dir: build/html/
+site_dir: html/
+copyright: Copyright © 2024 wolfSSL Inc.
+nav:
+    - "1. Introduction": index.md
+    - "2. Overview": chapter02.md
+    - "3. Getting Started": chapter03.md
+    - "4. Functional Components": chapter04.md
+    - "5. Client Library": chapter05.md
+    - "6. Server Library": chapter06.md
+    - "7. Customizing wolfHSM": chapter07.md
+    - "8. Porting wolfHSM": chapter08.md
+    - "9. API Reference": appendix01.md 
+theme:
+  name: null 
+  custom_dir: ../mkdocs-material/material
+  language: en
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: roboto
+    code: roboto mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
+extra_css: [skin.css]
+use_directory_urls: false
