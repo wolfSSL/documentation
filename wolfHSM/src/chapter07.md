@@ -72,8 +72,8 @@ This enables the callback to `switch` on the `oper` value and perform custom log
 #include "wolfhsm/wh_error.h"
 
 /* Example DMA callback for 32-bit client addresses */
-int myDmaCallback32(whServerContext* server, uint32_t clientAddr, 
-                    void** xformedCliAddr, uint32_t len, 
+int myDmaCallback32(whServerContext* server, uint32_t clientAddr,
+                    void** xformedCliAddr, uint32_t len,
                     whServerDmaOper oper, whServerDmaFlags flags)
 {
     /* Optionally transform client address to server address space, e.g. memmap() */
@@ -110,7 +110,7 @@ To register the callback at initialization, the callback function should be incl
 #include "wolfhsm/wh_server.h"
 
 /* Example of initializing a server config structr with a DMA32 callback then initializing the server */
-int main(void) 
+int main(void)
 {
     whServerDmaConfig dmaCfg = {0};
     dmaCfg.dma32Cb = myDmaCallback32;
@@ -125,7 +125,7 @@ int main(void)
     whServerContext serverCtx;
 
     wh_Server_Init(&serverCtx, &serverCfg);
-     
+
     /* server app logic */
 }
 ```
@@ -135,7 +135,7 @@ To register the callback after initialization, first initialize the server conte
 ```c
 #include "wolfhsm/wh_server.h"
 
-int main(void) 
+int main(void)
 {
 
     whServerConfig serverCfg =  { /* server config */ };
@@ -153,7 +153,7 @@ int main(void)
 
 ## DMA Address Allow List
 
-wolfHSM also exposes an "allow list" for client DMA addresses, providing a mechanism for the server to restrict the client's access to a pre-configured list of specific memory regions. This feature is particularly useful in scenarios where the server needs to limit the client's access to certain memory regions to prevent unauthorized access or to ensure that the client only accesses memory that is safe to access. For example, in a multicore system with one client running per-core, it is most likely that clients should not be able to access each others memory regions, nor read out server memory which could contain sensitive information like cryptographic keys. 
+wolfHSM also exposes an "allow list" for client DMA addresses, providing a mechanism for the server to restrict the client's access to a pre-configured list of specific memory regions. This feature is particularly useful in scenarios where the server needs to limit the client's access to certain memory regions to prevent unauthorized access or to ensure that the client only accesses memory that is safe to access. For example, in a multicore system with one client running per-core, it is most likely that clients should not be able to access each others memory regions, nor read out server memory which could contain sensitive information like cryptographic keys.
 
 It is important to note that the software allow list feature is meant to work as a second layer of protection on top of device-specific memory protection mechanisms, and should not be considered a first line of defense in preventing unauthorized memory accesses. It is imperative that the user configure the device-specific memory protection mechanisms required to enforce the isolation of their applications and segment the HSM core and associated memory from the rest of the system.
 
@@ -179,7 +179,7 @@ const whServerDmaAddrAllowList allowList = {
     },
 };
 
-int main() 
+int main()
 {
     whServerConfig config;
 
@@ -199,9 +199,9 @@ int main()
     /* Server is now configured with the allowlist */
     /* Perform other server operations */
 
-    /* Allow list can also be registered after initialization if the 
+    /* Allow list can also be registered after initialization if the
      * list is not present in the server configuration struct using:
-     * 
+     *
      *    wh_Server_DmaRegisterAllowList(&server, &allowList);
      */
 }
@@ -283,7 +283,7 @@ First, common messages shared between the client and server should be defined:
 
 enum {
 	MY_TYPE_A = WH_MESSAGE_CUSTOM_CB_TYPE_USER_DEFINED_START,
-	MY_TYPE_B, 
+	MY_TYPE_B,
 } myUserDefinedTypes;
 
 typedef struct {
@@ -327,13 +327,13 @@ static int customServerCb(whServerContext*                 server,
     if (req->type == WH_MESSAGE_CUSTOM_CB_TYPE_DMA32) {
 		uint8_t* clientPtr = (uint8_t*)((uintptr_t)req->data.dma32.client_addr);
 		size_t clientSz = req->data.dma32.client_sz;
-		
+
 		if (clientPtr == NULL) {
 			resp->err = WH_ERROR_BADARGS;
 		}
 		else {
 			rc = doWorkOnClientAddr(clientPtr, clientSz);
-		}	
+		}
     }
 	else if (req->type == MY_TYPE_A) {
 		myCustomCbDataA *data = (myCustomCbDataA*)((uintptr_t)req->data.data);
@@ -357,7 +357,7 @@ static int customServerCb(whServerContext*                 server,
 
 
 int main(void) {
-	
+
 	whServerContext serverCtx;
 
 	whServerConfig serverCfg = {
@@ -368,7 +368,7 @@ int main(void) {
 
 	wh_Server_RegisterCustomCb(&serverCtx, MY_CUSTOM_CB_ID, customServerCb));
 
-	/* process server requests (simplified) */ 
+	/* process server requests (simplified) */
 	while (1) {
 		wh_Server_HandleRequestMessage(&serverCtx);
 	}
@@ -399,7 +399,7 @@ if (isRegistered) {
 	whMessageCustomCb_Request req = {0};
 	whMessageCustomCb_Request resp = {0};
 
-	/* send custom request with built-in DMA type */	
+	/* send custom request with built-in DMA type */
 	req.id = MY_CUSTOM_CB_ID;
     req.type                   = WH_MESSAGE_CUSTOM_CB_TYPE_DMA32;
     req.data.dma32.client_addr = (uint32_t)((uintptr_t)&data);

@@ -90,13 +90,13 @@ Configuring a wolfHSM server involves allocating a server context structure and 
 
 The steps required to configure a server that supports client communication, NVM object storage using the NVM flash configuration, and local crypto (software only) are:
 
-1. Initialize the server comms configuration  
-    1\. Allocate and initialize a transport configuration structure, context, and callback implementation for the desired transport  
+1. Initialize the server comms configuration
+    1\. Allocate and initialize a transport configuration structure, context, and callback implementation for the desired transport
     2\. Allocate and initialize a comm server configuration structure using the transport configuration from step 1.1
-2. Initialize the server NVM context  
-    1\. Allocate and initialize a config, context, and callback structure for the low-level flash storage drivers (the implementation of these structures is provided by the port)  
-    2\. Allocate and initialize an NVM flash config, context, and callback strucure and bind the port flash configuration from step 2.1 to them  
-    3\. Allocate an NVM context structure and initialize it with the configuration from step 2.2 using `wh_Nvm_Init()`  
+2. Initialize the server NVM context
+    1\. Allocate and initialize a config, context, and callback structure for the low-level flash storage drivers (the implementation of these structures is provided by the port)
+    2\. Allocate and initialize an NVM flash config, context, and callback strucure and bind the port flash configuration from step 2.1 to them
+    3\. Allocate an NVM context structure and initialize it with the configuration from step 2.2 using `wh_Nvm_Init()`
 3.  Allocate and initialize a crypto context structure for the server
 4. Initialize wolfCrypt (before initializing the server)
 5. Allocate and initialize a server config structure and bind the comm server configuration, NVM context, and crypto context to it
@@ -169,7 +169,7 @@ whNvmContext nvmCtx = {0};
 wh_Nvm_Init(&nvmCtx, &whNvmConfig);
 
 /* Step 3: Allocate and initialize a crypto context structure */
-crypto_context cryptoCtx {
+whServerCryptoContext cryptoCtx {
     .devID = INVALID_DEVID; /* or set to custom crypto callback devID */
 };
 

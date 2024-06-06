@@ -36,13 +36,13 @@ sequence of a wolfHSM component is:
 #include "wolfhsm/component.h"        /* wolfHSM abstract API reference for a component */
 #include "port/vendor/mycomponent.h"  /* Platform specific definitions of configuration
                                        * and context structures, as well as declarations of
-                                       * callback functions */ 
+                                       * callback functions */
 
 /* Provide the lookup table for function callbacks for mycomponent. Note the type
 is the abstract type provided in wolfhsm/component.h */
 whComponentCb my_cb[1] = {MY_COMPONENT_CB};
 
-/* Fixed configuration data.  Note that pertinent data is copied out of the structure 
+/* Fixed configuration data.  Note that pertinent data is copied out of the structure
  * during init() */
 const myComponentConfig my_config = {
     .my_number = 3,
@@ -149,7 +149,7 @@ uint16_t req_magic = wh_COMM_MAGIC_NATIVE;
 uint16_t req_type = 123;
 uint16_t request_id;
 char* req_data = "RequestData";
-rc = wh_CommClient_SendRequest(context, req_magic, req_type, &request_id, 
+rc = wh_CommClient_SendRequest(context, req_magic, req_type, &request_id,
                     sizeof(req_data), req_data);
 /* Do other work */
 
@@ -167,7 +167,7 @@ client/server should Cleanup any context as a result.
 ### Transports
 
 Transports provide intact packets (byte sequences) of variable size (up to a
-maximum MTU), to the messaging layer for the library to process as a request or 
+maximum MTU), to the messaging layer for the library to process as a request or
 response. Transports implement the abstract interface defined by `whTransportClientCb`
 and are invoked directly by the commClient/commServer when needing to send and
 receive data.
@@ -176,7 +176,7 @@ Custom transport modules that implement the `whTransportClientCb` interface
 can be registered with the server and client and then are automatically used
 via the standard server and client request/response functions.
 
-Examples of a memory buffer transport module and a POSIX TCP socket transport can be found in wolfHSM's supported transports.  
+Examples of a memory buffer transport module and a POSIX TCP socket transport can be found in wolfHSM's supported transports.
 
 #### Supported Transports
 
@@ -257,7 +257,7 @@ One of the defining features of wolfHSM is that it enables the client applicatio
 - local and remote HSM implementations can be easily switched between by changing a single parameter to the wolfCrypt call, enabling maximum flexibility of implementation and ease of development. Client application development can be prototyped with local instances of wolfCrypt before the HSM core is even brought on-line
 - the wolfHSM API is simple, stable, well documented, and battle tested
 
-The ability to easily redirect wolfCrypt API calls to the wolfHSM server is based on the "crypto callback" (a.k.a cryptocb) of wolfCrypt. 
+The ability to easily redirect wolfCrypt API calls to the wolfHSM server is based on the "crypto callback" (a.k.a cryptocb) of wolfCrypt.
 
 
 The wolfHSM client is able to redirect wolfCrypt API calls to the wolfHSM server by implementing the remote procedure call logic as a [crypto callback](https://www.wolfssl.com/documentation/manuals/wolfssl/chapter06.html#crypto-callbacks-cryptocb). The Crypto callback framework in wolfCrypt enables users to override the default implementation of select cryptographic algorithms and provide their own custom implementations at runtime. The wolfHSM client library registers a crypto callback with wolfCrypt that transforms each wolfCrypt crypto API function into a remote procedure call to the HSM server to be executed in a secure environment.  Crypto callbacks are selected for use based on the device ID (`devId`) parameter accepted by most wolfCrypt API calls.
@@ -269,6 +269,6 @@ wolfHSM defines the `WOLFHSM_DEV_ID` value to represent the wolfHSM server crypt
 Many HSM devices also have hardware acceleration capabilities for select algorithms available. In these cases, the wolfHSM server may also support offloading the HSM server-side cryptography to device hardware. If supported, the wolfHSM server can be configured to do this automatically with no input required from the user. Any port-specific hardware acceleration capabilities will be documented in the wolfHSM port for that device.
 
 
-## AUTOSAR SHE 
+## AUTOSAR SHE
 
 TODO

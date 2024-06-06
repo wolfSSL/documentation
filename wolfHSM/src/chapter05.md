@@ -51,7 +51,7 @@ if (rc != WH_ERROR_OK) {
 
 The client context structure (`whClientContext`) holds the runtime state of the client and represents the endpoint of the connection with the server. There is a one-to-one relationship between client and server contexts, meaning an application that interacts with multiple servers will need multiple client contexts - one for each server. Each client API function takes a client context as an argument, indicating which server connection the operations will correspond to. If familiar with wolfSSL, the client context structure is analogous to the `WOLFSSL` connection context structure.
 
-### Initializing the client context 
+### Initializing the client context
 
 Before using any client APIs on a client context, the structure must be configured and initialized using the `whClientConfig` configuration structure and the `wh_Client_Init()` function.
 
@@ -157,15 +157,15 @@ Note that the echo request in step 6 is just a simple usage example. Once the co
 
 ## NVM Operations
 
-This section provides examples of how to use the client NVM API. Blocking APIs are used for simplicity, though the split transaction APIs can be used in a similar manner. 
+This section provides examples of how to use the client NVM API. Blocking APIs are used for simplicity, though the split transaction APIs can be used in a similar manner.
 
 Client usage of the server NVM storage first requires sending an initialization request to the server. This currently does not trigger any action on the server side but it may in the future and so it is recommended to include in client applications.
 
 ```c
 int rc;
-int serverRc; 
+int serverRc;
 uint32_t clientId; /* unused for now */
-uint32_t serverId; 
+uint32_t serverId;
 
 rc = wh_Client_NvmInit(&clientCtx, &serverRc, &clientId, &serverId);
 
@@ -202,7 +202,7 @@ For objects that should not be copied and sent over the transport, there exist D
 whNvmMetadata myMeta = {
   .id = 123,
   .access = WOLFHSM_NVM_ACCESS_ANY,
-  .flags = WOLFHSM_NVM_FLAGS_ANY, 
+  .flags = WOLFHSM_NVM_FLAGS_ANY,
   .label = “My Label”
 };
 
