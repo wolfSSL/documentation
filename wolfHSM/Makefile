@@ -45,6 +45,7 @@ api: wolfhsm-update
 # 3. Fix the titles of the header files markdown
 .PHONY: html-prep
 html-prep: api
+	$(Q)cp src/*.png build/html/
 	$(Q)cp -a api/md/*8h* build/html/
 
 	$(Q)perl -i -pe "s/\[(.*?)\]\(Classes\/.*?.md\)/\[\1\]\(#typedef-\1\)/g" build/html/group* build/html/*8h*
@@ -54,6 +55,8 @@ html-prep: api
 	$(Q)perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/\/tpm2_/tpm2_/g" build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*
+
+	$(Q)cat src/appendix01.md build/pdf/wh__*8h*.md > build/html/appendix01.md
 
 # Set input format to gfm to fix issues with converted API docs
 # Regexes:
@@ -65,16 +68,21 @@ html-prep: api
 # 6. Two regexes to handle bad Doxygen that didn't convert and the LaTeX processor thinks is LaTeX commands
 .PHONY: pdf-prep
 pdf-prep: api
-	$(Q)perl -i -pe "s/# /## /g" api/md/*.md
-	$(Q)perl -i -pe "s/(\/group_.*|Classes\/struct.*|\/.*8h)\.md//g" api/md/*.md
-	$(Q)perl -i -pe "s/^-(-)+$$//" api/md/*.md
-	$(Q)perl -i -pe "s/^title:.*//" api/md/*.md
-	$(Q)perl -i -pe "s/^Updated on.*//" api/md/*.md
-	$(Q)perl -i -pe "s/^summary.*//" api/md/*.md
-	$(Q)perl -i -pe "s/dox_comments\/header_files\///" api/md/*.md
-	$(Q)perl -i -pe "s/^\\\\//" api/md/*.md
-	$(Q)perl -i -pe "s/\\\\par/par/g" api/md/*.md
-	$(Q)perl -i -pe "s/\[(.*?)\]\(Classes\/.*?.md\)/\[\1\]\(#typedef-\1\)/g" api/md/*.md
-	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
-	$(Q)perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
-	$(Q)perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
+	$(Q)cp src/*.png build/pdf/
+	$(Q)cp -a api/md/*8h* build/pdf/
+
+	$(Q)perl -i -pe "s/# /## /g" build/pdf/*.md
+	$(Q)perl -i -pe "s/(\/group_.*|Classes\/struct.*|\/.*8h)\.md//g" build/pdf/*.md
+	$(Q)perl -i -pe "s/^-(-)+$$//" build/pdf/*.md
+	$(Q)perl -i -pe "s/^title:.*//" build/pdf/*.md
+	$(Q)perl -i -pe "s/^Updated on.*//" build/pdf/*.md
+	$(Q)perl -i -pe "s/^summary.*//" build/pdf/*.md
+	$(Q)perl -i -pe "s/dox_comments\/header_files\///" build/pdf/*.md
+	$(Q)perl -i -pe "s/^\\\\//" build/pdf/*.md
+	$(Q)perl -i -pe "s/\\\\par/par/g" build/pdf/*.md
+	$(Q)perl -i -pe "s/\[(.*?)\]\(Classes\/.*?.md\)/\[\1\]\(#typedef-\1\)/g" build/pdf/*.md
+	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/*.md
+	$(Q)perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/*.md
+	$(Q)perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/*.md
+
+	$(Q)cat src/appendix01.md build/pdf/wh__*8h*.md > build/pdf/appendix01.md
