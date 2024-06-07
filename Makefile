@@ -5,7 +5,7 @@ endif
 
 DOCKER_CMD=DOCKER_BUILDKIT=1 docker build -t doc_build --build-arg MANPATH=$(MANPATH) --build-arg PDFFILE=$(PDFFILE) --build-arg V=$(V) --target=manual --output=build -f Dockerfile .
 
-all: wolfssl wolfssh wolfboot wolfclu wolfcrypt-jni wolfmqtt wolfsentry wolfssl-jni wolftpm wolfhsm wolfengine fips-ready tuning porting
+all: wolfssl wolfssh wolfboot wolfclu wolfcrypt-jni wolfmqtt wolfsentry wolfssl-jni wolftpm wolfhsm wolfengine fips-ready tuning porting faq
 
 build:
 	$(Q)mkdir -p build
@@ -92,6 +92,12 @@ fips-ready: build
 tuning: MANPATH=wolfSSL-Tuning
 tuning: PDFFILE=wolfSSL-Tuning-Guide.pdf
 tuning: build
+	@$(DOCKER_CMD)
+
+.PHONY: faq
+faq: MANPATH=wolfSSL-FAQ
+faq: PDFFILE=wolfSSL-FAQ.pdf
+faq: build
 	@$(DOCKER_CMD)
 
 clean:
