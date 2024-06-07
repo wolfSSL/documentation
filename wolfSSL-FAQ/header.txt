@@ -1,4 +1,4 @@
-% wolfSSL Tuning Guide ![](logo.png)
+% wolfSSL FAQ ![](logo.png)
 
 ---
 header-includes:
