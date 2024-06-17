@@ -1489,11 +1489,7 @@ Uses popen for creating socket with host and post for wolfio.c socket open code 
 
 #### CloseSocket
 
-<<<<<<< HEAD
 A way to override the function used for closing a socket. Used with CRL, OCSP and BIO.
-=======
-A way to override the function used for closing socket a socket. Used with CRL, OCSP and BIO.
->>>>>>> 418f35ade78feb44af5cd196525979207e953bcb
 
 #### CONFIG_POSIX_API
 
