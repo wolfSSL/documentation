@@ -440,11 +440,11 @@ Used for compiling out special characters that embedded devices may have problem
 
 #### NO_OLD_SSL_NAMES
 
-Removes unended namespace.
+Removes unneeded namespace.
 
 #### NO_OLD_WC_NAMES
 
-Removes unended namespace.
+Removes unneeded namespace.
 
 #### NO_OLD_POLY1305
 
@@ -500,7 +500,7 @@ No default ticket encryption callback, server only. The application must set its
 
 #### WOLFSSL_NO_SOCK
 
-Board-specific, no sock platform.
+Board-specific, no socket platform.
 
 #### WOLFSSL_NO_TLS12
 
@@ -936,23 +936,23 @@ Used as a guard on redeclaration.
 
 #### WOLFSSL_DH_TYPE_DEFINED
 
-Used as redeclaration gaurd for DH.
+Used as redeclaration guard for DH.
 
 #### WOLFSSL_DSA_TYPE_DEFINED
 
-Used as redeclaration gaurd for DSA.
+Used as redeclaration guard for DSA.
 
 #### WOLFSSL_EC_TYPE_DEFINED
 
-Used as redeclaration gaurd for EC.
+Used as redeclaration guard for EC.
 
 #### WOLFSSL_RSA_TYPE_DEFINED
 
-Used as redeclaration gaurd for RSA.
+Used as redeclaration guard for RSA.
 
 #### WOLFSSL_ECDSA_TYPE_DEFINED
 
-Used as redeclaration gaurd for ECDSA.
+Used as redeclaration guard for ECDSA.
 
 #### WOLFSSL_DTLS_EXPORT_TYPES
 
@@ -1024,11 +1024,11 @@ Implements the use of AEAD and is required for TLS 1.3.
 
 #### HAVE_AES_CBC
 
-Used In the case when Static RSA is needed.
+Enable option for AES.
 
 #### HAVE_AES_DECRYPT
 
-Enables AES to decrypt symmetric cypher.
+This setting controls whether the decrypt direction of the various AES modes is supported.
 
 #### HAVE_ALPN
 
@@ -1060,7 +1060,7 @@ Define for Curve448 support. Additional macro settings can be changed. The defau
 
 #### HAVE_DANE
 
-To verify Raw Public Key cert, DANE(RFC6698) add macro HAVE_DANE for dane authentification.
+This macro is a protocol that uses DNSSEC(domain lookup with crypto signatures) to allow certificates to be validated without depending certificate authority. This can provide a stronger garuntee of legitamicy. To verify Raw Public Key cert, DANE(RFC6698) add macro HAVE_DANE for DANE authentication.
 
 #### HAVE_DILITHIUM
 
@@ -1085,10 +1085,6 @@ Enables post-quantum crypto FALCON from OpenQuantumSafe.
 #### HAVE_FIPS
 
 Used when implementing different FIPS versions.
-
-#### HAVE_FUZZER
-
-Used when implementing different F versions.
 
 #### HAVE_KEYING_MATERIAL
 
@@ -1200,7 +1196,7 @@ Enables user-defined PSK cipher.
 
 #### WOLFSSL_OLD_PRIME_CHECK
 
-Enable feature which uses faster DH prime checking.
+Enable feature which uses faster DH and RSA prime checking.
 
 #### WOLFSSL_STATIC_RSA
 
@@ -1208,11 +1204,11 @@ Static ciphers are strongly discouraged and should never be used if avoidable. H
 
 #### WOLFSSL_STATIC_PSK
 
-Static ciphers are highly discouraged see [`WOLFSSL_STATIC_RSA`](#wolfssl_static_rsa)
+Feature that enables static PSK cipher suites. Static ciphers are highly discouraged see [`WOLFSSL_STATIC_RSA`](#wolfssl_static_rsa)
 
 #### WOLFSSL_STATIC_DH
 
-Static ciphers are highly discouraged see [`WOLFSSL_STATIC_RSA`](#wolfssl_static_rsa)
+Feature that enables static ECDH cipher suites. Static ciphers are highly discouraged see [`WOLFSSL_STATIC_RSA`](#wolfssl_static_rsa)
 
 #### HAVE_NULL_CIPHER
 
@@ -1513,7 +1509,7 @@ Cleanup of the socket close code used, for example, CRL/OCSP and BIO, to use sin
 
 #### CONFIG_POSIX_API
 
-We need POSIX names for networking systems calls. This can either be enabled with CONFIG_NET_SOCKETS_POSIX_NAMES or with CONFIG_POSIX_API. This commit enables support for the latter."
+Enables POSIX names for networking systems calls.
 
 #### WOLFSSL_USER_CURRTIME
 
@@ -1531,21 +1527,13 @@ Identifies the minimum number of bits in ECCkey.
 
 Identifies the minimum number of bits in RSA key.
 
-#### EXIT_FAILURE
-
-Defined as 1 and is implemented to exit with a failure.
-
-#### EXIT_SUCCESS
-
-Defined as 0 but exits with success.
-
 #### EXTERNAL_SERIAL_SIZE
 
 A raw serial number byte that writes X509 serial numbers in unsigned binary to a buffer. For all cases, the buffer needs to be at least EXTERNAL_SERIAL_SIZE (32). On success, it returns WOLFSSL_SUCCESS.
 
 #### FIPS_VERSION_GE
 
-Define for use with FIPSv2.
+Define for use with general FIPS version comparisons.
 
 #### LARGE_STATIC_BUFFERS
 
@@ -2086,7 +2074,7 @@ Enable Single-Precision (SP) S390X assembly speedup macros. Only applies if `WOL
 
 #### SP_INT_BITS
 
-Single-Precision (SP) assembly speedup macro. Math configuration that can specify size.
+The number of bits to have in an sp_int. Which can determine the largest bignum that the library can handle.
 
 
 ### Stack or Chip Specific Defines
