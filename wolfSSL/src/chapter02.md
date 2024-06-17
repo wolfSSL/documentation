@@ -1288,7 +1288,7 @@ Enable middlebox compatibility in the TLS 1.3 handshake. This includes sending C
 
 #### WOLFSSL_TLS13_SHA512
 
-Allow generation of SHA-512 digests in a handshake - no ciphersuite. Requires SHA-512 at this time.
+Allow generation of SHA-512 digests in handshake - no ciphersuite requires SHA-512 at this time. This enables calculation of a SHA2-512 hash for the handshake messages even though its not used by TLS v1.3 yet.
 
 #### WOLFSSL_UIP
 
@@ -1356,7 +1356,7 @@ Used to define an invalid socket and is defined as -1.
 
 #### WOLFSSL_SOCKET_INVALID
 
-Used in socket handling.
+Used for testing and it only allows overriding the value used to indicate an invalid socket. Typically is -1.
 
 #### WOLFSSL_SOCKET_IS_INVALID
 
@@ -1485,11 +1485,11 @@ It is used as a cryptographic number, which is implemented in authentication. It
 
 #### WOLFSSL_USE_POPEN_HOST
 
-Used to implement popen and "host".
+Uses popen for creating socket with host and post for wolfio.c socket open code used with CRL and OCSP.
 
 #### CloseSocket
 
-Cleanup of the socket close code used, for example, CRL/OCSP and BIO, to use single macro `CloseSocket.`
+A way to override the function used for closing socket a socket. Used with CRL, OCSP and BIO.
 
 #### CONFIG_POSIX_API
 
@@ -1513,7 +1513,7 @@ Identifies the minimum number of bits in RSA key.
 
 #### EXTERNAL_SERIAL_SIZE
 
-A raw serial number byte that writes X509 serial numbers in unsigned binary to a buffer. For all cases, the buffer needs to be at least EXTERNAL_SERIAL_SIZE (32). On success, it returns WOLFSSL_SUCCESS.
+A raw serial number byte that writes X509 serial numbers in unsigned binary to a buffer. For all cases, the buffer needs to be at least EXTERNAL_SERIAL_SIZE (32). On success, it returns WOLFSSL_SUCCESS. Note: this is a internal macro that cannot be user defined.
 
 #### FIPS_VERSION_GE
 
@@ -1600,7 +1600,7 @@ Enables 3072-bit test certificate and key buffers located in `<wolfssl_root>/wol
 
 #### USE_CERT_BUFFERS_4096
 
-Enables 3072-bit test certificate and key buffers located in `<wolfssl_root>/wolfssl/certs_test.h`. Helpful when testing on and porting to embedded systems with no filesystem.
+Enables 4096-bit test certificate and key buffers located in `<wolfssl_root>/wolfssl/certs_test.h`. Helpful when testing on and porting to embedded systems with no filesystem.
 
 #### USE_CERT_BUFFERS_25519
 
