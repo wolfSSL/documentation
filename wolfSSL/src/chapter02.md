@@ -400,31 +400,43 @@ Enables wolfCrypt only while disabling TLS.
 
 #### NO_CAMELLIA_CBC
 
-Disables Camellia CBC support.
+Disables Camellia CBC support but only applies to TLS cipher suites only.
 
 #### NO_AES
 
 Disables AES algorithm support.
 
+#### NO_AES_128
+
+Used for AES key size selection at compile time.
+
+#### NO_AES_192
+
+Used for AES key size selection at compile time.
+
+#### NO_AES_256
+
+Used for AES key size selection at compile time.
+
 #### NO_AESGCM_AEAD
 
-Disables AES GCM algorithm support.
+Used for disabliing TLS cipher suites thst use AES GCM. It is used internally when no AES GCM cipher suites are enabled, but can also be used to limit cipher suites.
 
 #### NO_ASN_TIME
 
-Disables time checking for ASN.
+Disables time checking for ASN. Note: This should be used with caution because all certificate begin/end date checking will be skipped.
 
 #### NO_CHECK_PRIVATE_KEY
 
-RSA - needed to encrypt salt.
+This macro disables additional private key checking that is on by default. This enables checking to validate the private key is a pair for the public key. It is supported for RSA, ECDSA, ED25519, ED448, Falcon, Dilithium and Sphincs.
 
 #### NO_DH
 
-Disables DH support.
+Disables Diffie-Hellman (DH) support.
 
 #### NO_ED25519_CLIENT_AUTH
 
-Disables client authEd25519 requires caching enabled for tracking message hash used in EdDSA_Update for signing.
+Disables TLS client authentication support for ED25519. It is used to reduce memory usage during TLS if ED25519 is not used, since it requires caching messages.
 
 #### NO_ED448_CLIENT_AUTH
 
@@ -432,7 +444,7 @@ Disables client authentification for ED448.
 
 #### NO_FORCE_SCR_SAME_SUITE
 
-Applys a restriction on secure negotation. Don't allocate Suites' object on renegotiation.
+By default secure renegotiation requires using the same cipher suite. This disables that requirement.
 
 #### NO_MULTIBYTE_PRINT
 
@@ -440,7 +452,7 @@ Used for compiling out special characters that embedded devices may have problem
 
 #### NO_OLD_SSL_NAMES
 
-Removes unneeded namespace.
+This disables some of the old OpenSSL compatibility macros for using wolfSSL and OpenSSL together.
 
 #### NO_OLD_WC_NAMES
 
@@ -476,11 +488,11 @@ For disabling only the TSIP TLS-linked Common key encryption method.
 
 #### NO_WOLFSSL_SHA256
 
-Disables support for SHA-256.
+This applies to TLS 1.3 only. It allows SHA2-256 to be enabled and usable from wolfCrypt, but exclude it from TLS 1.3.
 
 #### WOLFSSL_BLIND_PRIVATE_KEY
 
-Used as a mask of private key DER.
+Used as a mask to blind the private key. The blinding is used to proctect aginst Rowhammer attacks.
 
 #### WOLFSSL_DTLS13_NO_HRR_ON_RESUME
 
@@ -488,11 +500,11 @@ If defined, a DTLS server will not do a cookie exchange on successful client res
 
 #### WOLFSSL_NO_CLIENT_AUTH
 
-Disable client authentification for Ed25519/Ed448.
+Disables the caching code required for using Ed25519 and Ed448.
 
 #### WOLFSSL_NO_CURRDIR
 
-Disable settings used when enabling Arduino.
+Portability macro for platforms that do not support ./ for test paths in wolfssl/test.h. Applies to testing tools only.
 
 #### WOLFSSL_NO_DEF_TICKET_ENC_CB
 
@@ -500,7 +512,7 @@ No default ticket encryption callback, server only. The application must set its
 
 #### WOLFSSL_NO_SOCK
 
-Board-specific, no socket platform.
+Portability macro for disabling built-in socket support. If using TLS without sockets typically WOLFSSL_USER_IO would be defined and callbacks used for send/recv.
 
 #### WOLFSSL_NO_TLS12
 
@@ -590,7 +602,7 @@ Turns on wolfSSL’s RSA key generation functionality. See [Keys and Certificate
 
 #### WOLF_PRIVATE_KEY_ID
 
-FIPS v5 and older doesn't support WOLF_PRIVATE_KEY_ID with PK callbacks. Required for client authentification in some cases.
+This is used with PKCS11 to enable support for key ID and label API's. FIPS v5 and older doesn't support WOLF_PRIVATE_KEY_ID with PK callbacks.
 
 #### WOLFSSL_WOLFSENTRY_HOOKS
 
@@ -598,23 +610,19 @@ Enables wolfSentry hook support.
 
 #### WOLFSSL_CERT_EXT
 
-Cert exit, key and cert generation feature.
+Certificate extension, key and cert generation feature.
 
 #### WOLFSSL_CERT_REQ
 
-Cert requirement, key, and cert generation feature.
+Certificate request, key, and cert generation feature.
 
 #### WOLFSSL_SSLKEYLOGFILE
 
-Warn if secrets logging is enabled. The SHOW_SECRETS and WOLFSSL_SSLKEYLOGFILE options should only be used for debugging and never in a production environment.
+This enables the key logging used by Wireshark. It does produce a compiler warning since the master secret and client random are written to a file. This is useful for testing and not recommended for production.
 
 #### WOLFSSL_SSLKEYLOGFILE_OUTPUT
 
-It can be used as an Optional Pre-Master-Secret logging for Wireshark.
-
-#### WOLFSSL_HAVE_CERT_SERVICE
-
-Used by autoconf to see if cert service is available.
+This macro defines the filename for the key logging. It is used with WOLFSSL_SSLKEYLOGFILE.
 
 #### WOLFSSL_HAVE_WOLFSCEP
 
@@ -622,7 +630,7 @@ Enable feature used by autoconf to see if wolfSCEP is available.
 
 #### WOLFSSL_HAVE_MIN
 
-Needed for use with older versions of xc16.
+This macro is for portability of the library to indicate if MIN/MAX are already defined by the platform. It prevents duplicate definitions.
 
 #### WOLFSSL_HAVE_TLS_UNIQUE
 
@@ -634,35 +642,11 @@ Enable for encrypted keys PKCS8 support.
 
 #### WOLFSSL_CUSTOM_OID
 
-Key Generation feature. Enables custom OID support for subject and request extensions.
-
-#### WOLFSSL_RIPEMD
-
-Enables RIPEMD-160 support.
-
-#### WOLFSSL_SHA384
-
-Enables SHA-384 support.
-
-#### WOLFSSL_SHA512
-
-Enables SHA-512 support.
-
-#### WOLFSSL_AES_128
-
-Enables AES-128 support.
-
-#### WOLFSSL_AES_256
-
-Enables AES-256 support.
+Certificate feature that enables custom OID support for subject and request extensions. This also applies to parsing certificates with custom OID.
 
 #### WOLFSSL_AES_DIRECT
 
-The AES option is used when you want to implement AES counter mode and when you want to use pkcs7. It's primarily used to make a direct call to a function in user settings, providing a flexible and customizable AES implementation.
-
-#### WOLFSSL_AES_KEY_SIZE_ENUM
-
-Needed by session ticket AES key sizes.
+Used by PKCS7 when direct AES ECB mode API's should be enabled and exposed.
 
 #### DEBUG_WOLFSSL
 
@@ -718,15 +702,15 @@ Builds even more OpenSSL compatibility into the library, and enables the wolfSSL
 
 #### HAVE_EXT_CACHE
 
-OpenSSL compat layer. Need OPENSSL_EXTRA to be defined as well.
+Enables a feature support use of an external session cache (vs an internal one).
 
 #### WOLFSSL_WPAS_SMALL
 
-WPA supplicant support. Used with OPENSSL_EXTRA for compatibility use.
+Enables a smaller subset of the compatibility layer for WPA supplicant support.
 
 #### OPENSSL_ALL
 
-Enable option for OpenSSL compatibility.
+Enables support for all compatibility functions for testing integration.
 
 #### OPENSSL_COEXIST
 
@@ -1624,7 +1608,7 @@ Enables Ed25519 test certificate and key buffers located in `<wolfssl_root>/wolf
 
 #### USE_WOLFSSL_IO
 
-Enables the wolfSSL IO functions.
+This macro enables callbacks to send/recv. You can find an example of it in use here: (https://github.com/wolfSSL/wolfssl-examples/blob/master/tls/client-tls-callback.c#L6)
 
 #### CUSTOM_RAND_GENERATE_SEED
 
@@ -1722,7 +1706,7 @@ Can be defined when using fast math ([`USE_FAST_MATH`](#use_fast_math)) on syste
 
 #### ECC_TIMING_RESISTANT
 
-This is used as a Timing Resistor for ECC. It reduces heap usage but also makes it slower, hardening the curve.
+This is used as a Timing Resistance feature that enables code in ecc.c to prevent side channel and differential power analysis (DPA) attacks.
 
 #### FUSION_RTOS
 
@@ -1802,7 +1786,7 @@ Disable printing of leading zero in hexidecimal string output. For example, if t
 
 #### WC_ASN_NAME_MAX
 
-Used when calculating curve x509. Use value from asn.h.
+This allows overriding the maximum name support for an X.509 certificate field.
 
 #### OPENSSL_EXTRA_X509_SMALL
 
@@ -2151,7 +2135,7 @@ Use if building for Linux Kernel Module.
 
 #### WORD64_AVAILABLE
 
-Platform with 64-bit CPU registers.
+Portability macro to indicate 64-bit types are supported. Typically its better to use SIZEOF_LONG_LONG 8.
 
 #### WOLFSSL_NUCLEUS_1_2
 
@@ -2220,10 +2204,6 @@ Used when configuring ARDUINO and wolfSSL. If building for Intel Galileo platfor
 #### HAVE_KEIL_RTX
 
 WolfSSL for MDK-RTX-TCP-FS Configuration.
-
-#### _SOCKLEN_T
-
-Needs to be set sometimes when porting, In many cases this is already covered.
 
 #### EBSNET
 
