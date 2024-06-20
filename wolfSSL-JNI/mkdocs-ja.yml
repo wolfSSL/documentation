@@ -15,7 +15,7 @@ nav:
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
-  language: en
+  language: ja
   palette:
     primary: indigo
     accent: indigo
