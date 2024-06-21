@@ -394,6 +394,10 @@ Removes code for OAEP padding.
 
 Turns off AES-CBC algorithm support.
 
+#### NO_AES_DECRYPT
+
+Can be set to reduce code size. Set to disable the decrypt and only support encryption.
+
 #### WOLFCRYPT_ONLY
 
 Enables wolfCrypt only while disabling TLS.
@@ -692,10 +696,6 @@ Enables Elliptical Curve Cryptography (ECC) support.
 
 Is an extension that can allow for compression of data over the connection. It normally shouldn't be used, see the note below under configure notes libz.
 
-#### HAVE_OCSP
-
-Enables Online Certificate Status Protocol (OCSP) support.
-
 #### OPENSSL_EXTRA
 
 Builds even more OpenSSL compatibility into the library, and enables the wolfSSL OpenSSL compatibility layer to ease porting wolfSSL into existing applications which had been designed to work with OpenSSL. It is off by default.
@@ -818,10 +818,6 @@ This is needed to use ProcessPeerCert callback.
 
 Only "reads" from data provided by the application via wolfSSL_provide_quic_data(). Then, transfer from there into the inputBuffer. `WOLFSSL_QUIC` is incompatible with `WOLFSSL_CALLBACKS`.
 
-#### WOLFSSL_QUIC_H
-
-Define for wolSSL quic API.
-
 #### WOLFSSL_QUIC_MAX_RECORD_CAPACITY
 
 Defines max quic capacity as 1024*1024 -- 1 MB.
@@ -860,19 +856,27 @@ SM settings for SM4 GCM.
 
 #### WOLFSSL_SNIFFER_CHAIN_INPUT
 
-Used in conjunction with build option `./configure --enable-sniffer`.
+The Chain Input option allows the sniffer to receive its input as a struct iovec list. Rather than a pointer to a raw packet.
 
 #### XSLEEP_MS
 
-Can be called to make the session wait for a specified number of milliseconds till it expires.
+Used for testing only. It allows defining a custom delay.
 
 #### XSNPRINTF
 
-Snprintf is used in asn.c for GetTimeString, PKCS7 test, and when debugging is turned on.
+Allows overriding the snprintf function.
 
 #### DEFAULT_TIMEOUT_SEC
 
-Used to define a default timeout in seconds.
+Used with `HAVE_IO_TIMEOUT` to specify the wolfio.c socket timeout in seconds. This is used by the internal socket code for OCSP and CRL HTTP.
+
+#### HAVE_IO_TIMEOUT
+
+Certificate revocation. IO options enable support for connect timeout, but the default is off.
+
+#### HAVE_OCSP
+
+Enables Online Certificate Status Protocol (OCSP) support.
 
 #### HAVE_CSHARP
 
@@ -914,41 +918,13 @@ Turns on the use of ARMv8 hardware acceleration.
 
 Turns on fast math RSA non-blocking support for splitting RSA operations into smaller chunks of work. Feature is enabled by calling [`wc_RsaSetNonBlock()`](group__RSA.md#function-wc_rsasetnonblock) and checking for `FP_WOULDBLOCK` return code.
 
-#### WC_RNG_TYPE_DEFINED
-
-Used as a guard on redeclaration.
-
-#### WOLFSSL_DH_TYPE_DEFINED
-
-Used as redeclaration guard for DH.
-
-#### WOLFSSL_DSA_TYPE_DEFINED
-
-Used as redeclaration guard for DSA.
-
-#### WOLFSSL_EC_TYPE_DEFINED
-
-Used as redeclaration guard for EC.
-
-#### WOLFSSL_RSA_TYPE_DEFINED
-
-Used as redeclaration guard for RSA.
-
-#### WOLFSSL_ECDSA_TYPE_DEFINED
-
-Used as redeclaration guard for ECDSA.
-
-#### WOLFSSL_DTLS_EXPORT_TYPES
-
-Used as a macro guard for redefinition warning.
-
 #### WC_RSA_BLINDING
 
 Used to enable timing resistance.
 
 #### WC_RSA_PSS
 
-TLS 1.3, in some cases, requires RSA PSS padding support.
+Enables RSA PSS padding. The only TLS 1.3 RSA padding scheme supported is PSS (per specification). PSS padding uses random padding.
 
 #### WOLFSSL_RSA_VERIFY_ONLY
 
@@ -1008,11 +984,7 @@ Implements the use of AEAD and is required for TLS 1.3.
 
 #### HAVE_AES_CBC
 
-Enable option for AES.
-
-#### HAVE_AES_DECRYPT
-
-This setting controls whether the decrypt direction of the various AES modes is supported.
+Enable option for AES CBC.
 
 #### HAVE_ALPN
 
@@ -1020,7 +992,7 @@ Crypto enables the option for application-layer protocol negotiation.
 
 #### HAVE_CAVIUM_OCTEON_SYNC
 
-By default, the OCTEON's global variables are all thread local. This tag allows them to be shared between threads.
+This enables the blocking (synchronous) version of the Marvell Cavium/Octeon hardware.
 
 #### HAVE_CERTIFICATE_STATUS_REQUEST
 
@@ -1044,7 +1016,7 @@ Define for Curve448 support. Additional macro settings can be changed. The defau
 
 #### HAVE_DANE
 
-This macro is a protocol that uses DNSSEC(domain lookup with crypto signatures) to allow certificates to be validated without depending certificate authority. This can provide a stronger garuntee of legitamicy. To verify Raw Public Key cert, DANE(RFC6698) add macro HAVE_DANE for DANE authentication.
+This option is only supported with `HAVE_RPK` (Raw Public Keys) and is a placeholder for when it might be added in the future.
 
 #### HAVE_DILITHIUM
 
