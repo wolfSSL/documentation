@@ -460,15 +460,15 @@ Removes unneeded namespace.
 
 #### NO_OLD_POLY1305
 
-For compiling out special characters that embedded devices may have problems with.
+This disables support for the old ChaCha20/Poly1305 TLS 1.2 cipher suite that is typically used for interop.
 
 #### NO_HANDSHAKE_DONE_CB
 
-Applys a restriction on secure negotation. Don't allocate Suites' object on renegotiation.
+Disables support for the handshake callback set with `wolfSSL_SetHsDoneCb`. This option is useful for reducing code size.
 
 #### NO_STDIO_FILESYSTEM
 
-ASN Library Selection (default to ASN_TEMPLATE).
+This disables include of stdio.h. Used with portability.
 
 #### NO_TLS_DH
 
@@ -476,7 +476,7 @@ Excludes TLS DH. Should not negotiate cipher suites based on ephemeral finite-fi
 
 #### NO_WOLFSSL_CM_VERIFY
 
-Sets certification manager callback.
+Disables the Certificate Manager verify callback. The verify callback allows intercepting errors and overriding them. This option is useful for reducing code size.
 
 #### NO_WOLFSSL_DIR
 
@@ -484,7 +484,7 @@ Disable directory support.
 
 #### NO_WOLFSSL_RENESAS_TSIP_TLS_SESSION
 
-For disabling only the TSIP TLS-linked Common key encryption method.
+For disabling only the TSIP TLS-linked Common key encryption method. Note: This is a Renesas RX TSIP specific define.
 
 #### NO_WOLFSSL_SHA256
 
@@ -496,7 +496,7 @@ Used as a mask to blind the private key. The blinding is used to proctect aginst
 
 #### WOLFSSL_DTLS13_NO_HRR_ON_RESUME
 
-If defined, a DTLS server will not do a cookie exchange on successful client resumption: the resumption will be faster (one RTT less) and will consume less bandwidth (one ClientHello and one HelloVerifyRequest/HelloRetryRequest less). On the other hand, if a valid SessionID/ticket/psk is collected, forged clientHello messages will consume resources on the server. For DTLS 1.3, using this option also allows for the server to process Early Data/0-RTT Data. Without this, the Early Data would be dropped since the server doesn't enter stateful processing until receiving a verified ClientHello with the cookie. To allow DTLS 1.3 resumption without the cookie exchange:- Compile wolfSSL with WOLFSSL_DTLS13_NO_HRR_ON_RESUME defined - Call wolfSSL_dtls13_no_hrr_on_resume(ssl, 1) on the WOLFSSL object to disable the cookie exchange on resumption - Continue like with a normal connection.
+If defined, a DTLS server will not do a cookie exchange on successful client resumption: the resumption will be faster (one RTT less) and will consume less bandwidth (one ClientHello and one HelloVerifyRequest/HelloRetryRequest less). On the other hand, if a valid SessionID/ticket/psk is collected, forged clientHello messages will consume resources on the server. For DTLS 1.3, using this option also allows for the server to process Early Data/0-RTT Data. Without this, the Early Data would be dropped since the server doesn't enter stateful processing until receiving a verified ClientHello with the cookie. To allow DTLS 1.3 resumption without the cookie exchange:- Compile wolfSSL with `WOLFSSL_DTLS13_NO_HRR_ON_RESUME` defined - Call wolfSSL_dtls13_no_hrr_on_resume(ssl, 1) on the WOLFSSL object to disable the cookie exchange on resumption - Continue like with a normal connection.
 
 #### WOLFSSL_NO_CLIENT_AUTH
 
@@ -512,7 +512,7 @@ No default ticket encryption callback, server only. The application must set its
 
 #### WOLFSSL_NO_SOCK
 
-Portability macro for disabling built-in socket support. If using TLS without sockets typically WOLFSSL_USER_IO would be defined and callbacks used for send/recv.
+Portability macro for disabling built-in socket support. If using TLS without sockets typically `WOLFSSL_USER_IO` would be defined and callbacks used for send/recv.
 
 #### WOLFSSL_NO_TLS12
 
@@ -602,7 +602,7 @@ Turns on wolfSSL’s RSA key generation functionality. See [Keys and Certificate
 
 #### WOLF_PRIVATE_KEY_ID
 
-This is used with PKCS11 to enable support for key ID and label API's. FIPS v5 and older doesn't support WOLF_PRIVATE_KEY_ID with PK callbacks.
+This is used with PKCS11 to enable support for key ID and label API's. FIPS v5 and older doesn't support `WOLF_PRIVATE_KEY_ID` with PK callbacks.
 
 #### WOLFSSL_WOLFSENTRY_HOOKS
 
@@ -622,7 +622,7 @@ This enables the key logging used by Wireshark. It does produce a compiler warni
 
 #### WOLFSSL_SSLKEYLOGFILE_OUTPUT
 
-This macro defines the filename for the key logging. It is used with WOLFSSL_SSLKEYLOGFILE.
+This macro defines the filename for the key logging. It is used with `WOLFSSL_SSLKEYLOGFILE`.
 
 #### WOLFSSL_HAVE_WOLFSCEP
 
@@ -722,7 +722,7 @@ Specifies the version number to implement OpenSSL compatibility.
 
 #### WOLFSSL_NGINX
 
-OpenSSL compatibility application specific "nginx (--enable-nginx) WOLFSSL_NGINX"
+OpenSSL compatibility application specific. Use, nginx `(--enable-nginx) WOLFSSL_NGINX`.
 
 #### WOLFSSL_ERROR_CODE_OPENSSL
 
@@ -756,7 +756,7 @@ OpenSSL compatibility specific macro.
 
 #### WOLFSSL_ASN_TEMPLATE
 
-Use newer ASN template asn.c code (default). Daul algo certificate features. "Dual alg cert support requires the ASN.1 template feature.".
+Use newer ASN template asn.c code (default). Daul algo certificate features. Dual alg cert support requires the ASN.1 template feature.
 
 #### WOLFSSL_ASYNC_IO
 
@@ -768,7 +768,7 @@ Enables ASF hooks seeding random data using the `atmel_get_random_number` functi
 
 #### WOLFSSL_CMAC
 
-Additional CMAC algorithm enable. Note: requires WOLFSSL_AES_DIRECT
+Additional CMAC algorithm enable. Note: requires `WOLFSSL_AES_DIRECT`.
 
 #### WOLFSSL_ESPIDF_ERROR_PAUSE
 
@@ -780,11 +780,11 @@ Turns on testing of IPv6 in the test applications. wolfSSL proper is IP neutral,
 
 #### TEST_NONBLOCK_CERTS
 
-Async test --enable-ocsp CFLAGS implement TEST_NONBLOCK_CERTS.
+Async test --enable-ocsp CFLAGS implement `TEST_NONBLOCK_CERTS`.
 
 #### TEST_OPENSSL_COEXIST
 
-Use when enabling the build option: ./configure --enable-opensslcoexist.
+Use when enabling the build option: `./configure --enable-opensslcoexist`.
 
 #### TEST_PK_PRIVKEY
 
@@ -808,15 +808,15 @@ TLS extension, Used for post-handshake authentification.
 
 #### WOLFSSL_PSK_MULTI_ID_PER_CS
 
-With TLS 1.3 PSK, when WOLFSSL_PSK_MULTI_ID_PER_CS is defined, multiple IDs for a cipher suite can be handled.
+With TLS 1.3 PSK, when `WOLFSSL_PSK_MULTI_ID_PER_CS` is defined, multiple IDs for a cipher suite can be handled.
 
 #### WOLFSSL_PUBLIC_ASN
 
-Need WOLFSSL_PUBLIC_ASN to use ProcessPeerCert callback.
+This is needed to use ProcessPeerCert callback.
 
 #### WOLFSSL_QUIC
 
-Only "reads" from data provided by the application via wolfSSL_provide_quic_data(). Then, transfer from there into the inputBuffer. WOLFSSL_QUIC is incompatible with WOLFSSL_CALLBACKS.
+Only "reads" from data provided by the application via wolfSSL_provide_quic_data(). Then, transfer from there into the inputBuffer. `WOLFSSL_QUIC` is incompatible with `WOLFSSL_CALLBACKS`.
 
 #### WOLFSSL_QUIC_H
 
@@ -860,7 +860,7 @@ SM settings for SM4 GCM.
 
 #### WOLFSSL_SNIFFER_CHAIN_INPUT
 
-Used in conjunction with build option ./configure --enable-sniffer.
+Used in conjunction with build option `./configure --enable-sniffer`.
 
 #### XSLEEP_MS
 
@@ -900,7 +900,7 @@ Turns on the use of static memory buffers and functions. This allows for using s
 
 #### WOLFSSL_STATIC_MEMORY_LEAN
 
-It requires WOLFSSL_STATIC_MEMORY to be defined. It uses smaller type sizes for structs requiring memory pool sizes of less than 65k and limits features available, like IO buffers, to reduce footprint size.
+It requires `WOLFSSL_STATIC_MEMORY` to be defined. It uses smaller type sizes for structs requiring memory pool sizes of less than 65k and limits features available, like IO buffers, to reduce footprint size.
 
 #### WOLFSSL_SESSION_EXPORT
 
@@ -1168,7 +1168,7 @@ The Session Watching option allows the sniffer to watch any packet provided with
 
 #### STATIC_BUFFER_LEN
 
-Don't fragment memory from the record header. Expands to: RECORD_HEADER_SZ.
+Don't fragment memory from the record header. Expands to: `RECORD_HEADER_SZ`.
 
 #### STATIC_CHUNKS_ONLY
 
@@ -1232,7 +1232,7 @@ Function TimeNowInMilliseconds() returns an unsigned 32-bit value. The default b
 
 #### WOLFSSL_MAX_DHKEY_BITS
 
-DH maximum bit size must be a multiple of 8. DH maximum bit size must not exceed 16384 or greater than WOLFSSL_MIN_DHKEY_BITS.
+DH maximum bit size must be a multiple of 8. DH maximum bit size must not exceed 16384 or greater than `WOLFSSL_MIN_DHKEY_BITS`.
 
 #### WOLFSSL_MIN_DHKEY_BITS
 
@@ -1300,7 +1300,7 @@ Specifies Max ticket age. For TLS 1.3, this is 7 days.
 
 #### TLS13_TICKET_NONCE_STATIC_SZ
 
-TLS13_TICKET_NONCE_STATIC_SZ is not supported in this FIPS_VERSION_GE.
+TLS13_TICKET_NONCE_STATIC_SZ is not supported in this `FIPS_VERSION_GE`.
 
 #### TLS13_TICKET_NONCE_MAX_SZ
 
@@ -1348,7 +1348,7 @@ Used when debugging name constraint tests. Not static to allow use in multiple l
 
 #### DEBUG_WOLFSSL_VERBOSE
 
-When using the OPENSSL_EXTRA or DEBUG_WOLFSSL_VERBOSE macro, WOLFSSL_ERROR is mapped to the new function WOLFSSL_ERROR_LINE, which gets the line number and function name where WOLFSSL_ERROR is called.
+When using the `OPENSSL_EXTRA` or `DEBUG_WOLFSSL_VERBOSE` macro, `WOLFSSL_ERROR` is mapped to the new function `WOLFSSL_ERROR_LINE`, which gets the line number and function name where `WOLFSSL_ERROR` is called.
 
 #### SOCKET_INVALID
 
@@ -1397,7 +1397,7 @@ Defined if this system supports signaling COND_TYPE - type that should be passed
 
 #### WOLFSSL_DTLS_CH_FRAG
 
-Allows a server to process a fragmented second/verified (one containing a valid cookie response) ClientHello message. The first/unverified (one without a cookie extension) ClientHello MUST be unfragmented so that the DTLS server can process it statelessly. This is only implemented for DTLS 1.3. The user MUST call wolfSSL_dtls13_allow_ch_frag() on the server to explicitly enable this during runtime. "Using DTLS 1.3 + pqc without WOLFSSL_DTLS_CH_FRAG will probably fail. Use --enable-dtls-frag-ch to enable it."
+Allows a server to process a fragmented second/verified (one containing a valid cookie response) ClientHello message. The first/unverified (one without a cookie extension) ClientHello MUST be unfragmented so that the DTLS server can process it statelessly. This is only implemented for DTLS 1.3. The user MUST call `wolfSSL_dtls13_allow_ch_frag()` on the server to explicitly enable this during runtime. Note: Using DTLS 1.3 + pqc without `WOLFSSL_DTLS_CH_FRAG` will probably fail In this case use `--enable-dtls-frag-ch` to enable it.
 
 #### WOLFSSL_DTLS_MTU_ADDITIONAL_READ_BUFFER
 
@@ -1497,11 +1497,11 @@ Enables POSIX names for networking systems calls.
 
 #### WOLFSSL_USER_CURRTIME
 
-Add in the option to use in test.h without the gettimeofday function using the macro WOLFSSL_USER_CURRTIME.
+Add in the option to use in test.h without the gettimeofday function using the macro `WOLFSSL_USER_CURRTIME`.
 
 #### WOLFSSL_USER_MUTEX
 
-Option for user-defined mutexes with WOLFSSL_USER_MUTEX.
+Option for user-defined mutexes with `WOLFSSL_USER_MUTEX`.
 
 #### DEFAULT_MIN_ECCKEY_BITS
 
@@ -1513,7 +1513,7 @@ Identifies the minimum number of bits in RSA key.
 
 #### EXTERNAL_SERIAL_SIZE
 
-A raw serial number byte that writes X509 serial numbers in unsigned binary to a buffer. For all cases, the buffer needs to be at least EXTERNAL_SERIAL_SIZE (32). On success, it returns WOLFSSL_SUCCESS. Note: this is a internal macro that cannot be user defined.
+A raw serial number byte that writes X509 serial numbers in unsigned binary to a buffer. For all cases, the buffer needs to be at least `EXTERNAL_SERIAL_SIZE` (32). On success, it returns `WOLFSSL_SUCCESS`. Note: this is a internal macro that cannot be user defined.
 
 #### LARGE_STATIC_BUFFERS
 
@@ -2131,7 +2131,7 @@ Use if building for Linux Kernel Module.
 
 #### WORD64_AVAILABLE
 
-Portability macro to indicate 64-bit types are supported. Typically its better to use SIZEOF_LONG_LONG 8.
+Portability macro to indicate 64-bit types are supported. Typically its better to use `SIZEOF_LONG_LONG` 8.
 
 #### WOLFSSL_NUCLEUS_1_2
 
@@ -2179,7 +2179,7 @@ Used if building for WICED Studio.
 
 #### FREESCALE_KSDK_FREERTOS
 
-Older name of this is FREESCALE_FREE_RTOS but this is used when building for Freescale KSDK FreeRTOS.
+Older name of this is `FREESCALE_FREE_RTOS` but this is used when building for Freescale KSDK FreeRTOS.
 
 #### FREESCALE_KSDK_MQX
 
