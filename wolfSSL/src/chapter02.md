@@ -1515,10 +1515,6 @@ Identifies the minimum number of bits in RSA key.
 
 A raw serial number byte that writes X509 serial numbers in unsigned binary to a buffer. For all cases, the buffer needs to be at least EXTERNAL_SERIAL_SIZE (32). On success, it returns WOLFSSL_SUCCESS. Note: this is a internal macro that cannot be user defined.
 
-#### FIPS_VERSION_GE
-
-Define for use with general FIPS version comparisons.
-
 #### LARGE_STATIC_BUFFERS
 
 Embedded callbacks require large static buffers; make sure it gives the option to enable larger buffers to 16K.
