@@ -606,11 +606,11 @@ Turns on wolfSSL’s RSA key generation functionality. See [Keys and Certificate
 
 #### WOLF_PRIVATE_KEY_ID
 
-This is used with PKCS11 to enable support for key ID and label API's. FIPS v5 and older doesn't support `WOLF_PRIVATE_KEY_ID` with PK callbacks.
+This is used with PKCS11 to enable support for key ID and label API's. FIPS v5 and older doesn't support `WOLF_PRIVATE_KEY_ID` with Crypto Callbacks.
 
 #### WOLFSSL_WOLFSENTRY_HOOKS
 
-Enables wolfSentry hook support.
+This switch adds support in the TLS layer for generic network `accept` and `connect` filter hooks, using `wolfSSL_CTX_set_AcceptFilter()` and `wolfSSL_CTX_set_ConnectFilter()`. It also activates wolfSentry integration in the example client and server applications.
 
 #### WOLFSSL_CERT_EXT
 
@@ -638,19 +638,31 @@ This macro is for portability of the library to indicate if MIN/MAX are already 
 
 #### WOLFSSL_HAVE_TLS_UNIQUE
 
-Added in libest port: allow applications to get the 'tls-unique' Channel Binding Type (https://tools.ietf.org/html/rfc5929#section-3). This is used in the EST protocol to bind an enrollment to a TLS session through 'proof-of-possession' (https://tools.ietf.org/html/rfc7030#section-3.4 and https://tools.ietf.org/html/rfc7030#section-3.5).
+Keeps the "Finished" messages after a TLS handshake for use as the "tls-unique" channel binding. Added in libest port: allow applications to get the 'tls-unique' Channel Binding Type (https://tools.ietf.org/html/rfc5929#section-3). This is used in the EST protocol to bind an enrollment to a TLS session through 'proof-of-possession' (https://tools.ietf.org/html/rfc7030#section-3.4 and https://tools.ietf.org/html/rfc7030#section-3.5).
 
 #### WOLFSSL_ENCRYPTED_KEYS
 
-Enable for encrypted keys PKCS8 support.
+Enable for encrypted keys PKCS8 support. This macro enables PKCS8 password based key encryption. Here is a link to RFC PKCS8 documentation (https://datatracker.ietf.org/doc/html/rfc5208).
 
 #### WOLFSSL_CUSTOM_OID
 
 Certificate feature that enables custom OID support for subject and request extensions. This also applies to parsing certificates with custom OID.
 
+#### WOLFSSL_RIPEMD
+
+Enables RIPEMD-160 support.
+
+#### WOLFSSL_SHA384
+
+Enables SHA-384 support.
+
+#### WOLFSSL_SHA512
+
+Enables SHA-512 support.
+
 #### WOLFSSL_AES_DIRECT
 
-Used by PKCS7 when direct AES ECB mode API's should be enabled and exposed.
+Enables direct AES ECB mode support. On its own ECB mode is not considered secure. This feature is required for PKCS7. Warning: In nearly all use cases ECB mode is considered to be less secure. Please avoid using ECB API’s directly whenever possible.
 
 #### DEBUG_WOLFSSL
 
@@ -726,7 +738,7 @@ OpenSSL compatibility application specific. Use, nginx `(--enable-nginx) WOLFSSL
 
 #### WOLFSSL_ERROR_CODE_OPENSSL
 
-Open SSL compatibility API wolfSSL_EVP_PKEY_cmp returns 0 on success and -1 on failure. This behavior is different from OpenSSL. EVP_PKEY_cmp returns:
+OpenSSL compatibility API wolfSSL_EVP_PKEY_cmp returns 0 on success and -1 on failure. This behavior is different from OpenSSL. EVP_PKEY_cmp returns:
 1: two keys match
 0: do not match
 -1: key types are different
@@ -772,7 +784,7 @@ Additional CMAC algorithm enable. Note: requires `WOLFSSL_AES_DIRECT`.
 
 #### WOLFSSL_ESPIDF_ERROR_PAUSE
 
-Enable to pause in a loop rather than exit.
+Used only in test.c and on test error adds a delay for debugging purposes.
 
 #### TEST_IPV6
 
@@ -780,7 +792,7 @@ Turns on testing of IPv6 in the test applications. wolfSSL proper is IP neutral,
 
 #### TEST_NONBLOCK_CERTS
 
-Async test --enable-ocsp CFLAGS implement `TEST_NONBLOCK_CERTS`.
+Used only for testing a non-blocking OCSP response. Enabled with `WOLFSSL_NONBLOCK_OCSP` and `OCSP_WANT_READ`.
 
 #### TEST_OPENSSL_COEXIST
 
@@ -788,15 +800,15 @@ Use when enabling the build option: `./configure --enable-opensslcoexist`.
 
 #### TEST_PK_PRIVKEY
 
-Loads and test PK private key.
+Used for testing PK callbacks only. In wolfssl/test.h it uses the context to pass the actual private key which is loaded and used in the PK callback.
 
 #### TEST_BUFFER_SIZE
 
-Can allocate buffer size for benchmarking.
+Allows overriding the TLS benchmarking test buffer size used with the example client/server `-B` option.
 
 #### FORCE_BUFFER_TEST
 
-"Forces" buffer test in benchmark.
+Forces use of the test_certs.h buffers instead of using the file system. Used for internal testing only in wolfssl/test.h.
 
 #### WOLFSSL_FORCE_MALLOC_FAIL_TEST
 
@@ -812,11 +824,11 @@ With TLS 1.3 PSK, when `WOLFSSL_PSK_MULTI_ID_PER_CS` is defined, multiple IDs fo
 
 #### WOLFSSL_PUBLIC_ASN
 
-This is needed to use ProcessPeerCert callback.
+This exposes the ASN.1 API's publicly that are used internally. This is useful for customers who want to use the internal asn.h API's to parse.
 
 #### WOLFSSL_QUIC
 
-Only "reads" from data provided by the application via wolfSSL_provide_quic_data(). Then, transfer from there into the inputBuffer. `WOLFSSL_QUIC` is incompatible with `WOLFSSL_CALLBACKS`.
+Enables support for QUIC protocol. See (https://github.com/wolfSSL/wolfssl/blob/master/doc/QUIC.md) for more information.
 
 #### WOLFSSL_QUIC_MAX_RECORD_CAPACITY
 
@@ -1441,11 +1453,11 @@ Retains peer certs. Parts of the OpenSSL compatibility layer require peer certs.
 
 #### WOLFSSL_SIGNER_DER_CERT
 
-Used to no CERT DER buffer OR NULL cm. Used to allocate DER and cert.
+This enables retention of the DER/ASN.1 used for signing. This is used by the compatibility layer an example of this is `wolfSSL_X509_STORE_get1_certs`.
 
 #### CA_TABLE_SIZE
 
-wolfSSL certificate manager. CA signer table. Used in certificate manager and be defined size.
+Used by the wolfSSL Certificate Manager signer table. The default `CA_TABLE_SIZE` is 11, but this can be adjusted based on actual needs. Each `WOLFSSL_CTX` has its own Certificate Manager (CM).
 
 #### ECDHE_SIZE
 
@@ -1493,7 +1505,7 @@ Embedded callbacks require large static buffers; make sure it gives the option t
 
 #### LIBWOLFSSL_VERSION_STRING
 
-A const char pointer defining the version.
+This is the wolfSSL version string populated for release bundles or when `./configure` is run. There is also a 32-bit HEX version of this in `LIBWOLFSSL_VERSION_HEX`. These come from wolfssl/version.h.
 
 
 ### Customizing or Porting wolfSSL
