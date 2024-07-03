@@ -307,7 +307,7 @@ wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error.h`.
 | `WC_PKCS7_WANT_READ_E` | -270 | PKCS7 stream operation wants more input |
 | `CRYPTOCB_UNAVAILABLE` | -271 | Crypto callback unavailable |
 | `PKCS7_SIGNEEDS_CHECK` | -272 | Signature needs verified by caller |
-| `ASN_SELF_SIGNED_E` | -273 | ASN self-signed certificate error |
+| `ASN_SELF_SIGNED_E` | -275 | ASN self-signed certificate error |
 | `MIN_CODE_E` | -300 | errors -101 -  -299 |
 
 ## Common Error Codes and their Solution

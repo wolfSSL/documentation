@@ -324,7 +324,7 @@ WolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
 |`WC_PKCS7_WANT_READ_E` |-270 |PKCS7ストリーム操作では、より多くの入力が必要です|
 |`CRYPTOCB_UNAVAILABLE` |-271 |Crypto Callbackが利用できません|
 |`PKCS7_SIGNEEDS_CHECK` |-272 |発信者によって検証された署名のニーズ|
-|`ASN_SELF_SIGNED_E` |-273 |ASN自己署名証明書エラー|
+|`ASN_SELF_SIGNED_E` |-275 |ASN自己署名証明書エラー|
 |`MIN_CODE_E` |-300 |エラー-101- -299 |
 
 
