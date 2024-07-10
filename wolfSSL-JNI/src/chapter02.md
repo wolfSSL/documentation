@@ -22,7 +22,7 @@ In order to run the unit tests, JUnit 4 is required to be installed on the
 development system. JUnit can be downloaded from the project website at
 [www.junit.org](http://www.junit.org).
 
-To install JUnit on a Unix/Linux/OSX system:
+To install JUnit4 on a Unix/Linux/OSX system:
 
 1) Download “ **junit-4.13.2.jar** ” and “ **hamcrest-all-1.3.jar** ”from [junit.org/junit4/](). At the time of writing, the above mentioned .jar files could be downloaded from the following links:
 
