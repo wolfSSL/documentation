@@ -10,7 +10,8 @@ SOURCES = chapter01.md \
           chapter05.md \
           chapter06.md \
           chapter07.md \
-          chapter08.md 
+          chapter08.md \
+          chapter09.md
 
 ifeq ($(DOC_LANG),JA)
     PDF  = wolfCrypt-JNI-JCE-Manual-jp.pdf
