@@ -1507,6 +1507,9 @@ Embedded callbacks require large static buffers; make sure it gives the option t
 
 This is the wolfSSL version string populated for release bundles or when `./configure` is run. There is also a 32-bit HEX version of this in `LIBWOLFSSL_VERSION_HEX`. These come from wolfssl/version.h.
 
+#### WOLFSSL_GET_CIPHER_BYTES
+
+Enables support for retrieving byte array representation of enabled ciphersuites.
 
 ### Customizing or Porting wolfSSL
 
