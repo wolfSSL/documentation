@@ -13,26 +13,16 @@ certs/                        (Test certificates and keys, used with unit tests)
 provider.conf              (Example OpenSSL config file using wolfProvider)
 include/
     wolfprovider/          (wolfProvider header files)
-openssl_patches/
-    1.0.2h/tests/        (patches for OpenSSL 1.0.2h test apps)
-    1.1.1b/tests/        (patches for OpenSSL 1.1.1b test apps)
 scripts/                      (wolfProvider test scripts)
 src/                            (wolfProvider source files)
 test/                           (wolfProvider test files)
 user_settings.h         (EXAMPLE user_settings.h)
 ```
-## OpenSSL Version Caveats
-
-Depending on the version of OpenSSL being used with wolfProvider, there are several algorithms support caveats, including:
-
-- SHA-3 support is only available with OpenSSL versions 1.1.1+
-- EC_KEY_METHOD is only available with OpenSSL versions 1.1.1+
-
 ## Building on *nix
 
 ### Building OpenSSL
 
-A pre-installed version of OpenSSL may be used with wolfProvider (barring algorithm caveats above), or OpenSSL can be recompiled for use with wolfProvider. General instructions for compiling OpenSSL on *nix-like platforms will be similar to the following. For complete and comprehensive OpenSSL build instructions, reference the OpenSSL INSTALL file and documentation.
+A pre-installed version of OpenSSL may be used with wolfProvider, or OpenSSL can be recompiled for use with wolfProvider. General instructions for compiling OpenSSL on *nix-like platforms will be similar to the following. For complete and comprehensive OpenSSL build instructions, reference the OpenSSL INSTALL file and documentation.
 ```
 git clone https://github.com/openssl/openssl.git
 cd openssl
@@ -166,42 +156,10 @@ By default, wolfProvider only builds a shared library, with building of a static
 |  --enable-debug | **Disabled** | Enable wolfProvider debugging support |
 |  --enable-coverage | **Disabled** | Build to generate code coverage stats |
 | --enable-usersettings | **Disabled** | Use your own user_settings.h and do not add Makefile CFLAGS |
-| --enable-dynamic-provider | Enabled | Enable loading wolfProvider as a dynamic provider |
+| --enable-dynamic | Enabled | Enable loading wolfProvider as a dynamic provider |
 | --enable-singlethreaded | **Disabled** | Enable wolfProvider single threaded |
-| --enable-digest | Enabled | Enable use of wc_Hash API for digesting data |
-| --enable-sha | Enabled | Enable SHA-1 |
-| --enable-sha224 | Enabled | Enable SHA2-224 |
-| --enable-sha256 | Enabled | Enable SHA2-256 |
-| --enable-sha384 | Enabled | Enable SHA2-384 |
-| --enable-sha512 | Enabled | Enable SHA2-512 |
-| --enable-sha3 | Enabled | Enable SHA3 |
-| --enable-sha3-224 | Enabled | Enable SHA3-224 |
-| --enable-sha3-256 | Enabled | Enable SHA3-256 |
-| --enable-sha3-384 | Enabled | Enable SHA3-384 |
-| --enable-sha3-512 | Enabled | Enable SHA3-512 |
-| --enable-cmac | Enabled | Enable CMAC |
-| --enable-hmac | Enabled | Enable HMAC |
-| --enable-des3cbc| Enabled | Enable 3DES-CBC |
-| --enable-aesecb | Enabled | Enable AES-ECB |
-| --enable-aescbc | Enabled | Enable AES-CBC |
-| --enable-aesctr | Enabled | Enable AES-CTR |
-| --enable-aesgcm | **Disabled** | Enable AES-GCM |
-| --enable-aesccm | **Disabled** | Enable AES-CCM |
-| --enable-rand | Enabled | Enable RAND |
-| --enable-rsa | Enabled | Enable RSA |
-| --enable-dh | Enabled | Enable DH |
-| --enable-evp-pkey | Enabled | Enable EVP_PKEY APIs |
-| --enable-ecc | Enabled | Enable ECC |
-| --enable-ec-key | Enabled | Enable ECC using EC_KEY |
-| --enable-ecdsa | Enabled | Enable ECDSA |
-| --enable-ecdh | Enabled | Enable ECDH |
-| --enable-eckg | Enabled | Enable EC Key Generation |
-| --enable-p192 | Enabled | Enable EC Curve P-192 |
-| --enable-p224 | Enabled | Enable EC Curve P-224 |
-| --enable-p256 | Enabled | Enable EC Curve P-256 |
-| --enable-p384 | Enabled | Enable EC Curve P-384 |
-| --enable-p521 | Enabled | Enable EC Curve P-521 |
 | --with-openssl=DIR |   | OpenSSL installation location to link against. If not set, use the system default library and include paths. |
+| --with-wolfssl=DIR |   | wolfSSL installation location to link against. If not set, use the system default library and include paths. |
 
 ## Build Defines
 
@@ -210,43 +168,43 @@ wolfProvider exposes several preprocessor defines that allow users to configure 
 | Define                                                      | Description |
 | :---------------------------------------------- | :-------------- |
 | WOLFPROVIDER_DEBUG | Build wolfProvider with debug symbols, optimization level, and debug logging. |
-| WE_NO_DYNAMIC_PROVIDER |  Do not build wolfProvider with dynamic provider support. Dynamic providers are ones that can be loaded into OpenSSL at runtime. |
-| WE_SINGLE_THREADED | Build wolfProvider in single-threaded mode. This removes the need for locking around global resources used internally. |
-| WE_USE_HASH | Enable digest algorithms using the wc_Hash API. |
-| WE_HAVE_SHA1 | Enable SHA-1 digest algorithm. |
-| WE_HAVE_SHA224 | Enable SHA-2 digest algorithm with digest size 224. |
-| WE_HAVE_SHA256 | Enable SHA-2 digest algorithm with digest size 256. |
-| WE_HAVE_SHA384 | Enable SHA-2 digest algorithm with digest size 384. |
-| WE_HAVE_SHA512| Enable SHA-2 digest algorithm with digest size 512. |
-| WE_SHA1_DIRECT | Enable the SHA-1 digest algorithm using the wc_Sha API. Incompatible with WE_USE_HASH. |
-| WE_SHA224_DIRECT | Enable the SHA-2 224 digest algorithm using the wc_Sha224 API. Incompatible with WE_USE_HASH. |
-| WE_SHA256_DIRECT | Enable the SHA-2 256 digest algorithm using the wc_Sha256 API. Incompatible with WE_USE_HASH. |
-| WE_HAVE_SHA3_224 | Enable SHA-3 digest algorithm with digest size 224. Not available in OpenSSL 1.0.2. |
-| WE_HAVE_SHA3_256 | Enable SHA-3 digest algorithm with digest size 256. Not available in OpenSSL 1.0.2. |
-| WE_HAVE_SHA3_384 | Enable SHA-3 digest algorithm with digest size 384. Not available in OpenSSL 1.0.2. |
-| WE_HAVE_SHA3_512 | Enable SHA-3 digest algorithm with digest size 512. Not available in OpenSSL 1.0.2. |
-| WE_HAVE_EVP_PKEY | Enable functionality that uses the EVP_PKEY API. This includes things like RSA, DH, etc. |
-| WE_HAVE_CMAC | Enable CMAC algorithm. |
-| WE_HAVE_HMAC | Enable HMAC algorithm. |
-| WE_HAVE_DES3CBC | Enable DES3-CBC algorithm. |
-|WE_HAVE_AESECB | Enable AES algorithm with ECB mode. |
-| WE_HAVE_AESCBC | Enable AES algorithm with CBC mode. |
-| WE_HAVE_AESCTR | Enable AES algorithm with countee mode. |
-| WE_HAVE_AESGCM | Enable AES algorithm with GCM mode. |
-| WE_HAVE_AESCCM |Enable AES algorithm with CCM mode. |
-| WE_HAVE_RANDOM | Enable wolfCrypt random implementation. |
-| WE_HAVE_RSA | Enable RSA operations (e.g. sign, verify, key generation, etc.). |
-| WE_HAVE_DH | Enable Diffie-Hellman operations (e.g. key generation, shared secret computation, etc.). |
-| WE_HAVE_ECC | Enable support for elliptic curve cryptography. |
-| WE_HAVE_EC_KEY | Enable support for EC_KEY_METHOD. Not available in OpenSSL 1.0.2. |
-| WE_HAVE_ECDSA | Enable ECDSA algorithm. |
-| WE_HAVE_ECDH | Enable EC Diffie-Hellman operations. |
-| WE_HAVE_ECKEYGEN | Enable EC key generation. |
-| WE_HAVE_EC_P192 | Enable EC curve P192. |
-| WE_HAVE_EC_P224 | Enable EC curve P224. |
-| WE_HAVE_EC_P256 | Enable EC curve P256. |
-| WE_HAVE_EC_P384 | Enable EC curve P384. |
-| WE_HAVE_EC_P512 | Enable EC curve P512. |
-| WE_HAVE_DIGEST | Compile code in benchmark program and unit tests for use with digest algorithms. |
+| WP_NO_DYNAMIC_PROVIDER |  Do not build wolfProvider with dynamic provider support. Dynamic providers are ones that can be loaded into OpenSSL at runtime. |
+| WP_SINGLE_THREADED | Build wolfProvider in single-threaded mode. This removes the need for locking around global resources used internally. |
+| WP_USE_HASH | Enable digest algorithms using the wc_Hash API. |
+| WP_HAVE_SHA1 | Enable SHA-1 digest algorithm. |
+| WP_HAVE_SHA224 | Enable SHA-2 digest algorithm with digest size 224. |
+| WP_HAVE_SHA256 | Enable SHA-2 digest algorithm with digest size 256. |
+| WP_HAVE_SHA384 | Enable SHA-2 digest algorithm with digest size 384. |
+| WP_HAVE_SHA512| Enable SHA-2 digest algorithm with digest size 512. |
+| WP_SHA1_DIRECT | Enable the SHA-1 digest algorithm using the wc_Sha API. Incompatible with WP_USE_HASH. |
+| WP_SHA224_DIRECT | Enable the SHA-2 224 digest algorithm using the wc_Sha224 API. Incompatible with WP_USE_HASH. |
+| WP_SHA256_DIRECT | Enable the SHA-2 256 digest algorithm using the wc_Sha256 API. Incompatible with WP_USE_HASH. |
+| WP_HAVE_SHA3_224 | Enable SHA-3 digest algorithm with digest size 224. Not available in OpenSSL 1.0.2. |
+| WP_HAVE_SHA3_256 | Enable SHA-3 digest algorithm with digest size 256. Not available in OpenSSL 1.0.2. |
+| WP_HAVE_SHA3_384 | Enable SHA-3 digest algorithm with digest size 384. Not available in OpenSSL 1.0.2. |
+| WP_HAVE_SHA3_512 | Enable SHA-3 digest algorithm with digest size 512. Not available in OpenSSL 1.0.2. |
+| WP_HAVE_EVP_PKEY | Enable functionality that uses the EVP_PKEY API. This includes things like RSA, DH, etc. |
+| WP_HAVE_CMAC | Enable CMAC algorithm. |
+| WP_HAVE_HMAC | Enable HMAC algorithm. |
+| WP_HAVE_DES3CBC | Enable DES3-CBC algorithm. |
+| WP_HAVE_AESECB | Enable AES algorithm with ECB mode. |
+| WP_HAVE_AESCBC | Enable AES algorithm with CBC mode. |
+| WP_HAVE_AESCTR | Enable AES algorithm with countee mode. |
+| WP_HAVE_AESGCM | Enable AES algorithm with GCM mode. |
+| WP_HAVE_AESCCM |Enable AES algorithm with CCM mode. |
+| WP_HAVE_RANDOM | Enable wolfCrypt random implementation. |
+| WP_HAVE_RSA | Enable RSA operations (e.g. sign, verify, key generation, etc.). |
+| WP_HAVE_DH | Enable Diffie-Hellman operations (e.g. key generation, shared secret computation, etc.). |
+| WP_HAVE_ECC | Enable support for elliptic curve cryptography. |
+| WP_HAVE_EC_KEY | Enable support for EC_KEY_METHOD. Not available in OpenSSL 1.0.2. |
+| WP_HAVE_ECDSA | Enable ECDSA algorithm. |
+| WP_HAVE_ECDH | Enable EC Diffie-Hellman operations. |
+| WP_HAVE_ECKEYGEN | Enable EC key generation. |
+| WP_HAVE_EC_P192 | Enable EC curve P192. |
+| WP_HAVE_EC_P224 | Enable EC curve P224. |
+| WP_HAVE_EC_P256 | Enable EC curve P256. |
+| WP_HAVE_EC_P384 | Enable EC curve P384. |
+| WP_HAVE_EC_P512 | Enable EC curve P512. |
+| WP_HAVE_DIGEST | Compile code in benchmark program and unit tests for use with digest algorithms. |
 | WOLFPROVIDER_USER_SETTINGS | Read user-specified defines from user_settings.h. |
 
