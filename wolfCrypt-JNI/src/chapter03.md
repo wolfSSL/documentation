@@ -2,23 +2,29 @@
 
 Before following steps in this section, please ensure that the dependencies in [Chapter 2](chapter02.md#requirements) above are installed.
 
+Before running `make`, copy the correct “makefile” for your system, depending if you are on Linux/Unix or MacOS. For example, if you were on Linux:
 
-First, copy the correct “makefile” for your system, depending if you are on Linux or OS X. For example, if you were on Linux:
 ```
 $ cd wolfcrypt-jni
 $ cp makefile.linux makefile
+```
+
 If you are instead on Mac OSX:
+
+```
 $ cd wolfcrypt-jni
 $ cp makefile.macosx makefile
 ```
 
-Then proceed to compile the native (C source) code with “make”:
+Then compile the native C JNI source code with “make”. This will generate the native JNI shared library (`libwolfcryptjni.so/dylib`).
+
 ```
 $ cd wolfcrypt-jni
 $ make
 ```
 
 To compile the Java sources, “ant” is used. There are several ant targets to compile either the JNI or JCE (includes JNI) packages, in either debug or release mode. Running regular “ant” will give usage options:
+
 ```
 $ ant
 ...
@@ -34,17 +40,19 @@ build:
 [echo] ----------------------------------------------------------------------------
 ```
 
-Use the build target that matches your need. For example, if you want to build the wolfJCE provider in release mode, run:
+Use the build target that matches your needs. For example, if you want to build the wolfJCE provider in release mode, run:
+
 ```
 $ ant build-jce-release
 ```
 
-And, to run the JUnit tests, run the following command. This will compile only the tests that match the build that was done (JNI vs. JCE) and run those tests as well.
+To run the JUnit tests, run `ant test`. This will compile only the tests that match the build that was done (JNI vs. JCE) and run those tests.
+
 ```
 $ ant test
 ```
 
-To clean the both Java JAR and native library:
+To clean the both Java JAR and native library, run:
 
 ```
 $ ant clean
@@ -53,7 +61,8 @@ $ make clean
 
 ## API Javadocs
 
-Running `ant` will generate a set of Javadocs under the `wolfcrypt-jni/docs`
-directory.  To view the root document, open the following file in a web browser:
+Running `ant` will generate a set of Javadocs under the `wolfcrypt-jni/docs/javadoc`
+directory. To view the Javadoc index, open the following file in a web browser:
 
-`wolfcrypt-jni/docs/index.html`
+`wolfcrypt-jni/docs/javadoc/index.html`
+
