@@ -41,7 +41,7 @@ Log levels can be controlled using the "**log_level**" provider control command 
 ```
 #include <wolfprovider/we_logging.h>
 
-ret = PROVIDER_ctrl_cmd(e, “log_level”, WE_LOG_ERROR | WE_LOG_INFO,
+ret = PROVIDER_ctrl_cmd(e, “log_level”, WP_LOG_ERROR | WP_LOG_INFO,
 NULL, NULL, 0);
 if (ret != 1) {
     printf(“Failed to set logging level\n”);
@@ -54,24 +54,24 @@ wolfProvider allows logging on a per-component basis. Components are defined in 
 
 | Log Component Enum | Description | Component Enum Value |
 | ------------------------------ | --------------- | -------------------------------- |
-| WE_LOG_RNG | Random number generation | 0x0001 |
-| WE_LOG_DIGEST | Digests (SHA-1/2/3) | 0x0002 |
-| WE_LOG_MAC | MAC functions (HMAC, CMAC) | 0x0004 |
-| WE_LOG_CIPHER | Ciphers (AES, 3DES) | 0x0008 |
-| WE_LOG_PK | Public Key Algorithms (RSA, ECC) | 0x0010 |
-| WE_LOG_KE | Key Agreement Algorithms (DH, ECDH) | 0x0020 |
-| WE_LOG_PROVIDER | All provider specific logs | 0x0040 |
-| WE_LOG_COMPONENTS_ALL | Log all components | WE_LOG_RNG &#124; WE_LOG_DIGEST &#124; WE_LOG_MAC &#124; WE_LOG_CIPHER &#124; WE_LOG_PK &#124; WE_LOG_KE &#124; WE_LOG_PROVIDER |
-| WE_LOG_COMPONENTS_DEFAULT | Default components logged (all). | WE_LOG_COMPONENTS_ALL |
+| WP_LOG_RNG | Random number generation | 0x0001 |
+| WP_LOG_DIGEST | Digests (SHA-1/2/3) | 0x0002 |
+| WP_LOG_MAC | MAC functions (HMAC, CMAC) | 0x0004 |
+| WP_LOG_CIPHER | Ciphers (AES, 3DES) | 0x0008 |
+| WP_LOG_PK | Public Key Algorithms (RSA, ECC) | 0x0010 |
+| WP_LOG_KE | Key Agreement Algorithms (DH, ECDH) | 0x0020 |
+| WP_LOG_PROVIDER | All provider specific logs | 0x0040 |
+| WP_LOG_COMPONENTS_ALL | Log all components | WP_LOG_RNG &#124; WP_LOG_DIGEST &#124; WP_LOG_MAC &#124; WP_LOG_CIPHER &#124; WP_LOG_PK &#124; WP_LOG_KE &#124; WP_LOG_PROVIDER |
+| WP_LOG_COMPONENTS_DEFAULT | Default components logged (all). | WP_LOG_COMPONENTS_ALL |
 
 
-The default wolfProvider logging configuration logs all components (`WE_LOG_COMPONENTS_DEFAULT`).
+The default wolfProvider logging configuration logs all components (`WP_LOG_COMPONENTS_DEFAULT`).
 
 Components logged can be controlled using the “ **log_components** ” provider control command at runtime, either through the `PROVIDER_ctrl_cmd()` API or OpenSSL configuration file settings. For example, to turn on only logging only for the Digest and Cipher algorithms:
 ```
 #include <wolfprovider/we_logging.h>
 
-ret = PROVIDER_ctrl_cmd(e, “ **log_components** ”, WE_LOG_DIGEST | WE_LOG_CIPHER,
+ret = PROVIDER_ctrl_cmd(e, “ **log_components** ”, WP_LOG_DIGEST | WP_LOG_CIPHER,
 NULL, NULL, 0);
 if (ret != 1) {
     printf(“Failed to set log components\n”);
