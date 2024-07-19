@@ -7,6 +7,6 @@ wolfProvider is structured as a separate standalone library which links against 
 For more details on the design and architecture of wolfProvider see the [wolfProvider Design](chapter09.md) chapter.
 
 
-![wolfProvider Overview](png/wolfprovider_overview.png)
+![wolfProvider Overview](../png/wolfprovider_overview.png)
 
 wolfProvider is compiled by default as a shared library called **libwolfprov** which can be dynamically registered at runtime by an application or OpenSSL through a config file. wolfProvider also provides an entry point for applications to load the provider when compiled in a static build.

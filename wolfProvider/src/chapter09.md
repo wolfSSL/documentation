@@ -25,7 +25,7 @@ wolfProvider is composed of the following source files, all located under the â€
 
 General wolfProvider architecture is as follows, showing both dynamic and static entry points:
 
-![wolfProvider Architecture](png/wolfprovider_architecture.png)
+![wolfProvider Architecture](../png/wolfprovider_architecture.png)
 
 ## wolfProvider Entry Points
 

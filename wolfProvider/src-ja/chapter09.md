@@ -25,7 +25,7 @@ wolfProvider は次のソース ファイルで構成され、すべて wolfProv
 
 一般的な wolfProvider アーキテクチャは次のとおりで、動的エントリ ポイントと静的エントリ ポイントの両方を示しています:
 
-![wolfProvider Architecture](png/wolfprovider_architecture.png)
+![wolfProvider Architecture](../png/wolfprovider_architecture.png)
 
 ## wolfProvider エントリーポイント
 
