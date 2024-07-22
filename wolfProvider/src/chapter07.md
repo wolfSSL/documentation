@@ -16,6 +16,6 @@ wolfProvider logs by default to stderr via `fprintf()`. Applications can overrid
 
 Additional macros that may be defined when compiling wolfProvider to adjust logging behavior include:
 
-**WOLFPROVIDER_USER_LOG** - Macro that defines the nameof function for log output. Users can define this to a custom log function to be used in place of fprintf.
+**WOLFPROV_USER_LOG** - Macro that defines the nameof function for log output. Users can define this to a custom log function to be used in place of fprintf.
 
-**WOLFPROVIDER_LOG_PRINTF** - Define that toggles the usageof fprintf (to stderr) to use printf (to stdout) instead. Not applicable if using WOLFPROVIDER_USER_LOG or custom logging callback.
+**WOLFPROV_LOG_PRINTF** - Define that toggles the usageof fprintf (to stderr) to use printf (to stdout) instead. Not applicable if using WOLFPROV_USER_LOG or custom logging callback.
