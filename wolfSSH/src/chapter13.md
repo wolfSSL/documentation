@@ -1128,8 +1128,394 @@ info.
 int wolfSSH_TriggerKeyExchange(WOLFSSH* ssh );
 ```
 
-##  Testing Functions
+## Channel Callbacks
 
+Interfaces to the wolfSSH library return single int values. Communicating
+status of asynchronous information, like the peer opening a channel, isn't
+easy with that interface. wolfSSH uses callback functions to notify the
+calling application of changes in state of a channel.
+
+There are callback functions for receipt of the following SSHv2 protocol
+messages:
+
+* SSH_MSG_CHANNEL_OPEN
+* SSH_MSG_CHANNEL_OPEN_CONFIRMATION
+* SSH_MSG_CHANNEL_OPEN_FAILURE
+* SSH_MSG_CHANNEL_REQUEST
+  - "shell"
+  - "subsystem"
+  - "exec"
+* SSH_MSG_CHANNEL_EOF
+* SSH_MSG_CHANNEL_CLOSE
+
+### Callback Function Prototypes
+
+The channel callback functions all take a pointer to a **WOLFSSH_CHANNEL**
+object, _channel_, and a pointer to the application defined data structure,
+_ctx_. Properties about the channel may be queried using API functions.
+
+```
+typedef int (*WS_CallbackChannelOpen)(WOLFSSH_CHANNEL* channel, void* ctx);
+typedef int (*WS_CallbackChannelReq)(WOLFSSH_CHANNEL* channel, void* ctx);
+typedef int (*WS_CallbackChannelEof)(WOLFSSH_CHANNEL* channel, void* ctx);
+typedef int (*WS_CallbackChannelClose)(WOLFSSH_CHANNEL* channel, void* ctx);
+```
+
+### wolfSSH_CTX_SetChannelOpenCb
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+int wolfSSH_CTX_SetChannelOpenCb(WOLFSSH_CTX* ctx,
+        WS_CallbackChannelOpen cb);
+```
+
+**Description**
+
+Sets the callback function, _cb_, into the wolfSSH _ctx_ used when a Channel
+Open (**SSH_MSG_CHANNEL_OPEN**) message is received from the peer.
+
+**Return Values**
+
+* **WS_SUCCESS** - Setting callback in _ctx_ was successful
+* **WS_SSH_CTX_NULL_E** - _ctx_ is **NULL**
+
+
+### wolfSSH_CTX_SetChannelOpenRespCb
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+int wolfSSH_CTX_SetChannelOpenRespCb(WOLFSSH_CTX* ctx,
+        WS_CallbackChannelOpen confCb,
+        WS_CallbackChannelOpen failCb);
+```
+
+**Description**
+
+Sets the callback functions, _confCb_ and _failCb_, into the wolfSSH _ctx_
+used when a Channel Open Confirmation (**SSH_MSG_CHANNEL_OPEN_CONFIRMATION**)
+or a Channel Open Failure (**SSH_MSG_CHANNEL_OPEN_FAILURE**) message is
+received from the peer.
+
+**Return Values**
+
+* **WS_SUCCESS** - Setting callbacks in _ctx_ was successful
+* **WS_SSH_CTX_NULL_E** - _ctx_ is **NULL**
+
+
+### wolfSSH_CTX_SetChannelReqShellCb
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+int wolfSSH_CTX_SetChannelReqShellCb(WOLFSSH_CTX* ctx,
+        WS_CallbackChannelReq cb);
+```
+
+**Description**
+
+Sets the callback function, _cb_, into the wolfSSH _ctx_ used when a Channel
+Request (**SSH_MSG_CHANNEL_REQUEST**) message is received from the peer for
+a _shell_.
+
+**Return Values**
+
+* **WS_SUCCESS** - Setting callback in _ctx_ was successful
+* **WS_SSH_CTX_NULL_E** - _ctx_ is **NULL**
+
+
+### wolfSSH_CTX_SetChannelReqSubsysCb
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+int wolfSSH_CTX_SetChannelReqSubsysCb(WOLFSSH_CTX* ctx,
+        WS_CallbackChannelReq cb);
+```
+
+**Description**
+
+Sets the callback function, _cb_, into the wolfSSH _ctx_ used when a Channel
+Request (**SSH_MSG_CHANNEL_REQUEST**) message is received from the peer for
+a _subsystem_. A common example of a subsystem is SFTP.
+
+**Return Values**
+
+* **WS_SUCCESS** - Setting callback in _ctx_ was successful
+* **WS_SSH_CTX_NULL_E** - _ctx_ is **NULL**
+
+
+### wolfSSH_CTX_SetChannelReqExecCb
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+int wolfSSH_CTX_SetChannelReqExecCb(WOLFSSH_CTX* ctx,
+        WS_CallbackChannelReq cb);
+```
+
+**Description**
+
+Sets the callback function, _cb_, into the wolfSSH _ctx_ used when a Channel
+Request (**SSH_MSG_CHANNEL_REQUEST**) message is received from the peer for
+a command to _exec_.
+
+**Return Values**
+
+* **WS_SUCCESS** - Setting callback in _ctx_ was successful
+* **WS_SSH_CTX_NULL_E** - _ctx_ is **NULL**
+
+
+### wolfSSH_CTX_SetChannelEofCb
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+int wolfSSH_CTX_SetChannelEof(WOLFSSH_CTX* ctx,
+        WS_CallbackChannelEof cb);
+```
+
+**Description**
+
+Sets the callback function, _cb_, into the wolfSSH _ctx_ used when a Channel
+EOF (**SSH_MSG_CHANNEL_EOF**) message is received from the peer. This
+message indicates that the peer isn't going to transmit any more data on this
+channel.
+
+**Return Values**
+
+* **WS_SUCCESS** - Setting callback in _ctx_ was successful
+* **WS_SSH_CTX_NULL_E** - _ctx_ is **NULL**
+
+
+### wolfSSH_CTX_SetChannelCloseCb
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+int wolfSSH_CTX_SetChannelClose(WOLFSSH_CTX* ctx,
+        WS_CallbackChannelClose cb);
+```
+
+**Description**
+
+Sets the callback function, _cb_, into the wolfSSH _ctx_ used when a Channel
+Close (**SSH_MSG_CHANNEL_CLOSE**) message is received from the peer. This
+message indicates that the peer is interested in terminating this channel.
+
+**Return Values**
+
+* **WS_SUCCESS** - Setting callback in _ctx_ was successful
+* **WS_SSH_CTX_NULL_E** - _ctx_ is **NULL**
+
+
+### wolfSSH_SetChannelOpenCtx
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+int wolfSSH_SetChannelOpenCtx(WOLFSSH* ssh, void* ctx);
+```
+
+**Description**
+
+Sets the context, _ctx_, into the wolfSSH _ssh_ object used when the callback
+for the Channel Open (**SSH_MSG_CHANNEL_OPEN**) message, Channel Open
+Confirmation (**SSH_MSG_CHANNEL_CONFIRMATION**) message, or Channel Open
+Failure (**SSH_MSG_CHANNEL_FAILURE**) is received from the peer.
+
+**Return Values**
+
+* **WS_SUCCESS** - Setting context in _ssh_ was successful
+* **WS_SSH_NULL_E** - _ssh_ is **NULL**
+
+
+### wolfSSH_SetChannelReqCtx
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+int wolfSSH_SetChannelReqCtx(WOLFSSH* ssh, void* ctx);
+```
+
+**Description**
+
+Sets the context, _ctx_, into the wolfSSH _ssh_ object used when the callback
+for the Channel Request (**SSH_MSG_CHANNEL_REQUEST**) message is received from
+the peer.
+
+**Return Values**
+
+* **WS_SUCCESS** - Setting context in _ssh_ was successful
+* **WS_SSH_NULL_E** - _ssh_ is **NULL**
+
+
+### wolfSSH_SetChannelEofCtx
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+int wolfSSH_SetChannelEofCtx(WOLFSSH* ssh, void* ctx);
+```
+
+**Description**
+
+Sets the context, _ctx_, into the wolfSSH _ssh_ object used when the callback
+for the Channel EOF (**SSH_MSG_CHANNEL_EOF**) message is received from
+the peer.
+
+**Return Values**
+
+* **WS_SUCCESS** - Setting context in _ssh_ was successful
+* **WS_SSH_NULL_E** - _ssh_ is **NULL**
+
+
+### wolfSSH_SetChannelCloseCtx
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+int wolfSSH_SetChannelCloseCtx(WOLFSSH* ssh, void* ctx);
+```
+
+**Description**
+
+Sets the context, _ctx_, into the wolfSSH _ssh_ object used when the callback
+for the Channel Close (**SSH_MSG_CHANNEL_CLOSE**) message is received from
+the peer.
+
+**Return Values**
+
+* **WS_SUCCESS** - Setting context in _ssh_ was successful
+* **WS_SSH_NULL_E** - _ssh_ is **NULL**
+
+
+### wolfSSH_GetChannelOpenCtx
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+void* wolfSSH_GetChannelOpenCtx(WOLFSSH* ssh);
+```
+
+**Description**
+
+Gets the context from the wolfSSH _ssh_ object used when the callback for the
+Channel Open (**SSH_MSG_CHANNEL_OPEN**) message.
+
+**Return Values**
+
+* pointer to the context data
+
+
+### wolfSSH_GetChannelReqCtx
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+void* wolfSSH_GetChannelReqCtx(WOLFSSH* ssh);
+```
+
+**Description**
+
+Gets the context from the wolfSSH _ssh_ object used when the callback for the
+Channel Request (**SSH_MSG_CHANNEL_REQUEST**) message.
+
+**Return Values**
+
+* pointer to the context data
+
+
+### wolfSSH_GetChannelEofCtx
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+void* wolfSSH_GetChannelEofCtx(WOLFSSH* ssh);
+```
+
+**Description**
+
+Gets the context from the wolfSSH _ssh_ object used when the callback for the
+Channel EOF (**SSH_MSG_CHANNEL_EOF**) message.
+
+**Return Values**
+
+* pointer to the context data
+
+
+### wolfSSH_GetChannelCloseCtx
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+void* wolfSSH_GetChannelCloseCtx(WOLFSSH* ssh);
+```
+
+**Description**
+
+Gets the context from the wolfSSH _ssh_ object used when the callback for the
+Channel Close (**SSH_MSG_CHANNEL_CLOSE**) message.
+
+**Return Values**
+
+* pointer to the context data
+
+
+### wolfSSH_ChannelGetSessionType
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+WS_SessionType wolfSSH_ChannelGetSessionType(const WOLFSSH_CHANNEL* channel);
+```
+
+**Description**
+
+Returns the **WS_SessionType** for the specified _channel_.
+
+**Return Values**
+
+* **WS_SessionType** - type for the session
+
+
+### wolfSSH_ChannelGetSessionCommand
+
+**Synopsis**
+
+```
+#include <wolfssh/ssh.h>
+const char* wolfSSH_ChannelGetSessionCommand(const WOLFSSH_CHANNEL* channel);
+```
+
+**Description**
+
+Returns a pointer to the command the user wishes to execute over the specified
+_channel_.
+
+**Return Values**
+
+* **const char*** - pointer to the string holding the command sent by the user
+
+
+##  Testing Functions
 
 
 ### wolfSSH_GetStats()
