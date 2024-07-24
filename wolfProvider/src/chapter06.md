@@ -7,22 +7,9 @@ wolfProvider supports output of log messages for informative and debug purposes.
 
 If not using Autoconf/configure, define `WOLFPROVIDER_DEBUG` when compiling the wolfProvider library.
 
-## Enable / Disable Debug Logging
-
-Once debug support has been compiled into the library, debugging must be enabled at runtime using the wolfProvider control commands specified in Section 5. To enable debug logging, use the `enable_debug` control command with the value of "1" to enable logging or "0" to disable logging. To enable logging using the `PROVIDER_ctrl_cmd()` API:
-```
-int ret = 0;
-ret = PROVIDER_ctrl_cmd(e, “enable_debug”, 1, NULL, NULL, 0);
-if (ret != 1) {
-    printf(“Failed to enable debug logging\n”);
-}
-```
-
-If wolfProvider has not been compiled with debug support enabled, an attempt to set `enable_debug` with `PROVIDER_ctrl_cmd()` will return failure (0).
-
 ## Controlling Logging Levels
 
-wolfProvider supports the following logging levels. These are defined in the “include/wolfprovider/we_logging.h” header file as part of the wolfProvider_LogType enum:
+wolfProvider supports the following logging levels. These are defined in the “include/wolfprovider/wp_logging.h” header file as part of the wolfProvider_LogType enum:
 
 | Log Enum | Description | Log Enum Value | 
 | -------------- |  --------------- |--------------------- |
@@ -37,20 +24,19 @@ WE_LOG_LEVEL_ALL WE_LOG_ERROR | All log levels are enabled | WE_LOG_ENTER &#124;
 
 The default wolfProvider logging level includes `WE_LOG_ERROR`, `WE_LOG_ENTER`, `WE_LOG_LEAVE`, and `WE_LOG_INFO`. This includes all log levels except verbose logs (`WE_LOG_VERBOSE`).
 
-Log levels can be controlled using the "**log_level**" provider control command at runtime, either through the `PROVIDER_ctrl_cmd()` API or OpenSSL configuration file settings. For example, to turn on only error and informative logs using the “log_level” control command, an application would call:
+Log levels can be controlled using the `wolfProv_SetLogLevel(int mask)`. For example, to turn on only error and informative logs:
 ```
-#include <wolfprovider/we_logging.h>
+#include <wolfprovider/wp_logging.h>
 
-ret = PROVIDER_ctrl_cmd(e, “log_level”, WP_LOG_ERROR | WP_LOG_INFO,
-NULL, NULL, 0);
-if (ret != 1) {
+ret = wolfProv_SetLogLevel(WP_LOG_ERROR | WP_LOG_INFO);
+if (ret != 0) {
     printf(“Failed to set logging level\n”);
 }
 ```
 
 ## Controlling Component Logging
 
-wolfProvider allows logging on a per-component basis. Components are defined in the wolfProvider_LogComponents enum in `include/wolfprovider/we_logging.h`:
+wolfProvider allows logging on a per-component basis. Components are defined in the wolfProvider_LogComponents enum in `include/wolfprovider/wp_logging.h`:
 
 | Log Component Enum | Description | Component Enum Value |
 | ------------------------------ | --------------- | -------------------------------- |
@@ -67,13 +53,12 @@ wolfProvider allows logging on a per-component basis. Components are defined in 
 
 The default wolfProvider logging configuration logs all components (`WP_LOG_COMPONENTS_DEFAULT`).
 
-Components logged can be controlled using the “ **log_components** ” provider control command at runtime, either through the `PROVIDER_ctrl_cmd()` API or OpenSSL configuration file settings. For example, to turn on only logging only for the Digest and Cipher algorithms:
+Components logged can be controlled using the `wolfProv_SetLogComponents(int mask)`. For example, to turn on only logging only for the Digest and Cipher algorithms:
 ```
-#include <wolfprovider/we_logging.h>
+#include <wolfprovider/wp_logging.h>
 
-ret = PROVIDER_ctrl_cmd(e, “ **log_components** ”, WP_LOG_DIGEST | WP_LOG_CIPHER,
-NULL, NULL, 0);
-if (ret != 1) {
+ret = wolfProv_SetLogComponents(WP_LOG_DIGEST | WP_LOG_CIPHER);
+if (ret != 0) {
     printf(“Failed to set log components\n”);
 }
 ```
@@ -81,7 +66,7 @@ if (ret != 1) {
 
 By default wolfProvider outputs debug log messages using **fprintf()** to **stderr**.
 
-Applications that want to have more control over how or where log messages are output can write and register a custom logging callback with wolfProvider. The logging callback should match the prototype of wolfProvider_Logging_cb in `include/wolfprovider/we_logging.h`:
+Applications that want to have more control over how or where log messages are output can write and register a custom logging callback with wolfProvider. The logging callback should match the prototype of wolfProvider_Logging_cb in `include/wolfprovider/wp_logging.h`:
 ```
 /**
 * wolfProvider logging callback.
@@ -93,7 +78,7 @@ typedef void (* **wolfProvider_Logging_cb** )(const int logLevel,
 const int component,
 const char *const logMessage);
 ```
-The callback can then be registered with wolfProvider using the “ **set_logging_cb** ” provider control command. For example, to use the `PROVIDER_ctrl_cmd()` API to set a custom logging callback:
+The callback can then be registered with wolfProvider using the `wolfProv_SetLoggingCb(wolfProv_Logging_cb logf)`. For example:
 ```
 void **customLogCallback** (const int logLevel, const int component,
 const char* const logMessage)
@@ -106,11 +91,9 @@ const char* const logMessage)
 int **main** (void)
 {
     int ret;
-    PROVIDER* e;
 ...
-    ret = PROVIDER_ctrl_cmd(e, “ **set_logging_cb** ”, 0, NULL,
-    (void(*)(void))my_Logging_cb, 0);
-    if (ret != 1) {
+    ret = wolfProv_SetLoggingCb((void(*)(void))my_Logging_cb);
+    if (ret != 0) {
         /* failed to set logging callback */
     }
 ...
