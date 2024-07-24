@@ -6,23 +6,13 @@ For documentation on how applications use and consume OpenSSL providers, refer t
 
 [OpenSSL 3.0](https://www.openssl.org/docs/man3.0/man7/provider.html)
 
-There are several ways an application can choose to consume, register, and configure provider usage. In the simplest usage, to load and register all PROVIDER implementations bundled with OpenSSL an application would need to call the following (taken from the above OpenSSL documentation):
-```
-/* For OpenSSL 1.0.2, need to make the “dynamic” PROVIDER available */
-PROVIDER_load_dynamic();
-
-/* Load all bundled PROVIDERs into memory and make them visible */
-PROVIDER_load_builtin_providers();
-/* Register all of them for every algorithm they collectively implement */
-PROVIDER_register_all_complete();
-```
-At this point, if the application is configured to read/use an OpenSSL config file, additional provider setup steps can be done there. For OpenSSL config documentation, reference the OpenSSL documentation:
+If the application is configured to read/use an OpenSSL config file, additional provider setup steps can be done there. For OpenSSL config documentation, reference the OpenSSL documentation:
 
 [OpenSSL 3.0](https://www.openssl.org/docs/man3.0/man5/config.html)
 
-An application can read and consume the default OpenSSL config file (openssl.cnf) or config as set by OPENSSL_CONF environment variable, and default [openssl_conf] section.
+An application can read and consume the default OpenSSL config file (openssl.cnf) or config as set by OPENSSL\_CONF environment variable, and default [openssl\_conf] section.
 
-Alternatively to using an OpenSSL config file, applications can explicitly initialize and register wolfProvider using the desired PROVIDER_\* APIs. As one example, initializing wolfProvider and registering for all algorithms could be done using:
+Alternatively to using an OpenSSL config file, applications can explicitly initialize and register wolfProvider using the desired OSSL\_PROVIDER_\* APIs. As one example, initializing wolfProvider and registering for all algorithms could be done using:
 ```
     OSSL_PROVIDER *prov = NULL;
     const char *build = NULL;
