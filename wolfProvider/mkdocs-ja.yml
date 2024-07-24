@@ -2,19 +2,18 @@ site_name: wolfProvider マニュアル
 site_url: https://wolfssl.com/
 docs_dir: build/html/
 site_dir: html/
-copyright: Copyright © 2022 wolfSSL Inc.
+copyright: Copyright © 2024 wolfSSL Inc.
 nav:
     - "1. イントロダクション": index.md
     - "2. OpenSSL版との互換性": chapter02.md
     - "3. wolfProviderのビルド": chapter03.md
     - "4. FIPS 140-2 のサポート": chapter04.md
-    - "5. Provider コントロールコマンド": chapter05.md
-    - "6. ロギング": chapter06.md
-    - "7. 移植性": chapter07.md
-    - "8. wolfProviderのロード": chapter08.md
-    - "9. wolfProviderの設計": chapter09.md
-    - "10. オープンソース統合に関する注意事項": chapter10.md
-    - "11. サポートとOpenSSLバージョン追加": chapter11.md
+    - "5. ロギング": chapter05.md
+    - "6. 移植性": chapter06.md
+    - "7. wolfProviderのロード": chapter07.md
+    - "8. wolfProviderの設計": chapter08.md
+    - "9. オープンソース統合に関する注意事項": chapter09.md
+    - "10. サポートとOpenSSLバージョン追加": chapter10.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material

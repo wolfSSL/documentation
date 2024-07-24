@@ -1,21 +1,80 @@
-# 移植性
+# wolfProviderのロード
 
-wolfProvider は、関連する wolfCrypt および OpenSSL ライブラリの移植性を活用するように設計されています。
+## OpenSSLをエンジン使用可能に構成
 
-## スレッド対応
+アプリケーションが OpenSSL エンジンを使用および使用する方法に関するドキュメントについては、OpenSSL のドキュメントを参照してください：
 
-wolfProvider はスレッド セーフであり、必要に応じて wolfCrypt (`wc_LockMutex()`、`wc_UnLockMutex()`) のミューテックス ロック メカニズムを使用します。 wolfCrypt には、サポートされているプラットフォーム用に抽象化されたミューテックス操作があります。
+[OpenSSL 1.0.2](https://www.openssl.org/docs/man1.0.2/man3/provider.html)
+[OpenSSL 1.1.1](https://www.openssl.org/docs/man1.1.1/man3/PROVIDER_add.html)
 
-## 動的メモリ使用
+アプリケーションがエンジンの使用を消費、登録、および構成するために選択できる方法はいくつかあります。 最も単純な使用法では、OpenSSL にバンドルされているすべての PROVIDER 実装をロードして登録するには、アプリケーションで次を呼び出す必要があります (上記の OpenSSL ドキュメントから引用)：
+```
+/* For OpenSSL 1.0.2, need to make the “dynamic” PROVIDER available */
+PROVIDER_load_dynamic();
 
-wolfProvider は、OpenSSL のメモリ割り当て関数を使用して、OpenSSL の動作との一貫性を維持します。 wolfProvider の内部で使用される割り当て関数には、"OPENSSL_malloc()"、"OPENSSL_free()"、"OPENSSL_zalloc()"、および"OPENSSL_realloc()"が含まれます。
+/* Load all bundled PROVIDERs into memory and make them visible */
+PROVIDER_load_builtin_providers();
 
-## ロギング
+/* Register all of them for every algorithm they collectively implement */
+PROVIDER_register_all_complete();
+```
+この時点で、アプリケーションが OpenSSL 構成ファイルを読み取り/使用するように構成されている場合は、そこで追加のエンジン セットアップ手順を実行できます。 OpenSSL 構成ドキュメントについては、OpenSSL ドキュメントを参照してください：
 
-wolfProvider はデフォルトで `fprintf()` 経由で stderr にログを記録します。 アプリケーションは、カスタム ロギング関数を登録することでこれをオーバーライドできます ([第 6 章](chapter06.md) を参照)。
+[OpenSSL 1.0.2 ドキュメント](https://www.openssl.org/docs/man1.0.2/man3/OPENSSL_config.html)<br>
+[OpenSSL 1.1.1 ドキュメント](https://www.openssl.org/docs/man1.1.1/man3/OPENSSL_config.html)
 
-ログの動作を調整するために wolfProvider をコンパイルするときに定義できる追加のマクロには、次のものがあります：
+たとえば、アプリケーションは、デフォルトの OpenSSL 構成ファイル (openssl.cnf) または OPENSSL_CONF 環境変数によって設定された構成、およびデフォルトの [openssl_conf] セクションを呼び出して、読み取り、使用できます
+```
+OPENSSL_config(NULL);
+```
 
-**WOLFPROVIDER_USER_LOG** - ログ出力の関数名を定義するマクロ。 ユーザーは、これを fprintf の代わりに使用するカスタム ログ関数に定義できます
+OpenSSL コンフィギュレーションファイルを使用する代わりに、アプリケーションは希望の PROVIDER_* API を使用して明示的に wolfProvider を初期化および登録できます。 一例として、wolfProvider の初期化とすべてのアルゴリズムの登録は、以下を使用して行うことができます：
+```
+PROVIDER* e = NULL;
 
-**WOLFPROVIDER_LOG_PRINTF** - fprintf (stderr) を切り替えて、代わりに printf (stdout) を使用するように定義します。 WOLFPROVIDER_USER_LOG またはカスタム ロギング コールバックを使用している場合は適用されません。
+e = PROVIDER_by_id(“wolfprovider”);
+if (e == NULL) {
+printf(“Failed to find wolfProvider\n”);
+/* error */
+}
+PROVIDER_set_default(e, PROVIDER_METHOD_ALL);
+
+/* normal application execution / behavior */
+
+PROVIDER_finish(e);
+PROVIDER_cleanup();
+```
+
+## OpenSSL コンフィギュレーションファイルからの wolfProvider のロード
+
+OpenSSLを使用するアプリケーションがコンフィギュレーションファイルを処理するように設定されている場合、wolfProviderはOpenSSLコンフィギュレーションファイルからロードできます。 wolfProvider ライブラリをコンフィギュレーションファイルに追加する方法の例を以下に示します。 [wolfssl_section] は、必要に応じてエンジン制御コマンド (enable_debug) を設定するように変更できます。
+
+```
+openssl_conf = openssl_init
+
+[openssl_init]
+providers = provider_section
+
+[provider_section]
+wolfSSL = wolfssl_section
+
+[wolfssl_section]
+# If using OpenSSL <= 1.0.2, change provider_id to wolfprovider
+(drop the "lib").
+provider_id = libwolfprovider
+# dynamic_path = .libs/libwolfprovider.so
+init = 1
+# Use wolfProvider as the default for all algorithms it provides.
+default_algorithms = ALL
+# Only enable when debugging application - produces large
+amounts of output.
+# enable_debug = 1
+```
+
+## wolfProvider 静的エントリポイント
+
+wolfProvider がスタティック ライブラリとして使用される場合、アプリケーションは次のエントリ ポイントを呼び出して wolfProvider をロードできます：
+```
+#include <wolfprovider/we_wolfprovider.h>
+PROVIDER_load_wolfprovider();
+```
