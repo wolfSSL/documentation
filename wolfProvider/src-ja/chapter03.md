@@ -230,43 +230,43 @@ wolfProvider は、ユーザーが wolfProvider の構築方法を設定でき�
 | マクロ定義  | 意味 |
 | :---------------------------------------------- | :-------------- |
 | WOLFPROVIDER_DEBUG | デバッグ シンボル、最適化レベル、デバッグ ロギングを使用して wolfProvider をビルドします |
-| WE_NO_DYNAMIC_PROVIDER |  wolfProviderをダイナミックエンジンとしてビルドしない。ダイナミックエンジンとはOpenSSLが実行時に動的にロードするエンジンです。 |
-| WE_SINGLE_THREADED | wolfProviderをシングルスレッドモードでビルドする。このマクロ定義によりグローバルリソースの使用の排他用に内部的に使用するロック機構を取り除きます。|
-| WE_USE_HASH | ハッシュアルゴリズムを wc_Hash APIを使って有効にする |
-| WE_HAVE_SHA1   |  SHA-1 を有効にする |
-| WE_HAVE_SHA224 |  SHA-2 224を有効にする |
-| WE_HAVE_SHA256 |  SHA-2 256を有効にする |
-| WE_HAVE_SHA384 |  SHA-2 384を有効にする |
-| WE_HAVE_SHA512 |  SHA-2 512を有効にする |
-| WE_SHA1_DIRECT | SHA-1 をwc_Sha APIを使って有効にする。WE_USE_HASHとはコンパチブルではない |
-| WE_SHA224_DIRECT |  SHA-2 224 を wc_Sha224 APIを使って有効にする。WE_USE_HASHとはコンパチブルではない |
-| WE_SHA256_DIRECT |  SHA-2 256 を wc_Sha256 APIを使って有効にする。WE_USE_HASHとはコンパチブルではない |
-| WE_HAVE_SHA3_224 |  SHA-3  224を有効にする（OpenSSL 1.0.2では利用不可）|
-| WE_HAVE_SHA3_256 |  SHA-3  256を有効にする（OpenSSL 1.0.2では利用不可）|
-| WE_HAVE_SHA3_384 |  SHA-3  384を有効にする（OpenSSL 1.0.2では利用不可）|
-| WE_HAVE_SHA3_512 |  SHA-3  512を有効にする（OpenSSL 1.0.2では利用不可）|
-| WE_HAVE_EVP_PKEY | EVP_PKEY APIを使用する機能を有効にする（RSA, DH等も含む） |
-| WE_HAVE_CMAC |  CMAC を有効にする |
-| WE_HAVE_HMAC |  HMAC を有効にする |
-| WE_HAVE_DES3CBC |  DES3-CBC を有効にする |
-|WE_HAVE_AESECB |  AES-ECB を有効にする |
-| WE_HAVE_AESCBC |  AES-CBC を有効にする |
-| WE_HAVE_AESCTR |  AES-countee modeを有効にする |
-| WE_HAVE_AESGCM |  AES-GCM を有効にする |
-| WE_HAVE_AESCCM | AES-CCM を有効にする |
-| WE_HAVE_RANDOM |  wolfCrypt の疑似乱数生成実装を有効にする |
-| WE_HAVE_RSA |  RSA 操作 (すなわち 署名, 検証, 鍵生成等)を有効にする |
-| WE_HAVE_DH |  Diffie-Hellman 操作 (すなわち 鍵生成, 共有シークレット計算等)を有効にする |
-| WE_HAVE_ECC |  楕円曲線暗号を有効にする |
-| WE_HAVE_EC_KEY | EC_KEY_METHODのサポートを有効にする（OpenSSL 1.0.2では利用不可） |
-| WE_HAVE_ECDSA |  ECDSA を有効にする |
-| WE_HAVE_ECDH |  EC Diffie-Hellman operationsを有効にする |
-| WE_HAVE_ECKEYGEN |  EC key generationを有効にする |
-| WE_HAVE_EC_P192 |  EC Curve P192を有効にする |
-| WE_HAVE_EC_P224 |  EC Curve P224を有効にする |
-| WE_HAVE_EC_P256 |  EC Curve P256を有効にする |
-| WE_HAVE_EC_P384 |  EC Curve P384を有効にする |
-| WE_HAVE_EC_P512 |  EC Curve P512を有効にする |
-| WE_HAVE_DIGEST | ダイジェストアルゴリズムをベンチマークとユニットテストのコードに含めてコンパイルする |
+| WP_NO_DYNAMIC_PROVIDER |  wolfProviderをダイナミックエンジンとしてビルドしない。ダイナミックエンジンとはOpenSSLが実行時に動的にロードするエンジンです。 |
+| WP_SINGLE_THREADED | wolfProviderをシングルスレッドモードでビルドする。このマクロ定義によりグローバルリソースの使用の排他用に内部的に使用するロック機構を取り除きます。|
+| WP_USE_HASH | ハッシュアルゴリズムを wc_Hash APIを使って有効にする |
+| WP_HAVE_SHA1   |  SHA-1 を有効にする |
+| WP_HAVE_SHA224 |  SHA-2 224を有効にする |
+| WP_HAVE_SHA256 |  SHA-2 256を有効にする |
+| WP_HAVE_SHA384 |  SHA-2 384を有効にする |
+| WP_HAVE_SHA512 |  SHA-2 512を有効にする |
+| WP_SHA1_DIRECT | SHA-1 をwc_Sha APIを使って有効にする。WP_USE_HASHとはコンパチブルではない |
+| WP_SHA224_DIRECT |  SHA-2 224 を wc_Sha224 APIを使って有効にする。WP_USE_HASHとはコンパチブルではない |
+| WP_SHA256_DIRECT |  SHA-2 256 を wc_Sha256 APIを使って有効にする。WP_USE_HASHとはコンパチブルではない |
+| WP_HAVE_SHA3_224 |  SHA-3  224を有効にする（OpenSSL 1.0.2では利用不可）|
+| WP_HAVE_SHA3_256 |  SHA-3  256を有効にする（OpenSSL 1.0.2では利用不可）|
+| WP_HAVE_SHA3_384 |  SHA-3  384を有効にする（OpenSSL 1.0.2では利用不可）|
+| WP_HAVE_SHA3_512 |  SHA-3  512を有効にする（OpenSSL 1.0.2では利用不可）|
+| WP_HAVE_EVP_PKEY | EVP_PKEY APIを使用する機能を有効にする（RSA, DH等も含む） |
+| WP_HAVE_CMAC |  CMAC を有効にする |
+| WP_HAVE_HMAC |  HMAC を有効にする |
+| WP_HAVE_DES3CBC |  DES3-CBC を有効にする |
+|WP_HAVE_AESECB |  AES-ECB を有効にする |
+| WP_HAVE_AESCBC |  AES-CBC を有効にする |
+| WP_HAVE_AESCTR |  AES-countee modeを有効にする |
+| WP_HAVE_AESGCM |  AES-GCM を有効にする |
+| WP_HAVE_AESCCM | AES-CCM を有効にする |
+| WP_HAVE_RANDOM |  wolfCrypt の疑似乱数生成実装を有効にする |
+| WP_HAVE_RSA |  RSA 操作 (すなわち 署名, 検証, 鍵生成等)を有効にする |
+| WP_HAVE_DH |  Diffie-Hellman 操作 (すなわち 鍵生成, 共有シークレット計算等)を有効にする |
+| WP_HAVE_ECC |  楕円曲線暗号を有効にする |
+| WP_HAVE_EC_KEY | EC_KEY_METHODのサポートを有効にする（OpenSSL 1.0.2では利用不可） |
+| WP_HAVE_ECDSA |  ECDSA を有効にする |
+| WP_HAVE_ECDH |  EC Diffie-Hellman operationsを有効にする |
+| WP_HAVE_ECKEYGEN |  EC key generationを有効にする |
+| WP_HAVE_EC_P192 |  EC Curve P192を有効にする |
+| WP_HAVE_EC_P224 |  EC Curve P224を有効にする |
+| WP_HAVE_EC_P256 |  EC Curve P256を有効にする |
+| WP_HAVE_EC_P384 |  EC Curve P384を有効にする |
+| WP_HAVE_EC_P512 |  EC Curve P512を有効にする |
+| WP_HAVE_DIGEST | ダイジェストアルゴリズムをベンチマークとユニットテストのコードに含めてコンパイルする |
 | WOLFPROVIDER_USER_SETTINGS | ユーザーの指定した定義をuser_settings.hファイルから読み込む |
 

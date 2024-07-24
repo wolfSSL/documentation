@@ -13,16 +13,16 @@ wolfProvider supports the following logging levels. These are defined in the “
 
 | Log Enum | Description | Log Enum Value | 
 | -------------- |  --------------- |--------------------- |
-| WE_LOG_ERROR | Logs errors | 0x0001 |
-| WE_LOG_ENTER | Logs when entering functions | 0x0002 |
-| WE_LOG_LEAVE | Logs when leaving functions | 0x0004 |
-| WE_LOG_INFO | Logs informative messages | 0x0008 |
-| WE_LOG_VERBOSE | Verbose logs, including encrypted/decrypted/digested data | 0x0010 |
-| WE_LOG_LEVEL_DEFAULT | Default log level, all except verbose level | WE_LOG_ERROR &#124; WE_LOG_ENTER &#124; WE_LOG_LEAVE &#124; WE_LOG_INFO |
-WE_LOG_LEVEL_ALL WE_LOG_ERROR | All log levels are enabled | WE_LOG_ENTER &#124; WE_LOG_LEAVE &#124; WE_LOG_INFO &#124; WE_LOG_VERBOSE |
+| WP_LOG_ERROR | Logs errors | 0x0001 |
+| WP_LOG_ENTER | Logs when entering functions | 0x0002 |
+| WP_LOG_LEAVE | Logs when leaving functions | 0x0004 |
+| WP_LOG_INFO | Logs informative messages | 0x0008 |
+| WP_LOG_VERBOSE | Verbose logs, including encrypted/decrypted/digested data | 0x0010 |
+| WP_LOG_LEVEL_DEFAULT | Default log level, all except verbose level | WP_LOG_ERROR &#124; WP_LOG_ENTER &#124; WP_LOG_LEAVE &#124; WP_LOG_INFO |
+WP_LOG_LEVEL_ALL WP_LOG_ERROR | All log levels are enabled | WP_LOG_ENTER &#124; WP_LOG_LEAVE &#124; WP_LOG_INFO &#124; WP_LOG_VERBOSE |
 
 
-The default wolfProvider logging level includes `WE_LOG_ERROR`, `WE_LOG_ENTER`, `WE_LOG_LEAVE`, and `WE_LOG_INFO`. This includes all log levels except verbose logs (`WE_LOG_VERBOSE`).
+The default wolfProvider logging level includes `WP_LOG_ERROR`, `WP_LOG_ENTER`, `WP_LOG_LEAVE`, and `WP_LOG_INFO`. This includes all log levels except verbose logs (`WP_LOG_VERBOSE`).
 
 Log levels can be controlled using the `wolfProv_SetLogLevel(int mask)`. For example, to turn on only error and informative logs:
 ```

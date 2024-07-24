@@ -75,6 +75,6 @@ amounts of output.
 
 wolfProvider がスタティック ライブラリとして使用される場合、アプリケーションは次のエントリ ポイントを呼び出して wolfProvider をロードできます：
 ```
-#include <wolfprovider/we_wolfprovider.h>
+#include <wolfprovider/wp_wolfprovider.h>
 PROVIDER_load_wolfprovider();
 ```

@@ -66,6 +66,6 @@ activate = 1
 
 When wolfProvider is used as a static library, applications can call the following entry point to load wolfProvider:
 ```
-#include <wolfprovider/we_wolfprovider.h>
+#include <wolfprovider/wp_wolfprovider.h>
 wolfssl_provider_init(const OSSL_CORE_HANDLE* handle, const OSSL_DISPATCH* in, const OSSL_DISPATCH** out, void** provCtx);
 ```
