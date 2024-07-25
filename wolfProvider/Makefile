@@ -12,8 +12,7 @@ SOURCES = chapter01.md \
 		  chapter07.md \
 		  chapter08.md \
 		  chapter09.md \
-		  chapter10.md \
-		  chapter11.md 
+		  chapter10.md
 
 ifeq ($(DOC_LANG),JA)
 	PDF = wolfProvider-Manual-jp.pdf
