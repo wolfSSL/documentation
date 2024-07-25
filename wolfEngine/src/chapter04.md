@@ -1,6 +1,6 @@
-# FIPS 140-2 Support
+# FIPS 140-3 Support
 
-wolfEngine has been designed to work with FIPS 140-2 validated versions of wolfCrypt when compiled against a FIPS-validated version of wolfCrypt. This usage scenario requires a properly licensed and validated version of wolfCrypt, as obtained from wolfSSL Inc.
+wolfEngine has been designed to work with FIPS 140-3 validated versions of wolfCrypt when compiled against a FIPS-validated version of wolfCrypt. This usage scenario requires a properly licensed and validated version of wolfCrypt, as obtained from wolfSSL Inc.
 
 Note that wolfCrypt FIPS libraries cannot be “switched” into non-FIPS mode. wolfCrypt FIPS and regular wolfCrypt are two separate source code packages.
 
