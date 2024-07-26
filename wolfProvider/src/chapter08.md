@@ -23,10 +23,6 @@ wolfProvider is composed of the following source files, all located under the â€
 | wp_tls_prf.c | wolfProvider TLS 1.0 PRF implementation. |
 
 
-General wolfProvider architecture is as follows, showing both dynamic and static entry points:
-
-![wolfProvider Architecture](../png/wolfprovider_architecture.png)
-
 ## wolfProvider Entry Points
 
 The main entry points into the wolfProvider library are either **wolfprovider_bind** () or **PROVIDER_load_wolfprovider** (). wolfprovider_bind() is called automatically by OpenSSL if wolfProvider has been loaded dynamically. PROVIDER_load_wolfprovider() is the entry point applications must call if wolfProvider has been built and used statically instead of dynamically.

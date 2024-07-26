@@ -22,11 +22,6 @@ wolfProvider は次のソース ファイルで構成され、すべて wolfProv
 | wp_rsa.c | wolfProvider RSA 実装 |
 | wp_tls_prf.c | wolfProvider TLS 1.0 PRF 実装 |
 
-
-一般的な wolfProvider アーキテクチャは次のとおりで、動的エントリ ポイントと静的エントリ ポイントの両方を示しています:
-
-![wolfProvider Architecture](../png/wolfprovider_architecture.png)
-
 ## wolfProvider エントリーポイント
 
 wolfProvider ライブラリへの主なエントリ ポイントは、**wolfprovider_bind** () または **PROVIDER_load_wolfprovider** () のいずれかです。 wolfProvider が動的にロードされている場合、wolfprovider_bind() は OpenSSL によって自動的に呼び出されます。 PROVIDER_load_wolfprovider() は、wolfProvider が動的ではなく静的に構築および使用されている場合に、アプリケーションが呼び出す必要があるエントリ ポイントです。
