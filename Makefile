@@ -5,7 +5,7 @@ endif
 
 DOCKER_CMD=DOCKER_BUILDKIT=1 docker build -t doc_build --build-arg MANPATH=$(MANPATH) --build-arg PDFFILE=$(PDFFILE) --build-arg V=$(V) --target=manual --output=build -f Dockerfile .
 
-all: wolfssl wolfssh wolfboot wolfclu wolfcrypt-jni wolfmqtt wolfsentry wolfssl-jni wolftpm wolfhsm wolfengine fips-ready tuning porting faq
+all: wolfssl wolfssh wolfboot wolfclu wolfcrypt-jni wolfmqtt wolfsentry wolfssl-jni wolftpm wolfhsm wolfengine wolfprovider fips-ready tuning porting faq
 
 build:
 	$(Q)mkdir -p build
@@ -74,6 +74,12 @@ wolfhsm: build
 wolfengine: MANPATH=wolfEngine
 wolfengine: PDFFILE=wolfEngine-Manual.pdf
 wolfengine: build
+	$(Q)$(DOCKER_CMD)
+
+.PHONY: wolfprovider
+wolfprovider: MANPATH=wolfProvider
+wolfprovider: PDFFILE=wolfProvider-Manual.pdf
+wolfprovider: build
 	$(Q)$(DOCKER_CMD)
 
 .PHONY: porting
