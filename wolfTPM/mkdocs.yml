@@ -13,9 +13,10 @@ nav:
       - "TPM2 Wrapper API": group__wolfTPM2__Wrappers.md
       - "TPM2 Header File": tpm2_8h.md
       - "TPM2 Wrapper Header File": tpm2__wrap_8h.md
+      - "TPM2 HAL IO": tpm__io_8h.md
     - "6. Cited Sources": chapter06.md
 theme:
-  name: null 
+  name: null
   custom_dir: ../mkdocs-material/material
   language: en
   palette:
