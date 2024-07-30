@@ -82,6 +82,6 @@ lintcheck:
 .PHONY: test
 test: lintcheck linkcheck
 
+CLEAN_FILES = $(PDF) build $(HTML)
 clean:
-	rm -f $(PDF)
-	rm -rf build $(HTML)
+	rm -rf $(CLEAN_FILES)
