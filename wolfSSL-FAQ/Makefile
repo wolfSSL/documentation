@@ -6,7 +6,12 @@ all: pdf html
 SOURCES = section01.md \
 		  section02.md
 
-PDF  = wolfSSL-FAQ.pdf
+ifeq ($(DOC_LANG),JA)
+    PDF  = wolfSSL-FAQ-jp.pdf
+else
+    PDF  = wolfSSL-FAQ.pdf
+endif
+
 DOXYFILE = Doxyfile
 
 
