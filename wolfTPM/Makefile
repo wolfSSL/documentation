@@ -31,7 +31,6 @@ wolftpm-update: wolftpm
 .PHONY: api
 api: wolftpm-update
 	$(Q)mkdir -p api/md
-	$(Q)cp Doxyfile wolftpm/docs
 	$(Q)cd wolftpm && doxygen docs/Doxyfile
 	$(Q)cd ..
 	$(Q)doxybook2 --input wolftpm/docs/xml --output api/md --config doxybook.cfg
