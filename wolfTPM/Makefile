@@ -52,10 +52,6 @@ html-prep: api
   endif
 
 	$(Q)rm -rf build/html/chapter05.md
-	$(Q)perl -i -pe "s/\[(.*?)\]\(Classes\/.*?.md\)/\[\1\]\(#typedef-\1\)/g" build/html/group* build/html/*8h*
-	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
-	$(Q)perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
-	$(Q)perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/\/tpm2_/tpm2_/g" build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*
