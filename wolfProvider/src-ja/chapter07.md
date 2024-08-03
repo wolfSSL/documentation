@@ -1,13 +1,15 @@
 # wolfProviderのロード
 
-## OpenSSLをエンジン使用可能に構成
+## OpenSSLをエンジンを利用できるように構成
 
-アプリケーションが OpenSSL エンジンを使用および使用する方法に関するドキュメントについては、OpenSSL のドキュメントを参照してください：
+アプリケーションがOpenSSLエンジンを使用および使用する方法については、OpenSSLのドキュメントをご参照ください。
 
-[OpenSSL 1.0.2](https://www.openssl.org/docs/man1.0.2/man3/provider.html)
-[OpenSSL 1.1.1](https://www.openssl.org/docs/man1.1.1/man3/PROVIDER_add.html)
+- [OpenSSL 1.0.2](https://www.openssl.org/docs/man1.0.2/man3/provider.html)
+- [OpenSSL 1.1.1](https://www.openssl.org/docs/man1.1.1/man3/PROVIDER_add.html)
 
-アプリケーションがエンジンの使用を消費、登録、および構成するために選択できる方法はいくつかあります。 最も単純な使用法では、OpenSSL にバンドルされているすべての PROVIDER 実装をロードして登録するには、アプリケーションで次を呼び出す必要があります (上記の OpenSSL ドキュメントから引用)：
+アプリケーションがエンジンを使用するための方法はいくつかあります。
+最も単純なものとして、OpenSSLにバンドルされているすべてのPROVIDER実装をロードして登録し、アプリケーションで次のコードを呼び出す方法があります。
+ (上記のOpenSSLドキュメントから引用しています)
 ```
 /* For OpenSSL 1.0.2, need to make the “dynamic” PROVIDER available */
 PROVIDER_load_dynamic();
@@ -18,36 +20,47 @@ PROVIDER_load_builtin_providers();
 /* Register all of them for every algorithm they collectively implement */
 PROVIDER_register_all_complete();
 ```
-この時点で、アプリケーションが OpenSSL 構成ファイルを読み取り/使用するように構成されている場合は、そこで追加のエンジン セットアップ手順を実行できます。 OpenSSL 構成ドキュメントについては、OpenSSL ドキュメントを参照してください：
 
-[OpenSSL 1.0.2 ドキュメント](https://www.openssl.org/docs/man1.0.2/man3/OPENSSL_config.html)<br>
-[OpenSSL 1.1.1 ドキュメント](https://www.openssl.org/docs/man1.1.1/man3/OPENSSL_config.html)
+アプリケーションがOpenSSL設定ファイルを使用するように設定されている場合、
+追加のプロバイダー設定ステップをそこで行うことができます。
+OpenSSLを構成する方法については、OpenSSLドキュメントをご覧ください。
 
-たとえば、アプリケーションは、デフォルトの OpenSSL 構成ファイル (openssl.cnf) または OPENSSL_CONF 環境変数によって設定された構成、およびデフォルトの [openssl_conf] セクションを呼び出して、読み取り、使用できます
+- [OpenSSL 1.0.2 ドキュメント](https://www.openssl.org/docs/man1.0.2/man3/OPENSSL_config.html)
+- [OpenSSL 1.1.1 ドキュメント](https://www.openssl.org/docs/man1.1.1/man3/OPENSSL_config.html)
+
+アプリケーションはデフォルトのOpenSSL構成ファイル (`openssl.cnf`)や、
+`OPENSSL_CONF`環境変数によって設定された構成の `[openssl_conf]` セクションを呼び出して、読み取り、使用できます。
+
 ```
 OPENSSL_config(NULL);
 ```
 
-OpenSSL コンフィギュレーションファイルを使用する代わりに、アプリケーションは希望の PROVIDER_* API を使用して明示的に wolfProvider を初期化および登録できます。 一例として、wolfProvider の初期化とすべてのアルゴリズムの登録は、以下を使用して行うことができます：
+OpenSSLコンフィギュレーションファイルを使用する代わりに、アプリケーションは`PROVIDER_*` APIを使用して明示的に wolfProviderの初期化やアルゴリズムの登録を行うこともできます。 
+一例として、wolfProviderの初期化とすべてのアルゴリズムの登録を行う場合を以下に示します。
+
 ```
 PROVIDER* e = NULL;
 
 e = PROVIDER_by_id(“wolfprovider”);
 if (e == NULL) {
-printf(“Failed to find wolfProvider\n”);
-/* error */
+    printf(“Failed to find wolfProvider\n”);
+    /* error */
 }
 PROVIDER_set_default(e, PROVIDER_METHOD_ALL);
 
-/* normal application execution / behavior */
+/* アプリケーションの実装 */
 
 PROVIDER_finish(e);
 PROVIDER_cleanup();
 ```
 
-## OpenSSL コンフィギュレーションファイルからの wolfProvider のロード
+## OpenSSLコンフィギュレーションファイルによるwolfProviderのロード
 
-OpenSSLを使用するアプリケーションがコンフィギュレーションファイルを処理するように設定されている場合、wolfProviderはOpenSSLコンフィギュレーションファイルからロードできます。 wolfProvider ライブラリをコンフィギュレーションファイルに追加する方法の例を以下に示します。 [wolfssl_section] は、必要に応じてエンジン制御コマンド (enable_debug) を設定するように変更できます。
+OpenSSLを使用するアプリケーションがコンフィギュレーションファイルを処理するように設定されている場合、
+wolfProviderはOpenSSLコンフィギュレーションファイルからロードできます。 
+
+wolfProviderライブラリをコンフィギュレーションファイルに追加する方法の例を以下に示します。
+`[wolfssl_section]`は、必要に応じてエンジン制御コマンド(`enable_debug`)を設定するように変更できます。
 
 ```
 openssl_conf = openssl_init
@@ -71,9 +84,11 @@ amounts of output.
 # enable_debug = 1
 ```
 
-## wolfProvider 静的エントリポイント
+## wolfProvider静的エントリポイント
 
-wolfProvider がスタティック ライブラリとして使用される場合、アプリケーションは次のエントリ ポイントを呼び出して wolfProvider をロードできます：
+wolfProviderを静的ライブラリとして使用する場合、アプリケーションは次のエントリポイントを呼び出して
+wolfProviderをロードできます。
+
 ```
 #include <wolfprovider/wp_wolfprovider.h>
 PROVIDER_load_wolfprovider();

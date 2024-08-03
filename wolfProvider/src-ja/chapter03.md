@@ -1,17 +1,18 @@
-# wolfProvider のビルド
+# wolfProviderのビルド
 
-## wolfProvider のソースコードの取得
+## wolfProviderのダウンロード
 
-wolfProvider の最新バージョンは、wolfSSL Inc. から直接入手できます。詳細については、[facts@wolfssl.com](mailto:facts@wolfssl.com) までお問い合わせください。
+wolfProviderの最新バージョンは、wolfSSL Inc. から直接入手できます。
+詳細については、[info@wolfssl.jp](mailto:info@wolfssl.jp)までお問い合わせください。
 
 
-## wolfProvider パッケージ構成
+## パッケージ構成
 
-一般的な wolfProvider パッケージは次のように構成されています:
+wolfProviderパッケージは、以下のように構成しています。
 
 ```
 certs/               (ユニットテストで使用されるテスト用証明書、鍵)
-provider.conf        　(wolfProviderを使用する場合のOpenSSLコンフィギュレーションファイルサンプル）
+provider.conf        (wolfProviderを使用する場合のOpenSSLコンフィギュレーションファイルサンプル)
 include/
     wolfprovider/      (wolfProviderヘッダーファイル)
 openssl_patches/
@@ -22,20 +23,21 @@ src/                 (wolfProvider ソースファイル)
 test/                (wolfProvider テストファイル)
 user_settings.h      (user_settings.hサンプル)
 ```
-## OpenSSL のバージョンに関する注意事項
 
-wolfProvider で使用されている OpenSSL のバージョンに応じて、次のようないくつかのアルゴリズム サポートの注意事項があります:
+## OpenSSLのバージョンに関する注意事項
 
-- SHA-3 はOpenSSL versions 1.1.1以降でサポートされます
-- EC_KEY_METHOD はOpenSSL versions 1.1.1以降でサポートされます
+次に示すアルゴリズムを利用するには、併記したOpenSSLバージョンが必要です。
 
-## *nix 上でのビルド
+- SHA-3：OpenSSL バージョン1.1.1以降が必要
+- EC_KEY_METHOD：OpenSSL バージョン1.1.1以降が必要
 
+## *nix上でのビルド
 
 ### OpenSSLをビルド
 
-OpenSSL のプリインストールされたバージョンを wolfProvider で使用することも (上記のアルゴリズムの警告を除いて)、または OpenSSL を再コンパイルして wolfProvider で使用することもできます。 *nix のようなプラットフォームで OpenSSL をコンパイルするための一般的な手順は、次のようになります。 完全で包括的な OpenSSL のビルド手順については、OpenSSL INSTALL ファイルとドキュメントを参照してください。
-
+すでにインストールされたOpenSSLを使用することも、新しく1からOpenSSLをコンパイルして使用することもできます。
+以下に、*nix(Linux, Unix)上でOpenSSLをコンパイルする一般的な手法を示します。
+より詳しいビルド手順をお求めでしたら、OpenSSLの[INSTALLファイル](https://github.com/openssl/openssl/blob/master/INSTALL.md)や[ドキュメント](https://docs.openssl.org/master/)をご参照ください。
 
 ```
 git clone https://github.com/openssl/openssl.git
@@ -47,24 +49,26 @@ sudo make install
 
 ### wolfSSLをビルド
 
-wolfProvider で wolfSSL の FIPS 検証済みバージョンを使用する場合は、特定の FIPS 検証済みソース バンドルとセキュリティ ポリシーで提供されるビルド手順に従ってください。 正しい「--enable-fips」設定オプションに加えて、wolfProvider は"**WOLFSSL_PUBLIC_MP**"が定義された状態で wolfSSL をコンパイルする必要があります。 たとえば、Linux で「wolfCrypt Linux FIPSv2」バンドルをビルドする場合:
+wolfProviderでwolfSSL FIPS版を使用するには、特定のFIPS検証済みソースバンドルやセキュリティポリシーで指定されたビルド手順に従う必要があります。
+まずコンフィギュレーションオプションとして`--enable-fips`が必要で、かつ **WOLFSSL_PUBLIC_MP** が定義された状態でwolfSSLをコンパイルします。
+以下に、Linuxで「wolfCrypt Linux FIPSv2バンドル」をビルドする例を示します。
 
 ```
 cd wolfssl-X.X.X-commercial-fips-linuxv
 ./configure **--enable-fips=v2 CFLAGS=”-DWOLFSSL_PUBLIC_MP”**
 make
 ./wolfcrypt/test/testwolfcrypt
-#--< fips_test.c 内の verifyCore を hash output from testwolfcryptスクリプトが出力するハッシュ値に更新してください >--
+#--< ここで、fips_test.c内のverifyCoreを開き、testwolfcryptスクリプトが出力するハッシュ値に更新してください >--
 
 make
 ./wolfcrypt/test/testwolfcrypt
 
-#--< 全アルゴリズムでパスするはずです>--
+#--< すべてのテストでPASSできるはずです >--
 
 sudo make install
 ```
 
-wolfProvider で使用する非 FIPS wolfSSL をビルドするには:
+非FIPS版のwolfSSLを使用する場合は、以下のようになります。
 ```
 cd wolfssl-X.X.X
 
@@ -74,7 +78,8 @@ make
 sudo make install
 ```
 
-GitHub から wolfSSL をクローンする場合、`./configure` を実行する前に `autogen.sh` スクリプトを実行する必要があります。 これにより、configure スクリプトが生成されます:
+なおwolfSSLをGitHubリポジトリから取得された場合は、`./configure`を実行する前に`autogen.sh`スクリプトを実行する必要があります。
+これにより、configureスクリプトが生成されます。
 
 ```
 ./autogen.sh
@@ -82,70 +87,76 @@ GitHub から wolfSSL をクローンする場合、`./configure` を実行す�
 
 ### wolfProviderをビルド
 
-Linux またはその他の *nix ライクなシステムで wolfProvider をビルドする場合は、autoconf システムを使用してください。 wolfProvider を構成およびコンパイルするには、wolfProvider ルート ディレクトリから次の 2 つのコマンドを実行します：
-
+Linuxなどの*nixライクな環境でwolfProviderをビルドする場合は、autoconfをご利用ください。
+wolfProviderをビルドするには、wolfProviderのルートディレクトリ上で次のコマンドを実行します。
 
 ```
 ./configure
 make
 ```
 
-GitHub から wolfProvider を取得してビルドする場合は、configure を実行する前に autogen.sh を実行します:
+wolfProviderをGitHubリポジトリから取得された場合は、`./configure`を実行する前に`autogen.sh`スクリプトを実行する必要があります。
+
 ```
 ./autogen.sh
 ```
 
-任意の数のビルドオプションを ./configure に追加できます。 利用可能なビルド オプションのリストについては、以下の「ビルド オプション」セクションを参照するか、次のコマンドを実行して、./configure スクリプトに渡す利用可能なビルド オプションのリストを表示してください：
-
+任意の数のビルドオプションを `./configure` に追加できます。 
+利用可能なビルドオプションの一覧については、後の「ビルドオプション」セクションに掲載しているほか、
+次のコマンドを実行することで表示できます。
 
 ```
 ./configure  --help
 ```
 
-"--with-openssl"オプションで変更しない限り、wolfProvider はシステムのデフォルトの OpenSSL ライブラリのインストールを使用します:
-
+wolfProviderは通常、システムにインストールされたデフォルトのOpenSSLライブラリを使用します。
+`--with-openssl`オプションにより、特定のディレクトリに存在するOpenSSLを使用することもできます。
 
 ```
 ./configure --with-openssl=/usr/local/ssl
 ```
-カスタム OpenSSL のインストール場所も、ライブラリ検索パスに追加する必要となる場合があります。Linux では、`LD_LIBRARY_PATH` が使用されます:
+
+デフォルト以外のOpenSSLを使用する場合、ライブラリ検索パスに追加しなければならないケースがあります。
+Linuxシステムでは、次のように`LD_LIBRARY_PATH`を編集します。
 
 ```
 export LD_LIBRARY_PATH=/usr/local/ssl:$LD_LIBRARY_PATH
 ```
 
-wolfProvider をビルドしてインストールするには、以下を実行します:
+wolfProviderをビルドしインストールするには、以下のコマンドを実行します。
 
 ```
 make
 make install
 ```
 
-インストールにはスーパーユーザー権限が必要な場合があります。その場合は、コマンドの前に sudo を付けます:
+インストール時にはroot権限を求められる場合があります。
+その際は、コマンドの前に`sudo`を付加します。
 
 ```
 sudo make install
 ```
 
-ビルドをテストするには、ルート wolfProvider ディレクトリからビルトインテストを実行します:
+ビルド結果をテストするには、wolfProviderのルートディレクトリで以下のコマンドを実行します。
 
 ```
 ./test/unit.test
 ```
 
-または autoconf を使用してテストを実行します:
+次のように、autoconfを使用して実行することもできます。
 
 ```
 make check
 ```
 
-`error while loading shared libraries: libssl.so.3` のようなエラーが発生した場合は、ライブラリが見つからなかった為です。上記のセクションで説明したように、`LD_LIBRARY_PATH` 環境変数を使用します：
-
+ライブラリが見つからない場合、
+`error while loading shared libraries: libssl.so.3` 
+のようなエラーが発生します。
+環境変数`LD_LIBRARY_PATH`を編集することで解決しないかお試しください。
 
 ## WinCE上でのビルド
 
-wolfProvider との完全な互換性のために、wolfCrypt の `user_settings.h` ファイルに以下の定義があることを確認してください:
-
+wolfProviderとの互換性を保つために、wolfCryptの`user_settings.h`ファイルに以下の定義があることをご確認ください。
 
 ```
 #define WOLFSSL_CMAC
@@ -161,27 +172,31 @@ wolfProvider との完全な互換性のために、wolfCrypt の `user_settings
 #define ECC_MIN_KEY_SZ=192
 ```
 
-使用するアルゴリズムと機能に応じて、`user_settings.h` ファイルに wolfProvider フラグを追加します。 wolfProvider のディレクトリにある `user_settings.h` ファイルで、wolfProvider ユーザー設定フラグが参照できます。
+使用するアルゴリズムと機能に応じて、`user_settings.h`ファイルにwolfProviderフラグを追加します。
+wolfProviderディレクトリにある`user_settings.h`ファイルで、wolfProviderユーザー設定フラグを参照できます。
 
-Windows CE 用の wcecompat、wolfCrypt、および OpenSSL をビルドし、それらのパスを参照できるようにします。
+Windows CE用のwcecompat、wolfCrypt、およびOpenSSLをビルドし、それらのパスを参照できるようにします。
 
-wolfProvider ディレクトリでソースファイルを開き、OpenSSL、wolfCrypt、および `user_settings.h` パスを使用しているディレクトリに変更します。 INCLUDES セクションと TARGETLIBS セクションのパスを更新する必要があります。
+wolfProviderディレクトリでソースファイルを開き、OpenSSL、wolfCrypt、および `user_settings.h` パスを使用しているディレクトリに変更します。 
+INCLUDESセクションとTARGETLIBSセクションのパスを更新する必要があります。
 
-Visual Studio で wolfProvider プロジェクトをロードします。 ベンチマークまたは単体テストを実行するかどうかに応じて、「bench.c」、または「unit.h」と「unit.c」のいずれかを含めます。
+Visual StudioでwolfProviderプロジェクトをロードします。
+ベンチマークまたは単体テストを実行する場合は、「bench.c」、または「unit.h」と「unit.c」のいずれかを含めます。
 
-プロジェクトをビルドすると、wolfProvider.exe 実行可能ファイルが作成されます。 この実行可能ファイルを --help で実行すると、オプションの完全なリストが表示されます。 wolfProvider を静的エンジンとして使用するには、`--static` フラグを付けて実行する必要があります。
-
+プロジェクトをビルドすると、実行可能ファイルwolfProvider.exeが作成されます。
+この実行可能ファイルに`--help`の引数をつけて実行すると、オプションの一覧を表示できます。 
+wolfProviderを静的エンジンとして使用するには`--static`を付けて実行する必要があります。
 
 ## ビルドオプション (./configure に指定するオプション)
 
-以下は、wolfProvider ライブラリの構築方法をカスタマイズする目的で `./configure` スクリプトに追加できるオプションです。
+ライブラリの構築方法をカスタマイズするために`./configure`スクリプトに追加できるオプションを以下に示します。
 
-デフォルトでは、wolfProvider は共有ライブラリのみを構築し、静的ライブラリの構築は無効になっています。 これにより、ビルド時間が 2 倍速くなります。 どちらのモードも、必要に応じて明示的に無効または有効にすることができます。
-
+デフォルトでは、ビルド時間を半分にするために共有ライブラリのみをビルドします。
+必要に応じて、静的ライブラリをビルドしたり共有ライブラリのビルドを無効化したりできます。
 
 | オプション   | デフォルト | 意味 |
 | :--------- | :---------------: | :-------------- |
-| --enable-static   | **無効** | スタティックライブラリとしてビルド   |
+| --enable-static   | **無効** | 静的ライブラリとしてビルド   |
 | --enable-shared   | 有効     | 共有ライブラリとしてビルド |
 | --enable-debug    | **無効** | wolfProviderのデバッグ出力を有効にする |
 | --enable-coverage | **無効** | コードカバレッジレポートを作成する用ビルド |
@@ -224,13 +239,13 @@ Visual Studio で wolfProvider プロジェクトをロードします。 ベン
 
 ## ビルド用マクロ定義
 
-wolfProvider は、ユーザーが wolfProvider の構築方法を設定できるようにするいくつかのプリプロセッサマクロを公開しています。 これらについては、次の表で説明します：
-
+wolfProviderは、お客様がwolfProviderのビルド方法を設定できるようにするいくつかのプリプロセッサマクロを公開しています。
+以下にその一覧を示します。
 
 | マクロ定義  | 意味 |
-| :---------------------------------------------- | :-------------- |
-| WOLFPROVIDER_DEBUG | デバッグ シンボル、最適化レベル、デバッグ ロギングを使用して wolfProvider をビルドします |
-| WP_NO_DYNAMIC_PROVIDER |  wolfProviderをダイナミックエンジンとしてビルドしない。ダイナミックエンジンとはOpenSSLが実行時に動的にロードするエンジンです。 |
+| :---------- | :--------------------- |
+| WOLFPROVIDER_DEBUG | デバッグシンボル、最適化レベル、デバッグロギングを使用してwolfProviderをビルドします |
+| WP_NO_DYNAMIC_PROVIDER |  wolfProviderをダイナミックエンジンとしてビルドしない。ダイナミックエンジンとは、OpenSSLが実行時に動的にロードするエンジンのことです。 |
 | WP_SINGLE_THREADED | wolfProviderをシングルスレッドモードでビルドする。このマクロ定義によりグローバルリソースの使用の排他用に内部的に使用するロック機構を取り除きます。|
 | WP_USE_HASH | ハッシュアルゴリズムを wc_Hash APIを使って有効にする |
 | WP_HAVE_SHA1   |  SHA-1 を有効にする |
@@ -238,30 +253,30 @@ wolfProvider は、ユーザーが wolfProvider の構築方法を設定でき�
 | WP_HAVE_SHA256 |  SHA-2 256を有効にする |
 | WP_HAVE_SHA384 |  SHA-2 384を有効にする |
 | WP_HAVE_SHA512 |  SHA-2 512を有効にする |
-| WP_SHA1_DIRECT | SHA-1 をwc_Sha APIを使って有効にする。WP_USE_HASHとはコンパチブルではない |
-| WP_SHA224_DIRECT |  SHA-2 224 を wc_Sha224 APIを使って有効にする。WP_USE_HASHとはコンパチブルではない |
-| WP_SHA256_DIRECT |  SHA-2 256 を wc_Sha256 APIを使って有効にする。WP_USE_HASHとはコンパチブルではない |
+| WP_SHA1_DIRECT | SHA-1 をwc_Sha APIを使って有効にする。WP_USE_HASHとは同時に指定できません。 |
+| WP_SHA224_DIRECT |  SHA-2 224 を wc_Sha224 APIを使って有効にする。WP_USE_HASHとは同時に指定できません。 |
+| WP_SHA256_DIRECT |  SHA-2 256 を wc_Sha256 APIを使って有効にする。WP_USE_HASHとは同時に指定できません。 |
 | WP_HAVE_SHA3_224 |  SHA-3  224を有効にする（OpenSSL 1.0.2では利用不可）|
 | WP_HAVE_SHA3_256 |  SHA-3  256を有効にする（OpenSSL 1.0.2では利用不可）|
 | WP_HAVE_SHA3_384 |  SHA-3  384を有効にする（OpenSSL 1.0.2では利用不可）|
 | WP_HAVE_SHA3_512 |  SHA-3  512を有効にする（OpenSSL 1.0.2では利用不可）|
 | WP_HAVE_EVP_PKEY | EVP_PKEY APIを使用する機能を有効にする（RSA, DH等も含む） |
-| WP_HAVE_CMAC |  CMAC を有効にする |
-| WP_HAVE_HMAC |  HMAC を有効にする |
-| WP_HAVE_DES3CBC |  DES3-CBC を有効にする |
-|WP_HAVE_AESECB |  AES-ECB を有効にする |
-| WP_HAVE_AESCBC |  AES-CBC を有効にする |
+| WP_HAVE_CMAC |  CMACを有効にする |
+| WP_HAVE_HMAC |  HMACを有効にする |
+| WP_HAVE_DES3CBC |  DES3-CBCを有効にする |
+| WP_HAVE_AESECB |  AES-ECBを有効にする |
+| WP_HAVE_AESCBC |  AES-CBCを有効にする |
 | WP_HAVE_AESCTR |  AES-countee modeを有効にする |
-| WP_HAVE_AESGCM |  AES-GCM を有効にする |
-| WP_HAVE_AESCCM | AES-CCM を有効にする |
-| WP_HAVE_RANDOM |  wolfCrypt の疑似乱数生成実装を有効にする |
-| WP_HAVE_RSA |  RSA 操作 (すなわち 署名, 検証, 鍵生成等)を有効にする |
-| WP_HAVE_DH |  Diffie-Hellman 操作 (すなわち 鍵生成, 共有シークレット計算等)を有効にする |
+| WP_HAVE_AESGCM |  AES-GCMを有効にする |
+| WP_HAVE_AESCCM | AES-CCMを有効にする |
+| WP_HAVE_RANDOM |  wolfCryptの疑似乱数生成実装を有効にする |
+| WP_HAVE_RSA |  RSA操作(署名、検証、鍵生成等)を有効にする |
+| WP_HAVE_DH |  Diffie-Hellman操作(鍵生成、共有シークレット計算等)を有効にする |
 | WP_HAVE_ECC |  楕円曲線暗号を有効にする |
 | WP_HAVE_EC_KEY | EC_KEY_METHODのサポートを有効にする（OpenSSL 1.0.2では利用不可） |
 | WP_HAVE_ECDSA |  ECDSA を有効にする |
-| WP_HAVE_ECDH |  EC Diffie-Hellman operationsを有効にする |
-| WP_HAVE_ECKEYGEN |  EC key generationを有効にする |
+| WP_HAVE_ECDH |  EC Diffie-Hellman操作を有効にする |
+| WP_HAVE_ECKEYGEN |  EC鍵生成を有効にする |
 | WP_HAVE_EC_P192 |  EC Curve P192を有効にする |
 | WP_HAVE_EC_P224 |  EC Curve P224を有効にする |
 | WP_HAVE_EC_P256 |  EC Curve P256を有効にする |

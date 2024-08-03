@@ -1,34 +1,38 @@
-# オープンソース統合に関する注意事項
+# その他のオープンソースソフトウェアとの統合に関する注意事項
 
-wolfProvider は、一般的な OpenSSL エンジン フレームワークとアーキテクチャに準拠しています。 そのため、OpenSSL を使用するアプリケーションから、OpenSSL 構成ファイルを介して、または PROVIDER API 呼び出しを介して他のエンジン実装と同様にwolfProviderをプログラムで利用することができます。
+wolfProviderは、一般的なOpenSSLエンジンフレームワークとアーキテクチャに準拠しています。
+そのため、OpenSSLを使用するアプリケーションからOpenSSL構成ファイルを介して、または`PROVIDER` API呼び出しを介して、他のエンジン実装と同様にwolfProviderをプログラムで利用できます。
 
-wolfSSL は、いくつかのオープン ソース プロジェクトで wolfProvider をテストしました。 この章には、wolfProvider 統合に関する注意事項とヒントが含まれています。 この章は、wolfProvider によるすべてのオープンソース プロジェクトのサポートを網羅しているわけではなく、wolfSSL またはコミュニティが追加のオープン ソース プロジェクトで wolfProvider をテストおよび使用することを報告するにつれて拡張されます。
-
-
+wolfSSLは、いくつかのオープンソースプロジェクトでwolfProviderをテストしました。
+この章には、wolfProviderとのインテグレーションに関する注意事項とヒントを示します。
+ただし、すべてのオープンソースプロジェクトを網羅しているわけではありません。
+今後も随時、wolfSSLまたはコミュニティが追加のオープンソースプロジェクトでwolfProviderの動作を確認し追記します。
 
 ## cURL
 
-cURL は、OpenSSL 構成ファイルを利用するように既にセットアップされています。 wolfProvider を利用するには:
+cURLはすでにOpenSSL構成ファイルを利用するようにセットアップされています。
+wolfProviderを利用するには、次のステップを実行してください。
 
-1. wolfProvider エンジン情報を OpenSSL 設定ファイルに追加します
-2. 必要に応じて、OPENSSL_CONF 環境変数が OpenSSL 構成ファイルを指すように設定します：
+1. wolfProviderエンジン情報をOpenSSL設定ファイルに追加します
+2. 必要に応じて、`OPENSSL_CONF`環境変数がOpenSSL設定ファイルを指すように設定します
 
 
 ```
 $ export OPENSSL_CONF=/path/to/openssl.cnf
 ```
-3. OPENSSL_PROVIDERS 環境変数を wolfProvider 共有ライブラリ ファイルの場所を指すように設定します:
+3. `OPENSSL_PROVIDERS` 環境変数をwolfProvider共有ライブラリファイルの場所を指すように設定します
 
 ```
 $ export OPENSSL_PROVIDERS=/path/to/wolfprovider/library/dir
 ```
 ## stunnel
 
-stunnel は wolfProvider でテストされています。 ノートは近日公開予定。
+stunnelはwolfProviderでテスト済みです。 詳細は追って更新いたします。
 
 ## OpenSSH
 
-OpenSSH は、`--with-ssl-provider` 構成オプションを使用して、OpenSSL エンジン サポートでコンパイルする必要があります。 必要に応じて、`--with-ssl-dir=DIR` を使用して、使用されている OpenSSL ライブラリのインストール場所を指定することもできます:
+OpenSSHは、`--with-ssl-provider`構成オプションを使用して、OpenSSLエンジンサポートでコンパイルする必要があります。
+必要に応じて`--with-ssl-dir=DIR`を使用して、使用されているOpenSSLライブラリのインストール場所を指定することもできます。
 
 ```
 $ cd openssh
@@ -38,8 +42,9 @@ $ make
 $ sudo make install
 ```
 
-OpenSSH には、wolfProvider を活用するための OpenSSL 構成ファイルのセットアップも必要です。 必要に応じて、OPENSSL_CONF 環境変数を構成ファイルを指すように設定できます。 OPENSSL_PROVIDERS 環境変数も、wolfProvider 共有ライブラリの場所に設定する必要があります:
-
+OpenSSHには、wolfProviderを活用するためのOpenSSL構成ファイルのセットアップも必要です。
+必要に応じて、`OPENSSL_CONF`環境変数を構成ファイルを指すように設定できます。 
+`OPENSSL_PROVIDERS`環境変数も、wolfProvider共有ライブラリの場所に設定する必要があります。
 
 ```
 $ export OPENSSL_CONF=/path/to/openssl.cnf
