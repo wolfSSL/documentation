@@ -168,7 +168,7 @@ non-secure callables (NSC).
 
 The example configuration for this scenario is available in `/config/examples/stm32l5-wolfcrypt-tz.config`.
 
-For more information, see [/docs/STM32-TZ.md](@@@need to change here@@@).
+For more information, see [Appendix L](appendix12.md).
 
 
 ### Scenario 3: Trustzone Disabled, using DUAL BANK
@@ -316,9 +316,9 @@ This option can be enabled with the `WOLFCRYPT_TZ=1` and `WOLFCRYPT_TZ_PKCS11=1`
 options in your configuration. This enables a PKCS11 accessible from NS domain via
 non-secure callables (NSC).
 
-The example configuration for this scenario is available in [/config/examples/stm32u5-wolfcrypt-tz.config](/config/examples/stm32u5-wolfcrypt-tz.config).
+The example configuration for this scenario is available in `/config/examples/stm32u5-wolfcrypt-tz.config`.
 
-For more information, see [/docs/STM32-TZ.md](/docs/STM32-TZ.md).
+For more information, see [Appendix L](appendix12.md).
 
 
 ### Scenario 3: TrustZone Disabled (DUAL BANK mode)
@@ -535,9 +535,9 @@ with RSA2048:
 
 ### Building STM32C0
 
-Reference configuration files (see [config/examples/stm32c0.config](/config/examples/stm32c0.config),
-[config/examples/stm32c0-rsa2048.config](/config/examples/stm32c0-rsa2048.config) and
-[config/examples/stm32c0-lms-8-10-1.config](/config/examples/stm32c0-lms-8-10-1.config)).
+Reference configuration files (see `config/examples/stm32c0.config`,
+`config/examples/stm32c0-rsa2048.config` and
+`config/examples/stm32c0-lms-8-10-1.config`).
 
 You can copy one of these to wolfBoot root as `.config`: `cp ./config/examples/stm32c0.config .config`.
 To build you can use `make`.
@@ -868,7 +868,7 @@ through different scenarios.
 Additionally, wolfBoot can be compiled with `FLASH_OTP_KEYSTORE` option, to store
 the public key(s) used for firmware authentication into a dedicated, one-time
 programmable flash area that can be write protected.
-For more information, see [/docs/flash-OTP.md](/docs/flash-OTP.md).
+For more information, see [Appendix C](appendix03.md).
 
 ### Scenario 1: TrustZone enabled, staging non-secure application
 
@@ -880,7 +880,7 @@ SRAM memories into two parts:
  - the first 256KB are used by wolfboot running in secure mode and the secure application
  - the remaining available space is used for non-secure application and update partition
 
-The example configuration for this scenario is available in [/config/examples/stm32h5.config](/config/examples/stm32h5.config).
+The example configuration for this scenario is available in `/config/examples/stm32h5.config`.
 
 #### How to use it
 
@@ -897,7 +897,7 @@ The example configuration for this scenario is available in [/config/examples/st
 - flash the application image to the non-secure partition:
 `STM32_Programmer_CLI -c port=swd -d test-app/image_v1_signed.bin 0x08040000`
 
-For a full list of all the option bytes tested with this configuration, refer to [STM32-TZ.md](/docs/STM32-TZ.md).
+For a full list of all the option bytes tested with this configuration, refer to [Appendix L](appendix12.md).
 
 ### Scenario 2: TrustZone Enabled, wolfCrypt as secure engine for NS applications
 
@@ -908,9 +908,9 @@ This option can be enabled with the `WOLFCRYPT_TZ=1` and `WOLFCRYPT_TZ_PKCS11=1`
 options in your configuration. This enables a PKCS11 accessible from NS domain via
 non-secure callables (NSC).
 
-The example configuration for this scenario is available in [/config/examples/stm32h5-tz.config](/config/examples/stm32h5-tz.config).
+The example configuration for this scenario is available in `/config/examples/stm32h5-tz.config`.
 
-For more information, see [/docs/STM32-TZ.md](/docs/STM32-TZ.md).
+For more information, see [Appendix L](appendix12.md).
 
 ### Scenario 3: DUALBANK mode
 
@@ -1366,7 +1366,7 @@ tested with MpLab IDE v. 6.20.
 The example application can be used to update the firmware over USB.
 
 More details about building the example projects can be found in the
-[IDE/MPLAB](/IDE/MPLAB) directory in this repository.
+`IDE/MPLAB` directory in this repository.
 
 
 ### Uploading the bootloader and the firmware image
@@ -1999,7 +1999,7 @@ c
 
 ## TI Hercules TMS570LC435
 
-See [/config/examples/ti-tms570lc435.config](/config/examples/ti-tms570lc435.config) for example configuration.
+See `/config/examples/ti-tms570lc435.config` for example configuration.
 
 
 
@@ -2166,7 +2166,7 @@ With RX GCC path or or custom cross compiler directly:
 OR
 `make RX_GCC_PATH="~/toolchains/gcc_8.3.0.202311_rx_elf"`
 
-TSIP: To enable TSIP use `make PKA=1`. See [docs/Renesas.md](docs/Renesas.md) for details.
+TSIP: To enable TSIP use `make PKA=1`. See [Appendix J](appendix10.md) for details.
 
 ### Flashing Renesas RX65N
 
@@ -2202,7 +2202,7 @@ Create a new "Renesas Debug" project. Choose the "E2 Lite" emulator and the buil
 
 Tested on the RX72N ENVISION KIT (HMI development kit for IoT systems). This includes an onboard E2 Lite emulator.
 
-The Renesas RX72N is supported either natively with "make" or through e2Studio. If using e2Studio see [Readme.md](../IDE/Renesas/e2studio/RX72N/Readme.md).
+The Renesas RX72N is supported either natively with "make" or through e2Studio. If using e2Studio see `/IDE/Renesas/e2studio/RX72N/Readme.md`.
 
 Default UART Serial on SCI2 at P12-RXD2 P13-TXD2. Use USB on CN8 to attach a Virtual USB COM port. This feaure is enabled with `DEBUG_UART=1`.
 
@@ -2280,7 +2280,7 @@ OR
 `make RX_GCC_PATH="~/toolchains/gcc_8.3.0.202311_rx_elf"`
 
 
-TSIP: To enable TSIP use `make PKA=1`. See [docs/Renesas.md](@@@need to change here@@@) for details.
+TSIP: To enable TSIP use `make PKA=1`. See [Appendix J](appendix10.md) for details.
 
 ### Flashing Renesas RX72N
 
@@ -2747,7 +2747,7 @@ IMAGE=test-app/image.elf SIGN=--ecc384 tools/scripts/x86_fsp/qemu/make_hd.sh
 ./tools/scripts/x86_fsp/qemu/qemu.sh -t
 ```
 
-For more advanced uses of TPM, please check [TPM.md](@@@need to change here@@@) to configure wolfBoot
+For more advanced uses of TPM, please check [Appendix M](appendix13.md) to configure wolfBoot
 according to your secure boot strategy.
 
 ### Running on Kontron VX3060-S2

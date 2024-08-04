@@ -61,7 +61,7 @@ The files generate by the keygen tool is the following:
 - A binary file `keystore.img` that can be used to provision the public keys through an alternative storage
 - The private key, for each `-g` option provided from command line
 
-For more information about the keystore mechanism, see [keystore.md](@@@need to change here@@@).
+For more information about the keystore mechanism, see [Appendix D](appendix04.md).
 
 
 ### Sign tool
@@ -283,4 +283,4 @@ tools/bin-assemble/bin-assemble factory.bin 0x0 wolfboot.bin \
 
 ### Signing Firmware with Azure Key Vault
 
-See [docs/azure_keyvault.md](@@@need to change here@@@).
+See [Appendix B](appendix02.md).

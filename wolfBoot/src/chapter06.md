@@ -440,7 +440,7 @@ The custom fields are identified by a 16-bit tag, and their size is indicated by
 
 At runtime, the values stored in the manifest header can be accessed using the `wolfBoot_find_header` function.
 
-The syntax for `--custom-tlv` option is also documented in [docs/Signing.md](@@@need to change here@@@/docs/Signing.md#adding-custom-fields-to-the-manifest-header).
+The syntax for `--custom-tlv` option is also documented in [Appendix H](appendix08.md).
 
 #### Image header: Example
 
@@ -635,7 +635,7 @@ Consider implementing these three functions based on the provided examples if yo
 
 On the remote system hosting the external partition image for the target, a simple protocol can be implemented on top of UART messages to serve flash-access specific calls.
 
-An example uart-flash-server daemon, designed to run on a GNU/Linux host and emulate the external partition with a local file on the filesystem, is available in [tools/uart-flash-server](tools/uart-flash-server).
+An example uart-flash-server daemon, designed to run on a GNU/Linux host and emulate the external partition with a local file on the filesystem, is available in `tools/uart-flash-server`.
 
 
 ### External flash update mechanism

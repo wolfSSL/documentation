@@ -3,17 +3,17 @@
 Platforms Supported:
 
 - Renesas RZ (RZN2L) (RSIP)
-    - [docs/Targets.md#renesas-rzn2l](/docs/Targets.md#renesas-rzn2l)
-    - [IDE/Renesas/e2studio/RZN2L/Readme.md](/IDE/Renesas/e2studio/RZN2L/Readme.md)
-    - [IDE/Renesas/e2studio/RZN2L/Readme_wRSIP.md](/IDE/Renesas/e2studio/RZN2L/Readme_wRSIP.md)
+    - [chapter03.md#renesas-rzn2l](chapter03.md#renesas-rzn2l)
+    - IDE/Renesas/e2studio/RZN2L/Readme.md
+    - IDE/Renesas/e2studio/RZN2L/Readme_wRSIP.md
 - Renesas RA (RA6M4) (SCE)
-    - [docs/Targets.md#renesas-ra6m4](/docs/Targets.md#renesas-ra6m4)
-    - [IDE/Renesas/e2studio/RA6M4/Readme.md](/IDE/Renesas/e2studio/RA6M4/Readme.md)
-    - [IDE/Renesas/e2studio/RA6M4/Readme_withSCE.md](/IDE/Renesas/e2studio/RA6M4/Readme_withSCE.md)
+    - [chapter03.md#renesas-ra6m4](chapter03.md#renesas-ra6m4)
+    - IDE/Renesas/e2studio/RA6M4/Readme.md
+    - IDE/Renesas/e2studio/RA6M4/Readme_withSCE.md
 - Renesas RX (RX65N/RX72N) (TSIP)
-    - [docs/Targets.md#renesas-rx72n](/docs/Targets.md#renesas-rx72n)
-    - [IDE/Renesas/e2studio/RX72N/Readme.md](/IDE/Renesas/e2studio/RX72N/Readme.md)
-    - [IDE/Renesas/e2studio/RX72N/Readme_withTSIP.md](/IDE/Renesas/e2studio/RX72N/Readme_withTSIP.md)
+    - [chapter03.md#renesas-rx72n](chapter03.md#renesas-rx72n)
+    - IDE/Renesas/e2studio/RX72N/Readme.md
+    - IDE/Renesas/e2studio/RX72N/Readme_withTSIP.md
 
 All of the Renesas examples support using e2Studio.
 The Renesas RX parts support using wolfBoot Makefile's with the rx-elf-gcc cross-compiler and example .config files.

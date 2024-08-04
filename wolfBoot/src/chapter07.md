@@ -9,7 +9,7 @@
    - Equip the application with the [wolfBoot library](chapter06.md#application-interface-for-interactions-with-the-bootloader) to interact with the bootloader
    - [Configure and compile](chapter02.md#compiling-wolfboot) a bootable image with a single "make" command
    - For help signing firmware see [wolfBoot Signing](chapter06.md#signing)
-   - For enabling measured boot see [wolfBoot measured boot](chapter06.md#measured-boot)
+   - For enabling measured boot see [wolfBoot measured boot](chapter06.md)
 
 ## Examples provided
 
@@ -28,7 +28,7 @@ The factory image can be flashed to the target device. It contains the bootloade
 
 The `sign.py` tool transforms a bootable firmware image to comply with the firmware image format required by the bootloader.
 
-For detailed information about the firmware image format, see [Firmware image](chapter06.md#firmware-image)
+For detailed information about the firmware image format, see [Firmware image](chapter06.md)
 
 For detailed information about the configuration options for the target system, see [Compiling wolfBoot](chapter02.md#compiling-wolfboot)
 

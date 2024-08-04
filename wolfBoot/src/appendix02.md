@@ -30,7 +30,7 @@ the keystore.
 ## Signing the firmware image for wolfBoot
 
 The signing operation using any external HSM is performed through three-steps,
-as described in the relevant section in [Signing.md](signing.md).
+as described in the relevant section in [Appendix B](appendix02.md).
 In this section we describe the procedure to sign the firmware image using Azure key vault.
 
 
