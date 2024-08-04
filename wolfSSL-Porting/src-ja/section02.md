@@ -157,9 +157,7 @@ FastMathを有効にするには、USE_FAST_MATHを定義し ./wolfcrypt/src/int
 
 標準のmalloc（）、free（）を、およびreallocの（）関数が利用できない場合、XMALLOC_USERを定義します。これによりターゲット環境依存のカスタムフックを　 ./wolfssl/wolfcrypt/types.h内に定義することができます。
 
-XMALLOC_USERの使用方法の詳細については、wolfSSLマニュアルのセクション5.1.1.1を参照してください。
-
-https://wolfssl.com/wolfSSL/Docs-wolfssl-manual-5-portability.html
+XMALLOC_USERの使用方法の詳細については、wolfSSLマニュアルの[5.1.1.1節](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter05.html#_3)を参照してください。
 
 ## 時計　　　　　　
 
@@ -179,11 +177,10 @@ A：C標準ライブラリがない場合、またはカスタムライブラリ
 
 wolfSSLは、C標準ライブラリを使用しなくても、開発者がより高いレベルの移植性と柔軟性を得ることができます。そのようなとき、ユーザーはC標準のものの代わりに使用したい機能をマップする必要があります。
 
-上のセクション2.8では、メモリ機能について説明しました。メモリ関数の抽象化に加えて、wolfSSLは文字列関数と数学関数も抽象化します。それぞれの関数は抽象化される関数の名前に対応してX<FUNC>の形で定義されます。
+上の2.8節では、メモリ機能について説明しました。メモリ関数の抽象化に加えて、wolfSSLは文字列関数と数学関数も抽象化します。それぞれの関数は抽象化される関数の名前に対応してX<FUNC>の形で定義されます。
 
-詳細については、wolfSSLマニュアルのセクション5.1をお読みください。
+詳細については、wolfSSLマニュアルの[5.1節](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter05.html#_2)をお読みください。
 
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-5-portability.html
 
 ## ロギング
 Q：どういう場合このセクションが必要ですか？<br>
@@ -193,9 +190,7 @@ A：デバッグメッセージを有効にしたいが、stderrは使用でき�
 
 stdderが利用できない環境や、デバッグメッセージを別の出力ストリームや別の形式で出力したい場合、wolfSSLではアプリケーションはロギングコールバックに登録できます。
 
-詳細については、wolfSSLマニュアルの第8.1節をお読みください。
-
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-8-debugging.html
+詳細については、wolfSSLマニュアルの[8.1節](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter08.html#_2)をお読みください。
 
 ## 公開鍵演算
 
@@ -212,9 +207,7 @@ wolfSSLを使用すると、SSL / TLS層が公開鍵操作を行う必要があ�
 - RSA暗号化コールバック
 - RSA復号化コールバック
 
-詳細は、wolfSSLマニュアルのセクション6.4を参照してください。
-
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-6-callbacks.html
+詳細は、wolfSSLマニュアルの[6.4節](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter06.html#_5)を参照してください。
 
 ## アトミックレコード層処理
 
@@ -228,15 +221,11 @@ A：TLSレコード層の独自の処理、特にMAC /暗号化と解読/検証�
 MAC /暗号化コールバック関数
 コールバック関数の復号化/検証
 
-詳細は、wolfSSLマニュアルのセクション6.3を参照してください。
-
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-6-callbacks.html
+詳細は、wolfSSLマニュアルの[6.3節](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter06.html#_4)を参照してください。
 
 ## 機能
 
 Q：どういう場合このセクションが必要ですか？<br>
 A：機能を無効にする場合。
 
-適切な定義を使用してwolfSSLをビルドするとき、機能を無効にすることができます。利用可能な定義のリストについては、wolfSSL Manualの第2章を参照してください。
-
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-2-building-wolfssl.html
+適切な定義を使用してwolfSSLをビルドするとき、機能を無効にすることができます。利用可能な定義のリストについては、wolfSSLマニュアルの[2章](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter02.html)を参照してください。
