@@ -222,7 +222,7 @@ Note: if you are using an external FLASH (e.g. SPI) in combination with a flash 
 ### Using One-time programmable (OTP) flash as keystore
 
 By default, keys are directly incorporated in the firmware image. To store the keys in a separate, one-time programmable (OTP) flash memory, use the `FLASH_OTP_KEYSTORE=1` option.
-For more information, see [/docs/OTP-keystore.md](@@@need to change here@@@).
+For more information, see [Appendix C](appendix03.md).
 
 ### Prefer multi-sector flash erase operations
 
