@@ -371,29 +371,41 @@ MEASURED_PCR_A?=16
 
 wolfBoot offers out-of-the-box solution. There is zero need of the developer to touch wolfBoot code in order to use measured boot. If you would want to check the code, then look in `src/image.c` and more specifically the `measure_boot()` function. There you would find several TPM2 native API calls to wolfTPM. For more information about wolfTPM you can check its GitHub repository.
 
-
 ## Firmware image
 
 ### Firmware entry point
 
-WolfBoot can only chain-load and execute firmware images from a specific entry point in memory, which must be specified as the origin of the FLASH memory in the linker script of the embedded application. This corresponds to the first partition in the flash memory.
+WolfBoot can only chain-load and execute firmware images from a specific entry point in memory,
+which must be specified as the origin of the FLASH memory in the linker script of the embedded
+application. This corresponds to the first partition in the flash memory.
 
-Multiple firmware images can be created this way, and stored in two different partitions. The bootloader will take care of moving the selected firmware to the first (BOOT) partition before chain-loading the image.
+Multiple firmware images can be created this way, and stored in two different partitions. The bootloader
+will take care of moving the selected firmware to the first (BOOT) partition before chain-loading the image.
 
-Due to the presence of an image header, the entry point of the application has a fixed additional offset of 256B from the beginning of the flash partition.
+Due to the presence of an image header, the entry point of the application has a fixed additional offset
+of 256B from the beginning of the flash partition.
 
 ### Firmware image header
 
-Each (signed) firmware image is pre-pended with a fixed-size **image header**, containing useful information about the firmware. The **image header** is padded to fit in 256B, in order to guarantee that the entry point of the actual firmware is stored on the flash starting from a 256-Bytes aligned address. This ensures that the bootloader can relocate the vector table before
-chain-loading the firmware the interrupt continue to work properly after the boot is complete.
+Each (signed) firmware image is prepended with a fixed-size **image header**, containing useful information about the
+firmware. The exact size of the **image header** depends on the size of the image digest and signature, which depend on
+the algorithms/key sizes used. Larger key sizes will result in a larger image header. The size of the image header is
+determined by the build system and provided to the application code in the `IMAGE_HEADER_SIZE` macro. The size of the generated
+image header is also output by the keytools during the signing operation. The **image header** data is padded out to the next
+multiple of 256B, in order to guarantee that the entry point of the actual firmware is stored on the flash starting from a
+256-Bytes aligned address. This ensures that the bootloader can relocate the vector table before chain-loading the firmware
+so interrupts continue to work properly after the boot is complete. When porting wolfBoot to a platform that doesn't use wolfBoot's
+Makefile-based build system, extra care should be taken to ensure `IMAGE_HEADER_SIZE` is set to a value that matches the output of
+the wolfBoot `sign` key tool.
 
 ![Image header](png/image_header.png)
 
-*The image header is stored at the beginning of the slot and the actual firmware image starts 256 Bytes after it*
+*The image header is stored at the beginning of the slot and the actual firmware image starts `IMAGE_HEADER_SIZE` Bytes after it*
 
 #### Image header: Tags
 
-The **image header** is prepended with a single 4-byte magic number, followed by a 4-byte field indicating the firmware image (excluding the header). All numbers in the header are stored in Little-endian format.
+The **image header** is prepended with a single 4-byte magic number, followed by a 4-byte field indicating the
+firmware image size (excluding the header). All numbers in the header are stored in Little-endian format.
 
 The two fixed fields are followed by one or more tags. Each TAG is structured as follows:
 
@@ -402,21 +414,68 @@ The two fixed fields are followed by one or more tags. Each TAG is structured as
   - ***N*** bytes of tag content
 
 With the following exception:
-  - A '0xFF' in the Type field indicate a simple padding byte. The 'padding' byte has no **size** field, and the next byte should be processed as **Type** again.  Each **Type** has a different meaning, and integrate information about the firmware. The following Tags are mandatory for validating the firmware image:
+  - A '0xFF' in the Type field indicate a simple padding byte. The 'padding' byte has no **size** field, and the next byte should be processed as **Type** again.
+
+Each **Type** has a different meaning, and integrate information about the firmware. The following Tags are mandatory for validating the firmware image:
   - A 'version' Tag (type: 0x0001, size: 4 Bytes) indicating the version number for the firmware stored in the image
   - A 'timestamp' Tag (type: 0x0002, size 8 Bytes) indicating the timestamp in unix seconds for the creation of the firmware
-  - A 'sha256 digest' Tag (type: 0x0003, size: 32 Bytes) used for integrity check of the firmware
+  - A 'sha digest' Tag (type: 0x0003, size: digest size (32 Bytes for SHA256)) used for integrity check of the firmware
   - A 'firmware signature' Tag (type: 0x0020, size: 64 Bytes) used to validate the signature stored with the firmware against a known public key
   - A 'firmware type' Tag (type: 0x0030, size: 2 Bytes) used to identify the type of firmware, and the authentication mechanism in use.
 
-Optionally, a 'public key hint digest' Tag can be transmitted in the header (type: 0x10, size:32 Bytes). This Tag contains the SHA256 digest of the public key used by the signing tool. The bootloader may use this field to locate the correct public key in case of multiple keys available.
+A 'public key hint digest' tag is transmitted in the header (type: 0x10, size:32 Bytes). This tag contains the SHA digest of the public key used
+by the signing tool. The bootloader may use this field to locate the correct public key in case of multiple keys available.
 
 wolfBoot will, in all cases, refuse to boot an image that cannot be verified and authenticated using the built-in digital signature authentication mechanism.
 
 
-#### Image signing tool
+#### Adding custom fields to the manifest header
 
-The image signing tool generates the header with all the required Tags for the compiled image, and add them to the output file that can be then stored on the primary slot on the device, or transmitted later to the device through a secure channel to initiate an update.
+It is possible to add custom fields to the manifest header, by using the `--custom-tlv` option in the signing tool.
+
+In order for the fields to be secured (checked by wolfBoot for integrity and authenticity),
+their value is placed in the manifest header before the signature is calculated. The signing tool takes care of the alignment and padding of the fields.
+
+The custom fields are identified by a 16-bit tag, and their size is indicated by a 16-bit length field. The tag and length fields are stored in little-endian format.
+
+At runtime, the values stored in the manifest header can be accessed using the `wolfBoot_find_header` function.
+
+The syntax for `--custom-tlv` option is also documented in [docs/Signing.md](@@@need to change here@@@/docs/Signing.md#adding-custom-fields-to-the-manifest-header).
+
+#### Image header: Example
+
+This example adds a custom field when the signing tool is used to sign the firmware image:
+
+```bash
+./tools/keytools/sign --ed25519 --custom-tlv 0x34 4 0xAABBCCDD test-app/image.bin wolfboot_signing_private_key.der 4
+```
+
+The output image `test-app/image_v4_signed.bin` will contain the custom field with tag `0x34` with length `4` and value `0xAABBCCDD`.
+
+From the bootloader code, we can then retrieve the value of the custom field using the `wolfBoot_find_header` function:
+
+```c
+uint32_t value;
+uint8_t* ptr = NULL;
+uint16_t tlv = 0x34;
+uint8_t* imageHdr = (uint8_t*)WOLFBOOT_PARTITION_BOOT_ADDRESS + IMAGE_HEADER_OFFSET;
+uint16_t size = wolfBoot_find_header(imageHdr, tlv, &ptr);
+if (size > 0 && ptr != NULL) {
+  /* Found field and ptr points to value 0xAABBCCDD */
+  memcpy(&value, ptr, size);
+  printf("TLV 0x%x=0x%x\n", tlv, value);
+}
+else {
+    /* Error: the field is not found */
+}
+```
+
+### Image signing tool
+
+The image signing tool generates the header with all the required Tags for the compiled image, and add them to the output file that can be then
+stored on the primary slot on the device, or transmitted later to the device through a secure channel to initiate an update.
+
+
 
 #### Storing firmware image
 
@@ -448,7 +507,7 @@ Applications or OS threads can be linked to the [libwolfboot library](#applicati
 
 ### Update procedure description
 
-Using the [API](#application-interface-for-interactions-with-the-bootloader) provided to the application, wolfBoot offers the possibility to initiate, confirm or  rollback an update.
+Using the [API](#application-interface-for-interactions-with-the-bootloader) provided to the application, wolfBoot offers the possibility to initiate, confirm or rollback an update.
 
 After storing the new firmware image in the UPDATE partition, the application should initiate the update by calling `wolfBoot_update_trigger()`. By doing so, the UPDATE partition is marked for update. Upon the next reboot, wolfBoot will:
   - Validate the new firmware image stored in the UPDATE partition
@@ -529,11 +588,11 @@ Requirement: wolfBoot is compiled with `DELTA_UPDATES=1`
 
 Version "1" is signed as usual, as a standalone image:
 
-`tools/keytools/sign.py --ecc256 --sha256 test-app/image.bin wolfboot_signing_private_key.der 1`
+`tools/keytools/sign --ecc256 --sha256 test-app/image.bin wolfboot_signing_private_key.der 1`
 
 When updating from version 1 to version 2, you can invoke the sign tool as:
 
-`tools/keytools/sign.py --delta test-app/image_v1_signed.bin --ecc256 --sha256 test-app/image.bin wolfboot_signing_private_key.der 2`
+`tools/keytools/sign --delta test-app/image_v1_signed.bin --ecc256 --sha256 test-app/image.bin wolfboot_signing_private_key.der 2`
 
 Besides the usual output file `image_v2_signed.bin`, the sign tool creates an additional `image_v2_signed_diff.bin` which should be noticeably smaller in size as long as the two binary files contain overlapping areas.
 
@@ -597,7 +656,9 @@ All write calls to external partitions from the bootloader perform an additional
 
 Viceversa, all read operations will decrypt the data stored when the feature is enabled.
 
-An extra option is provided to the `sign.py` sign tool to encrypt the firmware update after signing it, so that it can be stored as is in the external memory by the application, and will be decrypted by the bootloader in order to verify the update and begin the installation.
+An extra option is provided to the `sign` tool to encrypt the firmware update after signing it, so
+that it can be stored as is in the external memory by the application, and will be decrypted by the bootloader
+in order to verify the update and begin the installation.
 
 
 ### Temporary key storage
@@ -627,24 +688,28 @@ Moreover, using `libwolfboot` to access the external flash with wolfboot hal fro
 
 ### Symmetric encryption algorithms
 
-Encryption can be enabled in wolfBoot using `ENCRYPT=1`.
-
-The default algorithm used to encrypt and decrypt data in external partitions is Chacha20-256.
-AES-128 and AES-256 options are also available and can be selected using  `ENCRYPT_WITH_AES128=1` or `ENCRYPT_WITH_AES256=1`
-
-### Chacha20-256
-
-
-When ChaCha20 is selected:
+The default algorithm used to encrypt and decrypt data in external partitions
+is Chacha20-256.
 
  - The `key` provided to `wolfBoot_set_encrypt_key()` must be exactly 32 Bytes long.
  - The `nonce` argument must be a 96-bit (12 Bytes) randomly generated buffer, to be used as IV for encryption and decryption.
 
+AES-128 and AES-256 are also supported. AES is used in counter mode. AES-128 and AES-256 have a key length of 16 and 32 bytes
+respectively, and the IV size is 16 bytes long in both cases.
 
-#### Example usage with ChaCha20-256
+### Example usage
+
+To compile wolfBoot with encryption support, use the option `ENCRYPT=1`.
+
+By default, this also selects `ENCRYPT_WITH_CHACHA=1`. To use AES encryption instead,
+select `ENCRYPT_WITH_AES128=1` or `ENCRYPT_WITH_AES256=1`.
 
 
-The `sign.py` tool can sign and encrypt the image with a single command. The encryption secret is provided in a binary file that should contain a concatenation of a 32B ChaCha-256 key and a 12B nonce.
+### Signing and encrypting the update bundle with ChaCha20-256
+
+The `sign` tool can sign and encrypt the image with a single command.
+In case of chacha20, the encryption secret is provided in a binary file that should contain a concatenation of
+a 32B ChaCha-256 key and a 12B nonce.
 
 In the examples provided, the test application uses the following parameters:
 
@@ -659,7 +724,7 @@ So it is easy to prepare the encryption secret in the test scripts or from the c
 echo -n "0123456789abcdef0123456789abcdef0123456789ab" > enc_key.der
 ```
 
-The `sign.py` script can now be invoked to produce a signed+encrypted image, by using the extra argument `--encrypt` followed by the
+The `sign` tool can now be invoked to produce a signed+encrypted image, by using the extra argument `--encrypt` followed by the
 secret file:
 
 ```
@@ -668,16 +733,7 @@ secret file:
 
 which will produce as output the file `test-app/image_v24_signed_and_encrypted.bin`, that can be transferred to the target's external device.
 
-### AES-CTR
-
-
-AES is used in CTR mode. When AES is selected:
- - The `key` provided to `wolfBoot_set_encrypt_key()` must be 16 Bytes (AES128) or 32 Bytes (AES256) long.
- - The `nonce` argument is a 128-bit (16 Byyes) randomly generated buffer, used as initial counter for encryption and decryption.
-
-
-#### Example usage with AES-256
-
+### Signing and encrypting the update bundle with AES-256
 
 In case of AES-256, the encryption secret is provided in a binary file that should contain a concatenation of
 a 32B key and a 16B IV.
@@ -695,16 +751,61 @@ So it is easy to prepare the encryption secret in the test scripts or from the c
 echo -n "0123456789abcdef0123456789abcdef0123456789abcdef" > enc_key.der
 ```
 
-The `sign.py` script can now be invoked to produce a signed+encrypted image, by using the extra argument `--encrypt` followed by the
+The `sign` tool can now be invoked to produce a signed+encrypted image, by using the extra argument `--encrypt` followed by the
 secret file. To select AES-256, use the `--aes256` option.
 
 ```
-./tools/keytools/sign.py --aes256 --encrypt enc_key.der test-app/image.bin wolfboot_signing_private_key.der 24
+./tools/keytools/sign --aes256 --encrypt enc_key.der test-app/image.bin wolfboot_signing_private_key.der 24
 
 ```
 
 which will produce as output the file `test-app/image_v24_signed_and_encrypted.bin`, that can be transferred to the target's external device.
 
+### Encryption of incremental (delta) updates
+
+When used in combination with delta updates, encryption works the same way as in full-update mode. The final delta image is encrypted with the selected algorithm.
+
+
+### Encryption of self-updates
+
+When used in combination with bootloader 'self' updates, the encryption algorithm must be configured to run from RAM.
+
+This is done by changing the linker script for the target. At the moment the feature has been successfully tested
+with the ChaCha algorithm.
+
+The `.text` and `.rodata` segments in FLASH must be updated to not include symbols to be loaded in memory, so the following lines in the .text section:
+
+```
+        *(.text*)
+        *(.rodata*)
+
+
+```
+
+
+Must be replaced with:
+
+```
+        *(EXCLUDE_FILE(*chacha.o).text*)
+        *(EXCLUDE_FILE(*chacha.o).rodata*)
+```
+
+
+Similarly, the .data section loaded in RAM should contain all the .text and .rodata also coming
+from the symbols of the encryption algorithm. The .data section should have the following added,
+after           `KEEP(*(.ramcode))`:
+
+```
+        KEEP(*(.text.wc_Chacha*))
+        KEEP(*(.text.rotlFixed*))
+        KEEP(*(.rodata.sigma))
+        KEEP(*(.rodata.tau))
+```
+
+The combination of encryption + self update has been successfully tested on STM32L0.
+When using makefile based build, a different linker script `hal/$(TARGET)_chacha_ram.ld` is used
+as template. The file `hal/stm32l0_chacha_ram.ld` contains the changes described above to place
+all the needed symbols in RAM.
 
 
 ### API usage in the application
