@@ -68,19 +68,14 @@ By default, wolfBoot is compiled to use Ed25519 DSA. The implementation of ed255
 
 Better performance can be achieved using ECDSA with curve p-256. To activate ECC256 support, use
 
-`SIGN=ECC256`
+`SIGN=ECC256` or `SIGN=ECC384` or `SIGN=ECC521` respectively.
 
 when invoking `make`.
 
-RSA is also supported, with different key length. To activate RSA2048 or RSA4096, use:
+RSA is also supported, with different key length.
+To activate RSA2048, RSA3072 or RSA4096, use:
 
-`SIGN=RSA2048`
-
-or
-
-`SIGN=RSA4096`
-
-respectively.
+`SIGN=RSA2048` or `SIGN=RSA3072` or `SIGN=RSA4096` respectively.
 
 Ed448 is also supported via `SIGN=ED448`.
 
@@ -124,6 +119,15 @@ Some targets offer limited amount of RAM to use as stack space, either in genera
 
 In these cases, it might be useful to activate `WOLFBOOT_SMALL_STACK=1`. With this option, a fixed-size pool is created at compile time to assist the allocation of the object needed by the cryptography implementation. When compiled with `WOLFBOOT_SMALL_STACK=1`, wolfBoot reduces the stack usage considerably, and simulates dynamic memory allocations by assigning dedicated, statically allocated, pre-sized memory areas.
 
+### Allow bigger stack size allocation
+
+Some combinations of authentication algorithms, key sizes and math configuration in wolfCrypt require
+a large amount of memory to be allocated in the stack at runtime. By default, if your configuration
+falls in one of these cases, wolfBoot compilation will terminate with an explicit error.
+
+In some cases you might have enough memory available to allow large stack allocations.
+To circumvent the compile-time checks on the maximum allowed stack size, use `WOLFBOOT_HUGE_STACK=1`.
+
 ### Disable Backup of current running firmware
 
 Optionally, it is possible to disable the backup copy of the current running firmware upon the installation of the update. This implies that no fall-back mechanism is protecting the target from a faulty firmware installation, but may be useful in some cases where it is not possible to write on the update partition from the bootloader. The associated compile-time option is
@@ -153,6 +157,15 @@ WolfBoot can be compiled with the makefile option `EXT_FLASH=1`. When the extern
 If the `NO_XIP=1` makefile option is present, `PART_BOOT_EXT` is assumed too, as no execute-in-place is available on the system. This is typically the case of MMU system (e.g. Cortex-A) where the operating system image(s) are position-independent ELF images stored in a non-executable non-volatile memory, and must be copied in RAM to boot after verification.
 
 When external memory is used, the HAL API must be extended to define methods to access the custom memory. Refer to the [HAL](chapter04.md#hardware-abstraction-layer) chapter for the description of the `ext_flash_*` API.
+
+The `EXT_FLASH` option can also be used if the target device requires special handling for flash reads
+(e.g. word size requirements or other restrictions), regardless of whether the flash is internal or external.
+
+Note that the `EXT_FLASH` option is incompatible with the `NVM_FLASH_WRITEONCE` option. Targets that need
+both these options must implement the sector-based read-modify-erase-write sequence at the HAL layer.
+
+For an example of using `EXT_FLASH` to bypass read restrictions, (in this case, the inability to read from
+erased flash due to ECC errors) on a platform with write-once flash, see the infineon tricore port(`hal/aurix_tc3xx.c`).
 
 #### SPI devices
 
@@ -194,13 +207,29 @@ In some cases it might be helpful to store the status flags related to the UPDAT
 
 While on one hand this option slightly reduces the space available in the BOOT partition to store the firmware image, it keeps all the flags in the BOOT partition.
 
-### Invert logic of flags
-By default, most NVMs set the content of erased pages to `0xFF` (all ones).  Some FLASH memory models use inverted logic for erased page, setting the content to `0x00` (all zeroes) after erase. For these special cases, the option `FLAGS_INVERT = 1` can be used to modify the logic of the partition/sector flags used in wolfBoot.
+### Flash Erase value / Flag logic inversion
+
+By default, most NVMs set the content of erased pages to `0xFF` (all ones).
+
+Some FLASH memory models use inverted logic for erased page, setting the content to `0x00` (all zeroes) after erase.
+
+For these special cases, the option `FLAGS_INVERT = 1` can be used to modify the logic of the partition/sector flags used in wolfBoot.
+
+You can also manually override the fill bytes using `FILL_BYTE=` at build-time. It default to `0xFF`, but will use `0x00` if `FLAGS_INVERT` is set.
 
 Note: if you are using an external FLASH (e.g. SPI) in combination with a flash with inverted logic, ensure that you store all the flags in one partition, by using the `FLAGS_HOME=1` option described above.
 
+### Using One-time programmable (OTP) flash as keystore
 
+By default, keys are directly incorporated in the firmware image. To store the keys in a separate, one-time programmable (OTP) flash memory, use the `FLASH_OTP_KEYSTORE=1` option.
+For more information, see [/docs/OTP-keystore.md](@@@need to change here@@@).
 
+### Prefer multi-sector flash erase operations
+
+wolfBoot HAL flash erase function must be able to handle erase lengths larger than `WOLFBOOT_SECTOR_SIZE`, even if the underlying flash controller does not. However, in some cases, wolfBoot defaults to
+iterating over a range of flash sectors and erasing them one at a time. Setting the `FLASH_MULTI_SECTOR_ERASE=1` config option prevents this behavior when possible, configuring wolfBoot to instead prefer a
+single HAL flash erase invocation with a larger erase length versus the iterative approach. On targets where multi-sector erases are more performant, this option can be used to dramatically speed up the
+image swap procedure.
 ### Using Mac OS/X
 
 If you see 0xC3 0xBF (C3BF) repeated in your factory.bin then your OS is using Unicode characters.
@@ -220,10 +249,3 @@ LC_ALL=
 ```
 
 Then run the normal `make` steps.
-
-### Enabling mitigations against glitches and fault injections
-
-One type of attacks against secure boot mechanisms consists in skipping the execution of authentication and validation steps by injecting faults into the CPU through forced voltage or clock anomalies, or electromagnetic interferences at close range.
-
-Extra protection from specific attacks aimed to skip CPU instructions can be enabled using `ARMOR=1`. This feature is currently only available for ARM Cortex-M targets.
-
