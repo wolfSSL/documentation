@@ -2,7 +2,7 @@ site_name: wolfBoot Manual
 site_url: https://wolfssl.com/
 docs_dir: build/html/
 site_dir: html/
-copyright: wolfSSL Inc. 2021
+copyright: wolfSSL Inc. 2024
 nav:
     - "1. Introduction": index.md
     - "2. Compiling wolfBoot": chapter02.md
@@ -12,6 +12,19 @@ nav:
     - "6. wolfBoot Features": chapter06.md
     - "7. Integrating wolfBoot in an existing project": chapter07.md
     - "8. Troubleshooting": chapter08.md
+    - "A. ATA Security": appendix01.md
+    - "B. Signing firmware using Microsoft Azure Key Vault": appendix02.md
+    - "C. Using One-Time Programmable (OTP) flash area for keystore": appendix03.md
+    - "D. KeyStore structure: support for multiple public keys": appendix04.md
+    - "E. Build wolfBoot as Library": appendix05.md
+    - "F. wolfBoot Loaders / Updaters": appendix06.md
+    - "G. Measured Boot using wolfBoot": appendix07.md
+    - "H. Post-Quantum Signatures": appendix08.md
+    - "I. Remote External flash memory support via UART": appendix09.md
+    - "J. Renesas wolfBoot": appendix10.md
+    - "K. wolfBoot Key Tools": appendix11.md
+    - "L. wolfCrypt in TrustZone-M secure domain": appendix12.md
+    - "M. wolfBoot TPM support": appendix13.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material

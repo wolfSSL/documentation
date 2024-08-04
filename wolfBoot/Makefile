@@ -11,6 +11,19 @@ SOURCES = chapter01.md \
           chapter06.md \
           chapter07.md \
           chapter08.md 
+APPENDIX= appendix01.md \
+		  appendix02.md \
+		  appendix03.md \
+		  appendix04.md \
+		  appendix05.md \
+		  appendix06.md \
+		  appendix07.md \
+		  appendix08.md \
+		  appendix09.md \
+		  appendix10.md \
+		  appendix11.md \
+		  appendix12.md \
+		  appendix13.md
 
 ifeq ($(DOC_LANG),JA)
     PDF  = wolfBoot-Manual-jp.pdf

@@ -588,7 +588,10 @@ Requirement: wolfBoot is compiled with `DELTA_UPDATES=1`
 
 Version "1" is signed as usual, as a standalone image:
 
-`tools/keytools/sign --ecc256 --sha256 test-app/image.bin wolfboot_signing_private_key.der 1`
+```
+tools/keytools/sign --ecc256 --sha256 \
+test-app/image.bin wolfboot_signing_private_key.der 1
+```
 
 When updating from version 1 to version 2, you can invoke the sign tool as:
 

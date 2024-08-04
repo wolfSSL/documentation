@@ -148,14 +148,14 @@ SECWM2_PSTRT=0x1  SECWM2_PEND=0x0   No page of internal Flash Bank2 set as secur
     - `STM32_Programmer_CLI -c port=swd mode=hotplug -ob SECWM1_PSTRT=0x0 SECWM1_PEND=0x7F SECWM2_PSTRT=0x1 SECWM2_PEND=0x0`
 4. flash wolfBoot.bin to 0x0c00 0000
     - `STM32_Programmer_CLI -c port=swd -d ./wolfboot.bin 0x0C000000`
-5. flash .\test-app\image_v1_signed.bin to 0x0804 0000
+5. flash `.\test-app\image_v1_signed.bin` to 0x0804 0000
     - `STM32_Programmer_CLI -c port=swd -d ./test-app/image_v1_signed.bin 0x08040000`
 6. RED LD9 will be on
 
 - NOTE: STM32_Programmer_CLI Default Locations
-* Windows: `C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin\STM32_Programmer_CLI.exe`
-* Linux: `/usr/local/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI`
-* Mac OS/X: `/Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer/STM32CubeProgrammer.app/Contents/MacOs/bin/STM32_Programmer_CLI`
+* Windows: `C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer` `\bin\STM32_Programmer_CLI.exe`
+* Linux: `/usr/local/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin` `/STM32_Programmer_CLI`
+* Mac OS/X: `/Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer` `/STM32CubeProgrammer.app/Contents/MacOs/bin/STM32_Programmer_CLI`
 
 ### Scenario 2: Trustzone Enabled, wolfCrypt as secure engine for NS applications
 
@@ -217,15 +217,26 @@ Use `make DEBUG=1` and reload firmware.
 Linux:
 
 ```
-ST-LINK_gdbserver -d -cp /opt/st/stm32cubeide_1.3.0/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.linux64_1.3.0.202002181050/tools/bin -e -r 1 -p 3333`
+ST-LINK_gdbserver -d -cp /opt/st/stm32cubeide_1.3.0/plugins/\
+com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.\
+linux64_1.3.0.202002181050/tools/bin -e -r 1 -p 3333
 ```
 
-Max OS/X:
+Mac OS/X:
 
 ```sh
-sudo ln -s /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.macos64_1.6.0.202101291314/tools/bin/native/mac_x64/libSTLinkUSBDriver.dylib /usr/local/lib/libSTLinkUSBDriver.dylib
+sudo ln -s /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins\
+/com.st.stm32cube.ide.mcu.externaltools.\
+stlink-gdb-server.macos64_1.6.0.202101291314/\
+tools/bin/native/mac_x64/libSTLinkUSBDriver.dylib \
+/usr/local/lib/libSTLinkUSBDriver.dylib
 
-/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.macos64_1.6.0.202101291314/tools/bin/ST-LINK_gdbserver -d -cp ./Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.macos64_1.6.0.202101291314/tools/bin -e -r 1 -p 3333
+/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/\
+com.st.stm32cube.ide.mcu.externaltools.\
+stlink-gdb-server.macos64_1.6.0.202101291314/tools/bin/\
+ST-LINK_gdbserver -d -cp ./Contents/Eclipse/plugins/\
+com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.\
+macos64_1.6.0.202101291314/tools/bin -e -r 1 -p 3333
 ```
 
 - Connect with arm-none-eabi-gdb
@@ -287,14 +298,14 @@ SECWM2_PSTRT=0x1  SECWM2_PEND=0x0   No page of internal Flash Bank2 set as secur
     - `STM32_Programmer_CLI -c port=swd mode=hotplug -ob SECWM1_PSTRT=0x0 SECWM1_PEND=0x7F SECWM2_PSTRT=0x1 SECWM2_PEND=0x0`
 4. flash wolfBoot.bin to 0x0c000000
     - `STM32_Programmer_CLI -c port=swd -d ./wolfboot.bin 0x0C000000`
-5. flash .\test-app\image_v1_signed.bin to 0x08010000
+5. flash `.\test-app\image_v1_signed.bin` to 0x08010000
     - `STM32_Programmer_CLI -c port=swd -d ./test-app/image_v1_signed.bin 0x08100000`
 6. RED LD9 will be on
 
 - NOTE: STM32_Programmer_CLI Default Locations
-* Windows: `C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin\STM32_Programmer_CLI.exe`
-* Linux: `/usr/local/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI`
-* Mac OS/X: `/Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer/STM32CubeProgrammer.app/Contents/MacOs/bin/STM32_Programmer_CLI`
+* Windows: `C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer` `\bin\STM32_Programmer_CLI.exe`
+* Linux: `/usr/local/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin` `/STM32_Programmer_CLI`
+* Mac OS/X: `/Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer` `/STM32CubeProgrammer.app/Contents/MacOs/bin/STM32_Programmer_CLI`
 
 ### Scenario 2: TrustZone Enabled, wolfCrypt as secure engine for NS applications
 
@@ -347,19 +358,29 @@ Use `make DEBUG=1` and reload firmware.
 Linux:
 
 ```
-ST-LINK_gdbserver -d -cp /opt/st/stm32cubeide_1.3.0/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.linux64_1.3.0.202002181050/tools/bin -e -r 1 -p 3333`
+ST-LINK_gdbserver -d -cp /opt/st/stm32cubeide_1.3.0/plugins/\
+com.st.stm32cube.ide.mcu.externaltools.\
+cubeprogrammer.linux64_1.3.0.202002181050/tools/bin -e -r 1 -p 3333`
 ```
 
 Max OS/X:
 
 ```sh
-/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.macos64_2.1.300.202403291623/tools/bin/ST-LINK_gdbserver -d -cp /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.macos64_2.1.201.202404072231/tools/bin -e -r 1 -p 3333
+/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/\
+com.st.stm32cube.ide.mcu.externaltools.\
+stlink-gdb-server.macos64_2.1.300.202403291623/tools/bin/\
+ST-LINK_gdbserver -d -cp /Applications/STM32CubeIDE.app/\
+Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.\
+externaltools.cubeprogrammer.macos64_2.1.201.202404072231/tools/\
+bin -e -r 1 -p 3333
 ```
 
 Win:
 
 ```
-ST-LINK_gdbserver -d -cp C:\ST\STM32CubeIDE_1.7.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.win32_2.0.0.202105311346\tools\bin -e -r 1 -p 3333`
+ST-LINK_gdbserver -d -cp C:\ST\STM32CubeIDE_1.7.0\ ^
+STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools. ^
+cubeprogrammer.win32_2.0.0.202105311346\tools\bin -e -r 1 -p 3333`
 ```
 - Connect with arm-none-eabi-gdb or gdb-multiarch
 
@@ -413,7 +434,7 @@ Example 128KB partitioning on STM32-G070:
 
 ### Building STM32G0
 
-Reference configuration (see `/config/examples/stm32g0.config`.
+Reference configuration (see `/config/examples/stm32g0.config`).
 You can copy this to wolfBoot root as `.config`: `cp ./config/examples/stm32g0.config .config`.
 To build you can use `make`.
 
@@ -987,9 +1008,17 @@ st-flash write test-app/image_v1_signed.bin 0x08020000
 
 To sign the same application image as new version (2), use the sign tool
 
-Python: `tools/keytools/sign --ecc256 --sha256 test-app/image.bin wolfboot_signing_private_key.der 2`
+Python: 
+```
+tools/keytools/sign --ecc256 --sha256 \
+test-app/image.bin wolfboot_signing_private_key.der 2
+```
 
-C Tool: `tools/keytools/sign    --ecc256 --sha256 test-app/image.bin wolfboot_signing_private_key.der 2`
+C Tool: 
+```
+tools/keytools/sign  --ecc256 --sha256 \
+test-app/image.bin wolfboot_signing_private_key.der 2
+```
 
 Flash the updated version 2 image: `st-flash write test-app/image_v2_signed.bin 0x08120000`
 
@@ -1007,7 +1036,13 @@ ST-Link: `ST-LINK_gdbserver -d -e -r 1 -p 3333`
 
 Mac OS:
 ```
-/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.macos64_2.0.300.202203231527/tools/bin/ST-LINK_gdbserver -d -cp /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.macos64_2.0.200.202202231230/tools/bin -e -r 1 -p 3333
+/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/\
+com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.\
+macos64_2.0.300.202203231527/tools/bin/\
+ST-LINK_gdbserver -d -cp /Applications/STM32CubeIDE.app/\
+Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.\
+externaltools.cubeprogrammer.macos64_2.0.200.202202231230/tools/\
+bin -e -r 1 -p 3333
 ```
 
 2. Start GDB Client from wolfBoot root:
@@ -1741,12 +1776,14 @@ NOR Flash Region: `0xE8000000 - 0xEFFFFFFF` (128 MB)
 Flash Layout (with files):
 
 | Description | File | Address |
-| ----------- | ---- | ------- |
+| ------ | -------- | --- |
 | Reset Configuration Word (RCW) | `68PPC2_RCW_v0p7.bin` | `0xE8000000` |
 | Frame Manager Microcode | `fsl_fman_ucode_t2080_r1.0.bin` | `0xE8020000` |
 | Signed Application | `test-app/image_v1_signed.bin` | `0xE8080000` |
 | wolfBoot | `wolfboot.bin` | `0xEFF40000` |
-| Boot Entry Point (with offset jump to init code) |  | `0xEFFFFFFC` |
+| Boot Entry Point [^1]  |  | `0xEFFFFFFC` |
+
+[^1]: with offset jump to init code
 
 Or program the `factory.bin` to `0xE8080000`
 
@@ -1855,8 +1892,8 @@ This is an example for debugging the T2080 with CodeWarrior TAP, however we were
 
 Start GDB Proxy:
 
-Linux: /opt/Freescale/CW_PA_v10.5.1/PA/ccs/bin/gdbproxy
-Windows: C:\Freescale\CW_PA_v10.5.1\PA\ccs\bin\gdbproxy.exe
+- Linux: `/opt/Freescale/CW_PA_v10.5.1/PA/ccs/bin/gdbproxy`
+- Windows: `C:\Freescale\CW_PA_v10.5.1\PA\ccs\bin\gdbproxy.exe`
 
 ```
 set logging on
@@ -2133,8 +2170,8 @@ TSIP: To enable TSIP use `make PKA=1`. See [docs/Renesas.md](docs/Renesas.md) fo
 
 ### Flashing Renesas RX65N
 
-Download the Renesas Flashing Tool: https://www.renesas.com/us/en/software-tool/renesas-flash-programmer-programming-gui
-Download the Renesas E2 Lite Linux Driver: https://www.renesas.com/us/en/document/swo/e2-emulator-e2-emulator-lite-linux-driver?r=488806
+Download the [Renesas Flashing Tool](https://www.renesas.com/us/en/software-tool/renesas-flash-programmer-programming-gui)
+Download the [Renesas E2 Lite Linux Driver](https://www.renesas.com/us/en/document/swo/e2-emulator-e2-emulator-lite-linux-driver?r=488806)
 
 Default Flash ID Code: FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
@@ -2235,8 +2272,11 @@ make
 ```
 
 With RX GCC path or or custom cross compiler directly:
+
 `make CROSS_COMPILE="~/toolchains/gcc_8.3.0.202311_rx_elf/bin/rx-elf-"`
+
 OR
+
 `make RX_GCC_PATH="~/toolchains/gcc_8.3.0.202311_rx_elf"`
 
 
@@ -2244,8 +2284,8 @@ TSIP: To enable TSIP use `make PKA=1`. See [docs/Renesas.md](@@@need to change h
 
 ### Flashing Renesas RX72N
 
-Download the Renesas Flashing Tool: https://www.renesas.com/us/en/software-tool/renesas-flash-programmer-programming-gui
-Download the Renesas E2 Lite Linux Driver: https://www.renesas.com/us/en/document/swo/e2-emulator-e2-emulator-lite-linux-driver?r=488806
+Download the [Renesas Flashing Tool](https://www.renesas.com/us/en/software-tool/renesas-flash-programmer-programming-gui)
+Download the [Renesas E2 Lite Linux Driver](https://www.renesas.com/us/en/document/swo/e2-emulator-e2-emulator-lite-linux-driver?r=488806)
 
 Default Flash ID Code: FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
