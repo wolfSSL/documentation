@@ -147,13 +147,21 @@ wc_GenerateSeed関数をどのように記述する必要があるかの例に�
 Q：どういう場合このセクションが必要ですか？<br>
 A：標準のメモリ関数を使用できない場合、またはオプションの数学ライブラリ間のメモリ使用量の違いに関心があるような場合です。
 
-wolfSSLは、デフォルトではmalloc（）とfree（）を使用しています。通常の整数演算ライブラリを使用する場合、wolfCryptはrealloc（）も使用します。
+wolfSSLは、デフォルトではmalloc（）とfree（）を使用しています。
+旧来使用されてきた第1世代の整数演算ライブラリ(Normal Math)を使用する場合、wolfCryptはrealloc（）も使用します。
 
-デフォルトでは、wolfSSL/wolfCryptは、通常の整数ライブラリを使用します。これは、かなりの動的メモリを使用します。 wolfSSLを構築する場合、FastMathライブラリのほうを有効にすることができます。こちらは通常速度も速く、暗号操作（すべてのスタック上）には動的メモリーを使用しません。 Fastmathを使う場合、wolfSSLはrealloc（）の実装を必要としません。 wolfSSLのSSL層はそのほかにもいくつかの処理で動的メモリを使用しているので、malloc（）とfree（）は依然として必要です。
+現在、整数演算ライブラリとして最初期に開発された第1世代のNormal Mathライブラリ、パブリックドメインのTFM(Tom's Fast Math)をベースに開発した第2世代のFast Mathライブラリ、SP(Single Precision)最適化を適用した第3世代のSP Mathライブラリが存在します。
+このうち、第2世代以降のFast Math, SP Mathライブラリでは、暗号操作において動的メモリを使用しません。
 
-通常の整数演算ライブラリとFastMathライブラリ間のリソース使用量（スタック/ヒープ）の比較のドキュメントを参照ご希望のかたはお知らせください。
+メモリ使用量とスピードの観点から、私たちはSP Mathライブラリの使用を推奨しています。
+wolfSSL 5.4.0以降ではデフォルトで採用しており、第1世代のNormal Mathライブラリは廃止予定です。
+詳細は以下のページをご覧ください。
 
-FastMathを有効にするには、USE_FAST_MATHを定義し ./wolfcrypt/src/integer.cではなく ./wolfcrypt/src/tfm.cを使用します。 fastmathを使用するときはスタックメモリが大きいので、TFM_TIMING_RESISTANTも定義することをお勧めします。
+- [wolfSSLの新たな Multi-Precision 演算ライブラリ](https://wolfssl.jp/wolfblog/2021/02/03/multi-precision-math-library/)
+- [wolfSSL Math Library Comparison Matrix](https://www.wolfssl.com/wolfssl-math-library-comparison-matrix/)
+- [レガシー数学ライブラリを廃止します](https://wolfssl.jp/wolfblog/2023/03/13/deprecation-of-wolfssl-normal-math-library/)
+
+wolfSSLのSSL層はそのほかにもいくつかの処理で動的メモリを使用しているため、malloc（）とfree（）は依然として必要です。
 
 標準のmalloc（）、free（）を、およびreallocの（）関数が利用できない場合、XMALLOC_USERを定義します。これによりターゲット環境依存のカスタムフックを　 ./wolfssl/wolfcrypt/types.h内に定義することができます。
 
