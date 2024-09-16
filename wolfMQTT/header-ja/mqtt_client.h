@@ -199,7 +199,7 @@ typedef struct _MqttClient {
  *  \param      tx_buf_len  エンコード用送信バッファーの最大サイズ
  *  \param      rx_buf      デコード用受信バッファーへのポインター
  *  \param      rx_buf_len  デコード用受信バッファーの最大サイズ
- *  \param      cmd_timeout_ms　最大コマンド待ち時間（ミリ秒）
+ *  \param      cmd_timeout_ms 最大コマンド待ち時間（ミリ秒）
  *  \return     MQTT_CODE_SUCCESS または MQTT_CODE_ERROR_BAD_ARG
                 \n(enum MqttPacketResponseCodes　を参照)
  */
@@ -213,7 +213,6 @@ WOLFMQTT_API int MqttClient_Init(
 
 /*! \brief      MqttClient構造体にアロケートされたリソースをクリーンアップします。
  *  \param      client      MqttClient構造体へのポインター
- *  \return     none
  */
 WOLFMQTT_API void MqttClient_DeInit(MqttClient *client);
 
@@ -297,6 +296,7 @@ WOLFMQTT_API int MqttClient_Publish_ex(
  *  \param      client      MqttClient構造体へのポインター
  *  \param      publish     メッセージデータがセットされたMqttPublish構造体へのポインター
  *                          \n注: MqttPublishとMqttMessageは同じ構造体です。
+ *  \param      pubCb       コールバック関数へのポインター
  *  \return     MQTT_CODE_SUCCESS, MQTT_CODE_CONTINUE (for non-blocking) または 
                 MQTT_CODE_ERROR_* \n(enum MqttPacketResponseCodes　を参照)
     \sa         MqttClient_Publish
@@ -323,7 +323,7 @@ WOLFMQTT_API int MqttClient_Subscribe(
 /*! \brief      MQTT Unsubscribeパケットをエンコードして送信し、Unsubscribe Acknowledgmentパケットを待ちます。
  *  \note       この関数はMqttNet.readで待つブロッキング関数です。
  *  \param      client      MqttClient構造体へのポインター
- *  \param      トピックリストを与えられたMqttUnsubscribe構造体へのポインター
+ *  \param      unsubscribe トピックリストを与えられたMqttUnsubscribe構造体へのポインター
  *  \return     MQTT_CODE_SUCCESS または MQTT_CODE_ERROR_*
                 \n(enum MqttPacketResponseCodes　を参照)
  */
@@ -393,7 +393,7 @@ WOLFMQTT_API int MqttClient_Disconnect(
 /*! \brief      MQTT Disconnectパケットをエンコードして送信します(responseはありません)。
  *  \note       この関数はMqttNet.writeを使って送信を試みるノンブロッキング関数です。
  *  \param      client      MqttClient構造体へのポインター
- *  \param      MqttDisconnect構造体へのポインター。NULLを指定しても可。
+ *  \param      disconnect  MqttDisconnect構造体へのポインター。NULLを指定しても可。
  *  \return     MQTT_CODE_SUCCESS または MQTT_CODE_ERROR_*
                 \n(enum MqttPacketResponseCodes　を参照)
  */
@@ -586,7 +586,7 @@ WOLFMQTT_API int SN_Client_Subscribe(
 /*! \brief      MQTT-SN Unsubscribeパケットをエンコードして送信し、Unsubscribe Acknowledgmentパケットを待ちます。
  *  \note 　　　 この関数はMqttNet.readで待つブロッキング関数です。
  *  \param      client      MqttClient構造体へのポインター
- *  \param      トピックIDが与えられたSN_Unsubscribe構造体へのポインター
+ *  \param      unsubscribe トピックIDが与えられたSN_Unsubscribe構造体へのポインター
  *  \return     MQTT_CODE_SUCCESS または MQTT_CODE_ERROR_*
                 \n(enum MqttPacketResponseCodes　を参照)
  */
