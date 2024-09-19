@@ -495,6 +495,8 @@ wolfSSL supports using the Trust Protection Unit (TPU), Modular Arithmetic Accel
 
 To enable support define `WOLFSSL_MAX3266X` and `WOLFSSL_SP_MATH_ALL`. wolfSSL currently supports the hardware acceleration of RNG, AES-CBC, AES-GCM, AES-ECB, SHA-1, SHA-2, RSA 2048, and ECDSA.
 
+This HW also supports the use of wolfSSL's crypto callback feature to allow the usage of both HW and SW implentations.
+
 More details of the support can be found in the README.md at wolfcrypt/src/port/maxim of the wolfSSL repository tree.
 
 ## SSL Inspection (Sniffer)
