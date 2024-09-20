@@ -10,7 +10,7 @@ SSH is a layered set of protocols that provide multiplexed streams of data betwe
 
 ##  Why Choose wolfSSH?
 
-The wolfSSH library is a lightweight SSHv2 server library written in ANSI C and targeted for embedded, RTOS, and resource-constrained environments - primarily because of its small size, speed, and feature set. It is commonly used in standard operating environments as well because of its royalty-free pricing and excellent cross platform support. wolfSSH supports the industry standard SSH v2. wolfSSH is powered by the wolfCrypt library. A version of the wolfCrypt cryptography library has been FIPS 140-2 validated (Certificate #3389), and is a module in process for FIPS 140-3. For additional information, visit the wolfCrypt FIPS FAQ or contact fips@wolfssl.com.
+The wolfSSH library is a lightweight SSHv2 server library written in ANSI C and targeted for embedded, RTOS, and resource-constrained environments - primarily because of its small size, speed, and feature set. It is commonly used in standard operating environments as well because of its royalty-free pricing and excellent cross platform support. wolfSSH supports the industry standard SSH v2. wolfSSH is powered by the wolfCrypt library. A version of the wolfCrypt cryptography library has been FIPS 140-3 validated (Certificate #4718) and FIPS 140-2 validated (Certificate #3389). For additional information, visit the wolfCrypt FIPS FQA or contact fips@wolfssl.com.
 
 ### Features
 
