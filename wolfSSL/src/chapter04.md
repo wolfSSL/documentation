@@ -489,6 +489,16 @@ To enable support define `WOLFSSL_SILABS_SE_ACCEL` in user_settings.h. wolfSSL c
 
 More details and benchmarks are available in the README.md in wolfcrypt/src/port/silabs of the wolfSSL repository tree.
 
+### MAX32665/MAX32666
+
+wolfSSL supports using the Trust Protection Unit (TPU), Modular Arithmetic Accelerator (MAA) and TRNG found on supported models of the [MAX32666](https://www.analog.com/en/products/max32666.html)/[MAX32665](https://www.analog.com/en/products/max32665.html#part-details) microcontrollers from Analog Devices.
+
+To enable support define `WOLFSSL_MAX3266X` and `WOLFSSL_SP_MATH_ALL`. wolfSSL currently supports the hardware acceleration of RNG, AES-CBC, AES-GCM, AES-ECB, SHA-1, SHA-2, RSA 2048, and ECDSA.
+
+This HW also supports the use of wolfSSL's crypto callback feature to allow the usage of both HW and SW implentations.
+
+More details of the support can be found in the README.md at wolfcrypt/src/port/maxim of the wolfSSL repository tree.
+
 ## SSL Inspection (Sniffer)
 
 Beginning with the wolfSSL 1.5.0 release, wolfSSL has included a build option allowing it to be built with SSL Sniffer (SSL Inspection) functionality. This means that you can collect SSL traffic packets and with the correct key file, are able to decrypt them as well. The ability to “inspect” SSL traffic can be useful for several reasons, some of which include:
