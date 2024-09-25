@@ -147,19 +147,25 @@ wc_GenerateSeed関数をどのように記述する必要があるかの例に�
 Q：どういう場合このセクションが必要ですか？<br>
 A：標準のメモリ関数を使用できない場合、またはオプションの数学ライブラリ間のメモリ使用量の違いに関心があるような場合です。
 
-wolfSSLは、デフォルトではmalloc（）とfree（）を使用しています。通常の整数演算ライブラリを使用する場合、wolfCryptはrealloc（）も使用します。
+wolfSSLは、デフォルトではmalloc（）とfree（）を使用しています。
+旧来使用されてきた第1世代の整数演算ライブラリ(Normal Math)を使用する場合、wolfCryptはrealloc（）も使用します。
 
-デフォルトでは、wolfSSL/wolfCryptは、通常の整数ライブラリを使用します。これは、かなりの動的メモリを使用します。 wolfSSLを構築する場合、FastMathライブラリのほうを有効にすることができます。こちらは通常速度も速く、暗号操作（すべてのスタック上）には動的メモリーを使用しません。 Fastmathを使う場合、wolfSSLはrealloc（）の実装を必要としません。 wolfSSLのSSL層はそのほかにもいくつかの処理で動的メモリを使用しているので、malloc（）とfree（）は依然として必要です。
+現在、整数演算ライブラリとして最初期に開発された第1世代のNormal Mathライブラリ、パブリックドメインのTFM(Tom's Fast Math)をベースに開発した第2世代のFast Mathライブラリ、SP(Single Precision)最適化を適用した第3世代のSP Mathライブラリが存在します。
+このうち、第2世代以降のFast Math, SP Mathライブラリでは、暗号操作において動的メモリを使用しません。
 
-通常の整数演算ライブラリとFastMathライブラリ間のリソース使用量（スタック/ヒープ）の比較のドキュメントを参照ご希望のかたはお知らせください。
+メモリ使用量とスピードの観点から、私たちはSP Mathライブラリの使用を推奨しています。
+wolfSSL 5.4.0以降ではデフォルトで採用しており、第1世代のNormal Mathライブラリは廃止予定です。
+詳細は以下のページをご覧ください。
 
-FastMathを有効にするには、USE_FAST_MATHを定義し ./wolfcrypt/src/integer.cではなく ./wolfcrypt/src/tfm.cを使用します。 fastmathを使用するときはスタックメモリが大きいので、TFM_TIMING_RESISTANTも定義することをお勧めします。
+- [wolfSSLの新たな Multi-Precision 演算ライブラリ](https://wolfssl.jp/wolfblog/2021/02/03/multi-precision-math-library/)
+- [wolfSSL Math Library Comparison Matrix](https://www.wolfssl.com/wolfssl-math-library-comparison-matrix/)
+- [レガシー数学ライブラリを廃止します](https://wolfssl.jp/wolfblog/2023/03/13/deprecation-of-wolfssl-normal-math-library/)
+
+wolfSSLのSSL層はそのほかにもいくつかの処理で動的メモリを使用しているため、malloc（）とfree（）は依然として必要です。
 
 標準のmalloc（）、free（）を、およびreallocの（）関数が利用できない場合、XMALLOC_USERを定義します。これによりターゲット環境依存のカスタムフックを　 ./wolfssl/wolfcrypt/types.h内に定義することができます。
 
-XMALLOC_USERの使用方法の詳細については、wolfSSLマニュアルのセクション5.1.1.1を参照してください。
-
-https://wolfssl.com/wolfSSL/Docs-wolfssl-manual-5-portability.html
+XMALLOC_USERの使用方法の詳細については、wolfSSLマニュアルの[5.1.1.1節](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter05.html#_3)を参照してください。
 
 ## 時計　　　　　　
 
@@ -179,11 +185,10 @@ A：C標準ライブラリがない場合、またはカスタムライブラリ
 
 wolfSSLは、C標準ライブラリを使用しなくても、開発者がより高いレベルの移植性と柔軟性を得ることができます。そのようなとき、ユーザーはC標準のものの代わりに使用したい機能をマップする必要があります。
 
-上のセクション2.8では、メモリ機能について説明しました。メモリ関数の抽象化に加えて、wolfSSLは文字列関数と数学関数も抽象化します。それぞれの関数は抽象化される関数の名前に対応してX<FUNC>の形で定義されます。
+上の2.8節では、メモリ機能について説明しました。メモリ関数の抽象化に加えて、wolfSSLは文字列関数と数学関数も抽象化します。それぞれの関数は抽象化される関数の名前に対応してX<FUNC>の形で定義されます。
 
-詳細については、wolfSSLマニュアルのセクション5.1をお読みください。
+詳細については、wolfSSLマニュアルの[5.1節](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter05.html#_2)をお読みください。
 
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-5-portability.html
 
 ## ロギング
 Q：どういう場合このセクションが必要ですか？<br>
@@ -193,9 +198,7 @@ A：デバッグメッセージを有効にしたいが、stderrは使用でき�
 
 stdderが利用できない環境や、デバッグメッセージを別の出力ストリームや別の形式で出力したい場合、wolfSSLではアプリケーションはロギングコールバックに登録できます。
 
-詳細については、wolfSSLマニュアルの第8.1節をお読みください。
-
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-8-debugging.html
+詳細については、wolfSSLマニュアルの[8.1節](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter08.html#_2)をお読みください。
 
 ## 公開鍵演算
 
@@ -212,9 +215,7 @@ wolfSSLを使用すると、SSL / TLS層が公開鍵操作を行う必要があ�
 - RSA暗号化コールバック
 - RSA復号化コールバック
 
-詳細は、wolfSSLマニュアルのセクション6.4を参照してください。
-
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-6-callbacks.html
+詳細は、wolfSSLマニュアルの[6.4節](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter06.html#_5)を参照してください。
 
 ## アトミックレコード層処理
 
@@ -228,15 +229,11 @@ A：TLSレコード層の独自の処理、特にMAC /暗号化と解読/検証�
 MAC /暗号化コールバック関数
 コールバック関数の復号化/検証
 
-詳細は、wolfSSLマニュアルのセクション6.3を参照してください。
-
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-6-callbacks.html
+詳細は、wolfSSLマニュアルの[6.3節](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter06.html#_4)を参照してください。
 
 ## 機能
 
 Q：どういう場合このセクションが必要ですか？<br>
 A：機能を無効にする場合。
 
-適切な定義を使用してwolfSSLをビルドするとき、機能を無効にすることができます。利用可能な定義のリストについては、wolfSSL Manualの第2章を参照してください。
-
-https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-2-building-wolfssl.html
+適切な定義を使用してwolfSSLをビルドするとき、機能を無効にすることができます。利用可能な定義のリストについては、wolfSSLマニュアルの[2章](https://www.wolfssl.com/documentation/manuals/jp/wolfssl/chapter02.html)を参照してください。
