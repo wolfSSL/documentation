@@ -2739,7 +2739,7 @@ Enabling this option adds OCSP (Online Certificate Status Protocol) support to w
 
 ### `--enable-ocspstapling`
 
-Enable OCSP Stapling
+Enable OCSP Stapling (`=no-multi` to disable multiple OCSP Stapling for TLS1.3 Certificate)
 
 ### `--enable-ocspstapling2`
 
