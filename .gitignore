@@ -10,3 +10,6 @@ wolfTPM/api/
 wolfTPM/wolftpm/
 wolfHSM/api
 wolfHSM/docs/xml
+
+# Exclude Visual Studio Debris
+**/.vs
