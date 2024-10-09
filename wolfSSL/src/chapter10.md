@@ -82,6 +82,8 @@ For **SHA-384**, the functions [`wc_InitSha384()`](group__SHA.md#function-wc_ini
 
 For **SHA-512**, the functions [`wc_InitSha512()`](group__SHA.md#function-wc_initsha512), [`wc_Sha512Update()`](group__SHA.md#function-wc_sha512update), and [`wc_Sha512Final()`](group__SHA.md#function-wc_sha512final) will be used with the structure Sha512.
 
+SHA interleaving (typically only of interest to hardware-acceleration that supports it) is enabled by default, define `NO_WOLFSSL_SHA256_INTERLEAVE` to disable it. Software SHA has always supported interleaving.
+
 ### BLAKE2b
 
 To use BLAKE2b (a SHA-3 finalist) include the BLAKE2b header `wolfssl/wolfcrypt/blake2.h`. The structure to use is `Blake2b`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitBlake2b()`](group__BLAKE2.md#function-wc_initblake2b) call. Use [`wc_Blake2bUpdate()`](group__BLAKE2.md#function-wc_blake2bupdate) to update the hash and [`wc_Blake2bFinal()`](group__BLAKE2.md#function-wc_blake2bfinal) to retrieve the final hash:
