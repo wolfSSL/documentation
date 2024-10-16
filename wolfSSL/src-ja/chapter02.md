@@ -3553,9 +3553,7 @@ chachaを無効にします
 ### `--enable-ocspstapling`
 
 
-
-OCSPステーリングを有効にします
-
+OCSPステーリングを有効にします(`=no-multi`を指定するとTLS1.3使用時のCertificateメッセージへの 複数 OCSP Stapling を無効にします。)
 
 
 ### `--enable-ocspstapling2`
