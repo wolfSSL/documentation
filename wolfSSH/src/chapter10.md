@@ -8,9 +8,9 @@ wolfSSH software is a free software download and may be modified to the needs of
 
 ##  Commercial Licensing
 
-Businesses and enterprises who wish to incorporate wolfSSL products into proprietary appliances or other commercial software products for re-distribution must license commercial versions. Commercial licenses for wolfSSL, yaSSL, and wolfCrypt are available for $5,000 USD per end product or SKU. Licenses are generally issued for one product and include unlimited royalty-free distribution. Custom licensing terms are also available.
+Businesses and enterprises who wish to incorporate wolfSSL products into proprietary appliances or other commercial software products for re-distribution must license commercial versions. 
 
-Commercial licenses are also available for wolfMQTT and wolfSSH. Please contact licensing@wolfssl.com with inquiries.
+Please contact licensing@wolfssl.com with inquiries.
 
 ###  Support Packages
 
