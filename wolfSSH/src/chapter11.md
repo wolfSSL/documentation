@@ -39,7 +39,6 @@ Program Outline:
 2. You will receive up to one week of on-site consulting to switch out your old SSL library for wolfSSL. Travel expenses are not included.
 3. Normally, up to one week is the right amount of time for us to make the replacement in your code and do initial testing. Additional consulting on a  replacement is available as needed.
 4. You will receive the standard wolfSSL royalty free license to ship with your product.
-5. The price is $10,000.
 
 The purpose of this program is to enable users who are currently spending too much on their embedded SSL implementation to move to wolfSSL with ease. If you are interested in learning more, then please contact us at info@wolfssl.com.
 
