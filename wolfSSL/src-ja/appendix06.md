@@ -168,11 +168,11 @@ wolfSSL(以前のCyassl)エラーコードは`wolfssl/ssl.h`にあります。�
 
 
 
-## wolfcryptエラーコード
+## wolfCryptエラーコード
 
 
 
-WolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
+wolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
 
 |エラーコード列挙|エラーコード|エラー説明|
 | --------------- | ---------- | ----------------- |
@@ -280,8 +280,8 @@ WolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
 |`AKID_E` |-225 |権限キー識別子エラー|
 |`KEYUSAGE_E` |-226 |悪いキー使用率値|
 |`CERTPOLICIES_E` |-227 |証明書ポリシーの設定エラー|
-|`WC_INIT_E` |-228 |wolfcryptは初期化に失敗しました|
-|`SIG_VERIFY_E` |-229 |wolfcryptシグネチャーの検証エラー|
+|`WC_INIT_E` |-228 |wolfCryptは初期化に失敗しました|
+|`SIG_VERIFY_E` |-229 |wolfCryptシグネチャーの検証エラー|
 |`BAD_PKCS7_SIGNEEDS_CHECKCOND_E` |-230 |悪条件変数演算|
 |`SIG_TYPE_E` |-231 |署名タイプが有効/利用可能な|
 |`HASH_TYPE_E` |-232 |ハッシュタイプは有効/利用可能ではありません|
@@ -292,7 +292,7 @@ WolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
 |`ASN_PATHLEN_INV_E` |-238 |ASN CAパスの長さ反転誤差|
 |`BAD_KEYWRAP_ALG_E` |-239 |KeyWrapのアルゴリズムエラー|
 |`BAD_KEYWRAP_IV_E` |-240 |復号化されたAESキーラップIV不正|
-|`WC_CLEANUP_E` |-241 |wolfcryptのクリーンアップに失敗しました|
+|`WC_CLEANUP_E` |-241 |wolfCryptのクリーンアップに失敗しました|
 |`ECC_CDH_KAT_FIPS_E` |-242 |ECC CDH既知の回答テスト失敗|
 |`DH_CHECK_PUB_E` |-243 |DH公開キーエラーを確認します|
 |`BAD_PATH_ERROR` |-244 |Opendirの悪い道|
@@ -334,7 +334,7 @@ WolfCryptエラーコードは`wolfssl/wolfcrypt/error.h`にあります。
 
 
 
-アプリケーションをwolfsslで起動して実行するときに一般的に起こるエラーコードがいくつかあります。
+アプリケーションをwolfSSLで起動して実行するときに一般的に起こるエラーコードがいくつかあります。
 
 
 

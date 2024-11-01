@@ -26,10 +26,10 @@ wolfSSLチームは、実験的なポスト量子暗号アルゴリズムをwolf
 
 
 
-最近、量子コンピューターの開発にはますます多くのリソースが専念しています。そのため、クラウド量子コンピューティングリソースの商業化がすでに始まっています。現在の最新の状態は暗号化に関連する領域にまだありませんが、「まずデータを収集、蓄積し、後に時間をかけて解読を進めていく」などの一部の脅威モデルは、暗号化に関連する量子コンピューターの出現よりも早く準備が必要であることを意味します。
+今日では、量子コンピューターの開発にますます多くのリソースが割かれるようになりました。そのため、クラウド量子コンピューティングリソースの商業化がすでに始まっています。現時点では未だ実用レベルの暗号が解かれた報告はありません。しかし、「あらかじめデータを収集、蓄積し、後に時間をかけて解読を進めていく」といった脅威モデルが存在します。すなわち、暗号の復号に特化した量子コンピューターが出現するよりも早いうちに準備が必要です。
 
 
-NISTが、量子コンピューターに対して脆弱になる公開キー暗号アルゴリズムを置き換えるように設計された新しいクラスのアルゴリズムの標準化の道をリードしていることが広く認められています。このパッセージの執筆時点で、NISTはPQC標準化プロセスでの第3ラウンドの完了に近づいており、2022年初頭に標準化されるアルゴリズムを発表します。その後、プロセスにはもう1年かかると予測されています。プロトコルとデータ形式を説明する標準ドキュメントを作成します。その後、FIPSのような規制が開発を開始する可能性があります。
+NISTが、量子コンピューターに対して脆弱になる公開鍵暗号アルゴリズムを置き換えるように設計された新しいクラスのアルゴリズムの標準化を進めています。この章の執筆時点で、NISTはPQC標準化プロセスの第3ラウンドをほぼ完了させており、2022年初頭に標準化されるアルゴリズムを発表する予定です。その後、プロトコルとデータ形式を記述した標準文書を作成するプロセスにはさらに1年かかると予測されています。さらにその後には、FIPSのような規制の策定が開始される可能性があります。
 
 
 
@@ -37,24 +37,24 @@ NISTが、量子コンピューターに対して脆弱になる公開キー暗�
 
 
 
-高レベルの観点からは、TLS 1.3接続ごとに、認証と機密性は各接続を保護する2つの主な目標です。認証はECDSAなどのシグネチャスキームを介して維持されます。機密性は、ECDHEなどの重要な確立アルゴリズムによって維持され、その後、対称暗号化アルゴリズムで確立されたキーを使用して通信ストリームを暗号化する。したがって、TLS 1.3プロトコルのセキュリティを3種類の暗号化アルゴリズムに分解することができます。
+大まかに言えば、すべての TLS 1.3 接続において、認証と機密性は各接続を保護する重要な目標です。認証は、ECDSAなどの署名スキームによって維持されます。機密性は、ECDHEなどのキー確立アルゴリズムによって維持され、確立されたキーとAESなどの対称暗号化アルゴリズムを使用して通信ストリームを暗号化します。したがって、TLS 1.3 プロトコルのセキュリティは、次の3種類の暗号化アルゴリズムに分解できます。
 
 
 
 * 認証アルゴリズム
 
 
-* 重要な確立アルゴリズム
+* キー確立アルゴリズム
 
 
 * 対称暗号アルゴリズム
 
 
 
-従来の暗号に対する量子コンピューターの脅威には、2 つの形態があります。Grover のアルゴリズムは最新の対称暗号アルゴリズムのセキュリティを半分に減らしますが、Shor のアルゴリズムは最新の認証および鍵確立アルゴリズムのセキュリティを完全に破ります。その結果、対称的な暗号アルゴリズムの強度を2倍にし、従来の認証と主要な確立アルゴリズムをポスト量子暗号アルゴリズムに置き換えることにより、通信を保護し続けることができます。TLS 1.3のハンドシェーク中に、Ciphersuiteは、接続期間中に使用される対称暗号を指定することに注意してください。AES-128は一般に十分であると認められているため、AES_256_GCM_SHA384 Ciphersuiteを使用して強度を2倍にすることができます。鍵の確立と認証には、ポスト量子 KEM (Key Encapsulation Mechanisms) と署名スキームがあります。
+量子コンピュータが従来の暗号に及ぼす脅威には2つの形態があります。グローバーのアルゴリズムは、最新の対称暗号アルゴリズムのセキュリティを半分に低下させ、ショアのアルゴリズムは、最新の認証および鍵確立アルゴリズムのセキュリティを完全に破壊します。その結果、対称暗号アルゴリズムの強度を2倍にし、従来の認証および鍵確立アルゴリズムをポスト量子アルゴリズムに置き換えることで、通信を保護し続けることができます。TLS 1.3 ハンドシェイク中、暗号スイートは接続中に使用される対称暗号を指定します。AES-128は一般的に十分であると認められているため、AES_256_GCM_SHA384暗号スイートを使用することで強度を2倍にすることができます。鍵確立と認証には、ポスト量子KEM (Key Encapsulation Mechanisms) と署名スキームがあります。
 
 
-これらは、従来のアルゴリズムとは異なる種類の数学を使用します。それらは、量子コンピューターへの耐性のために特別に設計されています。統合することを選択した認証アルゴリズムとKEMはすべて格子ベースのアルゴリズムです。
+これらは量子コンピュータへの耐性のため、従来のアルゴリズムとは異なる種類の数学を使用して特別に設計されます。私たちが統合することを選択した認証アルゴリズムとKEMはすべて格子ベースのアルゴリズムです。
 
 
 * ダイリチウム署名スキーム
@@ -76,13 +76,13 @@ NISTが、量子コンピューターに対して脆弱になる公開キー暗�
 
 
 
-格子ベースの暗号化の説明はこの文書の範囲外になりますが、これらのアルゴリズムに関する情報は<https：//csrc.nist.gov/projects/post-quantum-cryptography/round  - でのNISTの提出にあります。3-提出>。
+格子ベースの暗号化の説明はこのドキュメントの範囲外のため、これらのアルゴリズムに関する詳細は、NIST の公開文書 <https://csrc.nist.gov/projects/post-quantum-cryptography/round-3-submissions> をご確認ください。
 
 
-残念ながら、ショックを受けるかもしれませんが、これらのアルゴリズムが量子コンピューターからの攻撃に抵抗できるかどうかは実際にはわかっていません。実際、これらのアルゴリズムが従来のコンピューターに対して安全であることさえわかっていません。その可能性はますます低くなりますが、誰かが格子ベースの暗号を破る可能性があります。しかし、セキュリティの専門家があなたに言うように、これは暗号化が常にどのように機能してきた形です。アルゴリズムは、使い始めは良いものですが、弱点や脆弱性が発見され、技術が向上します。ポスト量子アルゴリズムは、比較的新しく、コミュニティからもう少し注意を払う必要があるという点で、やや問題があります。
+残念ながら、この章を記している時点においてこれらのアルゴリズムが量子コンピューターからの攻撃に耐えられるかどうかは、まだ分かっていません。従来型コンピューターにおける攻撃耐性も同様です。可能性はますます低くなっていますが、誰かが格子ベースの暗号化を破る可能性があります。ただし、暗号化は常にこのような経緯で機能してきた歴史があります。アルゴリズムは使い始めたときは優れていますが、弱点や脆弱性が発見され、テクノロジーは順次改善されます。ポスト量子アルゴリズムは比較的新しいため、コミュニティからもう少し注目する必要があるかもしれません。
 
 
-解決策の 1 つは、これらの新しいアルゴリズムを完全に信用しないことです。とりあえず、私たちは実際に信頼する従来のアルゴリズムで、質量のKEMをハイブリダイズすることで賭けをヘッジできます。NIST標準化された曲線を備えたECCは、FIPSコンプライアンスが優先事項であるため、それらを使用し続ける必要があるため、優れた候補のように見えます。このため、ポストカントゥムケムを統合しただけでなく、NIST承認の曲線を介してECDSAでハイブリダイズしました。以下のハイブリッドグループのリストをご覧ください。
+解決策の1つは、これらの新しいアルゴリズムを完全には信頼しないことです。今のところ、ポスト量子KEMを、信頼している従来のアルゴリズムとハイブリッド化することで、このリスクを回避することができます。FIPS準拠を第一に考えると、NIST標準曲線を使用したECCは良い選択肢になります。このため、ポスト量子KEMを統合するだけでなく、NISTが承認した曲線上のECDSAとハイブリッド化しました。詳しくは以下のハイブリッドグループのリストを参照してください。
 
 
 
@@ -90,11 +90,11 @@ NISTが、量子コンピューターに対して脆弱になる公開キー暗�
 
 
 
-次の手順では、クリーンな Linux 開発環境から開始し、段階的に安全な TLS 1.3 接続を実行できるようにします。
+ここでは、まっさらなLinux環境から安全なTLS 1.3接続を実行できるようにするまでの手順を示します。
 
 ### ビルド手順
 
-wolfSSL リポジトリの INSTALL ファイル (https://github.com/wolfSSL/wolfssl/blob/master/INSTALL) を参照してください。
+wolfSSLリポジトリのINSTALLファイル (https://github.com/wolfSSL/wolfssl/blob/master/INSTALL) を参照してください。
 
 項目 15 (TLS 1.3 用の liboq を使用したビルド [実験的]) には、構成とビルドの方法に関する説明があります。
 
@@ -112,7 +112,7 @@ wolfSSL リポジトリの INSTALL ファイル (https://github.com/wolfSSL/wolf
 
 ### 量子安全な TLS 接続を確立する
 
-次のようにサーバーとクライアントを別々のターミナルで実行できます。
+次のようにして、サーバーとクライアントを別々のターミナルで実行します。
 
 ```sh
 examples/server/server -v 4 -l TLS_AES_256_GCM_SHA384 \
@@ -133,19 +133,20 @@ examples/client/client -v 4 -l TLS_AES_256_GCM_SHA384 \
 対称暗号化に AES-256、認証に FALCON 署名方式、キー確立に KYBER KEM とハイブリッド化された ECDHE を使用して、完全に量子安全な TLS 1.3 接続を実現しました。他のポスト量子の例についての詳細は、https://github.com/wolfSSL/wolfssl-examples/blob/master/pq/README.md で見つけることができます。
 
 
-## WolfsSLとOQSのフォークのOpenSSLの間の命名規則マッピング
+## wolfSSLとOQSのフォークのOpenSSLの間の命名規則マッピング
 
 
 
-NIST PQCコンペティションに提出したすべてのチームは、ここでNISTで定義されているように、複数のレベルのセキュリティをサポートしました：<https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation - 基準/セキュリティ - (評価 - 基準)>
+NIST PQCコンテストに応募したすべてのチームは、NISTが定義する複数のセキュリティレベルをサポートしていました。
+<https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria>
 
 
-そのように、彼らは彼らの亜種を識別する方法を思いつく必要があり、各チームは彼ら自身のバリアント命名スキームを思いつく必要がありました。次の表を見ることができるように、これを行う方法についてのチーム間に調整はありませんでした。wolfSSLライブラリは、バリアントのNISTレベルベースの命名規則を使用しています。OQSチームは、各提出書の命名規則に従うことを選択しました。次の表を参照してください。
+そのため、各チームはバリアントを識別する方法を考え出す必要があり、各チームが独自のバリアント命名スキームを考え出しました。次の表からわかるように、この方法についてチーム間で調整はありませんでした。wolfSSL ライブラリは、バリアントのNISTレベルベースの命名規則を使用します。OQSチームは、各応募論文の命名規則に従うことを選択しました。次の表で、当社の命名規則と応募論文の命名規則をマッピングしています。
 
 
 ポスト量子署名方式の命名規則:：
 
-wolfsslバリアント名|PQC提出バリアント名
+wolfSSLバリアント名|PQC提出バリアント名
 --------------------  |  ---------------------------
 FALCON_LEVEL1         |  FALCON512
 FALCON_LEVEL5         |  FALCON1024
@@ -161,9 +162,9 @@ SPHINCS_SMALL_LEVEL5  |  SPHINCS+-SHAKE256-256s-simple
 
 
 
-ポスト量子 KEM 命名規則：
+ポスト量子KEM命名規則：
 
-wolfsslバリアント名|PQC提出バリアント名
+wolfSSLバリアント名|PQC提出バリアント名
 --------------------  |  ---------------------------
 KYBER_LEVEL1          |  KYBER512
 KYBER_LEVEL3          |  KYBER768
@@ -172,7 +173,7 @@ KYBER_LEVEL5          |  KYBER1024
 
 ポスト量子ハイブリッド KEM 命名規則：
 
-wolfsslバリアント名|NIST ECC曲線とPQC提出バリアント名
+wolfSSLバリアント名|NIST ECC曲線とPQC提出バリアント名
 --------------------  |  ----------------------------------------------
 P256_KYBER_LEVEL1     |  ECDSA P-256 and KYBER512
 P384_KYBER_LEVEL3     |  ECDSA P-384 and KYBER768
@@ -185,12 +186,12 @@ P521_KYBER_LEVEL5     |  ECDSA P-521 and KYBER1024
 
 
 
-私たちがサポートするポストカントゥム署名アルゴリズムとKEMは、OQSプロジェクトのOpenSSLフォークによってもサポートされています。彼らの命名規則は私たちのものとは異なりますが、同じ数値OIDとコードポイントを使用し、暗号化アーティファクトが同じライブラリによって生成および処理されるという点で完全な相互運用性があります。すなわち、liboqs。コードポイントは、TLS 1.3のシガルグおよびサポートされているグループ拡張機能で使用されます。OIDは、公開キー、プライベートキー、署名の識別子として証明書およびプライベートキーで使用されます。
+当社がサポートする耐量子署名アルゴリズムとKEMは、OQSプロジェクトのOpenSSLフォークでもサポートされています。命名規則は当社のものとは異なりますが、同じ数値OIDとコードポイントを使用し、暗号化アーティファクトが同じライブラリ (liboqs) によって生成および処理されるという点で、完全な相互運用性があります。コードポイントは、TLS 1.3のsigalgsおよびサポートされるグループ拡張で使用されます。OIDは、公開鍵、秘密鍵、署名の識別子として証明書と秘密鍵で使用されます。
 
 
 TLS 1.3のための量子コードポイント
 
-wolfsslバリアント名|コードポイント
+wolfSSLバリアント名|コードポイント
 --------------------  |  ----------
 FALCON_LEVEL1         |  65035
 FALCON_LEVEL5         |  65038
@@ -207,7 +208,7 @@ P521_KYBER_LEVEL5     |  12093
 
 証明書の Post-Quantum OID：
 
-wolfsslバリアント名|oid
+wolfSSLバリアント名|oid
 --------------------  |  ---
 FALCON_LEVEL1         |  1.3.9999.3.1
 FALCON_LEVEL5         |  1.3.9999.3.4
@@ -226,12 +227,12 @@ SPHINCS_SMALL_LEVEL5  |  1.3.9999.6.9.7
 
 
 
-すべてのサイズはバイトです。
+以下に示すサイズの単位はバイトです。
 
 
 量子署名方式のアーティファクトサイズ：
 
-wolfsslバリアント名|公開キーのサイズ|秘密キーサイズ|最大署名サイズ
+wolfSSLバリアント名|公開鍵サイズ|秘密鍵サイズ|最大署名サイズ
 -------------------- | --------------- | ---------------- | ----------------------
 FALCON_LEVEL1        | 897             | 1281             | 690
 FALCON_LEVEL5        | 1793            | 2305             | 1330
@@ -248,12 +249,12 @@ SPHINCS_SMALL_LEVEL5 | 64              | 128              | 29792
 
 
 
-**注**：Falconには、さまざまな署名サイズがあります。
+**注**：Falconには、いくつかの署名サイズがあります。
 
 
-ポスト量子 KEM アーティファクトのサイズ：
+耐量子 KEM アーティファクトのサイズ：
 
-wolfsslバリアント名|公開キーのサイズ|秘密キーサイズ|暗号文サイズ|共有秘密のサイズ
+wolfSSLバリアント名|公開鍵サイズ|秘密鍵サイズ|暗号文サイズ|共有秘密のサイズ
 -------------------- | --------------- | ---------------- | --------------- | ------------------
 KYBER_LEVEL1         | 800             | 1632             | 768             | 32
 KYBER_LEVEL3         | 1184            | 2400             | 1088            | 32
@@ -268,8 +269,7 @@ KYBER_90S_LEVEL5     | 1568            | 3168             | 1568            | 32
 
 ## 統計的データ
 
-
-次の統計データとベンチマークは、Ubuntu 21.10 を実行する 8 コアの第 11 世代 Intel Core i7-1165G7@3-GHz で取得されました。Liboqsは、`0.7.0`の古いコードとのコンパイラの非互換性により、メインブランチの`ba5b61a779a0db364f0e691a0a0bc8ac42e73f1b`にアップグレードされました。次の構成が使用されました(特に明記しない限り)。
+以下の統計とベンチマークは、Ubuntu 21.10を実行している第11世代 Intel Core i7-1165G7@3-GHz(8コア) で取得しました。liboqs は、`0.7.0` の古いコードとのコンパイラの非互換性のため、メインブランチで `ba5b61a779a0db364f0e691a0a0bc8ac42e73f1b` を使用しています。特記のない限り、構成オプションは以下のとおりです。
 
 
 liboqs：
@@ -277,7 +277,7 @@ liboqs：
 
 
 ```text
-CFLAGS="-Os" cmake -DOQS_USE_OPENSSL=0 -DOQS_MINIMAL_BUILD="OQS_ENABLE_KEM_saber_saber;OQS_ENABLE_KEM_saber_lightsaber;OQS_ENABLE_KEM_saber_firesaber;OQS_ENABLE_KEM_kyber_1024;OQS_ENABLE_KEM_kyber_1024_90s;OQS_ENABLE_KEM_kyber_768;OQS_ENABLE_KEM_kyber_768_90s;OQS_ENABLE_KEM_kyber_512;OQS_ENABLE_KEM_kyber_512_90s;OQS_ENABLE_KEM_ntru_hps2048509;OQS_ENABLE_KEM_ntru_hps2048677;OQS_ENABLE_KEM_ntru_hps4096821;OQS_ENABLE_KEM_ntru_hrss701;OQS_ENABLE_SIG_falcon_1024;OQS_ENABLE_SIG_falcon_512" ..
+CFLAGS="-Os" cmake -DOQS_USE_OPENSSL=0 -DOQS_MINIMAL_BUILD="OQS_ENABLE_KEM_saber_saber;OQS_ENABLE_KEM_saber_lightsaber;OQS_ENABLE_KEM_saber_firesaber;OQS_ENABLE_KEM_kyber_1024;OQS_ENABLE_KEM_kyber_1024_90s;OQS_ENABLE_KEM_kyber_768;OQS_ENABLE_KEM_kyber_768_90s;OQS_ENABLE_KEM_kyber_512;OQS_ENABLE_KEM_kyber_512_90s;OQS_ENABLE_KEM_ntru_hps2048509;OQS_ENABLE_KEM_ntru_hps2048677;OQS_ENABLE_KEM_ntru_hps4096821;OQS_ENABLE_KEM_ntru_hrss701;OQS_ENABLE_SIG_falcon_1024;OQS_ENABLE_SIG_falcon_512;OQS_ENABLE_SIG_dilithium_2;OQS_ENABLE_SIG_dilithium_3;OQS_ENABLE_SIG_dilithium_5;OQS_ENABLE_SIG_dilithium_2_aes;OQS_ENABLE_SIG_dilithium_3_aes;OQS_ENABLE_SIG_dilithium_5_aes" ..
 ```
 
 
@@ -299,7 +299,7 @@ wolfssl：
 
 
 
-**注**：主にポストカントゥムアルゴリズムをベンチマークしていますが、比較目的のために従来のアルゴリズムを残しています。
+**注**：主に耐量子アルゴリズムをベンチマークしていますが、比較目的のために従来のアルゴリズムを残しています。
 
 
 
@@ -307,7 +307,7 @@ wolfssl：
 
 
 
-`tls_bench`のアプリケーションバイナリファイルの例は、ビルドされてから削除された後(約2.4m)2479992バイトです。`--with-liboqs`がなければ、ビルドされてから571832バイト(約559k)があります。これは、1908160バイト(約1.9MB)の違いです。
+`tls_bench` サンプルプログラムのバイナリファイルは約2.4MB、`--with-liboqs` を使用しない場合には559kBです。約1.9MBの違いがあります。
 
 
 
@@ -315,7 +315,7 @@ wolfssl：
 
 
 
-次の結果は、サンプルサーバーとクライアントを実行し、Wiresharkを介して送信されているすべての情報を記録することによって行われました。これには、相互認証、「こんにちはwolfSSL！」とTLS 1.3ハンドシェイクが含まれます。そして、「私はあなたのFa Shizzle」を聞きます！メッセージすべてのパケットの`tcp.len`を合計しました。
+サンプルサーバーとクライアントを実行し、送信されるすべての情報をWiresharkで記録することによって取得した値を以下に示します。これには、相互認証による TLS 1.3 ハンドシェイク、"hello wolfssl!"、"I hear you fa shizzle!" メッセージが含まれます。すべてのパケットの `tcp.len` を合計しました。
 
 ciphersuite |認証|キー施設|合計バイト
 ---------------------- | -------------- | --------------------- | -----------
@@ -348,10 +348,10 @@ TLS_AES_256_GCM_SHA384 | DILITHIUM_LEVEL5     | ECC SECP256R1         | 13477
 
 
 
-これらの統計は、次の構成フラグを追加することで取得されました：`--enable-trackmemory --enable-stacksize`。
+これらの統計は、次の構成フラグを追加して取得しました。
+`--enable-trackmemory --enable-stacksize`
 
-
-サーバーサインとクライアントのメモリの使用クライアントのサーバー認証なしで、TLS13-AES256-GCM-SHA384 CipherSuiteおよびECC SECP256R1のキー交換のためのECC SECP256R1。
+クライアントのサーバー認証なしのサーバー署名とクライアント検証、鍵交換用の TLS13-AES256-GCM-SHA384 暗号スイートおよび ECC SECP256R1 におけるメモリ使用量を以下に示します。
 
 
 
@@ -450,6 +450,10 @@ heap peak      =  41760
 
 
 KEMグループのメモリ使用。サーバーのクライアント認証には TLS13-AES256-GCM-SHA384 暗号スイートおよび RSA-2048 を使用し、クライアントのサーバー認証は使用しません。
+
+KEM グループのメモリ使用量を示します。サーバーのクライアント認証には TLS13-AES256-GCM-SHA384とRSA-2048を使用し、クライアントのサーバー認証は行いません。
+
+
 
 ```text
 Server KYBER_LEVEL1
@@ -676,7 +680,7 @@ decaps            |     299571 |          3.000 |          10.014 |      5.489 |
 
 
 
-次のベンチマークは、次の設定フラグを使用して得られました。
+次のベンチマークは、次の設定フラグを使用して取得しました。
 
 
 
@@ -688,7 +692,6 @@ decaps            |     299571 |          3.000 |          10.014 |      5.489 |
             --enable-aesni \
             --enable-sp \
             --enable-sp-math \
-            --enable-sp-math-all \
             --enable-sp-asm \
             CFLAGS="-Os -DECC_USER_CURVES -DHAVE_ECC256 -DHAVE_ECC384"
 ```
@@ -696,11 +699,11 @@ decaps            |     299571 |          3.000 |          10.014 |      5.489 |
 
 
 
-#### WolfCryptのベンチマーク
+#### wolfCryptのベンチマーク
 
 
 
-**注**：1つのコアのみが使用されます。
+**注**：シングルコアで測定したものです。
 
 
 
@@ -736,11 +739,11 @@ kyber90s_level5-ed         39300 ops took 1.000 sec, avg 0.025 ms, 39283.188 ops
 
 
 
-#### Wolfsslのベンチマーク
+#### wolfSSLのベンチマーク
 
 
 
-**注**：これらのベンチマークに使用されているコアのみが2つだけです。
+**注**：2コアで測定したものです。
 
 
 
@@ -996,7 +999,7 @@ wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P384_KYBER_90S_LE
 
 
 
-次のベンチマークは、次の設定フラグを使用して得られました。
+次のベンチマークは、次の設定フラグを使用して取得しました。
 
 
 
@@ -1013,7 +1016,7 @@ wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P384_KYBER_90S_LE
 
 
 
-**注**：これらのベンチマークに使用されているコアのみが2つだけです。
+**注**：2コアで測定したものです。
 
 
 ```text
@@ -1084,38 +1087,39 @@ wolfSSL Client Benchmark on TLS13-AES256-GCM-SHA384 with group P521_KYBER_90S_LE
 技術文書や既知の回答テストなどのその他のリソースは、NIST PQC Webサイトにあります。
 
 
-<https://csrc.nist.gov/projects/post-quantum-cryptography/round-3-submissions>。
+<https://csrc.nist.gov/projects/post-quantum-cryptography/round-3-submissions>
 
 
-アルゴリズム固有のベンチマーク情報については、OQS プロジェクトの Web サイトにベンチマーク情報があります。
+アルゴリズム固有のベンチマーク情報については、OQSプロジェクトのWebサイトに掲載されています。
 
 <https://openquantumsafe.org/benchmarking/>
 
 ## ポスト量子ステートフルハッシュベース署名
 
-このセクションでは最近wolfSSLがサポートを開始したLMS/HSSなどのポスト量子ステートフルハッシュベース署名（HBS)スキームをカバーしています。
+このセクションでは、最近wolfSSLがサポートを開始したLMS/HSSなどのポスト量子ステートフルハッシュベース署名(HBS)スキームについて記します。
 
 ### 動機づけ
 
-ステートフルHBSスキームには、さまざまな理由から関心が高まっています。ステートフルHBSスキームの主な動機はポスト量子セキュリティです。この付録で以前に説明したように、Shorのアルゴリズムを使用すると、量子コンピュータが大きな整数を効率的に因数分解し、離散対数を計算できるため、RSAやECCなどの公開鍵暗号化スキームを完全に突破できます。
+ステートフルHBSスキームは、さまざまな理由から関心が高まっています。
+ステートフルHBSスキームの主な目的は、量子セキュリティの強化です。前述したように、ショアのアルゴリズムにより、量子コンピューターは大きな整数を効率的に因数分解し、離散対数を計算することができます。これによって、RSAやECCなどの公開鍵暗号スキームを完全に破ることができます。
 
-対照的に、ステートフルHBSスキームは、その基礎となるハッシュ関数とマークルツリー(通常はSHA256で実装される) のセキュリティに基づいており、暗号に関連する量子コンピューターの出現によって破られるとは予想されていません。これらの理由により、これらはNIST SP 800-208およびNSAのCNSA 2.0スイートによって推奨されています。詳細については、次の2つのリンクを参照してください：
+対照的に、ステートフルHBSスキームは、その基礎となるハッシュ関数とマークルツリー(通常SHA256で実装)のセキュリティに基づいており、暗号に関連する量子コンピューターの登場によって破られることは予想されていません。これらの理由から、ステートフルHBSスキームは NIST SP 800-208 および NSA の CNSA 2.0 スイートで推奨されています。詳細については、次の2つのリンクをご参照ください。
 
 - <https://csrc.nist.gov/publications/detail/sp/800-208/final>
 - <https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF>
 
-さらに、CNSA 2.0タイムラインでは、ポスト量子ステートフルHBSスキームを2030年までに独占的に使用し、採用を「直ちに」開始する必要があると指定しています。実際LMSの導入は、CNSA 2.0スイートのスケジュールにおける最も早い要件です。
+さらにCNSA 2.0のタイムラインでは、2030年までにポスト量子ステートフルHBSスキームのみを使用する必要があり、採用は 「直ちに」 開始する必要があると規定されています。LMS の採用は、CNSA 2.0スイートのタイムラインで最も早い要件です。
 
-ただし、ステートフルHBSスキームの性質上、その使用と状態の追跡には十分な注意が必要です。ステートフルHBSシステムでは、秘密鍵は実際にはワンタイム署名 (OTS)鍵の有限セットであり、再利用することはできません。同じOTS鍵を使用して2つの異なるメッセージに署名すると、攻撃者が署名を偽造することが可能になり、スキーム全体のセキュリティが崩れてしまいます。したがって、ステートフルHBSスキームは、公共のインターネットなどの一般的な用途には適していません。
+ただし、ステートフルHBSスキームの性質上、その使用と状態の追跡には細心の注意を払う必要があります。ステートフルHBSシステムでは、秘密鍵は実際にはワンタイム署名(OTS)キーの有限セットであり、再利用されることはありません。同じOTSキーを使用して2つの異なるメッセージを署名すると、攻撃者が署名を偽造できる可能性があり、スキーム全体のセキュリティが崩壊します。したがって、ステートフルHBSスキームは、パブリックインターネットなどの一般的な使用には適していません。
 
-代わりに、これらの独自の強みと特性、およびNISTおよびNSAの支援により、LMS/HSSなどのステートフルHBSスキームは、オフラインファームウェア認証と署名検証、特に長期間の運用が予想される組み込みシステムまたは制約付きシステムで特に重要です。 したがって、暗号化に関連する量子コンピューターに対する耐性が必要です。
+LMS/HSSなどのステートフルHBSスキームは、特に長い運用寿命が期待され、暗号に関連する量子コンピューターに対して耐性が求められる組み込みシステムや制約付きシステムでのオフラインファームウェア認証と署名検証に特に役立ちます。
 
 
 ### LMS/HSS署名
 
 wolfSSLは、wolfCrypt組み込み暗号エンジンにLMS/HSSハッシュベースの署名スキームのサポートを追加しています。これは、以前のlibOQS統合と同様に、hash-sigsLMS/HSSライブラリ(<https://github.com/cisco/hash-sigs>)との実験的な統合によって実現されます。
 
-Leighton-Micali Signatures(LMS)とそのマルチツリーのバリアントであるHierarchical Signature System(HSS)は、ポスト量子、ステートフルハッシュベース署名スキームです。公開鍵と秘密鍵が小さく、署名と検証が速いことで知られています。シグネチャのサイズは大きくなりますが、Winternitzパラメーターを介して調整できます。詳細については、RFC8554の次の2つのリンクを参照してください：
+Leighton-Micali Signatures(LMS)とそのマルチツリーのバリアントであるHierarchical Signature System(HSS)は、ポスト量子、ステートフルハッシュベース署名スキームです。公開鍵と秘密鍵が小さく、署名と検証が速いことで知られています。署名のサイズは大きくなりますが、Winternitzパラメーターを介して調整できます。詳細については、RFC8554の次の2つのリンクを参照してください：
 
 - LMS: <https://datatracker.ietf.org/doc/html/rfc8554>
 - HSS: <https://datatracker.ietf.org/doc/html/rfc8554#section-6>
@@ -1170,27 +1174,28 @@ WC_LMS_PARM_L3_H5_W8  | 3992 | 32768
 WC_LMS_PARM_L3_H10_W4 | 7640 | 1073741824
 WC_LMS_PARM_L4_H5_W8  | 5340 | 1048576
 
-表からわかるように、署名のサイズは主にレベルとウィンターニッツパラメーター、および程度は低いですが高さによって決まります。
-- レベル値を大きくすると、シグネチャサイズが大幅に増加します。
-- 高さの値を大きくすると、署名のサイズが適度に増加します。
-- Winternitz 値を大きくすると、署名のサイズが小さくなりますが、鍵の生成と署名/検証にかかる時間が長くなります。
+表からわかるように、署名のサイズは主にレベルとWinternitz値、および比較的影響は小さいですが高さによって決まります。
 
-鍵の生成時間は、第1レベルのツリーの高さによって大きく決まります。使用可能な署名の数が同じであっても、レベル３、高さ5 のツリーは、初期鍵生成時にレベル１、高さ15 のツリーよりもはるかに高速です
+- レベル値を大きくすると、署名サイズは大幅に増加します。
+- 高さの値を大きくすると、署名のサイズは増加します。
+- Winternitz値を大きくすると、署名のサイズは小さくなりますが、鍵の生成と署名/検証にかかる時間が長くなります。
+
+鍵の生成時間は、第1レベルのツリーの高さによって大きく決まります。使用可能な署名の数が同じであっても、レベル3、高さ5のツリーは、初期鍵生成時にレベル1、高さ15のツリーよりもはるかに高速です
 
 #### LMS/HSSビルド方法
 
-wolfSSLリポジトリのINSTALLファイル(https://github.com/wolfSSL/wolfssl/blob/master/INSTALL)を参照してください。 項目17(LMS/HSSサポートのためのhash-sigsライブラリを使用した構築 [実験]) には、wolfSSLとhash-sigs LMS/HSSライブラリを設定および構築する方法についての手順が記載されています。
+wolfSSLリポジトリのINSTALLファイル (https://github.com/wolfSSL/wolfssl/blob/master/INSTALL) を参照してください。 項目17(LMS/HSSサポートのためのhash-sigsライブラリを使用した構築 [実験]) には、wolfSSLとhash-sigs LMS/HSSライブラリを設定および構築する方法についての手順が記載されています。
 
 #### ベンチマークデータ
 次のベンチマークデータは、Fedora 38(`6.2.9-300.fc38.x86_64`)上の8コアIntel i7-8700 CPU@3.20GHzで取得されました。マルチスレッドの例では4スレッドと4コアが使用されましたが、シングルスレッドの例では1コアのみが使用されました。
 
 INSTALLファイルの項目17で説明したように、hash-sigsライブラリは2つの静的ライブラリを提供します。
-- `hss_lib.a`: シングルスレッドバージョン。
-- `hss_lib_thread.a`: マルチスレッドバージョン。
+- `hss_lib.a`: シングルスレッド
+- `hss_lib_thread.a`: マルチスレッド
 
-マルチスレッドバージョンではワーカースレッドが生成され、鍵生成などのCPUを集中的に使用するタスクが高速化されます。これにより、主にすべてのパラメータ値に対する鍵の生成と署名が高速化され、程度は低いですが、より大きなレベル値の検証が高速化されます。
+マルチスレッドバージョンではワーカースレッドが生成され、鍵生成などのCPUを集中的に使用するタスクが高速化されます。これにより、主にすべてのパラメータ値に対する鍵の生成と署名が高速化され、より大きなレベル値の検証も多少高速化されます。
 
-参考までに、wolfSSLは両方のベンチマークを取得するために次のようにして構築されました。
+なお、以下のベンチマークは次の構成オプションを有効化して取得しました。
 
 
 ```text
@@ -1253,5 +1258,170 @@ LMS/HSS L3_H10_W4  7640     sign       400 ops took 1.010 sec, avg 2.526 ms, 395
 LMS/HSS L3_H10_W4  7640   verify      1500 ops took 1.052 sec, avg 0.701 ms, 1426.284 ops/sec
 LMS/HSS L4_H5_W8  5340     sign       100 ops took 1.066 sec, avg 10.665 ms, 93.768 ops/sec
 LMS/HSS L4_H5_W8  5340   verify       200 ops took 1.478 sec, avg 7.388 ms, 135.358 ops/sec
+Benchmark complete
+```
+
+
+### XMSS/XMSS^MT 署名
+
+wolfSSLは、XMSS/XMSS^MTステートフルハッシュベース署名のサポートを追加しています。LMSと同様に、これはRFC 8391 (https://www.rfc-editor.org/rfc/rfc8391.html) のxmss-reference リポジトリ (https://github.com/XMSS/xmss-reference.git) との実験的な統合によって実現されています。
+
+xmss-referenceは、`xmss_core_fast` および `xmss_core` 実装をサポートしています。`xmss_core_fast` 実装は、トレードオフとしてより大きな秘密鍵サイズでパフォーマンスを優先するように設計されています。
+
+当社の統合では `xmss_core_fast` を使用していますが、パッチが適用されているため、代わりに wolfCrypt SHA256実装を使用できます。
+
+パッチは、wolfssl-examplesリポジトリの
+```pq/stateful_hash_sig/0001-Patch-to-support-wolfSSL-xmss-reference-integration.patch```
+で公開しています。https://github.com/wolfSSL/wolfssl-examples
+
+全体的に、XMSS/XMSS^MTはLMS/HSSに似ています。より詳細な比較については、「LMS vs XMSS: 2 つのハッシュベース署名標準の比較」(https://eprint.iacr.org/2017/349.pdf) を参照してください。
+
+XMSS^MTはXMSSのマルチツリー一般化であり、HSS with LMSに似ていますが、XMSS/XMSS^MTではWinternitz値が `w=16` に固定されている点が異なります。公開鍵はXMSS/XMSS^MTでは若干大きくなり(XMSS/XMSS^MTでは68 バイト、LMS/HSSでは60バイト)、署名は若干小さくなります。
+
+#### サポートしているパラメータ
+
+wolfSSLは、NIST SP 800-208 (https://csrc.nist.gov/pubs/sp/800/208/final) の表10および11のSHA256 XMSS/XMSS^MTパラメータセットをサポートしています。
+
+parameter set name      | Oid         | n   | w   | h   | d   | h/d | Sig len
+----------------------- | ----------- | --- | --- | --- | --- | --- | --
+XMSS                    |             |     |     |     |     |     |
+"XMSS-SHA2_10_256"      |  0x00000001 |  32 |  16 |  10 |  1  |  10 | 2500
+"XMSS-SHA2_16_256"      |  0x00000002 |  32 |  16 |  16 |  1  |  16 | 2692
+"XMSS-SHA2_20_256"      |  0x00000003 |  32 |  16 |  20 |  1  |  20 | 2820
+XMSS^MT                 |             |     |     |     |     |     |
+"XMSSMT-SHA2_20/2_256"  |  0x00000001 |  32 |  16 |  20 |  2  |  10 | 4963
+"XMSSMT-SHA2_20/4_256"  |  0x00000002 |  32 |  16 |  20 |  4  |   5 | 9251
+"XMSSMT-SHA2_40/2_256"  |  0x00000003 |  32 |  16 |  40 |  2  |  20 | 5605
+"XMSSMT-SHA2_40/4_256"  |  0x00000004 |  32 |  16 |  40 |  4  |  10 | 9893
+"XMSSMT-SHA2_40/8_256"  |  0x00000005 |  32 |  16 |  40 |  8  |   5 | 18469
+"XMSSMT-SHA2_60/3_256"  |  0x00000006 |  32 |  16 |  60 |  3  |  20 | 8392
+"XMSSMT-SHA2_60/6_256"  |  0x00000007 |  32 |  16 |  60 |  6  |  10 | 14824
+"XMSSMT-SHA2_60/12_256" |  0x00000008 |  32 |  16 |  60 |  12 |   5 | 27688
+
+上記の表で、`n` は HASH 関数のバイト数、`w` はWinternitz値、`h` はツリーシステムの合計高さ、`d` はツリーのレベルを示します。
+
+鍵生成時間は第1レベルのツリーの高さ(または`h/d`) によって大きく左右されますが、署名の長さは主に`d` (ハイパーツリーレベルの数)とともに増加します。
+
+LMS/HSSと同様に、使用可能な署名の数は `2**h` に比例して増加します。ここで `h` はツリー システムの合計高さです。
+ 
+#### ベンチマークデータ
+
+以下では、Intel x86_64およびaarch64のいくつかのXMSS/XMSS^MTパラメータセットのベンチマーク データを示します。これらのシステムでのSHA256パフォーマンスも参考として記載されています。必要なハッシュチェーンの数が多いため、XMSS/XMSS^MTのCPU 作業の大部分が計算されるためです。さらに、xmss-referenceへのパッチはwolfCryptのSHA256実装を置き換えるため、同じASMの高速化のメリットが得られます。
+
+前述のように、XMSS統合ではxmss-referenceの`xmss_core_fast`実装を使用しています。この実装は、秘密鍵のサイズが大きいというトレードオフで、より高速なパフォーマンスを実現します。
+
+**x86_64**
+
+以下のx86_64ベンチマークデータは、Fedora 38 (`6.2.9-300.fc38.x86_64`) が動作するIntel i7-8700 CPU @ 3.20GHz(8コア)で取得しました。このCPUには`avx avx2`フラグがあり、`--enable-intelasm` を有効化することでハッシュ操作を高速化できます。
+
+`--enable-intelasm` を使用する場合
+
+```text
+$./wolfcrypt/benchmark/benchmark -xmss_xmssmt -sha256
+------------------------------------------------------------------------------
+ wolfSSL version 5.6.3
+------------------------------------------------------------------------------
+Math: 	Multi-Precision: Wolf(SP) word-size=64 bits=4096 sp_int.c
+wolfCrypt Benchmark (block bytes 1048576, min 1.0 sec each)
+SHA-256                    500 MiB took 1.009 seconds,  495.569 MiB/s Cycles per byte =   6.14
+XMSS-SHA2_10_256  2500     sign       200 ops took 1.010 sec, avg 5.052 ms, 197.925 ops/sec
+XMSS-SHA2_10_256  2500   verify      1600 ops took 1.011 sec, avg 0.632 ms, 1582.844 ops/sec
+XMSSMT-SHA2_20/2_256  4963     sign       200 ops took 1.286 sec, avg 6.431 ms, 155.504 ops/sec
+XMSSMT-SHA2_20/2_256  4963   verify       700 ops took 1.009 sec, avg 1.441 ms, 693.905 ops/sec
+XMSSMT-SHA2_20/4_256  9251     sign       300 ops took 1.223 sec, avg 4.076 ms, 245.335 ops/sec
+XMSSMT-SHA2_20/4_256  9251   verify       400 ops took 1.027 sec, avg 2.569 ms, 389.329 ops/sec
+XMSSMT-SHA2_40/4_256  9893     sign       200 ops took 1.466 sec, avg 7.332 ms, 136.394 ops/sec
+XMSSMT-SHA2_40/4_256  9893   verify       400 ops took 1.024 sec, avg 2.560 ms, 390.627 ops/sec
+XMSSMT-SHA2_40/8_256 18469     sign       300 ops took 1.202 sec, avg 4.006 ms, 249.637 ops/sec
+XMSSMT-SHA2_40/8_256 18469   verify       200 ops took 1.089 sec, avg 5.446 ms, 183.635 ops/sec
+XMSSMT-SHA2_60/6_256 14824     sign       200 ops took 1.724 sec, avg 8.618 ms, 116.033 ops/sec
+XMSSMT-SHA2_60/6_256 14824   verify       300 ops took 1.136 sec, avg 3.788 ms, 263.995 ops/sec
+XMSSMT-SHA2_60/12_256 27688     sign       300 ops took 1.210 sec, avg 4.034 ms, 247.889 ops/sec
+XMSSMT-SHA2_60/12_256 27688   verify       200 ops took 1.575 sec, avg 7.877 ms, 126.946 ops/sec
+Benchmark complete
+```
+
+`--enable-intelasm` を使用しない場合
+
+```text
+$./wolfcrypt/benchmark/benchmark -xmss_xmssmt -sha256
+------------------------------------------------------------------------------
+ wolfSSL version 5.6.3
+------------------------------------------------------------------------------
+Math: 	Multi-Precision: Wolf(SP) word-size=64 bits=4096 sp_int.c
+wolfCrypt Benchmark (block bytes 1048576, min 1.0 sec each)
+SHA-256                    275 MiB took 1.005 seconds,  273.549 MiB/s Cycles per byte =  11.13
+XMSS-SHA2_10_256  2500     sign       200 ops took 1.356 sec, avg 6.781 ms, 147.480 ops/sec
+XMSS-SHA2_10_256  2500   verify      1200 ops took 1.025 sec, avg 0.854 ms, 1170.547 ops/sec
+XMSSMT-SHA2_20/2_256  4963     sign       200 ops took 1.687 sec, avg 8.436 ms, 118.546 ops/sec
+XMSSMT-SHA2_20/2_256  4963   verify       600 ops took 1.187 sec, avg 1.978 ms, 505.663 ops/sec
+XMSSMT-SHA2_20/4_256  9251     sign       200 ops took 1.119 sec, avg 5.593 ms, 178.785 ops/sec
+XMSSMT-SHA2_20/4_256  9251   verify       300 ops took 1.086 sec, avg 3.622 ms, 276.122 ops/sec
+XMSSMT-SHA2_40/4_256  9893     sign       200 ops took 1.991 sec, avg 9.954 ms, 100.460 ops/sec
+XMSSMT-SHA2_40/4_256  9893   verify       300 ops took 1.043 sec, avg 3.478 ms, 287.545 ops/sec
+XMSSMT-SHA2_40/8_256 18469     sign       200 ops took 1.114 sec, avg 5.572 ms, 179.454 ops/sec
+XMSSMT-SHA2_40/8_256 18469   verify       200 ops took 1.495 sec, avg 7.476 ms, 133.770 ops/sec
+XMSSMT-SHA2_60/6_256 14824     sign       100 ops took 1.111 sec, avg 11.114 ms, 89.975 ops/sec
+XMSSMT-SHA2_60/6_256 14824   verify       200 ops took 1.070 sec, avg 5.349 ms, 186.963 ops/sec
+XMSSMT-SHA2_60/12_256 27688     sign       200 ops took 1.148 sec, avg 5.739 ms, 174.247 ops/sec
+XMSSMT-SHA2_60/12_256 27688   verify       100 ops took 1.080 sec, avg 10.797 ms, 92.618 ops/sec
+Benchmark complete
+```
+
+**aarch64**
+
+以下のaarch64データは、CPUフラグ`sha1 sha2 sha3 sha512`を使用してApple M1上で実行されているUbuntu(`5.15.0-71-generic`) で取得されました。`--enable-armasm` を使用してビルドすると、特に SHA ハッシュ操作が大幅に高速化されます。
+
+`--enable-armasm`を使用する場合
+
+```text
+$ ./wolfcrypt/benchmark/benchmark -xmss_xmssmt -sha256
+------------------------------------------------------------------------------
+ wolfSSL version 5.6.3
+------------------------------------------------------------------------------
+Math: Multi-Precision: Wolf(SP) word-size=64 bits=4096 sp_int.c
+wolfCrypt Benchmark (block bytes 1048576, min 1.0 sec each)
+SHA-256                   2305 MiB took 1.001 seconds, 2303.346 MiB/s
+XMSS-SHA2_10_256  2500     sign       800 ops took 1.079 sec, avg 1.349 ms, 741.447 ops/sec
+XMSS-SHA2_10_256  2500   verify      6500 ops took 1.007 sec, avg 0.155 ms, 6455.445 ops/sec
+XMSSMT-SHA2_20/2_256  4963     sign       700 ops took 1.155 sec, avg 1.650 ms, 606.154 ops/sec
+XMSSMT-SHA2_20/2_256  4963   verify      3100 ops took 1.021 sec, avg 0.329 ms, 3037.051 ops/sec
+XMSSMT-SHA2_20/4_256  9251     sign      1100 ops took 1.006 sec, avg 0.915 ms, 1093.191 ops/sec
+XMSSMT-SHA2_20/4_256  9251   verify      1700 ops took 1.013 sec, avg 0.596 ms, 1677.399 ops/sec
+XMSSMT-SHA2_40/4_256  9893     sign       600 ops took 1.096 sec, avg 1.827 ms, 547.226 ops/sec
+XMSSMT-SHA2_40/4_256  9893   verify      1600 ops took 1.062 sec, avg 0.664 ms, 1506.946 ops/sec
+XMSSMT-SHA2_40/8_256 18469     sign      1100 ops took 1.007 sec, avg 0.916 ms, 1092.214 ops/sec
+XMSSMT-SHA2_40/8_256 18469   verify       900 ops took 1.088 sec, avg 1.209 ms, 827.090 ops/sec
+XMSSMT-SHA2_60/6_256 14824     sign       600 ops took 1.179 sec, avg 1.966 ms, 508.728 ops/sec
+XMSSMT-SHA2_60/6_256 14824   verify      1100 ops took 1.038 sec, avg 0.944 ms, 1059.590 ops/sec
+XMSSMT-SHA2_60/12_256 27688     sign      1100 ops took 1.015 sec, avg 0.923 ms, 1083.767 ops/sec
+XMSSMT-SHA2_60/12_256 27688   verify       600 ops took 1.149 sec, avg 1.914 ms, 522.367 ops/sec
+Benchmark complete
+```
+
+`--enable-armasm`を使用しない場合
+
+```text
+$ ./wolfcrypt/benchmark/benchmark -xmss_xmssmt -sha256
+------------------------------------------------------------------------------
+ wolfSSL version 5.6.3
+------------------------------------------------------------------------------
+Math: Multi-Precision: Wolf(SP) word-size=64 bits=4096 sp_int.c
+wolfCrypt Benchmark (block bytes 1048576, min 1.0 sec each)
+SHA-256                    190 MiB took 1.020 seconds,  186.277 MiB/s
+XMSS-SHA2_10_256  2500     sign       200 ops took 1.908 sec, avg 9.538 ms, 104.845 ops/sec
+XMSS-SHA2_10_256  2500   verify       800 ops took 1.002 sec, avg 1.253 ms, 798.338 ops/sec
+XMSSMT-SHA2_20/2_256  4963     sign       100 ops took 1.084 sec, avg 10.843 ms, 92.222 ops/sec
+XMSSMT-SHA2_20/2_256  4963   verify       500 ops took 1.240 sec, avg 2.479 ms, 403.334 ops/sec
+XMSSMT-SHA2_20/4_256  9251     sign       200 ops took 1.615 sec, avg 8.074 ms, 123.855 ops/sec
+XMSSMT-SHA2_20/4_256  9251   verify       200 ops took 1.071 sec, avg 5.355 ms, 186.726 ops/sec
+XMSSMT-SHA2_40/4_256  9893     sign       100 ops took 1.354 sec, avg 13.543 ms, 73.840 ops/sec
+XMSSMT-SHA2_40/4_256  9893   verify       300 ops took 1.483 sec, avg 4.945 ms, 202.237 ops/sec
+XMSSMT-SHA2_40/8_256 18469     sign       200 ops took 1.588 sec, avg 7.941 ms, 125.922 ops/sec
+XMSSMT-SHA2_40/8_256 18469   verify       100 ops took 1.042 sec, avg 10.415 ms, 96.014 ops/sec
+XMSSMT-SHA2_60/6_256 14824     sign       100 ops took 1.571 sec, avg 15.710 ms, 63.654 ops/sec
+XMSSMT-SHA2_60/6_256 14824   verify       200 ops took 1.526 sec, avg 7.632 ms, 131.033 ops/sec
+XMSSMT-SHA2_60/12_256 27688     sign       200 ops took 1.607 sec, avg 8.036 ms, 124.434 ops/sec
+XMSSMT-SHA2_60/12_256 27688   verify       100 ops took 1.501 sec, avg 15.011 ms, 66.616 ops/sec
 Benchmark complete
 ```
