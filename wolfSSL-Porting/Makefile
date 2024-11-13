@@ -9,7 +9,7 @@ SOURCES = section01.md \
 		  section04.md
 
 ifeq ($(DOC_LANG),JA)
-    PDF  = wolfSSL-Porting-Guide-ja.pdf
+    PDF  = wolfSSL-Porting-Guide-jp.pdf
 	DOXYFILE = Doxyfile-ja
 else
     PDF  = wolfSSL-Porting-Guide.pdf
