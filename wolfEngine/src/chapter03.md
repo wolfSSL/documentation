@@ -202,6 +202,7 @@ By default, wolfEngine only builds a shared library, with building of a static l
 | --enable-p384 | Enabled | Enable EC Curve P-384 |
 | --enable-p521 | Enabled | Enable EC Curve P-521 |
 | --with-openssl=DIR |   | OpenSSL installation location to link against. If not set, use the system default library and include paths. |
+| --enable-openssh | **Disabled** | Enables use with openssh |
 
 ## Build Defines
 
