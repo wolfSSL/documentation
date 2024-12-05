@@ -25,3 +25,4 @@ wolfSSLは、お客様が新しい環境にwolfSSLを移植できるためのサ
 |1.9|03/02/2016|Chris Conlon|Expand data types, add Consulting Services|
 |1.9j|10/01/2018|Takashi Kojo|Japanese version|
 |1.10|12/30/2022|John Safranek|Initial markdown revision|
+|1.10j|11/26/2024|Masaki Iwai|Japanese version|
