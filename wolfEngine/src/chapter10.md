@@ -23,6 +23,8 @@ stunnel has been tested with wolfEngine. Notes coming soon.
 
 ## OpenSSH
 
+To use wolfEngine with OpenSSH you will need to add `--enable-openssh` to the `./configure` line of wolfEngine.
+
 OpenSSH needs to be compiled with OpenSSL engine support using the `--with-ssl-engine` configure option. If needed, `--with-ssl-dir=DIR` can also be used to specify the installation location of the OpenSSL library being used:
 ```
 $ cd openssh
