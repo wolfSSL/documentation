@@ -180,7 +180,7 @@ wc_Poly1305Final(&pmac, pmacDigest);
 
 ### AES
 
-wolfCrypt provides support for AES with key sizes of 16 bytes (128 bits), 24 bytes (192 bits), or 32 bytes (256 bits). Supported AES modes include CBC, CTR, GCM, and CCM-8.
+wolfCrypt provides support for AES with key sizes of 16 bytes (128 bits), 24 bytes (192 bits), or 32 bytes (256 bits). Supported AES modes include CBC, CTR, GCM (GCM-Streaming), OFB, CFB(1, 8, 128), SIV, XTS (XTS-Streaming), GMAC, CMAC, ECB, KW (KeyWrap), and CCM-8.
 
 **NOTE**: [`wc_AesInit()`](group__AES.md#function-wc_aesinit) should always be called first to initialize the `Aes` structure, before calling other `Aes` API functions such as [`wc_AesSetKey()`](group__AES.md#function-wc_aessetkey), and [`wc_AesGcmSetKey()`](group__AES.md#function-wc_aesgcmsetkey).
 
