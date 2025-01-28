@@ -841,6 +841,55 @@ authentication context.
 void* wolfSSH_GetUserAuthCtx(WOLFSSH* ssh )
 ```
 
+### wolfSSH_SetKeyboardAuthPrompts()
+
+
+**Synopsis**
+
+**Description**
+
+The wolfSSH_SetKeyboardAuthPrompts() function is used to setup the callback
+which will provide the server with the prompts to send to the client.
+
+**Return Values**
+
+None
+
+**Parameters**
+
+**ctx** - pointer to the wolfSSH context
+**cb** - callback function to provide the keyboard prompts
+
+```
+#include <wolfssh/ssh.h>
+void wolfSSH_SetKeyboardAuthPrompts(WOLFSSH_CTX* ctx,
+                                    WS_CallbackKeyboardAuthPrompts cb)
+```
+
+### wolfSSH_SetKeyboardAuthCtx()
+
+
+**Synopsis**
+
+**Description**
+
+The wolfSSH_SetKeyboardAuthCtx() function is used to setup the user context
+for the wolfSSH_SetKeyboardAuthPrompts() function.
+
+**Return Values**
+
+None
+
+**Parameters**
+
+**ssh** - pointer to the WOLFSSH object
+**keyboardAuthCtx* - pointer to the user context data
+
+```
+#include <wolfssh/ssh.h>
+void wolfSSH_SetKeyboardAuthCtx(WOLFSSH* ssh, void* keyboardAuthCtx)
+```
+
 ##  Set Username
 
 
