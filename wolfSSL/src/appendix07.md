@@ -1294,3 +1294,7 @@ XMSSMT-SHA2_60/12_256 27688     sign       200 ops took 1.607 sec, avg 8.036 ms,
 XMSSMT-SHA2_60/12_256 27688   verify       100 ops took 1.501 sec, avg 15.011 ms, 66.616 ops/sec
 Benchmark complete
 ```
+
+### Developer Notes
+
+* If you are trying to thwart the “harvest now, decrypt later” threat model and you are willing to sacrifice some interoperability, then you do not want to advertise support for conventional algorithms in the Supported Groups extension.  Be sure to call `wolfSSL_UseKeyShare()` and `wolfSSL_set_groups()` with your chosen algorithms.  Only calling `wolfSSL_UseKeyShare()` is insufficient as that will advertise your support for quantum-vulnerable algorithms. If your peer does not support post-quantum algorithms, they will then send a HelloRetryRequest which will then result in a connection with a conventional algorithm.
