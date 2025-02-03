@@ -22,6 +22,18 @@ void* wolfSSH_GetUserAuthCtx(WOLFSSH* ssh );
 ```
 This returns the pointer to the user authentication context data stored in the provided wolfSSH session. This is not to be confused with the wolfSSH’s context data used to create the session.
 
+## Setting the Keyboard Authentication Prompts Callback Function
+```
+void wolfSSH_SetKeyboardAuthPrompts(WOLFSSH_CTX* ctx, WS_CallbackKeyboardAuthPrompts cb);
+```
+
+The server needs to specify the prompts that are to be given to the client so
+that it can authenticate in Keyboard-Interactive mode. This callback allows the
+server to set the prompts ready to send to the client.
+
+Without this set, Keyboard-Interactive mode will be disabled on the server, even
+if attempts are made to explicitly enable it.
+
 ##  Example Echo Server User Authentication
 
 The example echo server implements the authentication callback with sample users using passwords and public keys. The example callback, wsUserAuth, is set on the wolfSSH context:

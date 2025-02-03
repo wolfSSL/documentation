@@ -44,6 +44,7 @@ The following are values passed to the user authentication callback function in 
 
 ```
 WOLFSSH_USERAUTH_PASSWORD
+WOLFSSH_USERAUTH_KEYBOARD
 WOLFSSH_USERAUTH_PUBLICKEY
 ```
 
@@ -72,6 +73,7 @@ WOLFSSH_USERAUTH_INVALID_USER
 WOLFSSH_USERAUTH_INVALID_PASSWORD
 WOLFSSH_USERAUTH_INVALID_PUBLICKEY
 WOLFSSH_USERAUTH_PARTIAL_SUCCESS
+WOLFSSH_USERAUTH_SUCCESS_ANOTHER
 ```
 
 ##  Callback Function Data Types
@@ -84,10 +86,11 @@ typedef struct WS_UserAuthData {
     byte* username ;
     word32 usernameSz ;
     byte* serviceName ;
-    word32 serviceNameSz ; n
+    word32 serviceNameSz ;
     union {
         WS_UserAuthData_Password password ;
         WS_UserAuthData_PublicKey publicKey ;
+        WS_UserAuthData_Keyboard keyboard ;
     } sf;
 } WS_UserAuthData;
 ```
@@ -109,6 +112,51 @@ typedef struct WS_UserAuthData_Password {
     uint32_t newPasswordSz ;
 } WS_UserAuthData_Password;
 ```
+
+### Keyboard-Interactive
+
+The Keyboard-Interactive mode allows for an arbitrary number of prompts and
+responses from the server to the client. The structure that contains the
+information is as follows:
+
+```c
+typedef struct WS_UserAuthData_Keyboard {
+    word32 promptCount;
+    word32 responseCount;
+    word32 promptNameSz;
+    word32 promptInstructionSz;
+    word32 promptLanguageSz;
+    byte* promptName;
+    byte* promptInstruction;
+    byte* promptLanguage;
+    word32* promptLengths;
+    word32* responseLengths;
+    byte* promptEcho;
+    byte** responses;
+    byte** prompts;
+} WS_UserAuthData_Keyboard;
+```
+
+On the client side, during authentication, the `promptName` and
+`promptInstruction` will indicate to the user information about the
+authentication. The `promptLanguage` field is a deprecated part of the API and
+is ignored.
+
+The `promptCount` indicates how many prompts there are. `prompts` contains the
+array of prompts, `promptLengths` is an array containing the length of prompt
+in `prompts`. `promptEcho` in an array of booleans indicating whether or not
+each prompt response should be echoed to the user as they are typing.
+
+Conversely there is `responseCount` to set the number of responses given.
+`responses` and `responseLengths` contain the response data for the prompts.
+
+The server can set the prompts using the `wolfSSH_SetKeyboardAuthPrompts()`
+callback. The `WS_CallbackKeyboardAuthPrompts` callback should set the
+`promptCount`, `prompts`, `promptLengths` and `promptEcho`. The other `prompt*`
+items are optional.
+
+The server should return `WOLFSSH_USERAUTH_SUCCESS_ANOTHER` from the
+`WS_CallbackUserAuth` callback to execute subsequent request / response rounds.
 
 ###  Public Key
 
