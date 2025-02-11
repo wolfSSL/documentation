@@ -29,7 +29,7 @@ The wolfSSH library is a lightweight SSHv2 server library written in ANSI C and 
 
 - Public key authentication options: RSA and ECDSA (with curves NISTP256, NISTP384, NISTP521)
 
-- User authentication support (password and public key authentication)
+- User authentication support (password, keyboard-interactive and public key authentication)
 
 - Simple API
 
