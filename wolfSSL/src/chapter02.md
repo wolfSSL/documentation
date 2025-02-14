@@ -1810,7 +1810,7 @@ There are 4 variants of GCM performance:
 * `GCM_SMALL` - Smallest footprint, slowest (FIPS validated)
 * `GCM_WORD32` - Medium (FIPS validated)
 * `GCM_TABLE` - Fast (FIPS validated)
-* `GCM_TABLE_4BIT` - Fastest (Not yet FIPS validated, will be included in FIPS 140-3!)
+* `GCM_TABLE_4BIT` - Fastest (FIPS validated)
 
 ### wolfSSL’s Math Options
 
