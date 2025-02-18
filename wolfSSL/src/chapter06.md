@@ -105,7 +105,229 @@ To use Atomic Record Layer callbacks, wolfSSL needs to be compiled using the `--
 
 ## Public Key Callbacks
 
-wolfSSL provides Public Key callbacks for users who wish to have more control over ECC sign/verify functionality as well as RSA sign/verify and encrypt/decrypt functionality during the SSL/TLS connection.
+wolfSSL provides Public Key callbacks for users who wish to have more control over DH, ECC, Ed25519, X25519, Ed448, X448, and RSA operations during the SSL/TLS connection.
+
+### DH Callbacks
+
+wolfSSL provides DH (Diffie-Hellman) callbacks for users who wish to have more control over DH key generation and key agreement operations during the SSL/TLS connection.
+
+The user can optionally define 2 functions:
+1. DH key generation callback
+2. DH key agreement callback
+
+These functions are prototyped by `CallbackDhGenerateKeyPair` and `CallbackDhAgree` in `ssl.h`:
+
+```c
+typedef int (*CallbackDhGenerateKeyPair)(DhKey* key, WC_RNG* rng,
+                                         byte* priv, word32* privSz,
+                                         byte* pub, word32* pubSz);
+
+typedef int (*CallbackDhAgree)(WOLFSSL* ssl, struct DhKey* key,
+        const unsigned char* priv, unsigned int privSz,
+        const unsigned char* otherPubKeyDer, unsigned int otherPubKeySz,
+        unsigned char* out, word32* outlen,
+        void* ctx);
+```
+
+The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+* `wolfSSL_CTX_SetDhGenerateKeyPair()`
+* `wolfSSL_CTX_SetDhAgreeCb()`
+
+The user can set a context per WOLFSSL object (session) with `wolfSSL_SetDhAgreeCtx()`.
+
+Example callbacks can be found in `wolfssl/test.h`, under `myDhCallback()`. Usage can be seen in the wolfSSL example client.
+
+To use DH callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` and `HAVE_DH` defined.
+
+### Ed25519 Callbacks
+
+wolfSSL provides Ed25519 callbacks for users who wish to have more control over Ed25519 sign/verify operations during the SSL/TLS connection.
+
+The user can optionally define 2 functions:
+1. Ed25519 sign callback
+2. Ed25519 verify callback
+
+These functions are prototyped by `CallbackEd25519Sign` and `CallbackEd25519Verify` in `ssl.h`:
+
+```c
+typedef int (*CallbackEd25519Sign)(WOLFSSL* ssl,
+       const unsigned char* in, unsigned int inSz,
+       unsigned char* out, unsigned int* outSz,
+       const unsigned char* keyDer, unsigned int keySz,
+       void* ctx);
+
+typedef int (*CallbackEd25519Verify)(WOLFSSL* ssl,
+       const unsigned char* sig, unsigned int sigSz,
+       const unsigned char* msg, unsigned int msgSz,
+       const unsigned char* keyDer, unsigned int keySz,
+       int* result, void* ctx);
+```
+
+The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+* `wolfSSL_CTX_SetEd25519SignCb()`
+* `wolfSSL_CTX_SetEd25519VerifyCb()`
+
+The user can set a context per WOLFSSL object (session) with:
+* `wolfSSL_SetEd25519SignCtx()`
+* `wolfSSL_SetEd25519VerifyCtx()`
+
+Example callbacks can be found in `wolfssl/test.h`, under `myEd25519Sign()` and `myEd25519Verify()`. Usage can be seen in the wolfSSL example client.
+
+To use Ed25519 callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` and `HAVE_ED25519` defined.
+
+### X25519 Callbacks
+
+wolfSSL provides X25519 callbacks for users who wish to have more control over X25519 key generation and shared secret computation during the SSL/TLS connection.
+
+The user can optionally define 2 functions:
+1. X25519 key generation callback
+2. X25519 shared secret callback
+
+These functions are prototyped by `CallbackX25519KeyGen` and `CallbackX25519SharedSecret` in `ssl.h`:
+
+```c
+typedef int (*CallbackX25519KeyGen)(WOLFSSL* ssl, struct curve25519_key* key,
+    unsigned int keySz, void* ctx);
+
+typedef int (*CallbackX25519SharedSecret)(WOLFSSL* ssl,
+        struct curve25519_key* otherKey,
+        unsigned char* pubKeyDer, unsigned int* pubKeySz,
+        unsigned char* out, unsigned int* outlen,
+        int side, void* ctx);
+```
+
+The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+* `wolfSSL_CTX_SetX25519KeyGenCb()`
+* `wolfSSL_CTX_SetX25519SharedSecretCb()`
+
+The user can set a context per WOLFSSL object (session) with:
+* `wolfSSL_SetX25519KeyGenCtx()`
+* `wolfSSL_SetX25519SharedSecretCtx()`
+
+Example callbacks can be found in `wolfssl/test.h`, under `myX25519KeyGen()` and `myX25519SharedSecret()`. Usage can be seen in the wolfSSL example client.
+
+To use X25519 callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` and `HAVE_CURVE25519` defined.
+
+### Ed448 Callbacks
+
+wolfSSL provides Ed448 callbacks for users who wish to have more control over Ed448 sign/verify operations during the SSL/TLS connection.
+
+The user can optionally define 2 functions:
+1. Ed448 sign callback
+2. Ed448 verify callback
+
+These functions are prototyped by `CallbackEd448Sign` and `CallbackEd448Verify` in `ssl.h`:
+
+```c
+typedef int (*CallbackEd448Sign)(WOLFSSL* ssl,
+       const unsigned char* in, unsigned int inSz,
+       unsigned char* out, unsigned int* outSz,
+       const unsigned char* keyDer, unsigned int keySz,
+       void* ctx);
+
+typedef int (*CallbackEd448Verify)(WOLFSSL* ssl,
+       const unsigned char* sig, unsigned int sigSz,
+       const unsigned char* msg, unsigned int msgSz,
+       const unsigned char* keyDer, unsigned int keySz,
+       int* result, void* ctx);
+```
+
+The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+* `wolfSSL_CTX_SetEd448SignCb()`
+* `wolfSSL_CTX_SetEd448VerifyCb()`
+
+The user can set a context per WOLFSSL object (session) with:
+* `wolfSSL_SetEd448SignCtx()`
+* `wolfSSL_SetEd448VerifyCtx()`
+
+Example callbacks can be found in `wolfssl/test.h`, under `myEd448Sign()` and `myEd448Verify()`. Usage can be seen in the wolfSSL example client.
+
+To use Ed448 callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` and `HAVE_ED448` defined.
+
+### X448 Callbacks
+
+wolfSSL provides X448 callbacks for users who wish to have more control over X448 key generation and shared secret operations during the SSL/TLS connection.
+
+The user can optionally define 2 functions:
+1. X448 key generation callback
+2. X448 shared secret callback
+
+These functions are prototyped by `CallbackX448KeyGen` and `CallbackX448SharedSecret` in `ssl.h`:
+
+```c
+typedef int (*CallbackX448KeyGen)(WOLFSSL* ssl, struct curve448_key* key,
+    unsigned int keySz, void* ctx);
+
+typedef int (*CallbackX448SharedSecret)(WOLFSSL* ssl,
+        struct curve448_key* otherKey,
+        unsigned char* pubKeyDer, unsigned int* pubKeySz,
+        unsigned char* out, unsigned int* outlen,
+        int side, void* ctx);
+```
+
+The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+* `wolfSSL_CTX_SetX448KeyGenCb()`
+* `wolfSSL_CTX_SetX448SharedSecretCb()`
+
+The user can set a context per WOLFSSL object (session) with:
+* `wolfSSL_SetX448KeyGenCtx()`
+* `wolfSSL_SetX448SharedSecretCtx()`
+
+Example callbacks can be found in `wolfssl/test.h`, under `myX448KeyGen()` and `myX448SharedSecret()`. Usage can be seen in the wolfSSL example client.
+
+To use X448 callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` and `HAVE_CURVE448` defined.
+
+### RSA PSS Callbacks
+
+wolfSSL provides RSA PSS callbacks for users who wish to have more control over RSA PSS sign/verify operations during the SSL/TLS connection.
+
+The user can optionally define 4 functions:
+1. RSA PSS sign callback
+2. RSA PSS verify callback
+3. RSA PSS sign check callback
+4. RSA PSS verify check callback
+
+These functions are prototyped by `CallbackRsaPssSign`, `CallbackRsaPssVerify`, and `CallbackRsaPssSignCheck` in `ssl.h`:
+
+```c
+typedef int (*CallbackRsaPssSign)(WOLFSSL* ssl,
+       const unsigned char* in, unsigned int inSz,
+       unsigned char* out, unsigned int* outSz,
+       int hash, int mgf,
+       const unsigned char* keyDer, unsigned int keySz,
+       void* ctx);
+
+typedef int (*CallbackRsaPssVerify)(WOLFSSL* ssl,
+       unsigned char* sig, unsigned int sigSz,
+       unsigned char** out,
+       int hash, int mgf,
+       const unsigned char* keyDer, unsigned int keySz,
+       void* ctx);
+
+typedef int (*CallbackRsaPssSignCheck)(WOLFSSL* ssl,
+       unsigned char* sig, unsigned int sigSz,
+       unsigned char** out,
+       const unsigned char* keyDer, unsigned int keySz,
+       void* ctx);
+```
+
+The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+* `wolfSSL_CTX_SetRsaPssSignCb()`
+* `wolfSSL_CTX_SetRsaPssVerifyCb()`
+* `wolfSSL_CTX_SetRsaSignCheckCb()`
+* `wolfSSL_CTX_SetRsaPssSignCheckCb()`
+
+The user can set a context per WOLFSSL object (session) with:
+* `wolfSSL_SetRsaPssSignCtx()`
+* `wolfSSL_SetRsaPssVerifyCtx()`
+* `wolfSSL_SetRsaSignCheckCtx()`
+* `wolfSSL_SetRsaPssSignCheckCtx()`
+
+Example callbacks can be found in `wolfssl/test.h`, under `myRsaPssSign()`, `myRsaPssVerify()`, and `myRsaPssSignCheck()`. Usage can be seen in the wolfSSL example client.
+
+To use RSA PSS callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` and `WC_RSA_PSS` defined.
+
+### ECC Callbacks
 
 The user can optionally define 7 functions:
 
