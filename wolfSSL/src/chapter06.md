@@ -107,6 +107,14 @@ To use Atomic Record Layer callbacks, wolfSSL needs to be compiled using the `--
 
 wolfSSL provides Public Key (PK) callbacks for users who wish to have more control over DH, ECC, Ed25519, X25519, Ed448, X448, and RSA operations during the SSL/TLS connection.
 
+To use Public Key callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` defined. This can be done using the configure option:
+
+```sh
+./configure --enable-pkcallbacks
+```
+
+Additionally, each callback type requires its specific feature to be enabled (e.g., `HAVE_DH`, `HAVE_ED25519`, etc.).
+
 ### DH Callbacks
 
 wolfSSL provides DH (Diffie-Hellman) callbacks for users who wish to have more control over DH key generation and key agreement operations during the SSL/TLS connection.
@@ -137,11 +145,7 @@ The user can set a context per WOLFSSL object (session) with `wolfSSL_SetDhAgree
 
 Example callbacks can be found in `wolfssl/test.h`, under `myDhCallback()`. Usage can be seen in the wolfSSL example client.
 
-To use DH callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` and `HAVE_DH` defined. This can be done using the configure option:
-
-```sh
-./configure --enable-pkcallbacks
-```
+To use DH callbacks, wolfSSL needs to be compiled with `HAVE_DH` defined.
 
 ### Ed25519 Callbacks
 
