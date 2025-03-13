@@ -11,6 +11,42 @@ The code must be installed into wolfSSL in order to be used.
 
 Note that the test and build configuration code is already in wolfSSL.
 
+## Getting and Installing wolfSM
+
+### Get wolfSM from GitHub
+
+Clone the wolfSM repository from GitHub:
+
+```sh
+git clone https://github.com/wolfssl/wolfsm.git
+```
+
+### Get wolfSSL from GitHub
+
+wolfSSL is needed to build and test the SM algorithm implementations.
+Checkout the wolfSSL repository from GitHub beside wolfSM:
+
+```sh
+# Directory structure should be:
+# <install-dir>
+# ├── wolfsm
+# └── wolfssl
+```
+
+```sh
+cd .. # To directory containing wolfsm
+git clone https://github.com/wolfssl/wolfssl.git
+```
+
+### Install SM code into wolfSSL
+
+To install the SM code into wolfSSL, use the install script:
+
+```sh
+cd wolfsm
+./install.sh
+```
+
 ## Building wolfSM
 
 Once the wolfSM files have been installed into wolfSSL, you can build SM algorithms into wolfSSL.
