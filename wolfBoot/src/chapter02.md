@@ -18,6 +18,8 @@ Once a .config file is in place, it will change the default compile-time options
 
 .config can be modified with a text editor to alter the default options later on.
 
+Detailed parameters can be found at [Appendix. N](appendix14.md)
+
 ## Platform selection
 
 If supported natively, the target platform can be specified using the `TARGET` variable. Make will automatically select the correct compile option, and include the corresponding HAL for the selected target. 

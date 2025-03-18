@@ -23,7 +23,8 @@ APPENDIX= appendix01.md \
 		  appendix10.md \
 		  appendix11.md \
 		  appendix12.md \
-		  appendix13.md
+		  appendix13.md \
+		  appendix14.md
 
 ifeq ($(DOC_LANG),JA)
     PDF  = wolfBoot-Manual-jp.pdf
