@@ -27,7 +27,8 @@ APPENDIX= appendix01.md \
 		  appendix05.md \
 		  appendix06.md \
 		  appendix07.md \
-		  appendix08.md
+		  appendix08.md \
+		  appendix09.md
 
 ifeq ($(DOC_LANG),JA)
     PDF  = wolfSSL-Manual-jp.pdf

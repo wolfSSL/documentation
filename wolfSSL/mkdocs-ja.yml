@@ -143,6 +143,7 @@ nav:
     - "F. エラーコード": appendix06.md
     - "G. ポスト量子暗号の実験": appendix07.md
     - "H. wolfSSL 移植ガイド": appendix08.md
+    - "I. wolfSM (ShangMi)": appendix09.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
