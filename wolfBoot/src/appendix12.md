@@ -1,4 +1,4 @@
-## wolfCrypt in TrustZone-M secure domain
+# wolfCrypt in TrustZone-M secure domain
 
 ARMv8-M microcontrollers support hardware-assisted domain separation for running
 software. This TEE mechanism provides two separate domains (secure & non-secure),
@@ -8,7 +8,7 @@ functions from the non-secure domain (non-secure callable).
 wolfBoot may optionally export the crypto functions as a non-callable APIs that
 are accessible from any software staged in non-secure domain.
 
-### Compiling wolfBoot with wolfCrypt in TrustZone-M secure domain
+## Compiling wolfBoot with wolfCrypt in TrustZone-M secure domain
 
 When wolfBoot is compiled with the options `TZEN=1` and `WOLFCRYPT_TZ=1`,
 a more complete set of components of the wolfCrypt crypto library are built-in
@@ -17,7 +17,7 @@ non-secure domain through non-secure callable APIs.
 
 This feature is used to isolate the core crypto operations from the applications.
 
-### PKCS11 API in non-secure world
+## PKCS11 API in non-secure world
 
 The `WOLFCRYPT_TZ_PKCS11` option provides a standard PKCS11 interface,
 including a storage for PKCS11 objects in a dedicated flash area in secure mode.
@@ -27,7 +27,7 @@ non-secure domain can access wolfCrypt through a standard PKCS11 interface and
 use the crypto library with pre-provisioned keys that are never exposed to the
 non-secure domain.
 
-### Example using STM32L552
+## Example using STM32L552
 
   - Copy the example configuration for STM32-L5 with support for wolfCrypt in
     TrustZone-M and PKCS11 interface: `cp config/examples/stm32l5-wolfcrypt-tz.config .config`
@@ -115,7 +115,7 @@ STM32_Programmer_CLI -c port=swd -d test-app/image_v1_signed.bin 0x08040000
     - Green LED: ECDSA Sign/Verify test successful
 
 
-### Example using STM32H563
+## Example using STM32H563
 
   - Copy one of the example configurations for STM32H5 with support for TrustZone and PKCS11 to `.config`:
       `cp config/examples/stm32h5-tz.config .config`
