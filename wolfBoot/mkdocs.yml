@@ -25,6 +25,7 @@ nav:
     - "K. wolfBoot Key Tools": appendix11.md
     - "L. wolfCrypt in TrustZone-M secure domain": appendix12.md
     - "M. wolfBoot TPM support": appendix13.md
+    - "N. wolfBoot Configuration Options": appendix14.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
