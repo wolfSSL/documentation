@@ -281,7 +281,7 @@ Example `Makefile.common` changes for Raspberry Pi with Cortex-A53:
 #### Building with configure with cross-compile
 
 The configure script in the main project directory can perform a cross-compile
-build with the the gcc-arm-none-eabi tools. Assuming the tools are installed in
+build with the gcc-arm-none-eabi tools. Assuming the tools are installed in
 your executable path:
 
 ```sh

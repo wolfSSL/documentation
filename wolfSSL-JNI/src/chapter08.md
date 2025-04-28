@@ -119,7 +119,7 @@ A random amount of time is injected into each client thread before:
   2) Doing I/O operations after the handshake
 
 The maximum amount of sleep time for each of those is "maxSleep", or 3 seconds
-by default. This is intended to add some randomness into the the client thread
+by default. This is intended to add some randomness into the client thread
 operations.
 
 Example usage:
