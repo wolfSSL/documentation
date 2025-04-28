@@ -40,7 +40,7 @@ The Sensor Network client implements the MQTT-SN protocol for low-bandwidth netw
 
 A special feature of MQTT-SN is the ability to use QoS level -1 (negative one) to publish to a predefined topic without first connecting to the gateway. There is no feedback in the application if there was an error, so confirmation of the test would involve running the `sn-client` first and watching for the publish from the `sn-client_qos-1`. There is an example provided in `/examples/sn-client/sn-client_qos-1`. It requires some configuration changes of the gateway.
 
-* Enable the the QoS-1 feature, predefined topics, and change the gateway name in `gateway.conf`:
+* Enable the QoS-1 feature, predefined topics, and change the gateway name in `gateway.conf`:
 
 ```
 QoS-1=YES
