@@ -18,6 +18,8 @@ SOURCES = Intro.md \
 		  hash.md \
 		  md5.md \
 		  pkcs12.md \
+		  pkcs7.md \
+		  pkcs8.md \
 		  pkey.md \
 		  rand.md \
 		  req.md \
@@ -25,7 +27,8 @@ SOURCES = Intro.md \
 		  sha.md \
 		  s_client.md \
 		  verify.md \
-		  x509.md
+		  x509.md \
+		  base64.md
 
 ifeq ($(DOC_LANG),JA)
     PDF  = wolfCLU-Manual-jp.pdf
