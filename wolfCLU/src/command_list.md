@@ -1,4 +1,5 @@
 ## List Of Commands:
+- base64
 - bench
 - ca
 - crl
@@ -10,6 +11,8 @@
 - hash
 - md5
 - pkcs12
+- pkcs7
+- pkcs8
 - pkey
 - rand
 - req

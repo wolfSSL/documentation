@@ -3,6 +3,7 @@ Verifies an X509 certificate given a CA. The last argument passed into the comma
 
 - [-CAfile] file name for CA to be used with verify
 - [-crl_check] if CRL checking should be used
+- [-untrusted] file name for intermediate certificate to be used in verification (only one -untrusted cert is currently supported)
 
 Example:
 
