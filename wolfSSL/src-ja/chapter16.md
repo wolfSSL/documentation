@@ -1,28 +1,23 @@
-
-
-# wolfSSL(以前のCyassl)の更新
-
-
-
+# wolfSSL(旧称：Cyassl)の更新
 
 ## 製品のリリース情報
 
+最新の情報は、公式X([@wolfSSL_Japan](https://x.com/wolfSSL_Japan), [@wolfSSL](https://x.com/wolfSSL))にてご確認いただけます。
+そのほか。GitHubリポジトリやブログポストもぜひご覧ください。
 
+ニュースレターも発行しています。
+ご希望の方は[info@wolfssl.jp](mailto:info@wolfssl.jp)までお問い合わせください。
 
-更新情報をTwitterに定期的に投稿しています。追加のリリース情報については、GitHubでプロジェクトを追跡したり、Facebookでフォローしたり、毎日のブログをフォローしたりできます。
+* GitHubリポジトリ - [https://www.github.com/wolfssl/wolfssl](https://www.github.com/wolfssl/wolfssl)
 
+* X 
+    * 日本 [https://x.com/wolfSSL_Japan](https://x.com/wolfSSL_Japan)
+    * グローバル [https://x.com/wolfSSL](https://x.com/wolfSSL)
 
+* Facebook - [https://www.facebook.com/wolfSSL](https://www.facebook.com/wolfSSL)
 
-* GithubのWolfssl -[https://www.github.com/wolfssl/wolfssl](https://www.github.com/wolfssl/wolfssl)
+* Reddit - [https://www.reddit.com/r/wolfssl/](https://www.reddit.com/r/wolfssl/)
 
-
-* Twitterのwolfssl -[https://twitter.com/wolfSSL](https://twitter.com/wolfSSL)
-
-
-* Facebookのwolfssl -[https://www.facebook.com/wolfSSL](https://www.facebook.com/wolfSSL)
-
-
-* redditのwolfssl -[https://www.reddit.com/r/wolfssl/](https://www.reddit.com/r/wolfssl/)
-
-
-* 毎日のブログ -  [https://www.wolfssl.com/blog](https://www.wolfssl.com/blog)
+* ブログ
+    * 日本 [https://wolfssl.jp/blog/](https://wolfssl.jp/blog/)
+    * グローバル [https://www.wolfssl.com/blog](https://www.wolfssl.com/blog)
