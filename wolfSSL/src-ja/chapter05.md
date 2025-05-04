@@ -1,33 +1,24 @@
-
-
-# ポータビリティ
-
-
-
+# 移植性
 
 ## 抽象化レイヤー
 
-
-
-
 ### C標準ライブラリ抽象化レイヤー
 
-
-
-wolfSSL(以前のCyassl)は、C標準ライブラリなしでビルドして、開発者により高いレベルのポータビリティと柔軟性を提供することができます。ユーザーは、C標準の関数の代わりに使用したい関数をマッピングする必要があります。
-
-
+wolfSSLはC標準ライブラリなしでビルドでき、開発者へより高いレベルの移植性と柔軟性を提供します。
+ユーザーは、C標準の代わりに使用したい関数をマッピングする必要があります。
 
 #### メモリ使用
 
+ほとんどのCプログラムは動的メモリ割り当てに`malloc()`と`free()`を使用します。
+wolfSSLは、代わりに`XMALLOC()`と`XFREE()`を使用します。
+デフォルトでは、これらはCランタイムバージョンを指します。
+`XMALLOC_USER`を定義することで、ユーザーは独自のフックを提供できます。
+各メモリ関数は標準的なものに加えて、ヒープヒントと割り当てタイプという2つの追加引数を取ります。
+ユーザーはこれらを無視するか、好きな方法で使用できます。
+wolfSSLのメモリ関数は`wolfssl/wolfcrypt/types.h`にあります。
 
-
-ほとんどのCプログラムは、動的メモリ割り当てに`malloc()`および`free()`を使用します。wolfSSLは、代わりに`XMALLOC()`および`XFREE()`を使用します。デフォルトでは、これらはCランタイムバージョンを指します。`XMALLOC_USER`を定義することにより、ユーザーは独自のフックを提供できます。各メモリ関数は、標準的なものについて2つの追加の引数、ヒープのヒント、および割り当てタイプを使用します。ユーザーは、これらを無視するか、好きな方法で使用できます。wolfSSLメモリ関数は`wolfssl/wolfcrypt/types.h`で見つけることができます。
-
-
-wolfSSLは、コンパイル時ではなく実行時にメモリオーバーライド関数を登録する機能も提供します。`wolfssl/wolfcrypt/memory.h`はこの機能のヘッダーであり、ユーザーは次の関数を呼び出してメモリ関数をセットアップできます。
-
-
+wolfSSLはコンパイル時ではなく実行時に、メモリオーバーライド関数を登録する機能も提供します。
+`wolfssl/wolfcrypt/memory.h`はこの機能のヘッダーであり、ユーザーは以下の関数を呼び出してメモリ関数を設定できます。
 
 ```c
 int wolfSSL_SetAllocators(wolfSSL_Malloc_cb  malloc_function,
@@ -35,309 +26,165 @@ int wolfSSL_SetAllocators(wolfSSL_Malloc_cb  malloc_function,
                          wolfSSL_Realloc_cb realloc_function);
 ```
 
-
-
-コールバックプロトタイプについては、ヘッダー`wolfssl/wolfcrypt/memory.h`、実装については`memory.c`を参照してください。
-
-
+詳しくは`wolfssl/wolfcrypt/memory.h`のコールバックプロトタイプと、`memory.c`の実装をご参照ください。
 
 #### string.h
 
-
-
-wolfSSLは、`string.h`の`memcpy()`、`memset()`、および`memcmp()`のように振る舞ういくつかの機能を使用します。それらはそれぞれ`XMEMCPY()`、`XMEMSET()`、および`XMEMCMP()`に抽象化されています。デフォルトでは、C標準ライブラリバージョンを指します。`STRING_USER`を定義することで、ユーザーは`types.h`で独自のフックを提供できます。たとえば、デフォルトでは`XMEMCPY()`は次のとおりです。
-
-
+wolfSSLは`string.h`の`memcpy()`、`memset()`、`memcmp()`などのように動作するいくつかの関数を使用します。
+これらはそれぞれ`XMEMCPY()`、`XMEMSET()`、`XMEMCMP()`として抽象化されています。
+デフォルトでは、それらはC標準ライブラリのバージョンを指しています。
+`STRING_USER`を定義することで、ユーザーは`types.h`で独自のフックを提供できます。
+例えば、デフォルトでは`XMEMCPY()`は次の通りです。
 
 ```c
 #define XMEMCPY(d,s,l)    memcpy((d),(s),(l))
 ```
 
-
-
-`STRING_USER`を定義した後は、次のことができます。
-
-
+`STRING_USER`を定義した後、別途用意したバージョン`my_memcpy()`を指すように設定するには以下のようにします。
 
 ```c
 #define XMEMCPY(d,s,l)    my_memcpy((d),(s),(l))
 ```
 
-
-
-またはマクロを避けたい場合：
-
-
+マクロを避けたい場合、次のように示すこともできます。
 
 ```c
 external void* my_memcpy(void* d, const void* s, size_t n);
 ```
 
+#### math.h
 
-
-あなたのバージョン`my_memcpy()`を指すようにwolfsslの抽象化レイヤーを設定する。
-
-
-
-#### Math.H
-
-
-
-wolfSSLは、`math.h`の`pow()` `log()`のように振る舞う2つの機能を使用しています。Difie-Hellmanのみが必要とするため、ビルドからDHを除外すると、独自のDHを提供する必要はありません。それらは`XPOW()`および`XLOG()`として`wolfcrypt/src/dh.c`に定義されます。
-
-
+wolfSSLは`math.h`の`pow()`と`log()`のように動作する2つの関数を使用します。
+これらはDiffie-Hellmanでのみ必要とするため、ビルドからDHを除外すれば、独自のものを提供する必要はありません。
+これらは`XPOW()`と`XLOG()`として抽象化され、`wolfcrypt/src/dh.c`にあります。
 
 #### ファイルシステムの使用
 
+デフォルトでは、wolfSSLは鍵と証明書をロードするためにシステムのファイルシステムを使用します。
+これは`NO_FILESYSTEM`を定義することでオフにできます。
+代わりに、システムが提供するものとは別のファイルシステムを使用したい場合、`ssl.c`の`XFILE()`レイヤーを使用して、ファイルシステム呼び出しを使用したいものに向けることができます。
+詳細はMICRIUMの定義で提供される実装例をご参照ください。
 
+### カスタム入出力抽象化レイヤー
 
-デフォルトでは、wolfSSLはキーと証明書をロードするためにシステムのファイルシステムを使用します。`NO_FILESYSTEM`を定義することでオフにすることができます。代わりに項目Vを参照してください。システムがて提供するファイル システムと異なるものを使用したい場合は、ssl.c の XFILE() レイヤーを使用して、ファイル システム呼び出しを使用したいシステムに向けることができます。Micrium Defineによって提供される例を参照してください。
+wolfSSLは、SSL接続のI/Oをより高度に制御したい、あるいはTCP/IP以外の異なる転送媒体の上でSSLを実行したい場合のために、カスタムI/O抽象化レイヤーを提供します。
 
+ユーザーは2つの関数を定義する必要があります。
 
+1. ネットワーク送信関数
+2. ネットワーク受信関数
 
-### カスタム入力/出力抽象化レイヤー
-
-
-
-wolfSSLは、SSL接続のI/Oをより高く制御したい、またはTCP/IP以外の異なるトランスポートメディアの上にSSLを実行したい方のためのカスタムI/O抽象化レイヤを提供します。
-
-
-ユーザーは2つの機能を定義する必要があります。
-
-
-
-1. ネットワーク送信機能
-
-
-2. ネットワーク受信機能
-
-
-
-これらの2つの関数は、`ssl.h`の`CallbackIOSend`および`CallbackIORecv`によってプロトタイプ化されています。
-
-
+これら2つの関数は`ssl.h`の`CallbackIOSend`と`CallbackIORecv`でプロトタイプ化されています。
 
 ```c
 typedef int (*CallbackIORecv)(WOLFSSL *ssl, char *buf, int sz, void *ctx);
 typedef int (*CallbackIOSend)(WOLFSSL *ssl, char *buf, int sz, void *ctx);
 ```
 
-
-
-ユーザーは`WOLFSSL_CTX`ごとに`wolfSSL_SetIOSend()`および`wolfSSL_SetIORecv()`に登録する必要があります。たとえば、デフォルトの場合は、`CBIORecv()`と`CBIOSend()`は`io.c`の下部に登録されています。
-
-
+ユーザーは`WOLFSSL_CTX`ごとに、`wolfSSL_SetIOSend()`と`wolfSSL_SetIORecv()`を使ってこれらの関数を登録する必要があります。
+例えばデフォルトの場合、`CBIORecv()`と`CBIOSend()`は`io.c`の最後に登録されています。
 
 ```c
 void wolfSSL_SetIORecv(WOLFSSL_CTX *ctx, CallbackIORecv CBIORecv)
 {
-     ctx->CBIORecv=CBIORecv;
+     ctx->CBIORecv = CBIORecv;
 }
 
 void wolfSSL_SetIOSend(WOLFSSL_CTX *ctx, CallbackIOSend CBIOSend)
 {
-    ctx->CBIOSend=CBIOSend;
+    ctx->CBIOSend = CBIOSend;
 }
 ```
 
+ユーザーは`io.c`の最後で示されているように、`wolfSSL_SetIOWriteCtx()`と`wolfSSL_SetIOReadCtx()`を使用して、WOLFSSLオブジェクト（セッション）ごとにコンテキストを設定できます。
+例えば、ユーザーがメモリバッファを使用している場合、コンテキストはメモリバッファへのアクセス方法を説明する構造体へのポインタかもしれません。
+ユーザーによるオーバーライドがない場合、ソケットをコンテキストとして登録します。
 
+`CBIORecv`と`CBIOSend`関数ポインタは、カスタムI/O関数を指すことができます。
+`io.c`にあるデフォルトの`Send()`および`Receive()`関数である`EmbedSend()`と`EmbedReceive()`は、テンプレートやガイドとして使用できます。
 
-ユーザは、`io.c`の下部に示されているように、`wolfSSL_SetIOWriteCtx()`および`wolfSSL_SetIOReadCtx()`でwolfSSLオブジェクト(セッション)ごとにコンテキストを設定することができる。例えば、ユーザがメモリバッファを使用している場合、コンテキストはどこで説明を説明する構造へのポインタであり得る。メモリバッファにアクセスします。デフォルトの場合は、ユーザーが上書きしないで、ソケットをコンテキストとして登録します。
+`WOLFSSL_USER_IO`を定義すると、デフォルトのI/O関数`EmbedSend()`と`EmbedReceive()`の自動設定を削除できます。
 
+### オペレーティングシステム抽象化レイヤー
 
-`CBIORecv`および`CBIOSend`関数ポインターは、カスタムI/O関数を指すことができます。`io.c`にあるデフォルトの`Send()`および`Receive()`関数、`EmbedSend()`および`EmbedReceive()`は、テンプレートとガイドとして使用できます。
+wolfSSL OS抽象化レイヤーは、wolfSSLをユーザーのオペレーティングシステムに移植しやすくします。
+`wolfssl/wolfcrypt/settings.h`には、OS抽象化レイヤーを起動する設定が含まれています。
 
+OS固有の定義は、wolfCryptの場合`wolfssl/wolfcrypt/types.h`に、wolfSSLの場合`wolfssl/internal.h`にあります。
 
-`WOLFSSL_USER_IO`は、デフォルトのI/O関数`EmbedSend()`および`EmbedReceive()`の自動設定を削除するために定義できます。
+## サポートしているオペレーティングシステム
 
-
-
-### オペレーティングシステムの抽象化レイヤー
-
-
-
-wolfSSL OS抽象化レイヤーは、ユーザーのオペレーティングシステムへのwolfSSLの簡単な移植を容易にするのに役立ちます。`wolfssl/wolfcrypt/settings.h`ファイルには、OSレイヤーをトリガーする設定が含まれています。
-
-
-OS特有の定義は、WolfCryptおよびWolfsslの`wolfssl/internal.h`の`wolfssl/wolfcrypt/types.h`にあります。
-
-
-
-## サポートされているオペレーティングシステム
-
-
-
-wolfSSLを定義する1つの要因は、新しいプラットフォームに簡単に移植される能力です。そのため、wolfsslは、out-of-box のオペレーティングシステムの多くをサポートしています。現在サポートされているオペレーティングシステムは次のとおりです。
-
-
+wolfSSLを定義する1つの要因は、新しいプラットフォームに簡単に移植される能力です。
+そのため、wolfsslは、out-of-box のオペレーティングシステムの多くをサポートしています。
+現在サポートしているオペレーティングシステムは、次の通りです。
 
 * Win32/64
-
-
-* Linux.
-
-
+* Linux
 * Mac OS X
-
-
 * Solaris
-
-
 * ThreadX
-
-
 * VxWorks
-
-
 * FreeBSD
-
-
 * NetBSD
-
-
 * OpenBSD
-
-
-* embedded Linux
-
-
-* yocto linux
-
-
+* Embedded Linux
+* Yocto Linux
 * OpenEmbedded
-
-
 * WinCE
-
-
 * Haiku
-
-
 * OpenWRT
-
-
-* iPhone(iOS)
-
-
+* iPhone (iOS)
 * Android
-
-
-* Nintendo Wii と Gamecube through DevKitPro
-
-
+* Nintendo Wii/Gamecube（DevKitPro経由）
 * QNX
-
-
-
 * MontaVista
-
-
 * NonStop
-
-
 * TRON/ITRON/µITRON
-
-
-* Micrium's µC/OS-III
-
-
+* Micrium µC/OS-III
 * FreeRTOS
-
-
 * SafeRTOS
-
-
-
 * NXP/Freescale MQX
-
-
 * Nucleus
-
-
 * TinyOS
-
-
 * HP/UX
-
-
 * AIX
-
-
 * ARC MQX
-
-
 * TI-RTOS
-
-
 * uTasker
-
-
 * embOS
-
-
 * INtime
-
-
 * Mbed
-
-
 * µT-Kernel
-
-
 * RIOT
-
-
-
 * CMSIS-RTOS
-
-
-
 * FROSTED
-
-
-
 * Green Hills INTEGRITY
-
-
-* keil RTX
-
-
+* Keil RTX
 * TOPPERS
-
-
-
-* Petalinux
-
-
+* PetaLinux
 * Apache Mynewt
 
+## サポートしているチップメーカー
 
+wolfSSLはARM、Intel、Motorola、mbed、Freescale、Microchip（PIC32）、STMicro（STM32F2/F4）、NXP、Analog Devices、Texas Instruments、AMDなどのチップセットをサポートしています。
 
+## C#ラッパー
 
-## サポートされたチップメーカー
+wolfSSLは、制限付きですがC#での使用をサポートしています。
+ポートを含むVisual Studioプロジェクトは、`root_wolfSSL/wrapper/CSharp/`にあります。
+Visual Studioプロジェクトを開いた後、ビルド -> 構成マネージャーをクリックして「アクティブソリューション構成」と「アクティブソリューションプラットフォーム」を設定します。
+サポートしているアクティブソリューション構成はDLLデバッグとDLLリリースです。
+サポートされているプラットフォームはWin32およびx64です。
 
+ソリューションとプラットフォームを設定したら、プリプロセッサフラグ`HAVE_CSHARP`を追加する必要があります。
+これにより、C#ラッパー及びサンプルプログラムで使用されるオプションがオンになります。
 
+その後、ビルドするだけでソリューションをビルドを選択します。
+これにより`wolfssl.dll`、`wolfSSL_CSharp.dll`および例が作成されます。
+サンプルプログラムは、それらをエントリポイントとしてターゲットにして、Visual Studioでデバッグを実行することで実行できます。
 
-wolfSSLは、ARM、Intel、Motorola、MBED、Freescale、Microchip(PIC32)、STMicro(STM32F2/F4)、NXP、Analog Devices、Texas Instruments、AMDなどを含むチップセットをサポートしています。
-
-
-
-## C＃ラッパー
-
-
-
-wolfSSLは、制限付きですがC＃での使用をサポートしています。ポートを含むビジュアルスタジオプロジェクトは、ディレクトリ`root_wolfSSL/wrapper/CSharp/`にあります。ビジュアルスタジオプロジェクトを開いた後、ビルド -> 構成マネージャーをクリックして「アクティブソリューション構成」と「アクティブソリューションプラットフォーム」を設定します。」はDLLデバッグとDLLリリースです。サポートされているプラットフォームはWin32およびX64です。
-
-
-ソリューションとプラットフォームを設定したら、プリプロセッサフラグ`HAVE_CSHARP`を追加する必要があります。これにより、C＃ラッパーで使用され、サンプルプログラムで使用されるオプションがオンになります。
-
-
-その後、ビルドするだけでビルドソリューションを選択します。これにより、`wolfssl.dll`、`wolfSSL_CSharp.dll`および例が作成されます。サンプルプログラムは、それらをエントリポイントとしてターゲットにして、Visual Studioでデバッグを実行することで実行できます。
-
-
-作成されたC＃ラッパーをC＃プロジェクトに追加することは、いくつかの方法で実行できます。1つの方法は、作成された`wolfssl.dll`および`wolfSSL_CSharp.dll`をディレクトリ`C:/Windows/System/`にインストールすることです。これにより、Wolfssl C＃ラッパーの呼び出しが可能になります。
-
-
+作成されたC#ラッパーをC#プロジェクトに追加するには、いくつかの方法があります。
+1つは、作成された`wolfssl.dll`と`wolfSSL_CSharp.dll`をディレクトリ`C:/Windows/System/`にインストールすることです。
 
 ```cs
 using wolfSSL.CSharp
@@ -351,5 +198,6 @@ public some_class {
 ...
 ```
 
+これにより、wolfSSL C#ラッパーへの呼び出しができるようになります。
 
-Wolfssl C＃ラッパーに電話をかける。別の方法は、Visual Studioプロジェクトを作成し、wolfSSLのバンドルC＃ラッパーソリューションを参照することです。
+もう1つの方法は、Visual Studioプロジェクトを作成し、wolfSSLにバンドルされているC#ラッパーソリューションを参照することです。
