@@ -42,7 +42,7 @@ For details on how to use these functions, please see the [Getting Started](chap
 
 ### Robust Client and Server Downgrade
 
-Both wolfSSL clients and servers have robust version downgrade capability.  If a specific protocol version method is used on either side, then only that version will be negotiated or an error will be returned.  For example, a client that uses TLS 1.0 and tries to connect to an SSL 3.0 only server, the connection will fail, likewise connecting to a TLS 1.1 will fail as well.
+Both wolfSSL clients and servers have robust version downgrade capability.  If a specific protocol version method is used on either side, then only that protocol version will be negotiated or an error will be returned.  For example, a client that uses TLS 1.0 and tries to connect to an SSL 3.0 only server, the connection will fail, likewise connecting to a TLS 1.1 will fail as well.
 
 To resolve this issue, a client that uses the [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) function will support the highest protocol version supported by the server by downgrading if necessary. In this case, the client will be able to connect to a server running TLS 1.0 - TLS 1.3 (or a subset or superset that includes SSL 3.0 depending on which protocol versions are configured in wolfSSL).  The only versions it can't connect to is SSL 2.0 which has been insecure for years, and SSL 3.0 which has been disabled by default.
 
