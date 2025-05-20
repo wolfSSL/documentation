@@ -1,7 +1,7 @@
 # ATA Security
 
 ## Introduction
-This document provides an overview of how wolfBoot can leaverage the ATA security features to lock or unlock ATA drive.
+This document provides an overview of how wolfBoot can leverage the ATA security features to lock or unlock ATA drive.
 The ATA drive may be locked either by using a hardcoded password or by using a secret that is sealed in the TPM.
 
 ## Table of Contents
