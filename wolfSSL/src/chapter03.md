@@ -207,7 +207,7 @@ If no command line arguments are given, then the client attempts to connect to t
 The client is able to benchmark a connection when using the `-b <num>` argument. When used, the client attempts to connect to the specified server/port the argument number of times and gives the average time in milliseconds that it took to perform `SSL_connect()`. For example:
 
 ```sh
-/examples/client/client -b 100 -h example.com -p 443 -d
+./examples/client/client -b 100 -h example.com -p 443 -d
 ```
 
 Returns:
