@@ -25,7 +25,7 @@ After downloading the ZIP file, unzip the file using the `unzip` command. To use
 
 When building wolfSSL on Linux, \*BSD, OS X, Solaris, or other \*nix-like systems, use the autoconf system. To build wolfSSL you only need to run two commands from the wolfSSL root directory, `./configure` and `make`.
 
-The `./configure` script sets up the build environment and you cab append any number of build options to `./configure`. For a list of available build options, please see [Build Options](#build-options) or run the following the command line to see a list of possible options to pass to the `./configure` script:
+The `./configure` script sets up the build environment and you can append any number of build options to `./configure`. For a list of available build options, please see [Build Options](#build-options) or run the following command to see a list of possible options to pass to the `./configure` script:
 
 ```sh
 ./configure --help
@@ -76,7 +76,7 @@ In addition to the instructions below, you can find instructions and tips for bu
 Solutions are included for Visual Studio 2008 in the root directory of the install. For use with Visual Studio 2010 and later, the existing project files should be able to be converted during the import process.
 
 **Note**:
-If importing to a newer version of VS you will be asked: “Do you want to overwrite the project and its imported property sheets?” You can avoid the following by selecting “No”. Otherwise if you select “Yes”, you will see warnings about `EDITANDCONTINUE` being ignored due to `SAFESEH` specification. You will need to right click on the testsuite, sslSniffer, server, echoserver, echoclient, and client individually and modify their Properties-\>Configuration Properties-\>Linker-\>Advanced (scroll all the way to the bottom in Advanced window). Locate “Image Has Safe Exception Handlers” and click the drop down arrow on the far right. Change this to No (`/SAFESEH:NO`) for each of the aforementioned. The other option is to disable `EDITANDCONTINUE` which, we have found to be useful for debugging purposes and is therefore not recommended.
+If importing to a newer version of VS you will be asked: “Do you want to overwrite the project and its imported property sheets?” You can avoid the following by selecting “No”. Otherwise if you select “Yes”, you will see warnings about `EDITANDCONTINUE` being ignored due to `SAFESEH` specification. You will need to right click on the testsuite, sslSniffer, server, echoserver, echoclient, and client individually and modify their Properties-\>Configuration Properties-\>Linker-\>Advanced (scroll all the way to the bottom in Advanced window). Locate “Image Has Safe Exception Handlers” and click the drop down arrow on the far right. Change this to No (`/SAFESEH:NO`) for each of the aforementioned. The other option is to disable `EDITANDCONTINUE` which, we have found to be useful for debugging purposes and is therefore not recommended for production software.
 
 ### VS 2010
 
@@ -84,15 +84,15 @@ You will need to download Service Pack 1 to build wolfSSL solution once it has b
 
 ### VS 2013 (64 bit solution)
 
-You will need to download Service Pack 4 to build wolfSSL solution once it has been updated. If VS reports a linker error, clean the project then Rebuild the project and the linker error should be taken care of.
+You will need to download Service Pack 4 to build wolfSSL solution once it has been updated. If VS reports a linker error, clean and rebuild the project; the linker error should be taken care of.
 
 To test each build, choose “Build All” from the Visual Studio menu and then run the testsuite program. To edit build options in the Visual Studio project, select your desired project (wolfssl, echoclient, echoserver, etc.) and browse to the “Properties” panel.
 
-**Note**: After the wolfSSL v3.8.0 release the build preprocessor macros were moved to a centralized file located at `IDE/WIN/user_settings.h`. This file can also be found in the project. To add features such as ECC or ChaCha20/Poly1305 add `#defines` here such as `HAVE_ECC` or `HAVE_CHACHA` / `HAVE_POLY1305`.
+**Note**: After the wolfSSL v3.8.0 release the build preprocessor macros were moved to a centralized file located at `IDE/WIN/user_settings.h`. This file can also be found in the project. To add features such as ECC or ChaCha20/Poly1305, add `#defines` here such as `HAVE_ECC` or `HAVE_CHACHA` / `HAVE_POLY1305`.
 
 ### Cygwin
 
-If building wolfSSL for Windows on a Windows development machine, we recommend using the included Visual Studio project files to build wolfSSL. However if Cygwin is required here is a short guide on how our team achieved a successful build:
+If building wolfSSL for Windows on a Windows development machine, we recommend using the included Visual Studio project files to build wolfSSL. However, if Cygwin is required here is a short guide on how our team achieved a successful build:
 
 1. Go to <https://www.cygwin.com/install.html> and download `setup-x86_64.exe`
 2. Run `setup-x86_64.exe` and install however you choose. Click through the installation menus until you reach the "Select Packages" stage.
@@ -174,7 +174,7 @@ wolfSSL also includes recipes for building wolfSSL on Yocto Linux and OpenEmbedd
     to include the name of the desired recipe(s). An example of this is shown below:
 
     ```sh
-    IMAGE_INSTALL_apped = "wolfssl wolfssh wolfmqtt"
+    IMAGE_INSTALL_append = "wolfssl wolfssh wolfmqtt"
     ```
 
 Once the image has been built, wolfSSL's default location (or related products from recipes) will be the `/usr/lib/` directory.
@@ -239,7 +239,7 @@ The library will output as `libwolfssl_osx.a` or `libwolfssl_ios.a` depending on
 compatibility) headers into an `include` directory located in
 `Build/Products/Debug` or `Build/Products/Release`.
 
-For the library and testsuite to link properly the build location needs to be configured as realitive to workspace.
+For the library and testsuite to link properly the build location needs to be configured relative to the workspace.
 
 1. File -> Workspace Settings (or Xcode -> Preferences -> Locations -> Locations)
 2. Derived Data -> Advanced
@@ -318,7 +318,7 @@ The following defines can be used to remove features from wolfSSL. This can be h
 
 #### NO_WOLFSSL_CLIENT
 
-Removes calls specific to the client and is for a server-only builds. You should only use this if you want to remove a few calls for the sake of size.
+Removes calls specific to the client and is for server-only builds. You should only use this if you want to remove a few calls for the sake of size.
 
 #### NO_WOLFSSL_SERVER
 
@@ -376,7 +376,7 @@ Can be defined when a session cache is not needed. This should reduce memory use
 
 #### NO_TLS
 
-Turns off TLS. We don’t recommend turning off TLS.
+Turns off TLS. We do not recommend turning off TLS.
 
 #### SMALL_SESSION_CACHE
 
@@ -1822,11 +1822,11 @@ There are three math libraries in wolfSSL.
 
 When building wolfSSL, only one of these must be used.
 
-Big Integer Library is the most portable option as it is written in C without any assembly. As such it is not optimized for specific architectures. All math variables are instanciated on the heap; minimal stack usage. Unfortunately, Big Integer Library is not timing resistant.
+Big Integer Library is the most portable option as it is written in C without any assembly. As such it is not optimized for specific architectures. All math variables are instantiated on the heap; minimal stack usage. Unfortunately, Big Integer Library is not timing resistant.
 
-Fast Math Library is a good option. It is implemented using both C and assembly. As such, it has optimizations for specific architectures. All math variables are instanciated on the stack; minimal heap usage. It can be made timing resistant if the `TFM_TIMING_RESISTANT` macro is defined. We have taken it through FIPS 140-2 and 140-3 certifications.
+Fast Math Library is a good option. It is implemented using both C and assembly. As such, it has optimizations for specific architectures. All math variables are instantiated on the stack, leading to less heap usage. It can be made timing resistant if the `TFM_TIMING_RESISTANT` macro is defined. We have taken it through FIPS 140-2 and 140-3 certifications.
 
-Single Precision (SP) Math Library is our recommended library. It is implemented using both C and assembly. As such, it has optimizations for specific architectures. All math variables are instanciated on the stack; minimal heap usage. It is always timing resistant. It is generally optimized for speed at the cost of code size, but is highly configurable to compile out unneeded code. We have taken it through DO-178C certifications.
+Single Precision (SP) Math Library is our recommended library. It is implemented using both C and assembly. As such, it has optimizations for specific architectures. All math variables are instantiated on the stack, leading to less heap usage. It is always timing resistant. It is generally optimized for speed at the cost of code size, but is highly configurable to compile out unneeded code. We have taken it through DO-178C certifications.
 
 #### Big Integer Math Library (Deprecation Planned)
 
@@ -1834,7 +1834,7 @@ This library is planned to be deprecated and removed from the wolfSSL/wolfCrypt 
 
 Forked from public domain LibTomMath library. For more information about LibTomMath, please see <https://www.libtom.net/LibTomMath/>. Please note that our fork is considerably more active and secure than the original public domain code.
 
-This is generally the most portable and generally easiest to get going with. The negatives to the normal big integer library are that it is slower, it uses a lot of heap memory as all memory is allocated from the heap, requires an `XREALLOC()` implementation and is not timing resistant. The implementation can be found in `integer.c`.
+This library is generally the most portable and easiest to get going with. The negatives to the normal big integer library are that it is slower, it uses a lot of heap memory as all memory is allocated from the heap, requires an `XREALLOC()` implementation, and is not timing resistant. The implementation can be found in `integer.c`.
 
 #### Fast Math
 
@@ -1848,7 +1848,7 @@ For FastMath, all memory is allocated on the stack. Because the stack memory usa
 
 On ia32, for example, all of the registers need to be available so high optimization and omitting the frame pointer needs to be taken care of. wolfSSL will add `-O3 -fomit-frame-pointer` to GCC for non debug builds. If you're using a different compiler you may need to add these manually to `CFLAGS` during configure.
 
-OS X will also need `-mdynamic-no-pic` added to `CFLAGS`. In addition, if you're building in shared mode for ia32 on OS X you'll need to pass options to `LDFLAGS` as well:
+OS X will also need `-mdynamic-no-pic` added to `CFLAGS`. In addition, if building in shared mode for ia32 on OS X you'll need to pass options to `LDFLAGS` as well:
 
 ```sh
 LDFLAGS="-Wl,-read_only_relocs,warning"
@@ -3738,7 +3738,7 @@ make
 ```
 
 
-There are fail safes to error out early on wolfCrypt_Init / wolfSSL_Init function calls. One case is if the cryptodev module has not been loaded or does not have the support available for the desired operations. The other case where the init. operation would fail if the NXP HSM was not able to be set up. If the application is failing on initialization, adding --enable-debug to the wolfSSL build and the function call wolfSSL_Debugging_ON() before the initialization of wolfSSL will print out useful debug messages about why it is failing.
+There are fail safes to error out early on wolfCrypt_Init / wolfSSL_Init function calls. One case is if the cryptodev module has not been loaded or does not have the support available for the desired operations. The other case where the init operation would fail is if the NXP HSM was not able to be set up. If the application is failing on initialization, adding --enable-debug to the wolfSSL build and the function call wolfSSL_Debugging_ON() before the initialization of wolfSSL will print out useful debug messages about why it is failing.
 
 
 Example building with debug options turned on
