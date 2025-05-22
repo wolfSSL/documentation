@@ -100,7 +100,7 @@ is available in the reference manual "Startup/Configuration/Shutdown Subsystem"
 topic.
 
 | `make` Option | Macro Option | Description |
-| -------------- | ------------ | ----------- |
+| ------------ | ----------------- | -------- |
 | `SHELL` | | Supplies an explicit/alternative path to `bash`. |
 | `AWK` | | Supplies an explicit/alternative path to Gnu `awk`. |
 | `V` | | Verbose `make` output <br> e.g. `make V=1 -j test` |
