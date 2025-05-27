@@ -4,7 +4,7 @@ wolfMQTT was written with portability in mind, and should generally be easy to b
 
 When using the autoconf / automake system to build, wolfMQTT uses a single Makefile to build all parts and examples of the library, which is both simpler and faster than using Makefiles recursively. If using the TLS features or the Firmware/Azure IoT Hub examples you’ll need to have wolfSSL installed. For wolfSSL and wolfMQTT we recommend using config options below
 ```
-./configure  --enable-ecc  --enable-supportedcurves  --enable-base64encode. 
+./configure  --enable-ecc  --enable-supportedcurves  --enable-base64encode
 ```
 For wolfSSL use `make && sudo make install`. If you get an error locating the libwolfssl.so, run `sudo ldconfig` from the wolfSSL directory.
 

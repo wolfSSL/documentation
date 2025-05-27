@@ -136,7 +136,8 @@ The portfwd tool accepts the following command line options:
 ### wolfSSH scpclient
 
 The scpclient, wolfscp, establishes a connection to an SSH server and copies
-the specified files from or to the local machine.
+the specified files from or to the local machine. When using the wolfSSH
+example, absolute paths must be used, and directories must end with a `/`.
 
 The scpclient tool accepts the following command line options:
 ```
