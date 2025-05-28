@@ -10,7 +10,7 @@ For an overview of wolfSSL features, please reference the wolfSSL product webpag
 
 ## Protocol Support
 
-wolfSSL supports **SSL 3.0**, **TLS **(**1.0**, **1.1**, **1.2, 1.3**), and **DTLS **(**1.0 **and **1.2**). You can easily select a protocol to use by using one of the following functions (as shown for either the client or server).  wolfSSL does not support SSL 2.0, as it has been insecure for several years.  The client and server functions below change slightly when using the OpenSSL compatibility layer.  For the OpenSSL-compatible functions, please see [OpenSSL Compatibility](chapter13.md#openssl-compatibility).
+wolfSSL supports **SSL 3.0**, **TLS **(**1.0**, **1.1**, **1.2, 1.3**), and **DTLS **(**1.0**, **1.2**, **1.3**). You can easily select a protocol to use by using one of the following functions (as shown for either the client or server).  wolfSSL does not support SSL 2.0, as it has been insecure for several years.  The client and server functions below change slightly when using the OpenSSL compatibility layer.  For the OpenSSL-compatible functions, please see [OpenSSL Compatibility](chapter13.md#openssl-compatibility).
 
 ### Server Functions
 
@@ -23,7 +23,7 @@ wolfSSL supports **SSL 3.0**, **TLS **(**1.0**, **1.1**, **1.2, 1.3**), and **DT
 * [`wolfTLSv1_3_server_method()`](group__Setup.md#function-wolftlsv1_3_server_method) - TLS 1.3
 * [`wolfSSLv23_server_method()`](group__Setup.md#function-wolfsslv23_server_method) - Use highest possible version from SSLv3 - TLS 1.2
 
-wolfSSL supports robust server downgrade with the [`wolfSSLv23_server_method()`](group__Setup.md#function-wolfsslv23_server_method) function. See [Robust Client and Server Downgrade](#robust-client-and-server-downgrade) for a details.
+wolfSSL supports robust server downgrade with the [`wolfSSLv23_server_method()`](group__Setup.md#function-wolfsslv23_server_method) function. See [Robust Client and Server Downgrade](#robust-client-and-server-downgrade) for details.
 
 ### Client Functions
 
@@ -36,17 +36,17 @@ wolfSSL supports robust server downgrade with the [`wolfSSLv23_server_method()`]
 * [`wolfTLSv1_3_client_method()`](group__Setup.md#function-wolftlsv1_3_client_method) - TLS 1.3
 * [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) - Use highest possible version from SSLv3 - TLS 1.2
 
-wolfSSL supports robust client downgrade with the [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) function. See [Robust Client and Server Downgrade](#robust-client-and-server-downgrade) for a details.
+wolfSSL supports robust client downgrade with the [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) function. See [Robust Client and Server Downgrade](#robust-client-and-server-downgrade) for details.
 
-For details on how to use these functions, please see the [Getting Started](chapter03.md#getting-started) chapter. For a comparison between SSL 3.0, TLS 1.0, 1.1, 1.2, and DTLS, please see Appendix A.
+For details on how to use these functions, please see the [Getting Started](chapter03.md#getting-started) chapter. For a comparison between SSL, TLS, and DTLS, please see Appendix A.
 
 ### Robust Client and Server Downgrade
 
-Both wolfSSL clients and servers have robust version downgrade capability.  If a specific protocol version method is used on either side, then only that protocol version will be negotiated or an error will be returned.  For example, a client that uses TLS 1.0 and tries to connect to an SSL 3.0 only server, the connection will fail, likewise connecting to a TLS 1.1 will fail as well.
+Both wolfSSL clients and servers have robust version downgrade capability.  If a specific protocol version method is used on either side, then only that protocol version will be negotiated or an error will be returned.  For example, if a client that uses TLS 1.0 tries to connect to an SSL 3.0 only server, then the connection will fail; likewise, connecting to a TLS 1.1 server will fail as well.
 
-To resolve this issue, a client that uses the [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) function will support the highest protocol version supported by the server by downgrading if necessary. In this case, the client will be able to connect to a server running TLS 1.0 - TLS 1.3 (or a subset or superset that includes SSL 3.0 depending on which protocol versions are configured in wolfSSL).  The only versions it can't connect to is SSL 2.0 which has been insecure for years, and SSL 3.0 which has been disabled by default.
+To resolve this issue, a client that uses the [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) function will support the highest protocol version supported by the server by downgrading if necessary. In this case, the client will be able to connect to a server running TLS 1.0 - TLS 1.3 (or a subset or superset that includes SSL 3.0 depending on which protocol versions are configured in wolfSSL).  The only versions it can't connect to are SSL 2.0 which has been insecure for years, and SSL 3.0 which has been disabled by default.
 
-Similarly, a server using the [`wolfSSLv23_server_method()`](group__Setup.md#function-wolfsslv23_server_method) function can handle clients supporting protocol versions from TLS 1.0 - TLS 1.2.  A wolfSSL server can't accept a connection from SSLv2 because no security is provided.
+Similarly, a server using the [`wolfSSLv23_server_method()`](group__Setup.md#function-wolfsslv23_server_method) function can handle clients supporting protocol versions from TLS 1.0 - TLS 1.3.  A wolfSSL server can't accept a connection from SSLv2 because no security is provided.
 
 ### IPv6 Support
 
@@ -60,7 +60,7 @@ Further information on IPv6 can be found here:
 
 ### DTLS
 
-wolfSSL has support for DTLS (“Datagram” TLS) for both client and server.  The current supported version is DTLS 1.0.
+wolfSSL has support for DTLS (“Datagram” TLS) for both client and server.  The current supported versions are DTLS 1.0, 1.2, and 1.3.
 
 The TLS protocol was designed to provide a secure transport channel across a **reliable** medium (such as TCP).  As application layer protocols began to be developed using UDP transport (such as SIP and various electronic gaming protocols), a need arose for a way to provide communications security for applications which are delay sensitive. This need lead to the creation of the DTLS protocol.
 
@@ -80,7 +80,7 @@ The focus of lwIP is to reduce RAM usage while still providing a full TCP stack.
 
 ### TLS Extensions
 
-A list of TLS extensions supported by wolfSSL and note of which RFC can be referenced for the given extension.
+A list of TLS extensions supported by wolfSSL and the RFC corresponding to each extension:
 
 | RFC | Extension | wolfSSL Type |
 | --- | --------- | ------------ |
@@ -114,7 +114,7 @@ Cipher suites come in a variety of strengths.  Because they are made up of sever
 
 There can be many methods of grading the strength of a cipher suite - the specific method used seems to vary between different projects and companies and can include things such as symmetric and public key algorithm key sizes, type of algorithm, performance, and known weaknesses.
 
-**NIST** (National Institute of Standards and Technology) makes recommendations on choosing an acceptable cipher suite by providing comparable algorithm strengths for varying key sizes of each.  The strength of a cryptographic algorithm depends on the algorithm and the key size used.  The NIST Special Publication, [SP800-57](https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-5/final), states that two algorithms are considered to be of comparable strength as follows:
+**NIST** (National Institute of Standards and Technology) makes recommendations on choosing an acceptable cipher suite by providing comparable algorithm strengths for varying key sizes of each.  The NIST Special Publication, [SP800-57](https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-5/final), states how two algorithms can be compared:
 
 > Two algorithms are considered to be of comparable strength for the given key sizes (X and Y) if the amount of work needed to “break the algorithms” or determine the keys (with the given key sizes) is approximately the same using a given resource. The security strength of an algorithm for a given key size is traditionally described in terms of the amount of work it takes to try all keys for a symmetric algorithm with a key size of “X” that has no shortcut attacks (i.e., the most efficient attack is to try all possible keys).
 
@@ -288,7 +288,7 @@ wolfSSL supports AEAD suites, including AES-GCM, AES-CCM, and CHACHA-POLY1305. T
 
 ### Block and Stream Ciphers
 
-wolfSSL supports the **AES**, **DES**, **3DES**, and **Camellia** block ciphers and the **RC4**, and **CHACHA20 **stream ciphers. AES, DES, 3DES and RC4 are enabled by default.  Camellia, and ChaCha20 can be enabled when building wolfSSL (with the [`--enable-camellia`](chapter02.md#--enable-camellia), and [`--disable-chacha`](chapter02.md#--disable-chacha) build options, respectively). The default mode of AES is CBC mode.  To enable GCM or CCM mode with AES, use the [`--enable-aesgcm`](chapter02.md#--enable-aesgcm) and [`--enable-aesccm`](chapter02.md#--enable-aesccm) build options.  Please see the examples for usage and the [wolfCrypt Usage Reference](chapter10.md#wolfcrypt-usage-reference) for specific usage information.
+wolfSSL supports the **AES**, **DES**, **3DES**, and **Camellia** block ciphers and the **RC4**, and **CHACHA20 **stream ciphers. AES, DES, 3DES, RC4, and ChaCha20 are enabled by default.  Camellia can be enabled when building wolfSSL with the [`--enable-camellia`](chapter02.md#--enable-camellia) build option. The default mode of AES is CBC mode.  To enable GCM or CCM mode with AES, use the [`--enable-aesgcm`](chapter02.md#--enable-aesgcm) and [`--enable-aesccm`](chapter02.md#--enable-aesccm) build options.  Please see the examples for usage and the [wolfCrypt Usage Reference](chapter10.md#wolfcrypt-usage-reference) for specific usage information.
 
 While SSL uses RC4 as the default stream cipher, it has been obsoleted due to compromise. Recently wolfSSL added ChaCha20. While RC4 is about 11% more performant than ChaCha, RC4 is generally considered less secure than ChaCha. ChaCha can put up very nice times of it’s own with added security as a tradeoff.
 
@@ -296,7 +296,7 @@ To see a comparison of cipher performance, visit the wolfSSL Benchmark web page,
 
 #### What’s the Difference?
 
-A block cipher has to be encrypted in chunks that are the block size for the cipher. For example, AES has a block size of 16 bytes. So if you're encrypting a bunch of small, 2 or 3 byte chunks back and forth, over 80% of the data is useless padding, decreasing the speed of the encryption/decryption process and needlessly wasting network bandwidth to boot. Basically block ciphers are designed for large chunks of data, have block sizes requiring padding, and use a fixed, unvarying transformation.
+A block cipher has to be encrypted in chunks that are the block size for the cipher. For example, AES has a block size of 16 bytes. So if you're encrypting a bunch of small, 2 or 3 byte chunks back and forth, over 80% of the data is useless padding, decreasing the speed of the encryption/decryption process and needlessly wasting network bandwidth to boot. Basically, block ciphers are designed for large chunks of data, have block sizes requiring padding, and use a fixed, unvarying transformation.
 
 Stream ciphers work well for large or small chunks of data. They are suitable for smaller data sizes because no block size is required. If speed is a concern, stream ciphers are your answer, because they use a simpler transformation that typically involves an xor'd keystream. So if you need to stream media, encrypt various data sizes including small ones, or have a need for a fast cipher then stream ciphers are your best bet.
 
@@ -344,7 +344,7 @@ Additionally, wolfSSL also provides support for RSA-Probabilistic Signature Sche
 
 #### PKCS #5, PBKDF1, PBKDF2, PKCS #12
 
-PKCS #5 is a password based key derivation method which combines a password, a salt, and an iteration count to generate a password-based key.  wolfSSL supports both PBKDF1 and PBKDF2 key derivation functions. A key derivation function produces a derived key from a base key and other parameters (such as the salt and iteration count as explained above). PBKDF1 applies a hash function (MD5, SHA1, etc) to derive keys, where the derived key length is bounded by the length of the hash function output. With PBKDF2, a pseudorandom function is applied (such as HMAC-SHA-1) to derive the keys. In the case of PBKDF2, the derived key length is unbounded.
+PKCS #5 is a password-based key derivation method which combines a password, a salt, and an iteration count to generate a password-based key.  wolfSSL supports both PBKDF1 and PBKDF2 key derivation functions. A key derivation function produces a derived key from a base key and other parameters (such as the salt and iteration count as explained above). PBKDF1 applies a hash function (MD5, SHA1, etc) to derive keys, where the derived key length is bounded by the length of the hash function output. With PBKDF2, a pseudorandom function is applied (such as HMAC-SHA-1) to derive the keys. In the case of PBKDF2, the derived key length is unbounded.
 
 wolfSSL also supports the PBKDF function from PKCS #12 in addition to PBKDF1 and PBKDF2. The function prototypes look like this:
 
@@ -389,13 +389,13 @@ Supported features include:
 
 ##### PKCS #7 Callbacks
 
-Additional callbacks and supporting functions were added to allow for a user to choose their keys after the PKCS7 bundle has been parsed.For unwrapping the CEK the function `wc_PKCS7_SetWrapCEKCb()` can be called. The callback set by this function gets called in the case of KARI and KEKRI bundles. The keyID or SKID gets passed from wolfSSL to the user along with the originator key in the case of KARI. After the user unwraps the CEK with their KEK the decrypted key to be used should then be passed back to wolfSSL. An example of this can be found in the wolfssl-examples repository in the file `signedData-EncryptionFirmwareCB.c`.
+Additional callbacks and supporting functions were added to allow for a user to choose their keys after the PKCS7 bundle has been parsed. For unwrapping the CEK the function `wc_PKCS7_SetWrapCEKCb()` can be called. The callback set by this function gets called in the case of KARI and KEKRI bundles. The keyID or SKID gets passed from wolfSSL to the user along with the originator key in the case of KARI. After the user unwraps the CEK with their KEK the decrypted key to be used should then be passed back to wolfSSL. An example of this can be found in the wolfssl-examples repository in the file `signedData-EncryptionFirmwareCB.c`.
 
 An additional callback was added for decryption of PKCS7 bundles. For setting a decryption callback function the API `wc_PKCS7_SetDecodeEncryptedCb()` can be used. To set a user defined context the API `wc_PKCS7_SetDecodeEncryptedCtx()` should be used. This callback will get executed on calls to `wc_PKCS7_DecodeEncryptedData()`.
 
 ##### PKCS #7 Streaming
 
-Stream oriented API for PKCS7 decoding gives the option of passing inputs in smaller chunks instead of all at once.By default the streaming functionality with PKCS7 is on. To turn off support for streaming PKCS7 API the macro `NO_PKCS7_STREAM` can be defined. An example of doing this with autotools would be `./configure --enable-pkcs7 CFLAGS=-DNO_PKCS7_STREAM`.
+Stream oriented API for PKCS7 decoding gives the option of passing inputs in smaller chunks instead of all at once. By default the streaming functionality with PKCS7 is on. To turn off support for streaming PKCS7 API the macro `NO_PKCS7_STREAM` can be defined. An example of doing this with autotools would be `./configure --enable-pkcs7 CFLAGS=-DNO_PKCS7_STREAM`.
 
 For streaming when decoding/verifying bundles the following functions are supported:
 
@@ -405,7 +405,7 @@ For streaming when decoding/verifying bundles the following functions are suppor
 4. [`wc_PKCS7_DecodeEnvelopedData()`](group__PKCS7.md#function-wc_pkcs7_decodeenvelopeddate)
 5. `wc_PKCS7_DecodeAuthEnvelopedData()`
 
-**Note**: that when calling [`wc_PKCS7_VerifySignedData_ex`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata_ex) it is expected that the argument pkiMsgFoot is the full buffer. The internal structure only supports streaming of one buffer which in this case would be `pkiMsgHead`.
+**Note**: that when calling [`wc_PKCS7_VerifySignedData_ex`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata_ex) it is expected that the argument pkiMsgFoot is the full buffer. The internal structure only supports streaming of one buffer, which in this case would be `pkiMsgHead`.
 
 ### Forcing the Use of a Specific Cipher
 

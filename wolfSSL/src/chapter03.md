@@ -2,7 +2,7 @@
 
 ## General Description
 
-wolfSSL, formerly CyaSSL, is about 10 times smaller than yaSSL and up to 20 times smaller than OpenSSL when using the compile options described in [Chapter 2](chapter02.md#building-wolfssl). User benchmarking and feedback also reports dramatically better performance from wolfSSL vs. OpenSSL in the vast majority of standard SSL operations.
+wolfSSL, formerly CyaSSL, is about 10 times smaller than yaSSL, and up to 20 times smaller than OpenSSL when using the compile options described in [Chapter 2](chapter02.md#building-wolfssl). User benchmarking and feedback also reports dramatically better performance from wolfSSL vs. OpenSSL in the vast majority of standard SSL operations.
 
 For instructions on the build process please see [Chapter 2](chapter02.md#building-wolfssl).
 
@@ -218,7 +218,7 @@ wolfSSL_connect avg took:  296.417 milliseconds
 
 If you'd like to change the default host from localhost, or the default port from 11111, you can change these settings in `/wolfssl/test.h`. The variables wolfSSLIP and wolfSSLPort control these settings. Re-build all of the examples including testsuite when changing these settings otherwise the test programs won't be able to connect to each other.
 
-By default, the wolfSSL example client tries to connect to the specified server using TLS 1.2. The user is able to change the SSL/TLS version which the client uses by using the `-v` command line option. The following values are available for this option:
+By default, the wolfSSL example client tries to connect to the specified server using TLS 1.2. The user is able to change the SSL/TLS version which the client uses by passing the `-v` command line option. The following values are available for this option:
 
 * `-v 0` - SSL 3.0 (disabled by default)
 * `-v 1` - TLS 1.0
@@ -462,7 +462,7 @@ Enabling this define will switch the benchmark application from loading test key
 
 #### USE_CERT_BUFFERS_2048
 
-Enabling this define is similar to [`USE_CERT_BUFFERS_1024`](#use_cert_buffers_1024) accept that 2048-bit key and certificate buffers are used instead of 1024-bit ones. This define is useful when the processor is fast enough to do
+Enabling this define is similar to [`USE_CERT_BUFFERS_1024`](#use_cert_buffers_1024) except that 2048-bit key and certificate buffers are used instead of 1024-bit ones. This define is useful when the processor is fast enough to do
 2048-bit public key operations but when there is no filesystem available to load keys and certificates from files.
 
 ## Changing a Client Application to Use wolfSSL
@@ -475,7 +475,7 @@ This section will explain the basic steps needed to add wolfSSL to a client appl
     #include <wolfssl/ssl.h>
     ```
 
-2. Initialize wolfSSL and the `WOLFSSL_CTX`. You can use one `WOLFSSL_CTX` no matter how many WOLFSSL objects you end up creating. Basically you'll just need to load CA certificates to verify the server you are connecting to. Basic initialization looks like:
+2. Initialize wolfSSL and the `WOLFSSL_CTX`. You can use one `WOLFSSL_CTX` no matter how many WOLFSSL objects you end up creating. You'll just need to load CA certificates to verify the server you are connecting to. Basic initialization looks like:
 
     ```c
     wolfSSL_Init();

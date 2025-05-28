@@ -10,17 +10,17 @@ wolfSSL (formerly CyaSSL) has support for **PEM**, and **DER** formats for certi
 
 **DER**, or “Distinguished Encoding Rules”, is a binary format of a certificate. DER file extensions can include `.der` and `.cer`, and cannot be viewed with a text editor.
 
-An X.509 certificate is encoded using ASN.1 format. The DER format is the ASN.1 encoding. The PEM format is Base64 encoded and wrapped with a human readable header and footer. TLS send certificates in DER format.
+An X.509 certificate is encoded using ASN.1 format. The DER format is the ASN.1 encoding. The PEM format is Base64 encoded and wrapped with a human readable header and footer. TLS sends certificates in DER format.
 
 ## Supported Certificate Extensions
 
     
 If an unsupported or unknown extension that is marked as critical is found, then 
 an error message is returned, otherwise unsupported or unknown extensions found 
-are ignored. Certificate extension parsing expect that at the very least 
+are ignored. Certificate extension parsing expects that at the very least 
 `--enable-certext` (macro WOLFSSL_CERT_EXT) has been used when 
 compiling the wolfSSL library. This is a high level list of certificate 
-extensions that can be **parsed** and at least part if not all of the extensions
+extensions that can be **parsed** and at least part, if not all, of the extensions
  be used.
     
 | Extension From [RFC 5280](https://datatracker.ietf.org/doc/html/rfc5280#section-4.2) | Supported |
@@ -405,7 +405,7 @@ Supported types are:
 * `PKCS8_PRIVATEKEY_TYPE`
 * `PKCS8_ENC_PRIVATEKEY_TYPE`
 
-Now the buffer `pemCert<` holds the PEM format of the certificate.
+Now the buffer `pemCert` holds the PEM format of the certificate.
 
 If you wish to create a CA signed certificate then a couple of steps are required. After filling in the subject information as before, you’ll need to set the issuer information from the CA certificate.  This can be done with `SetIssuer()` like this:
 
