@@ -19,15 +19,17 @@ The log levels can be found in `wolfssl/wolfcrypt/logging.h`, and the implementa
 
 wolfSSL tries to provide informative error messages in order to help with debugging.
 
-Each [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) and [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) call will return the number of bytes written upon success, 0 upon connection closure, and -1 for an error,  just like `read()` and `write()`.  In the event of an error you can use two calls to get more information about the error.
+[//]: # (This is a comment. links to group__IO.md and group__Debug.md are causing lines to be truncated so I have removed references to them.)
 
-The function [`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error) will return the current error code. It takes the current `WOLFSSL` object, and [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) or [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) result value as an arguments and returns the corresponding error code.
+Each `wolfSSL_read()` and `wolfSSL_write()` call will return the number of bytes written upon success, 0 upon connection closure, and -1 for an error,  just like `read()` and `write()`.  In the event of an error you can use two calls to get more information about the error.
+
+The function `wolfSSL_get_error()` will return the current error code. It takes the current `WOLFSSL` object, and `wolfSSL_read()` or `wolfSSL_write()` result value as arguments and returns the current error code.
 
 ```c
 int err = wolfSSL_get_error(ssl, result);
 ```
 
-To get a more human-readable error code description, the [`wolfSSL_ERR_error_string()`](group__Debug.md#function-wolfssl_err_error_string) function can be used.  It takes the return code from [`wolfSSL_get_error`](group__Debug.md#function-wolfssl_get_error) and a storage buffer as arguments, and places the corresponding error description into the storage buffer (`errorString` in the example below).
+To get a more human-readable error code description, the `wolfSSL_ERR_error_string()` function can be used.  It takes the return code from `wolfSSL_get_error` and a storage buffer as arguments, and places the corresponding error description into the storage buffer (`errorString` in the example below).
 
 ```c
 char errorString[80];

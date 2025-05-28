@@ -4,7 +4,7 @@ docs_dir: build/html/
 site_dir: html/
 copyright: Copyright © 2024 wolfSSL Inc.
 nav:
-    - "1. Introduction": chapter01.md
+    - "1. Introduction": index.md
     - "2. Overview": chapter02.md
     - "3. Getting Started": chapter03.md
     - "4. Functional Components": chapter04.md
@@ -12,9 +12,9 @@ nav:
     - "6. Server Library": chapter06.md
     - "7. Customizing wolfHSM": chapter07.md
     - "8. Porting wolfHSM": chapter08.md
-    - "9. API Reference": appendix01.md 
+    - "9. API Reference": appendix01.md
 theme:
-  name: null 
+  name: null
   custom_dir: ../mkdocs-material/material
   language: en
   palette:
