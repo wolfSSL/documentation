@@ -11,4 +11,4 @@ This page lists some of the most common issues and questions that are recieved b
 	2. [Followup Post Q: Why is the feature NO_ATTRIBUTE_CONSTRUCTOR there then if I can not use it?](./section02.md#does-the-power-on-self-test-post-really-have-to-run-every-time)
 	3. [Followup Post Q: Who can determine when NO_ATTRIBUTE_CONSTRUCTOR is allowed?](./section02.md#does-the-power-on-self-test-post-really-have-to-run-every-time)
 	4. [Followup Post Q: What about with fips-ready, can I use NO_ATTRIBUTE_CONSTRUCTOR with fips-ready?](./section02.md#does-the-power-on-self-test-post-really-have-to-run-every-time)
-4. [WhatWhat can go wrong for the end user after basic testing?](./section02.md#what-can-go-wrong-for-the-end-user-after-basic-testing)
+4. [What can go wrong for the end user after basic testing?](./section02.md#what-can-go-wrong-for-the-end-user-after-basic-testing)
