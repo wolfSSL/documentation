@@ -5,7 +5,7 @@ autoconf / automake システムを使用してビルドする場合、wolfMQTT 
 
 
 ```
-./configure  --enable-ecc  --enable-supportedcurves  --enable-base64encode. 
+./configure  --enable-ecc  --enable-supportedcurves  --enable-base64encode
 ```
 
 wolfSSL の場合は、`make && sudo make install` を使用します。 libwolfssl.so の検索でエラーが発生した場合は、wolfSSL ディレクトリから`sudo ldconfig`を実行します。
