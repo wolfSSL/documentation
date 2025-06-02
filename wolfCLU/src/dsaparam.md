@@ -13,5 +13,6 @@ Example:
 
 ```
 wolfssl dsaparam -out dsa.params 1024
+
 wolfssl dsaparam -in dsa.params -genkey
 ```

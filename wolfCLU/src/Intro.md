@@ -6,4 +6,4 @@ Nov, 24, 2021
 
 
 ## Intro
-wolfCLU was created to handle some common cryptographic operations to make it easier/quicker then writing an application from scratch. An example of some of the operations handled are certificate parsing and key generation.
+wolfCLU was created to handle some common cryptographic operations to make it easier/quicker than writing an application from scratch. An example of some of the operations handled are certificate parsing and key generation.

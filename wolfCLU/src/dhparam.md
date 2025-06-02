@@ -14,3 +14,4 @@ Example:
 
 ```
 wolfssl dhparam -check -out dh.params 1024
+```

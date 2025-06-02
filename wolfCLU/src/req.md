@@ -16,6 +16,6 @@ Example:
 
 ```
 wolfssl ecparam -genkey -out ecc.key -name secp384r1
-wolfssl req -new -x509 -days 3650 -config selfsigned.conf -key ecc.key -out ecc.cert \
--outform der -sha256
+
+wolfssl req -new -x509 -days 3650 -config selfsigned.conf -key ecc.key -out ecc.cert -outform der -sha256
 ```

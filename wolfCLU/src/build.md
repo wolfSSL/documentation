@@ -1,7 +1,7 @@
 ## Building wolfCLU
 
 ### Building on *NIX
-To build wolfCLU first build wolfSSL with the --enable-wolfclu flag. An example of this would be:
+To build wolfCLU, start by building wolfSSL with the --enable-wolfclu flag. An example of this would be:
 
 ```
 cd wolfssl
@@ -34,11 +34,11 @@ Run `make check` to run unit tests.
 
 ## Building on Windows
 
-wolfCLU can also be built with its Visual Studios solution, wolfclu.sln. The solution provides both Debug and Release builds of Dynamic 32- or 64-bit libraries. The file `user_settings.h` should be used in the wolfSSL build to configure it.
+wolfCLU can also be built with the appropriate Visual Studio solution, wolfclu.sln. The solution provides both Debug and Release builds of Dynamic 32- or 64-bit libraries. The file `user_settings.h` should be used in the wolfSSL build to configure it.
 
 The file `wolfclu\ide\winvs\user_settings.h` contains the settings used to configure wolfSSL with the appropriate settings. This file must be copied from the directory `wolfclu\ide\winvs` to `wolfssl\IDE\WIN`. You can then build wolfSSL with support for wolfCLU. 
 
-Before building wolfCLU, Make sure you have the same architecture (Win32 or x64) selected as used in wolfSSL.
+Before building wolfCLU, make sure you have the same architecture (Win32 or x64) selected as used in wolfSSL.
 
 This project assumes that the wolfSSH and wolfSSL source directories
 are installed side-by-side and do not have the version number in their
@@ -49,7 +49,7 @@ names:
         wolfssl\
 ```
 
-Building wolfCLU a release configuration will generate `wolfssl.exe` in the 
+Building a wolfCLU release configuration will generate `wolfssl.exe` in the 
 `Release\Win32` or `Release\x64` directory. 
 
 #### Running Unit Tests
