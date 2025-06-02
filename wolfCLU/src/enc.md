@@ -1,6 +1,6 @@
 ### ENC Command
 
-Used for encrypting an input and with (-d) can decrypt also.
+Used for encrypting an input. Setting -d enables decryption.
 
 Available encryption and decryption algorithms are:    
 

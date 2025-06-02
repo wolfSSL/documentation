@@ -1,2 +1,2 @@
 ### BENCH Command
-Command in progress for benchmarking algorithms. Current use to run all algorithms would be "wolfssl bench -all".
+Command in progress for benchmarking algorithms. To benchmark all algorithms run "wolfssl bench -all".
