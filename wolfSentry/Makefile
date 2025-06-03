@@ -1,15 +1,11 @@
 -include ../common/common.am
 .DEFAULT_GOAL := all
-all: pdf html
+all: pre-build pdf html
 
-
-ifeq ($(DOC_LANG),JA)
-SOURCES = chapter01.md \
-		  chapter02.md \
-		  chapter04.md
-else
-SOURCES = README.md freertos-lwip-app.md json_configuration.md ChangeLog.md
-endif
+SOURCES = README.md \
+		  freertos-lwip-app.md \
+		  json_configuration.md \
+		  ChangeLog.md
 
 PDF = wolfSentry-Manual.pdf
 
@@ -26,3 +22,9 @@ html-prep:
 
 .PHONY: pdf-prep
 pdf-prep:
+
+.PHONY: pre-build
+pre-build:
+ifeq ($(DOC_LANG),JA)
+	cp src/ChangeLog.md src-ja/
+endif
