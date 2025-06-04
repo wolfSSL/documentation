@@ -19,6 +19,20 @@ test/                           (wolfProvider test files)
 user_settings.h         (EXAMPLE user_settings.h)
 ```
 ## Building on *nix
+The quickest method is to use the `scripts/build-wolfprovider.sh` script as follows:
+
+```
+./scripts/build-wolfprovider.sh
+```
+
+It will retrieve the dependencies and compile them as necessary. To use other than the default (such as different releases) you can set various environment variables prior to calling the script:
+
+```
+OPENSSL_TAG=openssl-3.2.0 WOLFSSL_TAG=v5.7.2-stable WOLFPROV_DEBUG=1 scripts/build-wolfprovider.sh
+```
+
+Alternatively, you can manually compile each component using the following guide.
+
 
 ### Building OpenSSL
 
@@ -51,15 +65,30 @@ To build non-FIPS wolfSSL for use with wolfProvider:
 ```
 cd wolfssl-X.X.X
 
-./configure --enable-cmac --enable-keygen --enable-sha --enable-des
---enable-aesctr --enable-aesccm --enable-x963kdf
-CPPFLAGS="-DHAVE_AES_ECB -DWOLFSSL_AES_DIRECT -DWC_RSA_NO_PADDING
--DWOLFSSL_PUBLIC_MP -DECC_MIN_KEY_SZ=192 -DWOLFSSL_PSS_LONG_SALT
--DWOLFSSL_PSS_SALT_LEN_DISCOVER"
-
+./configure --enable-opensslcoexist --enable-cmac --enable-keygen --enable-sha --enable-des3 --enable-aesctr --enable-aesccm --enable-x963kdf --enable-compkey CPPFLAGS="-DHAVE_AES_ECB -DWOLFSSL_AES_DIRECT -DWC_RSA_NO_PADDING -DWOLFSSL_PUBLIC_MP -DHAVE_PUBLIC_FFDHE -DWOLFSSL_DH_EXTRA -DWOLFSSL_PSS_LONG_SALT -DWOLFSSL_PSS_SALT_LEN_DISCOVER -DRSA_MIN_SIZE=1024" --enable-certgen --enable-aeskeywrap --enable-enckeys --enable-base16 --with-eccminsz=192
 make
 sudo make install
 ```
+
+Add `--enable-aesgcm-stream` if available for better AES-GCM support.
+Add `--enable-curve25519` to include support for X25519 Key Exchange.
+Add `--enable-curve448` to include support for X448 Key Exchange.
+Add `--enable-ed25519` to include support for Ed25519 signatures and certificates..
+Add `--enable-ed448` to include support for Ed448 signature and certificates.
+
+Add `--enable-pwdbased` to the configure command above if PKCS#12 is used in OpenSSL.
+
+Add to CPPFLAGS `-DHAVE_FFDHE_6144 -DHAVE_FFDHE_8192 -DFP_MAX_BITS=16384` to enable predefined 6144-bit and 8192-bit DH parameters.
+
+Add to `--enable-hmac-copy` if performing HMAC repeatedly with the same key to improve performance. (Available with wolfSSL 5.7.8+.)
+
+Add `--enable-sp=yes,asm' '--enable-sp-math-all'` to use SP Integer maths. Replace `-DFP_MAX_BITS=16384` with -DSP_INT_BITS=8192` when used.
+
+Remove `-DWOLFSSL_PSS_LONG_SALT -DWOLFSSL_PSS_SALT_LEN_DISCOVER` and add `--enable-fips=v2` to the configure command above if building from a FIPS v2 bundle and not the git repository. Change `--enable-fips=v2` to `--enable-fips=ready` if using a FIPS Ready bundle.
+
+If '--with-eccminsz=192' is not supported by wolfSSL, add '-DECC_MIN_KEY_SZ=192' to the CPPFLAGS.
+
+``
 
 If cloning wolfSSL from GitHub, you will need to run the `autogen.sh` script before running `./configure`. This will generate the configure script:
 ```
