@@ -12,7 +12,20 @@ nav:
     - "6. wolfBootの機能": chapter06.md
     - "7. wolfBootの既存プロジェクトへの統合": chapter07.md
     - "8. トラブルシューティング": chapter08.md
-    - "A. コンフィギュレーションオプション": appendix14.md
+    - "A. ATAセキュリティ": appendix01.md
+    - "B. Microsoft Azure Key Vaultを使用したファームウェアの署名": appendix02.md
+    - "C. One Time Programmable (OTP) フラッシュ領域を鍵ストアとして使用": appendix03.md
+    - "D. KeyStore構造：複数の公開鍵のサポート": appendix04.md
+    - "E. wolfBootをライブラリとしてビルド": appendix05.md
+    - "F. wolfBootローダー/アップデーター": appendix06.md
+    - "G. wolfBootを使用したMeasured Boot": appendix07.md
+    - "H. ポスト量子署名": appendix08.md
+    - "I. UARTを介したリモート外部フラッシュメモリのサポート": appendix09.md
+    - "J. Renesas製品におけるwolfBootの使用": appendix10.md
+    - "K. wolfBoot鍵ツール": appendix11.md
+    - "L. TrustZone-MセキュアドメインにおけるwolfCrypt": appendix12.md
+    - "M. wolfBoot TPMサポート": appendix13.md
+    - "N. コンフィギュレーションオプション": appendix14.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
