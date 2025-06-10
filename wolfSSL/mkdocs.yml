@@ -35,7 +35,6 @@ nav:
       - "Compression": group__Compression.md
       - "Error Reporting": group__Error.md
       - "IoT-Safe Module": group__IoTSafe.md
-      - "Key and Cert Conversion": group__Keys.md
       - "Logging": group__Logging.md
       - "Math API": group__Math.md
       - "Random Number Generation": group__Random.md
