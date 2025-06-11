@@ -35,7 +35,6 @@ nav:
       - "圧縮": group__Compression.md
       - "エラーレポート": group__Error.md
       - "IoT-Safeモジュール": group__IoTSafe.md
-      - "鍵と証明書変換": group__Keys.md
       - "ロギング": group__Logging.md
       - "整数演算 API": group__Math.md
       - "乱数生成": group__Random.md
