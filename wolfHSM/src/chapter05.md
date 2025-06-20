@@ -285,7 +285,7 @@ wh_Client_KeyErase(clientCtx, keyId);
 
 When using wolfCrypt in the client application, compatible crypto operations can be executed on the wolfHSM server by passing `WOLFHSM_DEV_ID` as the `devId` argument. The wolfHSM client must be initialized before using any wolfHSM remote crypto.
 
-If wolfHSM does not yet support that algorithm, the API call will return `CRYPTOCB_UNAVAILABLE`. See [supported wolfCrypt algorithms](todo) for the full list of algorithms wolfHSM supports for remote HSM execution.
+If wolfHSM does not yet support that algorithm, the API call will return `CRYPTOCB_UNAVAILABLE`.
 
 Here is an example of how a client application would perform an `AES CBC` encryption operation on the wolfHSM server:
 

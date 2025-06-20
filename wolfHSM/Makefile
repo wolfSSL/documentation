@@ -49,10 +49,7 @@ html-prep: api
 	$(Q)cp -a api/md/*8h* build/html/
 
 	$(Q)perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
-	$(Q)perl -i -pe "s/\/tpm2_/tpm2_/g" build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*
-
-	$(Q)cp src/appendix01.md build/html/appendix01.md
 
 # Set input format to gfm to fix issues with converted API docs
 # Regexes:
@@ -81,4 +78,3 @@ pdf-prep: api
 	$(Q)perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/*.md
 	$(Q)perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/*.md
 
-	$(Q)cp src/appendix01.md build/pdf/appendix01.md

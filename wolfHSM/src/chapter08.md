@@ -28,20 +28,20 @@ Official ports of wolfHSM are provided for various supported architectures, with
 
 ### Infineon Aurix TC3XX
 
-(Port in progress)
 The distribution of this  port is restricted by the vendor. Please contact support@wolfssl.com for access.
 
-Infineon Aurix TC3xx
+**Infineon Aurix TC3xx**
+
 - Up to 6x 300MHz TriCore application cores
 - 1x 100MHz ARM Cortex M3 HSM core
 - Crypto offload: TRNG, AES128, ECDSA, ED25519, SHA
 
 ### ST SPC58NN
 
-(Port in progress)
 The distribution of this  port is restricted by the vendor. Please contact support@wolfssl.com for access.
 
-ST SPC58NN
+** ST SPC58NN**
+
 - 3x 200MHz e200z4256 PowerPC application cores
 - 1x 100MHz e200z0 PowerPC HSM core with NVM
 - Crypto offload: TRNG, AES128

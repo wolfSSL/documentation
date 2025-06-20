@@ -12,7 +12,9 @@ nav:
     - "6. Server Library": chapter06.md
     - "7. Customizing wolfHSM": chapter07.md
     - "8. Porting wolfHSM": chapter08.md
-    - "9. API Reference": appendix01.md
+    - "9. API Reference":
+      - Client API: wh__client_8h.md
+      - Server API: wh__server_8h.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
