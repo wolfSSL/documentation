@@ -88,3 +88,7 @@ jobs:
       run: cd wolfCrypt-JNI && export PATH=$PATH:"/home/runner/work/documentation" && make html
     - name: wolfcrypt-jni pdf
       run: cd wolfCrypt-JNI && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: wolfHSM html
+      run: cd wolfHSM && export PATH=$PATH:"/home/runner/work/documentation" && make html
+    - name: wolfHSM pdf
+      run: cd wolfHSM && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
