@@ -77,4 +77,4 @@ pdf-prep: api
 	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/*.md
 	$(Q)perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/*.md
 	$(Q)perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/*.md
-
+	$(Q)cat build/pdf/wh__client_8h.md build/pdf/wh__client__crypto_8h.md build/pdf/wh__server_8h.md >> build/pdf/appendix01.md
