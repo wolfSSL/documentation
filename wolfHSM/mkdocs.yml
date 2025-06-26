@@ -14,6 +14,7 @@ nav:
     - "8. Porting wolfHSM": chapter08.md
     - "9. API Reference":
       - Client API: wh__client_8h.md
+      - Client Crypto API: wh__client__crypto_8h.md
       - Server API: wh__server_8h.md
 theme:
   name: null
