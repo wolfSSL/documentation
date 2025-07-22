@@ -119,11 +119,11 @@ wolfCrypt_SetCb_fips(myFipsCb);
 
 2. wolfSSL Inc also wanted an option available should one wish to call one of the ESV validated entropy sources so a callback option made sense.
 
-## Will my applications that are linked agaist the 140-3 module still work with the 140-3 module?
+## Will my applications that are linked agaist the 140-2 module still work with the 140-3 module?
 
 A: Absolutely! wolfCrypt FIPS modules v2.x (cert #3389, 140-2 module) has 100% API compatibility minus the 3DES services with wolfCrypt FIPS module v5.2.1 (cert #4718, 140-3 module). In addition to the 140-2 APIs, there are new services (TLS KDFs, AES-OFB, etc) and newer extended APIs. For a full list of new services and new API definitions supported by the 140-3 module please refer to the FIPS 140-3 User Guide [UG] which includes an exhaustive list of every FIPS service and correlated API + description(s). If you need a copy of the [UG] please let the wolfSSL team know by emailing support@wolfssl.com requesting a copy of the FIPS [UG]. 
 
-## The wc_SetSeed_Cd() callback and the TLS Layer:
+## The wc_SetSeed_Cb() callback and the TLS Layer:
 
 If a user-supplied seed routine is to be used in conjunction with the TLS layer, wc_SetSeed_Cb(user_seed_function) must be called after the initial wolfSSL_Init(), and before the application calls wolfSSL_CTX_new().
 
@@ -139,7 +139,7 @@ wolfSSL_CTX_new(&ctx);
 
 To avoid potential implementation bugs users could alternatively use the setting #define CUSTOM_RAND_GENERATE' and register their own custom RNG seed gen callback.
 
-Example of setting custom seed gen without depending on wc_SetSeed_Cd():
+Example of setting custom seed gen without depending on wc_SetSeed_Cb():
 
 ```
 extern unsigned int my_rng_seed_gen(void);
