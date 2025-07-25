@@ -9,14 +9,17 @@ The most recent version of wolfProvider can be obtained directly from wolfSSL In
 The general wolfProvider package is structured as follows:
 
 ```
-certs/                        (Test certificates and keys, used with unit tests)
-provider.conf              (Example OpenSSL config file using wolfProvider)
+certs/                      (Test certificates and keys, used with unit tests)
+examples/                   (Code examples)
 include/
-    wolfprovider/          (wolfProvider header files)
-scripts/                      (wolfProvider test scripts)
-src/                            (wolfProvider source files)
-test/                           (wolfProvider test files)
-user_settings.h         (EXAMPLE user_settings.h)
+    wolfprovider/           (wolfProvider header files)
+IDE/                        (Integration examples)
+scripts/                    (wolfProvider scripts for testing and building)
+src/                        (wolfProvider source files)
+test/                       (wolfProvider test files)
+provider.conf               (Example OpenSSL config file using wolfProvider)
+provider-fips.conf          (Example OpenSSL config file using wolfProvider FIPS)
+user_settings.h             (EXAMPLE user_settings.h)
 ```
 ## Building on *nix
 The quickest method is to use the `scripts/build-wolfprovider.sh` script as follows:
@@ -25,13 +28,25 @@ The quickest method is to use the `scripts/build-wolfprovider.sh` script as foll
 ./scripts/build-wolfprovider.sh
 ```
 
-It will retrieve the dependencies and compile them as necessary. To use other than the default (such as different releases) you can set various environment variables prior to calling the script:
+It will clone, configure, compile, and install OpenSSL and wolfSSL with a default set of options. Two methods are available to override these defaults:
+
+Setting the various environment variables prior to calling the script:
 
 ```
-OPENSSL_TAG=openssl-3.2.0 WOLFSSL_TAG=v5.7.2-stable WOLFPROV_DEBUG=1 scripts/build-wolfprovider.sh
+OPENSSL_TAG=openssl-3.2.0 WOLFSSL_TAG=v5.7.2-stable WOLFPROV_DEBUG=1 ./scripts/build-wolfprovider.sh
 ```
 
-Alternatively, you can manually compile each component using the following guide.
+Specifying arguments for the script to parse:
+
+```
+./scripts/build-wolfprovider.sh --openssl-ver=openssl-3.2.0 --wolfssl-ver=v5.7.2-stable --debug
+```
+
+Of course, these methods can be combined to achieve the desired build combination as well.
+
+For a full list of environment variables and script arguments do `./scripts/build-wolfprovider.sh --help`.
+
+If desired, each component can be manually compiled using the following guide.
 
 
 ### Building OpenSSL
@@ -47,19 +62,20 @@ sudo make install
 
 ### Building wolfSSL
 
-If using a FIPS-validated version of wolfSSL with wolfProvider, follow the build instructions provided with your specific FIPS validated source bundle and Security Policy. In addition to the correct “--enable-fips” configure option, wolfProvider will need wolfSSL to be compiled with “ **WOLFSSL_PUBLIC_MP** ” defined. For example, building the “wolfCrypt Linux FIPSv2” bundle on Linux:
+If using a FIPS-validated version of wolfSSL with wolfProvider, follow the build instructions provided with your specific FIPS validated source bundle and Security Policy. In addition to the correct “--enable-fips” configure option, wolfProvider will need wolfSSL to be compiled with “**WOLFSSL_PUBLIC_MP**” defined. For example, building the “wolfCrypt Linux FIPSv2” bundle on Linux:
 ```
 cd wolfssl-X.X.X-commercial-fips-linuxv
-./configure **--enable-fips=v2 CFLAGS=”-DWOLFSSL_PUBLIC_MP”**
+./configure --enable-fips=v2 CFLAGS=”-DWOLFSSL_PUBLIC_MP”
 make
 ./wolfcrypt/test/testwolfcrypt
-< modify fips_test.c using verifyCore hash output from testwolfcrypt
->
+< modify fips_test.c using verifyCore hash output from testwolfcrypt >
 make
 ./wolfcrypt/test/testwolfcrypt
 < all algorithms should PASS >
 sudo make install
 ```
+
+If available, it may be easier to instead `make` then run the `./fips-hash.sh` utility and then `make` once again. This utility automates the process of updating fips_test.c with the testwolfcrypt hash output.
 
 To build non-FIPS wolfSSL for use with wolfProvider:
 ```
@@ -178,15 +194,25 @@ The following are options which may be appended to the `./configure` script to c
 
 By default, wolfProvider only builds a shared library, with building of a static library disabled. This speeds up build times by a factor of two. Either mode can be explicitly disabled or enabled if desired.
 
-| Option               | Default Value | Description |
-| :---------               | :---------------: | :-------------- |
-|  --enable-static  | **Disabled** | Build static libraries   |
-| --enable-shared | Enabled | Build shared libraries |
-|  --enable-debug | **Disabled** | Enable wolfProvider debugging support |
-|  --enable-coverage | **Disabled** | Build to generate code coverage stats |
+| Option            | Default Value     | Description                    |
+| :---------------- | :---------------: | :----------------------------- |
+| --disable-option-checking | **Disabled** | | ignore unrecognized --enable/--with options |
+| --enable-silent-rules | **Disabled** | less verbose build output (undo: "make V=1") |
+| --disable-silent-rules | **Disabled** | verbose build output (undo: "make V=0") |
+| --enable-static | **Disabled** | Build static libraries |
+| --enable-pic[=PKGS] | **Use Both** | try to use only PIC/non-PIC objects |
+| --enable-shared | **Enabled** | Build shared libraries |
+| --enable-fast-install[=PKGS] | **Enabled** |  optimize for fast installation |
+| --enable-aix-soname=aix\|svr4\|both | **aix** | shared library versioning (aka "SONAME") variant to provide on AIX |
+| --enable-dependency-tracking | **Disabled** | do not reject slow dependency extractors |
+| --disable-dependency-tracking | **Disabled** | speeds up one-time build |
+| --disable-libtool-lock | **Disabled** |  avoid locking (might break parallel builds) |
+| --enable-debug | **Disabled** | Enable wolfProvider debugging support |
+| --enable-coverage | **Disabled** | Build to generate code coverage stats |
 | --enable-usersettings | **Disabled** | Use your own user_settings.h and do not add Makefile CFLAGS |
-| --enable-dynamic | Enabled | Enable loading wolfProvider as a dynamic provider |
+| --enable-dynamic | **Enabled** | Enable loading wolfProvider as a dynamic provider |
 | --enable-singlethreaded | **Disabled** | Enable wolfProvider single threaded |
+| | | |
 | --with-openssl=DIR |   | OpenSSL installation location to link against. If not set, use the system default library and include paths. |
 | --with-wolfssl=DIR |   | wolfSSL installation location to link against. If not set, use the system default library and include paths. |
 
@@ -194,46 +220,57 @@ By default, wolfProvider only builds a shared library, with building of a static
 
 wolfProvider exposes several preprocessor defines that allow users to configure how wolfProvider is built. These are described in the table below.
 
-| Define                                                      | Description |
-| :---------------------------------------------- | :-------------- |
-| WOLFPROVIDER_DEBUG | Build wolfProvider with debug symbols, optimization level, and debug logging. |
-| WP_NO_DYNAMIC_PROVIDER |  Do not build wolfProvider with dynamic provider support. Dynamic providers are ones that can be loaded into OpenSSL at runtime. |
-| WP_SINGLE_THREADED | Build wolfProvider in single-threaded mode. This removes the need for locking around global resources used internally. |
-| WP_USE_HASH | Enable digest algorithms using the wc_Hash API. |
-| WP_HAVE_SHA1 | Enable SHA-1 digest algorithm. |
-| WP_HAVE_SHA224 | Enable SHA-2 digest algorithm with digest size 224. |
-| WP_HAVE_SHA256 | Enable SHA-2 digest algorithm with digest size 256. |
-| WP_HAVE_SHA384 | Enable SHA-2 digest algorithm with digest size 384. |
-| WP_HAVE_SHA512| Enable SHA-2 digest algorithm with digest size 512. |
-| WP_SHA1_DIRECT | Enable the SHA-1 digest algorithm using the wc_Sha API. Incompatible with WP_USE_HASH. |
-| WP_SHA224_DIRECT | Enable the SHA-2 224 digest algorithm using the wc_Sha224 API. Incompatible with WP_USE_HASH. |
-| WP_SHA256_DIRECT | Enable the SHA-2 256 digest algorithm using the wc_Sha256 API. Incompatible with WP_USE_HASH. |
-| WP_HAVE_SHA3_224 | Enable SHA-3 digest algorithm with digest size 224. Not available in OpenSSL 1.0.2. |
-| WP_HAVE_SHA3_256 | Enable SHA-3 digest algorithm with digest size 256. Not available in OpenSSL 1.0.2. |
-| WP_HAVE_SHA3_384 | Enable SHA-3 digest algorithm with digest size 384. Not available in OpenSSL 1.0.2. |
-| WP_HAVE_SHA3_512 | Enable SHA-3 digest algorithm with digest size 512. Not available in OpenSSL 1.0.2. |
-| WP_HAVE_EVP_PKEY | Enable functionality that uses the EVP_PKEY API. This includes things like RSA, DH, etc. |
-| WP_HAVE_CMAC | Enable CMAC algorithm. |
-| WP_HAVE_HMAC | Enable HMAC algorithm. |
-| WP_HAVE_DES3CBC | Enable DES3-CBC algorithm. |
-| WP_HAVE_AESECB | Enable AES algorithm with ECB mode. |
-| WP_HAVE_AESCBC | Enable AES algorithm with CBC mode. |
-| WP_HAVE_AESCTR | Enable AES algorithm with countee mode. |
-| WP_HAVE_AESGCM | Enable AES algorithm with GCM mode. |
-| WP_HAVE_AESCCM |Enable AES algorithm with CCM mode. |
-| WP_HAVE_RANDOM | Enable wolfCrypt random implementation. |
-| WP_HAVE_RSA | Enable RSA operations (e.g. sign, verify, key generation, etc.). |
-| WP_HAVE_DH | Enable Diffie-Hellman operations (e.g. key generation, shared secret computation, etc.). |
-| WP_HAVE_ECC | Enable support for elliptic curve cryptography. |
-| WP_HAVE_EC_KEY | Enable support for EC_KEY_METHOD. Not available in OpenSSL 1.0.2. |
-| WP_HAVE_ECDSA | Enable ECDSA algorithm. |
-| WP_HAVE_ECDH | Enable EC Diffie-Hellman operations. |
-| WP_HAVE_ECKEYGEN | Enable EC key generation. |
-| WP_HAVE_EC_P192 | Enable EC curve P192. |
-| WP_HAVE_EC_P224 | Enable EC curve P224. |
-| WP_HAVE_EC_P256 | Enable EC curve P256. |
-| WP_HAVE_EC_P384 | Enable EC curve P384. |
-| WP_HAVE_EC_P512 | Enable EC curve P512. |
-| WP_HAVE_DIGEST | Compile code in benchmark program and unit tests for use with digest algorithms. |
+| Define                           | Description |
+| :------------------------------- | :----------------------------- |
 | WOLFPROVIDER_USER_SETTINGS | Read user-specified defines from user_settings.h. |
-
+| WOLFPROV_DEBUG | Output debug information |
+| WP_CHECK_FORCE_FAIL | Force failure checking for testing purposes |
+| WP_ALLOW_NON_FIPS | Allow certain non-FIPS algorithms in FIPS mode |
+| WP_HAVE_AESCCM | AES encryption in CCM (Counter with CBC-MAC) mode |
+| WP_HAVE_AESCFB | AES encryption in CFB (Cipher Feedback) mode |
+| WP_HAVE_AESCBC | AES encryption in CBC (Cipher Block Chaining) mode |
+| WP_HAVE_AESCTR | AES encryption in CTR (Counter) mode |
+| WP_HAVE_AESCTS | AES encryption in CTS (Ciphertext Stealing) mode |
+| WP_HAVE_AESECB | AES encryption in ECB (Electronic Codebook) mode |
+| WP_HAVE_AESGCM | AES encryption in GCM (Galois/Counter Mode) mode |
+| WP_HAVE_CMAC | CMAC (Cipher-based Message Authentication Code) support |
+| WP_HAVE_DES3CBC | Triple DES encryption in CBC mode |
+| WP_HAVE_DH | Diffie-Hellman key exchange support |
+| WP_HAVE_DIGEST | General digest/hash algorithm support |
+| WP_HAVE_ECC | General Elliptic Curve Cryptography support |
+| WP_HAVE_EC_P192 | P-192 elliptic curve support |
+| WP_HAVE_EC_P224 | P-224 elliptic curve support |
+| WP_HAVE_EC_P256 | P-256 elliptic curve support |
+| WP_HAVE_EC_P384 | P-384 elliptic curve support |
+| WP_HAVE_EC_P521 | P-521 elliptic curve support |
+| WP_HAVE_ECDH | ECDH (Elliptic Curve Diffie-Hellman) key exchange support |
+| WP_HAVE_ECDSA | ECDSA (Elliptic Curve Digital Signature Algorithm) support |
+| WP_HAVE_ECKEYGEN | Elliptic curve key generation support |
+| WP_HAVE_ED25519 | Ed25519 elliptic curve signature support |
+| WP_HAVE_ED448 | Ed448 elliptic curve signature support |
+| WP_HAVE_GMAC | GMAC (Galois/Counter Mode Authentication) support |
+| WP_HAVE_HKDF | HKDF (HMAC-based Key Derivation Function) support |
+| WP_HAVE_HMAC | HMAC (Hash-based Message Authentication Code) support |
+| WP_HAVE_KRB5KDF | Kerberos 5 Key Derivation Function support |
+| WP_HAVE_MD5 | MD5 hash algorithm support |
+| WP_HAVE_MD5_SHA1 | MD5+SHA1 combination support |
+| WP_HAVE_PBE | Password-Based Encryption support |
+| WP_HAVE_RANDOM | Random number generation support |
+| WP_HAVE_RSA | RSA encryption and signature support |
+| WP_HAVE_SHA1 | SHA1 hash algorithm support |
+| WP_HAVE_SHA224 | SHA224 hash algorithm support |
+| WP_HAVE_SHA256 | SHA256 hash algorithm support |
+| WP_HAVE_SHA384 | SHA384 hash algorithm support |
+| WP_HAVE_SHA3 | SHA3 family hash algorithm support |
+| WP_HAVE_SHA3_224 | SHA3-224 hash algorithm support |
+| WP_HAVE_SHA3_256 | SHA3-256 hash algorithm support |
+| WP_HAVE_SHA3_384 | SHA3-384 hash algorithm support |
+| WP_HAVE_SHA3_512 | SHA3-512 hash algorithm support |
+| WP_HAVE_SHA512 | SHA512 hash algorithm support |
+| WP_HAVE_SHA512_224 | SHA512/224 hash algorithm support |
+| WP_HAVE_SHA512_256 | SHA512/256 hash algorithm support |
+| WP_HAVE_SHAKE_256 | SHAKE256 extendable output function support |
+| WP_HAVE_TLS1_PRF | TLS1 Pseudo-Random Function support |
+| WP_HAVE_X25519 | X25519 elliptic curve support |
+| WP_HAVE_X448 | X448 elliptic curve support |
+| WP_RSA_PSS_ENCODING | RSA-PSS (Probabilistic Signature Scheme) encoding support |
