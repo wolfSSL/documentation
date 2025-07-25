@@ -25,11 +25,23 @@ The quickest method is to use the `scripts/build-wolfprovider.sh` script as foll
 ./scripts/build-wolfprovider.sh
 ```
 
-It will retrieve the dependencies and compile them as necessary. To use other than the default (such as different releases) you can set various environment variables prior to calling the script:
+It will clone, configure, compile, and install OpenSSL and wolfSSL with a default set of options. Two methods are available to override these defaults:
+
+1. Setting the various environment variables prior to calling the script:
 
 ```
-OPENSSL_TAG=openssl-3.2.0 WOLFSSL_TAG=v5.7.2-stable WOLFPROV_DEBUG=1 scripts/build-wolfprovider.sh
+OPENSSL_TAG=openssl-3.2.0 WOLFSSL_TAG=v5.7.2-stable WOLFPROV_DEBUG=1 ./scripts/build-wolfprovider.sh
 ```
+
+2. Specifying arguments for the script to parse:
+
+```
+./scripts/build-wolfprovider.sh --openssl-ver=openssl-3.2.0 --wolfssl-ver=v5.7.2-stable --debug
+```
+
+Of course, these methods can be combined to achieve the desired build combination as well.
+
+For a full list of environment variables and script arguments do `./scripts/build-wolfprovider.sh --help`.
 
 Alternatively, you can manually compile each component using the following guide.
 
@@ -50,7 +62,7 @@ sudo make install
 If using a FIPS-validated version of wolfSSL with wolfProvider, follow the build instructions provided with your specific FIPS validated source bundle and Security Policy. In addition to the correct “--enable-fips” configure option, wolfProvider will need wolfSSL to be compiled with “ **WOLFSSL_PUBLIC_MP** ” defined. For example, building the “wolfCrypt Linux FIPSv2” bundle on Linux:
 ```
 cd wolfssl-X.X.X-commercial-fips-linuxv
-./configure **--enable-fips=v2 CFLAGS=”-DWOLFSSL_PUBLIC_MP”**
+./configure --enable-fips=v2 CFLAGS=”-DWOLFSSL_PUBLIC_MP”
 make
 ./wolfcrypt/test/testwolfcrypt
 < modify fips_test.c using verifyCore hash output from testwolfcrypt
