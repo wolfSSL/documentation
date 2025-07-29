@@ -256,7 +256,7 @@ EchoServer:
 * [`wolfDTLSv1_2_server_method();`](ssl_8h.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
 * [`wolfDTLSv1_3_server_method();`](ssl_8h.md#function-wolfdtlsv1_3_server_method) - DTLS 1.3
 
-We need to load our CA (Certificate Authority) certificate into the `WOLFSSL_CTX` so that the when the echoclient connects to the echoserver, it is able to verify the server’s identity. To load the CA certificates into the `WOLFSSL_CTX`, use [`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations). This function requires three arguments: a `WOLFSSL_CTX` pointer, a certificate file, and a path value. The path value points to a directory which should contain CA certificates in PEM format. When looking up certificates, wolfSSL will look at the certificate file value before looking in the path location. In this case, we don’t need to specify a certificate path because we will specify one CA file - as such we use the value 0 for the path argument. The [`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations) function returns either `SSL_SUCCESS` or `SSL_FAILURE`:
+We need to load our CA (Certificate Authority) certificate into the `WOLFSSL_CTX` so that the when the echoclient connects to the echoserver, it is able to verify the server’s identity. To load the CA certificates into the `WOLFSSL_CTX`, use [`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations). This function requires three arguments: a `WOLFSSL_CTX` pointer, a certificate file, and a path value. The path value points to a directory which should contain CA certificates in PEM format. When looking up certificates, wolfSSL will look at the certificate file value before looking in the path location. In this case, we don’t need to specify a certificate path because we will specify one CA file - as such we use NULL for the path argument. The [`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations) function returns either `SSL_SUCCESS` or `SSL_FAILURE`:
 
 ```c
 wolfSSL_CTX_load_verify_locations(WOLFSSL_CTX* ctx, const char* file, const char* path)
@@ -278,10 +278,10 @@ EchoClient:
     }
 
     /* Load CA certificates into WOLFSSL_CTX */
-    if (wolfSSL_CTX_load_verify_locations(ctx,"../certs/ca-cert.pem",0) !=
+    if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", NULL) !=
         SSL_SUCCESS) {
-        fprintf(stderr, "Error loading ../certs/ca-cert.pem, please check"
-            "the file.\n");
+        fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
+            "please check the file.\n");
         exit(EXIT_FAILURE);
     }
 ```
@@ -304,7 +304,7 @@ if ( (ctx = wolfSSL_CTX_new(wolfTLSv1_2_server_method())) == NULL) {
 }
 
 /* Load CA certificates into WOLFSSL_CTX */
-if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", 0) !=
+if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", NULL) !=
          SSL_SUCCESS) {
     fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
         "please check the file.\n");
@@ -312,7 +312,7 @@ if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", 0) !=
 }
 
 /* Load server certificates into WOLFSSL_CTX */
-if (wolfSSL_CTX_use_certificate_file(ctx,"../certs/server-cert.pem",
+if (wolfSSL_CTX_use_certificate_file(ctx, "../certs/server-cert.pem",
         SSL_FILETYPE_PEM) != SSL_SUCCESS) {
     fprintf(stderr, "Error loading ../certs/server-cert.pem, please"
         "check the file.\n");
@@ -320,7 +320,7 @@ if (wolfSSL_CTX_use_certificate_file(ctx,"../certs/server-cert.pem",
 }
 
 /* Load keys */
-if (wolfSSL_CTX_use_PrivateKey_file(ctx,"../certs/server-key.pem",
+if (wolfSSL_CTX_use_PrivateKey_file(ctx, "../certs/server-key.pem",
         SSL_FILETYPE_PEM) != SSL_SUCCESS) {
     fprintf(stderr, "Error loading ../certs/server-key.pem, please check"
         "the file.\n");
@@ -341,11 +341,11 @@ wolfSSL_Cleanup();
 
 ### EchoClient
 
-A WOLFSSL object needs to be created after each TCP Connect and the socket file descriptor needs to be associated with the session. In the echoclient example, we will do this after the call to `Connect()`, shown below:
+A WOLFSSL object needs to be created after each TCP connect and the socket file descriptor needs to be associated with the session. In the echoclient example, we will do this after the call to `connect()`, shown below:
 
 ```c
 /* Connect to socket file descriptor */
-Connect(sockfd, (SA *) &servaddr, sizeof(servaddr));
+connect(sockfd, (SA *) &servaddr, sizeof(servaddr));
 ```
 
 Directly after connecting, create a new `WOLFSSL` object using the [`wolfSSL_new()`](group__Setup.md#function-wolfssl_new) function. This function returns a pointer to the `WOLFSSL` object if successful or `NULL` in the case of failure. We can then associate the socket file descriptor (`sockfd`) with the new `WOLFSSL` object (`ssl`):
@@ -497,7 +497,7 @@ while(cleanup != 1)
 }
 ```
 
-For the echoserver we need to disable the operating system from restarting calls which were being executed before the signal was handled after our handler has finished. By disabling these, the operating system will not restart calls to `accept()` after the signal has been handled. If we didn’t do this, we would have to wait for another client to connect and disconnect before the echoserver would clean up resources and exit. To define the signal handler and turn off `SA_RESTART`, first define act and oact structures in the echoserver’s `main()` function:
+For the echoserver we need to disable the operating system from restarting calls which were being executed before the signal was handled after our handler has finished. By disabling these, the operating system will not restart calls to `accept()` after the signal has been handled. If we didn’t do this, we would have to wait for another client to connect and disconnect before the echoserver would clean up resources and exit. To define the signal handler and turn off `SA_RESTART`, first define `act` and `oact` structures in the echoserver’s `main()` function:
 
 ```c
 struct sigaction     act, oact;

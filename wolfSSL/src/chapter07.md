@@ -174,7 +174,7 @@ int wolfSSL_CTX_trust_peer_cert(WOLFSSL_CTX *ctx,
 
 ## Certificate Chain Verification
 
-wolfSSL requires that only the top or “root” certificate in a chain to be loaded as a trusted certificate in order to verify a certificate chain. This means that if you have a certificate chain (A -\> B -\> C), where C is signed by B, and B is signed by A, wolfSSL only requires that certificate A be loaded as a trusted certificate in order to verify the entire chain (A-\>B-\>C).
+wolfSSL requires only the top or “root” certificate in a chain to be loaded as a trusted certificate in order to verify a certificate chain. This means that if you have a certificate chain (A -\> B -\> C), where C is signed by B, and B is signed by A, wolfSSL only requires that certificate A be loaded as a trusted certificate in order to verify the entire chain (A-\>B-\>C).
 
 For example, if a server certificate chain looks like:
 
@@ -192,7 +192,7 @@ Checking the domain name of the certificate is an important step that verifies t
 
 ## No File System and using Certificates
 
-Normally a file system is used to load private keys, certificates, and CAs. Since wolfSSL is sometimes used in environments without a full file system an extension to use memory buffers instead is provided. To use the extension define the constant `NO_FILESYSTEM` and the following functions will be made available:
+Normally a file system is used to load private keys, certificates, and CAs. Since wolfSSL is sometimes used in environments without a full file system, an extension to use memory buffers instead is provided. To use the extension define the constant `NO_FILESYSTEM` and the following functions will be made available:
 
 * [`int wolfSSL_CTX_load_verify_buffer(WOLFSSL_CTX* ctx, const unsigned char* in,long sz, int format);`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_buffer)
 * [`int wolfSSL_CTX_use_certificate_buffer(WOLFSSL_CTX* ctx, const unsigned char* in, long sz, int format);`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_buffer)
@@ -204,7 +204,7 @@ Use these functions exactly like their counterparts that are named `*_file` inst
 
 ### Test Certificate and Key Buffers
 
-wolfSSL has come bundled with test certificate and key files in the past.  Now it also comes bundled with test certificate and key buffers for use in environments with no filesystem available.  These buffers are available in `certs_test.h` when defining one or more of `USE_CERT_BUFFERS_1024`, `USE_CERT_BUFFERS_2048`, or `USE_CERT_BUFFERS_256`.
+wolfSSL comes bundled with test certificate and key files.  Additionally, it also comes bundled with test certificate and key buffers for use in environments with no filesystem available.  These buffers are available in `certs_test.h` when defining one or more of `USE_CERT_BUFFERS_1024`, `USE_CERT_BUFFERS_2048`, or `USE_CERT_BUFFERS_256`.
 
 ## Serial Number Retrieval
 
@@ -225,7 +225,7 @@ wolfSSL supports RSA key generation of varying lengths up to 4096 bits. Key gene
 int MakeRsaKey(RsaKey* key, int size, long e, RNG* rng);
 ```
 
-Where `size` is the length in bits and `e` is the public exponent, using 65537 is usually a good choice for `e`. The following from `wolfcrypt/test/test.c` gives an example creating an RSA key of 1024 bits:
+Where `size` is the length in bits and `e` is the public exponent (using 65537 is usually a good choice for `e`). The following from `wolfcrypt/test/test.c` gives an example creating an RSA key of 1024 bits:
 
 ```c
 RsaKey genKey;

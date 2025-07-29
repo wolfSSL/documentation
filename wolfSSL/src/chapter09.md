@@ -52,7 +52,7 @@ wolfSSL (formerly CyaSSL) is thread safe by design. Multiple threads can enter t
 
 ## Input and Output Buffers
 
-wolfSSL now uses dynamic buffers for input and output. They default to 0 bytes and are controlled by the `RECORD_SIZE` define in `wolfssl/internal.h`. If an input record is received that is greater in size than the static buffer, then a dynamic buffer is temporarily used to handle the request and then freed. You can set the static buffer size up to the `MAX_RECORD_SIZE` which is 2^16 or 16,384.
+wolfSSL now uses dynamic buffers for input and output. They default to 0 bytes and are controlled by the `RECORD_SIZE` define in `wolfssl/internal.h`. If an input record is received that is greater in size than the static buffer, then a dynamic buffer is temporarily used to handle the request and then freed. You can set the static buffer size up to the `MAX_RECORD_SIZE` which is 2^14 or 16,384.
 
 If you prefer the previous way that wolfSSL operated, with 16Kb static buffers that will never need dynamic memory, you can still get that option by defining `LARGE_STATIC_BUFFERS`.
 

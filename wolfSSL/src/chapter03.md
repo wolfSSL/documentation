@@ -496,7 +496,7 @@ This section will explain the basic steps needed to add wolfSSL to a client appl
 
     ```c
     /*after connecting to socket fd*/
-    WOLF SSL* ssl;
+    WOLFSSL* ssl;
     if ((ssl = wolfSSL_new(ctx)) == NULL) {
         fprintf(stderr, "wolfSSL_new error.\n");
         exit(EXIT_FAILURE);
@@ -558,7 +558,7 @@ calling:
 
 This section will explain the basic steps needed to add wolfSSL to a server application using the wolfSSL native API. For a client explanation, please see [Changing a Client Application to Use wolfSSL](#changing-a-client-application-to-use-wolfssl). A more complete walk-through, with example code, is located in the [SSL Tutorial](chapter11.md#ssl-tutorial) chapter.
 
-1. Follow the instructions above for a client, except change the client method call in step 5 to a server one, so:
+1. Follow the instructions above for a client, except change the client method call in step 2 to a server one, so:
 
     ```c
     wolfSSL_CTX_new(wolfTLSv1_client_method());

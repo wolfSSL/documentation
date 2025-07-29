@@ -120,6 +120,7 @@ Additionally, each callback type requires its specific feature to be enabled (e.
 wolfSSL provides DH (Diffie-Hellman) callbacks for users who wish to have more control over DH key generation and key agreement operations during the SSL/TLS connection.
 
 The user can optionally define 2 functions:
+
 1. DH key generation callback
 2. DH key agreement callback
 
@@ -138,6 +139,7 @@ typedef int (*CallbackDhAgree)(WOLFSSL* ssl, struct DhKey* key,
 ```
 
 The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+
 * `wolfSSL_CTX_SetDhGenerateKeyPair()`
 * `wolfSSL_CTX_SetDhAgreeCb()`
 
@@ -152,6 +154,7 @@ To use DH callbacks, wolfSSL needs to be compiled with `HAVE_DH` defined.
 wolfSSL provides Ed25519 callbacks for users who wish to have more control over Ed25519 sign/verify operations during the SSL/TLS connection.
 
 The user can optionally define 2 functions:
+
 1. Ed25519 sign callback
 2. Ed25519 verify callback
 
@@ -172,10 +175,12 @@ typedef int (*CallbackEd25519Verify)(WOLFSSL* ssl,
 ```
 
 The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+
 * `wolfSSL_CTX_SetEd25519SignCb()`
 * `wolfSSL_CTX_SetEd25519VerifyCb()`
 
 The user can set a context per WOLFSSL object (session) with:
+
 * `wolfSSL_SetEd25519SignCtx()`
 * `wolfSSL_SetEd25519VerifyCtx()`
 
@@ -188,6 +193,7 @@ To use Ed25519 callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` 
 wolfSSL provides X25519 callbacks for users who wish to have more control over X25519 key generation and shared secret computation during the SSL/TLS connection.
 
 The user can optionally define 2 functions:
+
 1. X25519 key generation callback
 2. X25519 shared secret callback
 
@@ -205,10 +211,12 @@ typedef int (*CallbackX25519SharedSecret)(WOLFSSL* ssl,
 ```
 
 The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+
 * `wolfSSL_CTX_SetX25519KeyGenCb()`
 * `wolfSSL_CTX_SetX25519SharedSecretCb()`
 
 The user can set a context per WOLFSSL object (session) with:
+
 * `wolfSSL_SetX25519KeyGenCtx()`
 * `wolfSSL_SetX25519SharedSecretCtx()`
 
@@ -221,6 +229,7 @@ To use X25519 callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` a
 wolfSSL provides Ed448 callbacks for users who wish to have more control over Ed448 sign/verify operations during the SSL/TLS connection.
 
 The user can optionally define 2 functions:
+
 1. Ed448 sign callback
 2. Ed448 verify callback
 
@@ -241,10 +250,12 @@ typedef int (*CallbackEd448Verify)(WOLFSSL* ssl,
 ```
 
 The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+
 * `wolfSSL_CTX_SetEd448SignCb()`
 * `wolfSSL_CTX_SetEd448VerifyCb()`
 
 The user can set a context per WOLFSSL object (session) with:
+
 * `wolfSSL_SetEd448SignCtx()`
 * `wolfSSL_SetEd448VerifyCtx()`
 
@@ -257,6 +268,7 @@ To use Ed448 callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` an
 wolfSSL provides X448 callbacks for users who wish to have more control over X448 key generation and shared secret operations during the SSL/TLS connection.
 
 The user can optionally define 2 functions:
+
 1. X448 key generation callback
 2. X448 shared secret callback
 
@@ -274,10 +286,12 @@ typedef int (*CallbackX448SharedSecret)(WOLFSSL* ssl,
 ```
 
 The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+
 * `wolfSSL_CTX_SetX448KeyGenCb()`
 * `wolfSSL_CTX_SetX448SharedSecretCb()`
 
 The user can set a context per WOLFSSL object (session) with:
+
 * `wolfSSL_SetX448KeyGenCtx()`
 * `wolfSSL_SetX448SharedSecretCtx()`
 
@@ -290,6 +304,7 @@ To use X448 callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` and
 wolfSSL provides RSA PSS callbacks for users who wish to have more control over RSA PSS sign/verify operations during the SSL/TLS connection.
 
 The user can optionally define 4 functions:
+
 1. RSA PSS sign callback
 2. RSA PSS verify callback
 3. RSA PSS sign check callback
@@ -320,12 +335,14 @@ typedef int (*CallbackRsaPssSignCheck)(WOLFSSL* ssl,
 ```
 
 The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+
 * `wolfSSL_CTX_SetRsaPssSignCb()`
 * `wolfSSL_CTX_SetRsaPssVerifyCb()`
 * `wolfSSL_CTX_SetRsaSignCheckCb()`
 * `wolfSSL_CTX_SetRsaPssSignCheckCb()`
 
 The user can set a context per WOLFSSL object (session) with:
+
 * `wolfSSL_SetRsaPssSignCtx()`
 * `wolfSSL_SetRsaPssVerifyCtx()`
 * `wolfSSL_SetRsaSignCheckCtx()`
@@ -432,7 +449,7 @@ The high level steps use crypto callbacks are:
 
 
 #### 1. Compile wolfSSL with crypto callback support
-Support for crypto callbacks is enabled in wolfSSL via the `–enable-cryptocb` configure option, or `#define WOLF_CRYPTO_CB`.
+Support for crypto callbacks is enabled in wolfSSL via the `–-enable-cryptocb` configure option, or `#define WOLF_CRYPTO_CB`.
 
 #### 2. Register your callback and unique devID with wolfCrypt
 
@@ -467,6 +484,7 @@ wc_InitCmac_ex
 This will cause wolfCrypt to invoke the crypto callback in place of the default implementation. This is not an exhaustive API list. Please refer to the wolfCrypt API documentation to see if a particular algorithm supports crypto callbacks.
 
 #### 4. (TLS only): associate the devId with a wolfSSL context
+
 To enable use of a crypto callback when using TLS, you must supply the `devId` arguments on initialization of a `WOLFSSL_CTX` or `WOLFSSL` struct.
 ```c
 wolfSSL_CTX_SetDevId(ctx, devId);

@@ -263,7 +263,7 @@ For usage examples please see the camellia_test() function in `<wolfssl_root>/wo
 
 **NOTE**: ARC4 is outdated and considered insecure. Please consider using a different stream cipher.
 
-The most common stream cipher used on the Internet is ARC4. wolfCrypt supports it through the header `wolfssl/wolfcrypt/arc4.h`.  Usage is simpler than block ciphers because there is no block size and the key length can be any length. The following is a typical usage of ARC4.
+wolfCrypt supports ARC4 through the header `wolfssl/wolfcrypt/arc4.h`.  Usage is simpler than block ciphers because there is no block size and the key length can be any length. The following is a typical usage of ARC4.
 
 ```c
 Arc4 enc;
