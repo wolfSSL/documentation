@@ -62,7 +62,7 @@ Further information on IPv6 can be found here:
 
 wolfSSL has support for DTLS (“Datagram” TLS) for both client and server.  The current supported versions are DTLS 1.0, 1.2, and 1.3.
 
-The TLS protocol was designed to provide a secure transport channel across a **reliable** medium (such as TCP).  As application layer protocols began to be developed using UDP transport (such as SIP and various electronic gaming protocols), a need arose for a way to provide communications security for applications which are delay sensitive. This need lead to the creation of the DTLS protocol.
+The TLS protocol was designed to provide a secure transport channel across a **reliable** medium (such as TCP).  As application layer protocols began to be developed using UDP transport (such as SIP and various electronic gaming protocols), a need arose for a way to provide communications security for applications which are delay sensitive. This need led to the creation of the DTLS protocol.
 
 Many people believe the difference between TLS and DTLS is the same as TCP vs. UDP. This is incorrect.  UDP has the benefit of having no handshake, no tear-down, and no delay in the middle if something gets lost (compared with TCP).  DTLS on the other hand, has an extended SSL handshake and tear-down and must implement TCP-like behavior for the handshake.  In essence, DTLS reverses the benefits that are offered by UDP in exchange for a secure connection.
 
@@ -147,7 +147,7 @@ The following cipher suites are supported by wolfSSL. A cipher suite is a combin
 
 Each cipher suite defines a key exchange algorithm, a bulk encryption algorithm, and a message authentication code algorithm (MAC). The **key exchange algorithm **(RSA, DSS, DH, EDH) determines how the client and server will authenticate during the handshake process. The **bulk encryption algorithm** (DES, 3DES, AES, ARC4), including block ciphers and stream ciphers, is used to encrypt the message stream. The **message authentication code (MAC) algorithm** (MD2, MD5, SHA-1, SHA-256, SHA-512, RIPEMD) is a hash function used to create the message digest.
 
-The table below matches up to the cipher suites (and categories) found in `<wolfssl_root>/wolfssl/internal.h` (starting at about line 706).  If you are looking for a cipher suite which is not in the following list, please contact us to discuss getting it added to wolfSSL.
+The table below matches up to the cipher suites (and categories) found in `<wolfssl_root>/wolfssl/internal.h` (starting at about line 1097).  If you are looking for a cipher suite which is not in the following list, please contact us to discuss getting it added to wolfSSL.
 
 ECC cipher suites:
 
@@ -290,7 +290,7 @@ wolfSSL supports AEAD suites, including AES-GCM, AES-CCM, and CHACHA-POLY1305. T
 
 wolfSSL supports the **AES**, **DES**, **3DES**, and **Camellia** block ciphers and the **RC4**, and **CHACHA20 **stream ciphers. AES, DES, 3DES, RC4, and ChaCha20 are enabled by default.  Camellia can be enabled when building wolfSSL with the [`--enable-camellia`](chapter02.md#--enable-camellia) build option. The default mode of AES is CBC mode.  To enable GCM or CCM mode with AES, use the [`--enable-aesgcm`](chapter02.md#--enable-aesgcm) and [`--enable-aesccm`](chapter02.md#--enable-aesccm) build options.  Please see the examples for usage and the [wolfCrypt Usage Reference](chapter10.md#wolfcrypt-usage-reference) for specific usage information.
 
-While SSL uses RC4 as the default stream cipher, it has been obsoleted due to compromise. Recently wolfSSL added ChaCha20. While RC4 is about 11% more performant than ChaCha, RC4 is generally considered less secure than ChaCha. ChaCha can put up very nice times of it’s own with added security as a tradeoff.
+While SSL uses RC4 as the default stream cipher, it has been obsoleted due to compromise. Recently wolfSSL added ChaCha20. While RC4 is about 11% more performant than ChaCha, RC4 is generally considered less secure than ChaCha. ChaCha can put up very nice times of its own with added security as a tradeoff.
 
 To see a comparison of cipher performance, visit the wolfSSL Benchmark web page, located here: <https://www.wolfssl.com/docs/benchmarks>.
 
@@ -350,7 +350,7 @@ wolfSSL also supports the PBKDF function from PKCS #12 in addition to PBKDF1 and
 
 ```c
 int PBKDF2(byte* output, const byte* passwd, int pLen,
-           const byte* salt,int sLen, int iterations,
+           const byte* salt, int sLen, int iterations,
            int kLen, int hashType);
 
 int PKCS12_PBKDF(byte* output, const byte* passwd, int pLen,
@@ -376,7 +376,7 @@ PKCS#8:  [https://tools.ietf.org/html/rfc5208](https://tools.ietf.org/html/rfc52
 
 #### PKCS #7
 
-PKCS #7 is designed to transfer bundles of data whether is an enveloped certificate or unencrypted but signed string of data. The functionality is turned on by using the enable option ([`--enable-pkcs7`](chapter02.md#--enable-pkcs7)) or by using the macro `HAVE_PKCS7`. Note that degenerate cases are allowed by default as per the RFC having an empty set of signers. To toggle allowing degenerate cases on and off the function `wc_PKCS7_AllowDegenerate()` can be called.
+PKCS #7 is designed to transfer bundles of data whether as an enveloped certificate or unencrypted but signed string of data. The functionality is turned on by using the enable option ([`--enable-pkcs7`](chapter02.md#--enable-pkcs7)) or by using the macro `HAVE_PKCS7`. Note that degenerate cases are allowed by default as per the RFC having an empty set of signers. To toggle allowing degenerate cases on and off the function `wc_PKCS7_AllowDegenerate()` can be called.
 
 Supported features include:
 
@@ -424,7 +424,7 @@ wolfSSL_CTX_set_cipher_list(ctx, "AES128-SHA");
 
 ### OpenQuantumSafe's liboqs Integration
 
-Please see the appendix "Experimenting with Quantum-Safe Cryptography" in this document for more details.
+Please see the appendix "Experimenting with Post-Quantum Cryptography" in this document for more details.
 
 ## Hardware Accelerated Crypto
 
@@ -481,9 +481,9 @@ For necessary defines, see the `WOLFSSL_ESPWROOM32` define in `settings.h`. The 
 Unlike the ESP32, there's no hardware-based cryptography available for the ESP8266. See the `WOLFSSL_ESP8266` define in `user_settings.h`
 or use `./configure CFLAGS="-DWOLFSSL_ESP8266"` to compile for the embedded ESP8266 target.
 
-### ERF32
+### EFR32
 
-wolfSSL is able to use the ERF32 family of devices for hardware-based cryptography.
+wolfSSL is able to use the EFR32 family of devices for hardware-based cryptography.
 
 To enable support define `WOLFSSL_SILABS_SE_ACCEL` in user_settings.h. wolfSSL currently supports the hardware acceleration of RNG, AES-CBC, AES-GCM, AES-CCM, SHA-1, SHA-2, ECDHE, and ECDSA on the EFR32 platform.
 
@@ -495,7 +495,7 @@ wolfSSL supports using the Trust Protection Unit (TPU), Modular Arithmetic Accel
 
 To enable support define `WOLFSSL_MAX3266X` and `WOLFSSL_SP_MATH_ALL`. wolfSSL currently supports the hardware acceleration of RNG, AES-CBC, AES-GCM, AES-ECB, SHA-1, SHA-2, RSA 2048, and ECDSA.
 
-This HW also supports the use of wolfSSL's crypto callback feature to allow the usage of both HW and SW implentations.
+This HW also supports the use of wolfSSL's crypto callback feature to allow the usage of both HW and SW implementations.
 
 More details of the support can be found in the README.md at wolfcrypt/src/port/maxim of the wolfSSL repository tree.
 
@@ -531,7 +531,7 @@ Watch callbacks with wolfSSL sniffer can be turned on with `WOLFSSL_SNIFFER_WATC
 * `ssl_SetWatchKey_buffer`: Loads a new DER format key into server session.
 * `ssl_SetWatchKey_file`: File version of `ssl_SetWatchKey_buffer`.
 
-Statistics collecting with the sniffer can be compiled in with defining the macro `WOLFSSL_SNIFFER_STATS`. The statistics are kept in a SSLStats structure and are copied to an applications SSLStats structure by a call to `ssl_ReadStatistics`. Additional API to use with sniffer statistics is `ssl_ResetStatistics` (resets the collection of statistics) and `ssl_ReadResetStatistics` (reads the current statistic values and then resets the internal state). The following is the current statistics kept when turned on:
+Statistics collecting with the sniffer can be compiled in by defining the macro `WOLFSSL_SNIFFER_STATS`. The statistics are kept in a SSLStats structure and are copied to an application's SSLStats structure by a call to `ssl_ReadStatistics`. Additional API to use with sniffer statistics is `ssl_ResetStatistics` (resets the collection of statistics) and `ssl_ReadResetStatistics` (reads the current statistic values and then resets the internal state). The following is the current statistics kept when turned on:
 
 * `sslStandardConns`
 * `sslClientAuthConns`
@@ -583,7 +583,7 @@ Or if you are using a user_settings.h header, add the following macro definition
 ```
 user_settings.h
 
-　　#define WOLFSSL_STATIC_MEMORY
+    #define WOLFSSL_STATIC_MEMORY
 ```
 
 The static-buffer-allocation option is implemented by default to fall back to the standard malloc() function when a NULL heap hint is passed in. If a heap hint is passed in and the memory associated with it is exhausted, an error will occur. If the environment does not provide dynamic memory management functionality, a link error will occur. Therefore, also define the **WOLFSSL_NO_MALLOC** macro to disable this feature if needed:
@@ -591,11 +591,11 @@ The static-buffer-allocation option is implemented by default to fall back to th
 ```
 user_settings.h
 
-　　#define WOLFSSL_STATIC_MEMORY
+    #define WOLFSSL_STATIC_MEMORY
     #define WOLFSSL_NO_MALLOC
 ```
 
-In addition there are two build configurations. `--enable-staticmemory=small` which is a
+In addition there are two build configurations. One is `--enable-staticmemory=small` which is a
 smaller version that has smaller struct sizes and less supporting API's available. The other build
 configuration is `--enable-staticmemory=debug` that enables the ability to set a callback function. This is
 useful in cases where printf() is not available for determining what is being allocated and what
@@ -667,7 +667,7 @@ int ret;
 #define MAX_CONCURRENT_IO   0
 
 unsigned char GEN_MEM[GEN_MEM_SIZE];
-unsigned char IO_MEM[IO_MEM_SIZE];　
+unsigned char IO_MEM[IO_MEM_SIZE];
 
   /* set up a general-purpose buffer and generate WOLFSSL_CTX from it on the first call. */
    ret = wolfSSL_CTX_load_static_memory(
@@ -719,8 +719,8 @@ The memory block size and number of blocks for each area to be used are defined 
 /wolfssl/wolfcrypt/memory.h
 
    #define WOLFSSL_STATIC_ALIGN 16  /* alignment 16 bytes by default*/
-   #define WOLFMEM_MAX_BUCKETS  9　　/* number of buckets */
- 　#define WOLFMEM_IO_SZ         16992   /* buffer size for I/O  */
+   #define WOLFMEM_MAX_BUCKETS  9   /* number of buckets */
+   #define WOLFMEM_IO_SZ        16992   /* buffer size for I/O  */
    #define LARGEST_MEM_BUCKET   16128   /* the max block size */   
    #define WOLFMEM_BUCKETS      64,128,256,512,1024,2432,3456,
                                                    4544,LARGEST_MEM_BUCKET
@@ -728,7 +728,7 @@ The memory block size and number of blocks for each area to be used are defined 
 
 ```
 
-* **WOLFSSL_STATIC_ALIGN** specifies the buffer alignment size. 16 bytes by default. You need to change it according to the alignment size of your MCU.
+* **WOLFSSL_STATIC_ALIGN** specifies the buffer alignment size. It is 16 bytes by default. You need to change it according to the alignment size of your MCU.
 * **WOLFMEM_MAX_BUCKETS** shows the number of buckets. This means using 9 different bucket sizes.
 * **WOLFMEM_BUCKETS** specifies the number of bytes in blocks in each bucket, separated by commas, from smallest to largest. This definition applies to general purpose buffers.
 
@@ -738,27 +738,28 @@ In the example above, a bucket with a block size of 64 bytes is the minimum size
 
 #### Macros for I/O Use Buffers
 
-For TLS client
+For TLS client:
 
 - `wolfTLSv1_3_client_method_ex`
 - `wolfTLSv1_2_client_method_ex`
 - `wolfTLSv1_1_client_method_ex`
 - `wolfSSLv23_client_method_ex`
 
-For TLS server
+For TLS server:
+
 - `wolfTLSv1_3_server_method_ex`
 - `wolfTLSv1_2_server_method_ex`
 - `wolfTLSv1_1_server_method_ex`
 - `wolfSSLv23_server_method_ex`
 
-For DTLS client
+For DTLS client:
 
 - `wolfDTLSv1_3_client_method_ex`
 - `wolfTLSv1_2_client_method_ex`
 - `wolfTLSv1_1_client_method_ex`
 - `wolfSSLv23_client_method_ex`
 
-For DTLS server
+For DTLS server:
 
 - `wolfDTLSv1_3_server_method_ex`
 - `wolfTLSv1_2_server_method_ex`
@@ -847,9 +848,9 @@ wolfSSL_CTX_load_verify_locations(ctx, caCert, 0);
 To turn on client verification and control its behavior, the [`wolfSSL_CTX_set_verify()`](group__Setup.md#function-wolfssl_ctx_set_verify) function is used.  In the following example, `SSL_VERIFY_PEER` turns on a certificate request from the server to the client.  `SSL_VERIFY_FAIL_IF_NO_PEER_CERT` instructs the server to fail if the client does not present a certificate to validate on the server side.  Other options to [`wolfSSL_CTX_set_verify()`](group__Setup.md#function-wolfssl_ctx_set_verify) include `SSL_VERIFY_NONE` and `SSL_VERIFY_CLIENT_ONCE`.
 
 ```c
-wolfSSL_CTX_set_verify(ctx,SSL_VERIFY_PEER | ((usePskPlus)?
+wolfSSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | (usePskPlus ?
                        SSL_VERIFY_FAIL_EXCEPT_PSK :
-                       SSL_VERIFY_FAIL_IF_NO_PEER_CERT),0);
+                       SSL_VERIFY_FAIL_IF_NO_PEER_CERT), 0);
 ```
 
 An example of client authentication can be found in the example server (`server.c`) included in the wolfSSL download (`/examples/server/server.c`).
@@ -903,38 +904,6 @@ All TLS extensions can also be enabled with:
 ```sh
 ./configure --enable-tlsx
 ```
-
-## User Crypto Module
-
-User Crypto Module allows for a user to plug in custom crypto that they want used during supported operations (Currently RSA operations are supported). An example of a module is located in the directory `root_wolfssl/wolfcrypt/user-crypto/` using IPP libraries. Examples of the configure option when building wolfSSL to use a crypto module is as follows:
-
-```sh
-./configure --with-user-crypto
-```
-
-or
-
-```sh
-./configure --with-user-crypto=/dir/to
-```
-
-When creating a user crypto module that performs RSA operations, it is mandatory that there is a header file for RSA called `user_rsa.h`. For all user crypto operations it is mandatory that the users library be called `libusercrypto`. These are the names that wolfSSL autoconf tools will be looking for when linking and using a user crypto module. In the example provided with wolfSSL, the header file `user_rsa.h` can be found in the directory `wolfcrypt/user-crypto/include/` and the library once created is located in the directory `wolfcrypt/user-crypto/lib/`. For a list of required API look at the header file provided.
-
-To build the example, after having installed IPP libraries, the following commands from the root wolfSSL directory should be ran.
-
-```sh
-cd wolfcrypt/user-crypto/
-./autogen.sh
-./configure
-make
-sudo make install
-```
-
-The included example in wolfSSL requires the use of IPP, which will need to be installed before the project can be built. Though even if not having IPP libraries to build the example it is intended to provide users with an example of file name choice and API interface. Once having made and installed both the library libusercrypto and header files, making wolfSSL use the crypto module does not require any extra steps. Simply using the configure flag [`--with-user-crypto`](chapter02.md#--with-user-crypto) will map all function calls from the typical wolfSSL crypto to the user crypto module.
-
-Memory allocations, if using wolfSSL’s XMALLOC, should be tagged with `DYNAMIC_TYPE_USER_CRYPTO`. Allowing for analyzing memory allocations used by the module.
-
-User crypto modules **cannot** be used in conjunction with the wolfSSL configure options fast-rsa and/or fips. Fips requires that specific, certified code be used and fast-rsa makes use of the example user crypto module to perform RSA operations.
 
 ## Timing-Resistance in wolfSSL
 
