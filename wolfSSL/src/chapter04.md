@@ -807,7 +807,7 @@ When you're done using static memory allocation, you should call `void wc_Unload
 
 #### Advanced Static Buffer Size Calculation
 
-The function `int wolfSSL_StaticBufferSz_ex(unsigned int listSz, const word32 *sizeList, const word32 *distList, byte* buffer, word32 sz, int flag)` allows you to calculate the required buffer size for static memory allocation with custom bucket sizes and distributions. This is useful when you want to optimize memory usage for your specific application needs.
+The function `int wolfSSL_StaticBufferSz_ex(unsigned int listSz, const word32 *sizeList, const word32 *distList, byte* buffer, word32 sz, int flag)` is a pre-allocation planning tool that calculates how much of a given buffer can be effectively used for static memory allocation, based on the provided bucket sizes and distribution. It returns the usable portion of the buffer that fits complete buckets, excluding any unusable leftover space. This is useful for sizing and tuning static memory pools to maximize utilization and reduce overall memory usage.
 
 Parameters:
 - `listSz`: Number of bucket sizes in the list
@@ -829,7 +829,7 @@ The static-buffer-allocation option provided by wolfSSL manages the specified bu
 
 #### Macros for General Use Buffers
 
-Each bucket varies in size depending on the number of memory blocks it contains and their size. 
+Each bucket varies in size depending on the number of memory blocks it contains and their size.
 
 The memory block size and number of blocks for each area to be used are defined in /wolfssl/wolfcrypt/memory.h with the following macros:
 
@@ -839,7 +839,7 @@ The memory block size and number of blocks for each area to be used are defined 
    #define WOLFSSL_STATIC_ALIGN 16  /* alignment 16 bytes by default*/
    #define WOLFMEM_MAX_BUCKETS  9   /* number of buckets */
    #define WOLFMEM_IO_SZ        16992   /* buffer size for I/O  */
-   #define LARGEST_MEM_BUCKET   16128   /* the max block size */   
+   #define LARGEST_MEM_BUCKET   16128   /* the max block size */
    #define WOLFMEM_BUCKETS      64,128,256,512,1024,2432,3456,
                                                    4544,LARGEST_MEM_BUCKET
    #define WOLFMEM_DIST         49,10,6,14,5,6,9,1,1
