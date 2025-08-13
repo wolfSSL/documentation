@@ -63,18 +63,18 @@ You will need the patched OQS OpenSSL Provider fork in order to generate X.509 c
 You can run the server and client like this in separate terminals:
 
 ```sh
-    $ examples/server/server -v 4 -l TLS_AES_256_GCM_SHA384 \
-      -A certs/mldsa87_root_cert.pem \
-      -c certs/mldsa44_entity_cert.pem \
-      -k certs/mldsa44_entity_key.pem \
+examples/server/server -v 4 -l TLS_AES_256_GCM_SHA384 \
+      -A ../osp/oqs/mldsa87_root_cert.pem \
+      -c ../osp/oqs/mldsa44_entity_cert.pem \
+      -k ../osp/oqs/mldsa44_entity_key.pem \
       --pqc SecP521r1MLKEM1024
 ```
 
 ```sh
-    $ examples/client/client -v 4 -l TLS_AES_256_GCM_SHA384 \
-      -A certs/mldsa44_root_cert.pem \
-      -c certs/mldsa87_entity_cert.pem \
-      -k certs/mldsa87_entity_key.pem \
+examples/client/client -v 4 -l TLS_AES_256_GCM_SHA384 \
+      -A ../osp/oqs/mldsa44_root_cert.pem \
+      -c ../osp/oqs/mldsa87_entity_cert.pem \
+      -k ../osp/oqs/mldsa87_entity_key.pem \
       --pqc SecP521r1MLKEM1024
 ```
 
