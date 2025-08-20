@@ -308,6 +308,14 @@ wolfSSL supports several different hashing functions, including **MD2**, **MD4**
 
 wolfSSL supports the **RSA**, **ECC**, **DSA/DSS** and **DH** public key options, with support for **EDH** (Ephemeral Diffie-Hellman) on the wolfSSL server.  Detailed usage of these functions can be found in the wolfCrypt Usage Reference, [Public Key Cryptography](chapter10.md#public-key-cryptography).
 
+#### ML-KEM, ML-DSA
+
+ML-KEM (Module Lattice Key Encapsulation Mechanism) is a NIST-standardized, lattice-based post-quantum algorithm derived from Kyber. It enables two parties to establish a shared key over an insecure channel using a key encapsulation mechanism, protecting against both classical and quantum adversaries.
+
+ML-DSA (Module Lattice Digital Signature Algorithm) is a NIST-standardized, lattice-based post-quantum digital signature scheme derived from Dilithium. It enables a sender to produce a verifiable signature that proves the origin and integrity of a message.
+
+Both ML-KEM and ML-DSA are public-key algorithms designed to resist cryptographically relevant quantum computers. They are part of NIST's Post-Quantum Cryptography standards (FIPS 203 and FIPS 204) and can be deployed today, often in hybrid form, to prepare for the post-quantum era.
+
 ### ECC Support
 
 wolfSSL has support for Elliptic Curve Cryptography (ECC) including but not limited to: ECDH-ECDSA, ECDHE-ECDSA, ECDH-RSA, ECDHE-PSK and ECDHE-RSA.
@@ -424,7 +432,7 @@ wolfSSL_CTX_set_cipher_list(ctx, "AES128-SHA");
 
 ### OpenQuantumSafe's liboqs Integration
 
-Please see the appendix "Experimenting with Post-Quantum Cryptography" in this document for more details.
+Please see the appendix [Experimenting with Post-Quantum Cryptography](appendix07.md#experimenting-with-post-quantum-cryptography) in this document for more details.
 
 ## Hardware Accelerated Crypto
 
