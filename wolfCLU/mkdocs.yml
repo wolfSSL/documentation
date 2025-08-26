@@ -2,7 +2,7 @@ site_name: wolfCLU Manual
 site_url: https://wolfssl.com/
 docs_dir: build/html/
 site_dir: html/
-copyright: wolfSSL Inc. 2022
+copyright: wolfSSL Inc. 2025
 nav:
     - "1. Introduction": index.md
     - "2. Building wolfCLU": build.md
@@ -16,6 +16,8 @@ nav:
       - "HASH Command": hash.md
       - "MD5 Command": md5.md
       - "PKCS12 Command": pkcs12.md
+      - "PKCS7 Command": pkcs7.md
+      - "PKCS8 Command": pkcs8.md
       - "PKEY Command": pkey.md
       - "RAND Command": rand.md
       - "REQ Command": req.md
@@ -23,6 +25,7 @@ nav:
       - "S_CLIENT Command": s_client.md
       - "VERIFY Command": verify.md
       - "X509 Command": x509.md
+      - "BASE64 Command": base64.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
