@@ -307,7 +307,6 @@ wolfHSMのキャッシュスロットの数は`WOLFHSM_NUM_RAMKEYS`で設定さ�
 ただし、wolfHSMのリモート暗号化を使用する前に、wolfHSMクライアントを初期化する必要があります。
 
 wolfHSMがそのアルゴリズムをまだサポートしていない場合、API呼び出しは`CRYPTOCB_UNAVAILABLE`を返します。
-wolfHSMがリモートHSM実行でサポートしているアルゴリズムの完全なリストについては、[サポートされているwolfCryptアルゴリズム(後日提供予定)](todo)をご参照ください。
 
 以下に、クライアントアプリケーションがwolfHSMサーバーで`AES CBC`暗号化操作を実行する例を示します。
 

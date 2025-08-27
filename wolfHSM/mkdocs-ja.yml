@@ -4,7 +4,7 @@ docs_dir: build/html/
 site_dir: html/
 copyright: Copyright © 2024 wolfSSL Inc.
 nav:
-    - "1. イントロダクション": chapter01.md
+    - "1. イントロダクション": index.md
     - "2. 概要": chapter02.md
     - "3. wolfHSMの始め方": chapter03.md
     - "4. ライブラリ構造": chapter04.md
@@ -12,9 +12,12 @@ nav:
     - "6. サーバライブラリ": chapter06.md
     - "7. カスタマイズ": chapter07.md
     - "8. ポーティング": chapter08.md
-    - "9. APIリファレンス": appendix01.md
+    - "9. APIリファレンス":
+      - クライアントAPI: wh__client_8h.md
+      - クライアント暗号API: wh__client__crypto_8h.md
+      - サーバAPI: wh__server_8h.md
 theme:
-  name: null 
+  name: null
   custom_dir: ../mkdocs-material/material
   language: ja
   palette:
