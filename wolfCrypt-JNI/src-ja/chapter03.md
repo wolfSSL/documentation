@@ -17,12 +17,15 @@ Mac OSXにインストールする場合:
 $ cd wolfcrypt-jni
 $ cp makefile.macosx makefile
 ```
-次に、 "make" を使用してネイティブ (C ソース) コードをコンパイルします:
+
+次に、 "make" を使用してネイティブ (C ソース) コードをコンパイルします。
+これにより、ネイティブJNI共有ライブラリ（`libwolfcryptjni.so/dylib`）が生成されます：
 
 ```
 $ cd wolfcrypt-jni
 $ make
 ```
+
 Java ソースのコンパイルには "ant" を使用します。 JNI または JCE (JNI を含む) パッケージをデバッグ モードまたはリリース モードでコンパイルするための ant ターゲットがいくつかあります。 ターゲットを指定せずに "ant" を実行すると、使用オプションが表示されます：
 
 
@@ -40,18 +43,20 @@ build:
 [echo] build-jce-release | builds release JAR with JNI and JCE classes
 [echo] ----------------------------------------------------------------------------
 ```
+
 必要に応じてビルドターゲットを指定してください。 たとえば、リリース モードで wolfJCE プロバイダーをビルドする場合は、次を実行します：
 
 ```
 $ ant build-jce-release
 ```
-また、JUnit テストを実行するには、次のコマンドを実行します。 これにより、実行されたビルド (JNI と JCE) に一致するテストのみがコンパイルされ、それらのテストも実行されます。
 
+JUnitテストを実行するには、`ant test` を実行してください。これにより、実行されたビルド（JNIとJCE）に一致するテストのみがコンパイル、実行されます。
 
 ```
 $ ant test
 ```
-Java JAR とネイティブ ライブラリの両方を消去するには:
+
+Java JAR とネイティブ ライブラリの両方を消去するには、次のようにします:
 
 ```
 $ ant clean
@@ -60,6 +65,6 @@ $ make clean
 
 ## APIマニュアル（Javadoc）
 
-`ant` を実行すると、`wolfcrypt-jni/docs` ディレクトリの下に一連の Javadoc が生成されます。 ルートドキュメントを表示するには、Web ブラウザで次のファイルを開きます：
+`ant` を実行すると、`wolfcrypt-jni/docs/javadoc` ディレクトリの下に一連の Javadoc が生成されます。 Javadocインデックスを表示するには、Web ブラウザで次のファイルを開きます：
 
-`wolfcrypt-jni/docs/index.html`
+`wolfcrypt-jni/docs/javadoc/index.html`

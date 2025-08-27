@@ -1,53 +1,63 @@
 #  インストール
 
-wolfJCE をインストールして使用するには、次の 2 つの方法があります：
+wolfJCEをインストールして使用する方法は2つあります - 1つは単一のJavaアプリケーション内での実行時、もう1つは全てのJavaアプリケーションが使用するためのシステムレベルです。
 
 
 ##  実行時インストール
 
-実行時に wolfJCE をインストールして使用するには、まず  "**libwolfcryptjni.so**" がシステムのライブラリ検索パスにあることを確認してください。 Linux では、このパスを次のようにして変更できます：
-
+単一のアプリケーション内での実行時にwolfJCEをインストールして使用するには、まず「**libwolfcryptjni.so**」（MacOSの場合は「**libwolfcryptjni.dylib**」）がシステムのライブラリ検索パスにあることを確認してください。
+Linuxでは、このパスを次のようにして変更できます：
 
 ```
-    $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/add
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/add
 ```
+
+MacOSでは、代わりに `DYLD_LIBRARY_PATH` を使用できます：
+
+```
+$ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/path/to/add
+```
+
 次に、wolfCrypt JNI / wolfJCE JAR ファイル (**wolfcrypt-jni.jar**) を Java クラスパスに配置します。 これを行うには、システムのクラスパス設定を調整するか、コンパイル時と実行時に次のようにします：
 
+```
+$ javac -classpath <path/to/jar> ...
+$ java -classpath <path/to/jar> ...
+```
+
+最後に、Javaアプリケーションで、プロバイダークラスをインポートし、`Security.insertProviderAt()` を呼び出してwolfCryptProviderをJavaプロバイダーリストの最上位優先プロバイダーとして挿入することで、実行時にプロバイダーを追加してください。
+プロバイダーの位置1が最も優先度の高い位置であることにご注意ください。
 
 ```
-    $ javac -classpath <path/to/jar> ...
-    $ java -classpath <path/to/jar> ...
-```
-最後に、Java アプリケーションで、プロバイダークラスをインポートし、Security.addProvider() を呼び出して、実行時にプロバイダーを追加します：
+import com.wolfssl.provider.jce.WolfCryptProvider;
 
+public class TestClass {
+   public static void main(String args[]) {
+      ...
+      Security.insertProviderAt(new WolfCryptProvider(), 1);
+      ...
+   }
+}
 ```
-    import com.wolfssl.provider.jce.WolfCryptProvider;
-    public class TestClass {
-       public static void main(String args[]) {
-          ...
-          Security.addProvider(new WolfCryptProvider());
-          ...
-       }
-    }
-```
+
 検証のためにインストールされているすべてのプロバイダーのリストを出力するには、次のようにします：
 
 ```
-    Provider[] providers = Security.getProviders()
-    for (Provider prov:providers) {
-       System.out.println(prov);
-    }
+Provider[] providers = Security.getProviders()
+for (Provider prov:providers) {
+    System.out.println(prov);
+}
 ```
 
-##  OS / システムレベルでのインストール
+##  OS / システムレベルでのインストール (Java 8以下)
 
-システム レベルで wolfJCE プロバイダーをインストールするには、JAR を OS の正しい Java インストール ディレクトリにコピーし、共有ライブラリがライブラリ検索パスにあることを確認します。
+wolfJCEはシステムレベルでインストールできるため、暗号化にJava Security APIを使用するあらゆるJavaアプリケーションがwolfJCEを活用できます。
+wolfJCEプロバイダーをシステムレベルでインストールするには、JARをお使いのOSとJDKに対応した正しいJavaインストールディレクトリにコピーし、共有ライブラリがライブラリ検索パスにあることを確認します。
 
-wolfJCE JAR ファイル (**wolfcrypt-jni.jar**) と共有ライブラリ (**libwolfcryptjni.so**) を次のディレクトリに追加します：
-
+wolfCrypt JNI/JCE JARファイル（**wolfcrypt-jni.jar**）と共有ライブラリ（**libwolfcryptjni.so** または **libwolfcryptjni.dylib**）を以下のディレクトリに追加してください：
 
 ```
-       $JAVA_HOME/jre/lib/ext directory
+$JAVA_HOME/jre/lib/ext
 ```
 
 たとえば、OpenJDK を使用する Ubuntu では、次のようになります：
@@ -55,15 +65,17 @@ wolfJCE JAR ファイル (**wolfcrypt-jni.jar**) と共有ライブラリ (**lib
 ```
 /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext
 ```
-さらに、次のようなエントリを java.security ファイルに追加します：
+
+次に、以下のように `java.security` ファイルにWolfCryptProviderのプロバイダーエントリを追加してください：
 
 ```
 security.provider.N=com.wolfssl.provider.jce.WolfCryptProvider
 ```
-ava.security ファイルは次の場所にあります：
+
+java.security ファイルは次の場所にあります：
 
 ```
 $JAVA_HOME/jre/lib/security/java.security
 ```
-"N" を、ファイル内の他のプロバイダーと比較して WolfCryptProvider に持たせたい優先順位に置き換えます。
 
+"N" を、ファイル内の他のプロバイダーと比較して WolfCryptProvider に持たせたい優先順位に置き換えます。

@@ -9,19 +9,17 @@ wolfJSSE では、ホスト システムに Java をインストールする必�
     + OpenJDK
     + Zulu JDK
     + Amazon Coretto
-- Android
-
-wolfSSL JNI/JSSE のビルド システムは、現時点でMicrosoft Windows で実行するようにセットアップされていません。この件について興味がある方は[facts@wolfssl.com](mailto:facts@wolfssl.com)までお問い合わせください。
-
-"IDE/Android"の下に含まれるAndroid Studioのサンプルプログラムプロジェクトは、Linux と Windows の両方でテストされています。
-
+- Mac OSX
+- Windows (Visual Studio)
+- Android Studio
+- Android AOSP
 
 ##  JUnit
 
-ユニットテストを実行するには、開発システムに JUnit 4 がインストールされている必要があります。JUnit は、プロジェクトの Web サイト[www.junit.org](http://www.junit.org)
+ユニットテストを実行するには、開発システムに JUnit4 がインストールされている必要があります。JUnit4 は、プロジェクトの Web サイト[www.junit.org](http://www.junit.org)
 からダウンロードできます。
 
-Unix/Linux/OSX システムに JUnit をインストールするには:
+Unix/Linux/OSX システムに JUnit4 をインストールするには:
 
 1) [junit.org/junit4/]() から "**junit-4.13.2.jar**" と " **hamcrest-all-1.3.jar**" をダウンロードします。 執筆時点では、上記の .jar ファイルは次のリンクからダウンロードできます。
 
@@ -39,11 +37,7 @@ $ export JUNIT_HOME=/path/to/jar/files
 
 ##  システム要件 (gcc、ant)
 
-**gcc** と **ant** がそれぞれCコードとJavaコードのコンパイルに使用されます。開発システム上に上記がインストールされていることを確認してください。 
-
-
-**注意事項**: `java.sh` スクリプトは、Java のインストールフォルダとして一般的なロケーションを使用します。 Java のインストールフォルダが異なる場合、`java.sh` の実行時にエラーが発生する可能性があります。 この場合、`java.sh` を環境に合わせて変更する必要があります。
-
+**gcc** と **ant** は、それぞれネイティブCコードとJavaコードのコンパイルに使用されます。これらが開発マシンにインストールされていることを確認してください。**ant** の代わりに **maven** でコンパイルすることもできます。
 
 
 ##  wolfSSL SSL/TLS ライブラリ
