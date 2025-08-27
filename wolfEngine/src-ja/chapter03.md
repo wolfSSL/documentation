@@ -221,6 +221,7 @@ Visual Studio で wolfEngine プロジェクトをロードします。 ベン�
 | --enable-p384 | 有効 |  EC Curve P-384 を有効にする|
 | --enable-p521 | 有効 |  EC Curve P-521 を有効にする|
 | --with-openssl=DIR |   | OpenSSLのインストール場所を指定。指定しない場合はシステムのデフォルトライブラリパスとインクルードパスが使われます。|
+| --enable-openssh | **無効** | OpenSSHと組み合わせて使用する |
 
 ## ビルド用マクロ定義
 

@@ -1,6 +1,6 @@
-# FIPS 140-2 のサポート
+# FIPS 140-3 のサポート
 
-wolfEngine は、FIPS で検証されたバージョンの wolfCrypt に対してコンパイルされた場合に、FIPS 140-2 で検証されたバージョンの wolfCrypt で動作するように設計されています。 この使用シナリオには、wolfSSL Inc. から入手した、適切にライセンスされ、検証されたバージョンの wolfCrypt が必要です。
+wolfEngine は、FIPS で検証されたバージョンの wolfCrypt に対してコンパイルされた場合に、FIPS 140-3 で検証されたバージョンの wolfCrypt で動作するように設計されています。 この使用シナリオには、wolfSSL Inc. から入手した、適切にライセンスされ、検証されたバージョンの wolfCrypt が必要です。
 
 wolfCrypt FIPS ライブラリは、非 FIPS モードに「切り替える」ことができないことに注意してください。 wolfCrypt FIPS と通常の wolfCrypt は、2 つの別個のソース コード パッケージです。
 
