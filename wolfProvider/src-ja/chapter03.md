@@ -33,6 +33,21 @@ user_settings.h      (user_settings.hサンプル)
 
 ## *nix上でのビルド
 
+最も簡単な方法は、以下のように `scripts/build-wolfprovider.sh` スクリプトを使用することです。
+
+```
+./scripts/build-wolfprovider.sh
+```
+
+このスクリプトは必要に応じて依存関係を取得し、コンパイルします。
+異なるリリースを使用したい場合など、デフォルトでないパラメータを使用するには、次のように環境変数として設定してください。
+
+```
+OPENSSL_TAG=openssl-3.2.0 WOLFSSL_TAG=v5.7.2-stable WOLFPROV_DEBUG=1 scripts/build-wolfprovider.sh
+```
+
+あるいは、以下のガイドを使用して各コンポーネントを手動でコンパイルすることもできます。
+
 ### OpenSSLをビルド
 
 すでにインストールされたOpenSSLを使用することも、新しく1からOpenSSLをコンパイルして使用することもできます。
@@ -69,16 +84,41 @@ sudo make install
 ```
 
 非FIPS版のwolfSSLを使用する場合は、以下のようになります。
+
 ```
 cd wolfssl-X.X.X
 
-./configure --enable-cmac --enable-keygen --enable-sha --enable-des --enable-aesctr --enable-aesccm --enable-x963kdf CPPFLAGS="-DHAVE_AES_ECB -DWOLFSSL_AES_DIRECT -DWC_RSA_NO_PADDING -DWOLFSSL_PUBLIC_MP -DECC_MIN_KEY_SZ=192 -DWOLFSSL_PSS_LONG_SALT -DWOLFSSL_PSS_SALT_LEN_DISCOVER"
-
+./configure --enable-opensslcoexist --enable-cmac --enable-keygen --enable-sha --enable-des3 --enable-aesctr --enable-aesccm --enable-x963kdf --enable-compkey CPPFLAGS="-DHAVE_AES_ECB -DWOLFSSL_AES_DIRECT -DWC_RSA_NO_PADDING -DWOLFSSL_PUBLIC_MP -DHAVE_PUBLIC_FFDHE -DWOLFSSL_DH_EXTRA -DWOLFSSL_PSS_LONG_SALT -DWOLFSSL_PSS_SALT_LEN_DISCOVER -DRSA_MIN_SIZE=1024" --enable-certgen --enable-aeskeywrap --enable-enckeys --enable-base16 --with-eccminsz=192
 make
 sudo make install
 ```
 
-なおwolfSSLをGitHubリポジトリから取得された場合は、`./configure`を実行する前に`autogen.sh`スクリプトを実行する必要があります。
+より良いAES-GCMサポートのために、利用可能であれば `--enable-aesgcm-stream` を追加してください。
+
+X25519鍵交換のサポートを含めるために `--enable-curve25519` を追加してください。
+
+X448鍵交換のサポートを含めるために `--enable-curve448` を追加してください。
+
+Ed25519署名と証明書のサポートを含めるために `--enable-ed25519` を追加してください。
+
+Ed448署名と証明書のサポートを含めるために `--enable-ed448` を追加してください。
+
+OpenSSLでPKCS#12を使用する場合は、 `--enable-pwdbased` を追加してください。
+
+事前定義された6144ビットおよび8192ビットDHパラメータを有効にするために、CPPFLAGSに `-DHAVE_FFDHE_6144 -DHAVE_FFDHE_8192 -DFP_MAX_BITS=16384` を追加してください。
+
+同じ鍵でHMACを繰り返し実行してパフォーマンスを向上させる場合は `--enable-hmac-copy` を追加してください。
+（wolfSSL 5.7.8以降で利用可能です。）
+
+SP整数演算を使用するために `--enable-sp=yes,asm' '--enable-sp-math-all'` を追加してください。
+使用する際は `-DFP_MAX_BITS=16384` を `-DSP_INT_BITS=8192` に置き換えてください。
+
+FIPS v2バンドルからビルドしており、gitリポジトリからではない場合は、`-DWOLFSSL_PSS_LONG_SALT -DWOLFSSL_PSS_SALT_LEN_DISCOVER` を削除し、上記のconfigureコマンドに `--enable-fips=v2` を追加してください。
+FIPS Readyバンドルを使用している場合は、`--enable-fips=v2` を `--enable-fips=ready` に変更してください。
+
+`--with-eccminsz=192` がwolfSSLでサポートされていない場合は、CPPFLAGSに `-DECC_MIN_KEY_SZ=192` を追加してください。
+
+wolfSSLをGitHubリポジトリから取得された場合は、`./configure`を実行する前に`autogen.sh`スクリプトを実行する必要があります。
 これにより、configureスクリプトが生成されます。
 
 ```
