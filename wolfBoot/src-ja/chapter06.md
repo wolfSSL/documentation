@@ -199,7 +199,7 @@ ED25519鍵を使ってKeyStoreを作成する例を示します：
 
 - first.der 第1の秘密鍵
 - second.der 第2の秘密鍵
-- src/keystore.c 第１，第２の秘密鍵に対応した2つの公開鍵を含んだC KeyStore
+- src/keystore.c 第１、第２の秘密鍵に対応した2つの公開鍵を含んだC KeyStore
 
 keystore.cは以下の様に見えるはずです：
 

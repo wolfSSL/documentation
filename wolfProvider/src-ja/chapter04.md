@@ -1,6 +1,6 @@
 # FIPS 140-2のサポート
 
-wolfProviderは，FIPSで検証されたバージョンのwolfCryptに対して適切にコンパイルされた場合にのみ、FIPS140-2に対応した動作を行うよう設計しています。
+wolfProviderは、FIPSで検証されたバージョンのwolfCryptに対して適切にコンパイルされた場合にのみ、FIPS140-2に対応した動作を行うよう設計しています。
 この使用シナリオには、wolfSSL Inc. から入手した、適切にライセンスされ、検証されたバージョンのwolfCryptが必要です。
 
 wolfCrypt FIPSライブラリは、非FIPSモードに「切り替える」ことができません。
