@@ -4,37 +4,44 @@ wolfJCE は、"wolfcrypt-jni" JNI ラッパー ライブラリにバンドルさ
 
 JNI ラッパーのみを使用したいユーザーの場合、JCE プロバイダー クラスを含まないバージョンの "wolfcrypt-jni.jar" をコンパイルすることができます。
 
-wolfJCE / wolfCrypt JNI パッケージ構造:
+**wolfJCE / wolfCrypt JNI パッケージ構造:**
 
 
 ```
 wolfcrypt-jni /
-AUTHORS
-build.xml                          ant ビルドスクリプト
-COPYING
-docs /                             Javadoc
-jni /                              ネイティブC JNI バインディングソースファイル
-lib /                              コンパイル成果物（ライブラリ）の出力先
-LICENSING
-Makefile generic                   Makefile
-Makefile.linux                     Linux用　Makefile
-Makefile.osx                       OSX用 Makefile
-README_JCE.md
-README.md
-src /
-    main/java/                     Java ソースファイル
-    test/java/                     テストソースファイル
+   .github                        GitHub Actionsワークフロー
+   AUTHORS
+   COPYING
+   ChangeLog.md                   更新履歴
+   IDE/                           IDEプロジェクトファイル
+       WIN/                       Visual Studioプロジェクトファイル
+   LICENSING
+   README.md                      メインREADME
+   README_JCE.md                  wolfJCE README
+   build.xml                      antビルドスクリプト
+   docs /                         Javadocs
+   examples/                      サンプルアプリケーションと証明書/鍵
+       certs/                     サンプル証明書/鍵/KeyStores
+       provider/                  JCEサンプルアプリ
+   jni/                           ネイティブC JNIバインディングソースファイル
+   lib/                           コンパイル成果物（ライブラリ）の出力先
+   makefile.linux                 Linux用のMakefile
+   makefile.osx                   OSX用のMakefile
+   pom.xml                        Mavenビルドファイル
+   rpm/                           Linux rpmファイル
+   scripts/                       テストスクリプト（Facebook Infer等）
+   src/                           ソースコード
+       main/java                  Javaソースファイル
 ```
 
-wolfJCE プロバイダーのソース コードは "src/main/java/com/wolfssl/provider/jce" ディレクトリにあり、"**com.wolfssl.provider.jce**" Java パッケージの一部です。
- 
-wolfCrypt JNI ラッパーは "src/main/java/com/wolfssl/wolfcrypt" ディレクトリにあり、"**com.wolfssl.wolfcrypt**" Java パッケージの一部です。 このパッケージは wolfJCE クラスによって使用されるため、JCE のユーザーはこのパッケージを直接使用する必要はありません。
+wolfJCEプロバイダーのソースコードは `src/main/java/com/wolfssl/provider/jce` ディレクトリにあり、「**com.wolfssl.provider.jce**」Javaパッケージの一部です。
 
-wolfCrypt-JNI と wolfJCE がコンパイルされると、出力 JAR とネイティブ共有ライブラリが "./lib" ディレクトリに配置されます。 これらには、JCE ビルドがコンパイルされると、wolfCrypt JNI ラッパーと wolfJCE プロバイダーの両方が含まれることに注意してください。
+wolfCrypt JNIラッパーは `src/main/java/com/wolfssl/wolfcrypt` ディレクトリにあり、「**com.wolfssl.wolfcrypt**」Javaパッケージの一部です。このパッケージはwolfJCEクラスによって使用されるため、JCEのユーザーはこのパッケージを直接使用する必要はありません。
 
+wolfCrypt JNIとwolfJCEがコンパイルされると、出力JARとネイティブ共有ライブラリは `./lib` ディレクトリに配置されます。JCEビルドがコンパイルされる際、これらにはwolfCrypt JNIラッパーとwolfJCEプロバイダーの両方が含まれることにご注意ください。
 
 ```
 lib/
-    libwolfcryptjni.so
+    libwolfcryptjni.so (libwolfcryptjni.dylib)
     wolfcrypt-jni.jar
 ```
