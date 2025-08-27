@@ -12,7 +12,10 @@ nav:
     - "6. サーバライブラリ": chapter06.md
     - "7. カスタマイズ": chapter07.md
     - "8. ポーティング": chapter08.md
-    - "9. APIリファレンス": appendix01.md
+    - "9. APIリファレンス":
+      - クライアントAPI: wh__client_8h.md
+      - クライアント暗号API: wh__client__crypto_8h.md
+      - サーバAPI: wh__server_8h.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material

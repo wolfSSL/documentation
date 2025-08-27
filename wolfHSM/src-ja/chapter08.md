@@ -28,10 +28,9 @@ wolfHSMの公式ポートは、サポートされているさまざまなアー�
 
 ### Infineon Aurix TC3XX
 
-(現在対応中です。)
 このポートの配布はベンダーによって制限されています。ご入用の方は、info@wolfssl.jp までお問い合わせください。
 
-Infineon Aurix TC3xx
+**Infineon Aurix TC3xx**
 
 - 最大6つのの300MHz TriCoreアプリケーションコア
 - 1つの100MHz ARM Cortex M3 HSMコア
@@ -39,10 +38,9 @@ Infineon Aurix TC3xx
 
 ### ST SPC58NN
 
-(現在対応中です。)
 このポートの配布はベンダーによって制限されています。ご入用の方は、info@wolfssl.jp までお問い合わせください。
 
-ST SPC58NN
+**ST SPC58NN**
 
 - 3つの200MHz e200z4256 PowerPC アプリケーションコア
 - 1つの100MHz e200z0 PowerPC HSMコア (NVM付き)
