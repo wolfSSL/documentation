@@ -66,11 +66,11 @@ sudo make install
 
 wolfProviderでwolfSSL FIPS版を使用するには、特定のFIPS検証済みソースバンドルやセキュリティポリシーで指定されたビルド手順に従う必要があります。
 まずコンフィギュレーションオプションとして`--enable-fips`が必要で、かつ **WOLFSSL_PUBLIC_MP** が定義された状態でwolfSSLをコンパイルします。
-以下に、Linuxで「wolfCrypt Linux FIPSv2バンドル」をビルドする例を示します。
+以下に、Linuxで「wolfCrypt Linux FIPSv5バンドル」をビルドする例を示します。
 
 ```
-cd wolfssl-X.X.X-commercial-fips-linuxv
-./configure **--enable-fips=v2 CFLAGS=”-DWOLFSSL_PUBLIC_MP”**
+cd wolfssl-X.X.X-commercial-fips-linuxv5
+./configure **--enable-fips=v5 CFLAGS=”-DWOLFSSL_PUBLIC_MP”**
 make
 ./wolfcrypt/test/testwolfcrypt
 #--< ここで、fips_test.c内のverifyCoreを開き、testwolfcryptスクリプトが出力するハッシュ値に更新してください >--
