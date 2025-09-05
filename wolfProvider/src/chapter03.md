@@ -47,10 +47,10 @@ sudo make install
 
 ### Building wolfSSL
 
-If using a FIPS-validated version of wolfSSL with wolfProvider, follow the build instructions provided with your specific FIPS validated source bundle and Security Policy. In addition to the correct “--enable-fips” configure option, wolfProvider will need wolfSSL to be compiled with “ **WOLFSSL_PUBLIC_MP** ” defined. For example, building the “wolfCrypt Linux FIPSv2” bundle on Linux:
+If using a FIPS-validated version of wolfSSL with wolfProvider, follow the build instructions provided with your specific FIPS validated source bundle and Security Policy. In addition to the correct “--enable-fips” configure option, wolfProvider will need wolfSSL to be compiled with “ **WOLFSSL_PUBLIC_MP** ” defined. For example, building the “wolfCrypt Linux FIPSv5” bundle on Linux:
 ```
-cd wolfssl-X.X.X-commercial-fips-linuxv
-./configure **--enable-fips=v2 CFLAGS=”-DWOLFSSL_PUBLIC_MP”**
+cd wolfssl-X.X.X-commercial-fips-linuxv5
+./configure **--enable-fips=v5 CFLAGS=”-DWOLFSSL_PUBLIC_MP”**
 make
 ./wolfcrypt/test/testwolfcrypt
 < modify fips_test.c using verifyCore hash output from testwolfcrypt
