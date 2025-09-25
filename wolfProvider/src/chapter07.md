@@ -10,7 +10,7 @@ If the application is configured to read/use an OpenSSL config file, additional 
 
 [OpenSSL 3.0](https://www.openssl.org/docs/man3.0/man5/config.html)
 
-An application can read and consume the default OpenSSL config file (openssl.cnf) or config as set by OPENSSL\_CONF environment variable, and default [openssl\_conf] section.
+An application can read and consume the default OpenSSL config file (openssl.cnf) or config as set by OPENSSL\_CONF environment variable and default [openssl\_conf] section.
 
 Alternatively to using an OpenSSL config file, applications can explicitly initialize and register wolfProvider using the desired OSSL\_PROVIDER_\* APIs. As one example, initializing wolfProvider and registering for all algorithms could be done using:
 ```
