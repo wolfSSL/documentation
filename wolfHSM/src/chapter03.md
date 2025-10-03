@@ -101,7 +101,7 @@ The steps required to configure a server that supports client communication, NVM
 4. Initialize wolfCrypt (before initializing the server)
 5. Allocate and initialize a server config structure and bind the comm server configuration, NVM context, and crypto context to it
 6. Allocate a server context structure and initialize it with the server configuration using `wh_Server_Init()`
-7. Set the server connection state to connected using `wh_Server_SetConnected()` when the underlying transport is ready to be used for client communication (see [wolfHSM Examples](https://github.com/wolfSSL/wolfHSM-examples) for more information)
+7. Set the server connection state to connected using `wh_Server_SetConnected()` when the underlying transport is ready to be used for client communication (see [wolfHSM Examples](https://github.com/wolfSSL/wolfHSM/tree/main/examples) for more information)
 8. Process client requests using `wh_Server_HandleRequestMessage()`
 
 The server may be configured to support NVM object storage using NVM flash configuration. Include the steps to [initialize NVM](./chapter04.md#NVM-Architecture) on the server after step 1.
