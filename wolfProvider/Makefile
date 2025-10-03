@@ -22,6 +22,8 @@ endif
 
 .PHONY: html-prep
 html-prep:
+	$(Q)cp png/*.png build/html/
 
 .PHONY: pdf-prep
 pdf-prep:
+	$(Q)cp png/*.png build/pdf/
