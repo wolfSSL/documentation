@@ -2,7 +2,7 @@ site_name: wolfProvider マニュアル
 site_url: https://wolfssl.com/
 docs_dir: build/html/
 site_dir: html/
-copyright: Copyright © 2024 wolfSSL Inc.
+copyright: Copyright © 2025 wolfSSL Inc.
 nav:
     - "1. イントロダクション": index.md
     - "2. OpenSSLとの互換性": chapter02.md

@@ -8,23 +8,7 @@ autoconfを使用している場合、これは`./configure`に`--enable-debug`�
 ./configure --enable-debug
 ```
 
-autoconf/configureを使用しない場合は、wolfProviderライブラリをコンパイルする際に `WOLFPROVIDER_DEBUG` を定義します。
-
-## デバッグログの有効化/無効化
-
-デバッグサポートを有効化してコンパイルを行った後、以下に示すwolfProviderコントロールコマンドを使用して実行時にデバッグを有効にする必要があります。
-"0" を指定すると、ログ出力が無効になります。
-`PROVIDER_ctrl_cmd()` APIを使用してログ出力を有効にする例を以下に示します。
-
-```
-int ret = 0;
-ret = PROVIDER_ctrl_cmd(e, “enable_debug”, 1, NULL, NULL, 0);
-if (ret != 1) {
-    printf(“Failed to enable debug logging\n”);
-}
-```
-
-wolfProviderがデバッグサポート無効の状態でコンパイルされた場合、`PROVIDER_ctrl_cmd()`で`enable_debug`を設定しようとすると失敗(0)が返されます。
+autoconf/configureを使用しない場合は、wolfProviderライブラリをコンパイルする際に `WOLFPROV_DEBUG` を定義します。
 
 ## ログ出力レベルの制御
 
@@ -70,9 +54,10 @@ wolfProviderでは、コンポーネントごとにログを出力できます�
 | WP_LOG_CIPHER | 暗号化コンポーネント(AES, 3DES) | 0x0008 |
 | WP_LOG_PK     | 公開鍵コンポーネント (RSA, ECC) | 0x0010 |
 | WP_LOG_KE     | 鍵合意コンポーネント (DH, ECDH) | 0x0020 |
-| WP_LOG_PROVIDER | エンジン特有 | 0x0040 |
-| WP_LOG_COMPONENTS_ALL | 全コンポーネント | WP_LOG_RNG &#124; WP_LOG_DIGEST &#124; WP_LOG_MAC &#124; WP_LOG_CIPHER &#124; WP_LOG_PK &#124; WP_LOG_KE &#124; WP_LOG_PROVIDER |
-| WP_LOG_COMPONENTS_DEFAULT | デフォルトコンポーネント (all). | WP_LOG_COMPONENTS_ALL |
+| WP_LOG_KDF    | パスワードベースの鍵導出コンポーネント | 0x0040 |
+| WP_LOG_PROVIDER | すべてのプロバイダー固有ログを有効化 | 0x0080 |
+| WP_LOG_COMPONENTS_ALL | すべてのコンポーネントログを有効化 | WP_LOG_RNG &#124; WP_LOG_DIGEST &#124; WP_LOG_MAC &#124; WP_LOG_CIPHER &#124; WP_LOG_PK &#124; WP_LOG_KE &#124; WP_LOG_PROVIDER |
+| WP_LOG_COMPONENTS_DEFAULT | デフォルト構成 (すべてのログを有効化) | WP_LOG_COMPONENTS_ALL |
 
 デフォルトでは、すべてのコンポーネントを対象としてログを出力します(`WP_LOG_COMPONENTS_DEFAULT`)。
 
@@ -120,7 +105,7 @@ const char* const logMessage)
     fprintf(stderr, “wolfProvider log message: %d\n”, logMessage);
 }
 
-int **main** (void)
+int main (void)
 {
     int ret;
     PROVIDER* e;
