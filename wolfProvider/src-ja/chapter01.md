@@ -10,9 +10,9 @@ wolfProviderの概要図、そしてアプリケーションやOpenSSLとどの�
 
 wolfProviderの設計とアーキテクチャの詳細については、[wolfProviderの設計](chapter09.md) の章をご覧ください。
 
-![wolfProvider Overview](../png/wolfProvider_overview.png)
+![wolfProvider Overview](wolfProvider_overview.png)
 
-wolfProviderは、**libwolfprovider** という名前の共有ライブラリとしてコンパイルされます。
+wolfProviderは、**libwolfprov** という名前の共有ライブラリとしてコンパイルされます。
 これは、アプリケーションまたはコンフィギュレーションファイルを介してOpenSSLによって実行時に動的に登録できます。
 wolfProviderは、アプリケーションが静的ビルドでコンパイルされたときにエンジンをロードするためのエントリポイントも提供します。
 

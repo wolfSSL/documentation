@@ -11,25 +11,18 @@ wolfProviderの最新バージョンは、wolfSSL Inc. から直接入手でき�
 wolfProviderパッケージは、以下のように構成しています。
 
 ```
-certs/               (ユニットテストで使用されるテスト用証明書、鍵)
-provider.conf        (wolfProviderを使用する場合のOpenSSLコンフィギュレーションファイルサンプル)
+certs/                      (ユニットテストで使用されるテスト用証明書、鍵)
+examples/                   (実装例)
 include/
-    wolfprovider/      (wolfProviderヘッダーファイル)
-openssl_patches/
-    1.0.2h/tests/    (OpenSSL 1.0.2h テストアプリ用パッチ)
-    1.1.1b/tests/    (OpenSSL 1.1.1b テストアプリ用パッチ)
-scripts/             (wolfProvider テストスクリプト)
-src/                 (wolfProvider ソースファイル)
-test/                (wolfProvider テストファイル)
-user_settings.h      (user_settings.hサンプル)
+    wolfprovider/           (wolfProviderヘッダーファイル)
+IDE/                        (IDE向けプロファイル)
+scripts/                    (wolfProvider テスト/ビルドスクリプト)
+src/                        (wolfProvider ソースファイル)
+test/                       (wolfProvider テストファイル)
+provider.conf               (wolfProviderを使用する場合のOpenSSLコンフィギュレーションファイルサンプル)
+provider-fips.conf          (wolfProvider FIPS版を使用する場合のOpenSSLコンフィギュレーションファイルサンプル)
+user_settings.h             (user_settings.hサンプル)
 ```
-
-## OpenSSLのバージョンに関する注意事項
-
-次に示すアルゴリズムを利用するには、併記したOpenSSLバージョンが必要です。
-
-- SHA-3：OpenSSL バージョン1.1.1以降が必要
-- EC_KEY_METHOD：OpenSSL バージョン1.1.1以降が必要
 
 ## *nix上でのビルド
 
@@ -39,14 +32,27 @@ user_settings.h      (user_settings.hサンプル)
 ./scripts/build-wolfprovider.sh
 ```
 
-このスクリプトは必要に応じて依存関係を取得し、コンパイルします。
-異なるリリースを使用したい場合など、デフォルトでないパラメータを使用するには、次のように環境変数として設定してください。
+このスクリプトはOpenSSLとwolfSSLをデフォルトのオプションセットでクローン、構成、コンパイル、インストールします。
+
+これらの構成オプションを変更するには、以下の2つの方法があります。
+
+スクリプトを呼び出す前に、各種環境変数を設定する方法:
 
 ```
-OPENSSL_TAG=openssl-3.2.0 WOLFSSL_TAG=v5.7.2-stable WOLFPROV_DEBUG=1 scripts/build-wolfprovider.sh
+OPENSSL_TAG=openssl-3.2.0 WOLFSSL_TAG=v5.7.2-stable WOLFPROV_DEBUG=1 ./scripts/build-wolfprovider.sh
 ```
 
-あるいは、以下のガイドを使用して各コンポーネントを手動でコンパイルすることもできます。
+スクリプトの引数として指定する方法：
+
+```
+./scripts/build-wolfprovider.sh --openssl-ver=openssl-3.2.0 --wolfssl-ver=v5.7.2-stable --debug
+```
+
+これらの方法を組み合わせて、目的のビルドの組み合わせを実現することもできます。
+
+環境変数とスクリプト引数の完全なリストについては、`./scripts/build-wolfprovider.sh --help` を実行してください。
+
+必要に応じて、以下のガイドを使用して各コンポーネントを手動でコンパイルすることもできます。
 
 ### OpenSSLをビルド
 
@@ -70,7 +76,7 @@ wolfProviderでwolfSSL FIPS版を使用するには、特定のFIPS検証済み�
 
 ```
 cd wolfssl-X.X.X-commercial-fips-linuxv
-./configure **--enable-fips=v2 CFLAGS=”-DWOLFSSL_PUBLIC_MP”**
+./configure --enable-fips=v2 CFLAGS="-DWOLFSSL_PUBLIC_MP"
 make
 ./wolfcrypt/test/testwolfcrypt
 #--< ここで、fips_test.c内のverifyCoreを開き、testwolfcryptスクリプトが出力するハッシュ値に更新してください >--
@@ -82,6 +88,9 @@ make
 
 sudo make install
 ```
+
+可能であれば、`make` を実行してから `./fips-hash.sh` ユーティリティを実行し、もう一度 `make` を実行する方が簡単かもしれません。
+このユーティリティは、testwolfcrypt のハッシュ出力を使用して `fips_test.c` を更新するプロセスを自動化します。
 
 非FIPS版のwolfSSLを使用する場合は、以下のようになります。
 
@@ -234,94 +243,84 @@ wolfProviderを静的エンジンとして使用するには`--static`を付け�
 デフォルトでは、ビルド時間を半分にするために共有ライブラリのみをビルドします。
 必要に応じて、静的ライブラリをビルドしたり共有ライブラリのビルドを無効化したりできます。
 
-| オプション   | デフォルト | 意味 |
-| :--------- | :---------------: | :-------------- |
-| --enable-static   | **無効** | 静的ライブラリとしてビルド   |
-| --enable-shared   | 有効     | 共有ライブラリとしてビルド |
-| --enable-debug    | **無効** | wolfProviderのデバッグ出力を有効にする |
-| --enable-coverage | **無効** | コードカバレッジレポートを作成する用ビルド |
-| --enable-usersettings | **無効** | user_settings.h を使用しMakefileの CFLAGSを使用しない |
-| --enable-dynamic-provider | 有効 | wolfProvider をダイナミックエンジンとしてロードする |
-| --enable-singlethreaded | **無効** |  wolfProviderをシングルスレッド環境で使用する |
-| --enable-digest | 有効 |  ダイジェストの生成にwc_Hash APIを使用する |
-| --enable-sha | 有効 |  SHA-1 を有効にする|
-| --enable-sha224 | 有効 |  SHA2-224 を有効にする|
-| --enable-sha256 | 有効 |  SHA2-256 を有効にする|
-| --enable-sha384 | 有効 |  SHA2-384 を有効にする|
-| --enable-sha512 | 有効 |  SHA2-512 を有効にする|
-| --enable-sha3 | 有効 |  SHA3 を有効にする|
-| --enable-sha3-224 | 有効 |  SHA3-224 を有効にする|
-| --enable-sha3-256 | 有効 |  SHA3-256 を有効にする|
-| --enable-sha3-384 | 有効 |  SHA3-384 を有効にする|
-| --enable-sha3-512 | 有効 |  SHA3-512 を有効にする|
-| --enable-cmac | 有効 |  CMAC を有効にする|
-| --enable-hmac | 有効 |  HMAC を有効にする|
-| --enable-des3cbc| 有効 |  3DES-CBC を有効にする|
-| --enable-aesecb | 有効 |  AES-ECB を有効にする|
-| --enable-aescbc | 有効 |  AES-CBC を有効にする|
-| --enable-aesctr | 有効 |  AES-CTR を有効にする|
-| --enable-aesgcm | **無効** |  AES-GCM を有効にする|
-| --enable-aesccm | **無効** |  AES-CCM を有効にする|
-| --enable-rand | 有効 |  RAND を有効にする|
-| --enable-rsa | 有効 |  RSA を有効にする|
-| --enable-dh | 有効 |  DH を有効にする|
-| --enable-evp-pkey | 有効 |  EVP_PKEY APIs を有効にする|
-| --enable-ec-key | 有効 |  ECC using EC_KEY を有効にする|
-| --enable-ecdsa | 有効 |  ECDSA を有効にする|
-| --enable-ecdh | 有効 |  ECDH を有効にする|
-| --enable-eckg | 有効 |  EC Key Generation を有効にする|
-| --enable-p192 | 有効 |  EC Curve P-192 を有効にする|
-| --enable-p224 | 有効 |  EC Curve P-224 を有効にする|
-| --enable-p256 | 有効 |  EC Curve P-256 を有効にする|
-| --enable-p384 | 有効 |  EC Curve P-384 を有効にする|
-| --enable-p521 | 有効 |  EC Curve P-521 を有効にする|
-| --with-openssl=DIR |   | OpenSSLのインストール場所を指定。指定しない場合はシステムのデフォルトライブラリパスとインクルードパスが使われます。|
+| オプション | デフォルト値 | 説明 |
+| :---------------- | :---------------: | :----------------------------- |
+| --disable-option-checking | **無効** | | 認識されない --enable/--with オプションを無視する |
+| --enable-silent-rules | **無効** | ビルド出力の詳細度を低くする (元に戻す: "make V=1") |
+| --disable-silent-rules | **無効** | ビルド出力の詳細度を高くする (元に戻す: "make V=0") |
+| --enable-static | **無効** | 静的ライブラリをビルドする |
+| --enable-pic[=PKGS] | 両方使用 | PIC/非PIC オブジェクトのみを使用する |
+| --enable-shared | 有効 | 共有ライブラリをビルドする |
+| --enable-fast-install[=PKGS] | 有効 | 高速にインストールできるよう最適化する |
+| --enable-aix-soname=aix\|svr4\|both | **aix** | AIXで提供する共有ライブラリのバージョン管理 (別名 "SONAME") バリアント |
+| --enable-dependency-tracking | **無効** | 遅い依存関係抽出を拒否しない |
+| --disable-dependency-tracking | **無効** | ワンタイムビルドを高速化する |
+| --disable-libtool-lock | **無効** | ロックを回避する (並列ビルドが失敗する可能性があります) |
+| --enable-debug | **無効** | wolfProviderのデバッグ出力を有効にする |
+| --enable-coverage | **無効** | コードカバレッジ統計を生成するようにビルドする |
+| --enable-usersettings | **無効** | user_settings.h を使用し、MakefileのCFLAGSを使用しない |
+| --enable-dynamic | 有効 | wolfProviderをダイナミックプロバイダーとしてロードできるようにする |
+| --enable-singlethreaded | **無効** | wolfProviderをシングルスレッド環境で使用する |
+| | | | |
+| --with-openssl=DIR | | リンクするOpenSSLのインストール場所。設定されていない場合は、システムのデフォルトのライブラリとインクルードパスが使用されます。 |
+| --with-wolfssl=DIR | | リンクするwolfSSLのインストール場所。設定されていない場合は、システムのデフォルトのライブラリとインクルードパスが使用されます。 |
 
 ## ビルド用マクロ定義
 
 wolfProviderは、お客様がwolfProviderのビルド方法を設定できるようにするいくつかのプリプロセッサマクロを公開しています。
 以下にその一覧を示します。
 
-| マクロ定義  | 意味 |
-| :---------- | :--------------------- |
-| WOLFPROVIDER_DEBUG | デバッグシンボル、最適化レベル、デバッグロギングを使用してwolfProviderをビルドします |
-| WP_NO_DYNAMIC_PROVIDER |  wolfProviderをダイナミックエンジンとしてビルドしない。ダイナミックエンジンとは、OpenSSLが実行時に動的にロードするエンジンのことです。 |
-| WP_SINGLE_THREADED | wolfProviderをシングルスレッドモードでビルドする。このマクロ定義によりグローバルリソースの使用の排他用に内部的に使用するロック機構を取り除きます。|
-| WP_USE_HASH | ハッシュアルゴリズムを wc_Hash APIを使って有効にする |
-| WP_HAVE_SHA1   |  SHA-1 を有効にする |
-| WP_HAVE_SHA224 |  SHA-2 224を有効にする |
-| WP_HAVE_SHA256 |  SHA-2 256を有効にする |
-| WP_HAVE_SHA384 |  SHA-2 384を有効にする |
-| WP_HAVE_SHA512 |  SHA-2 512を有効にする |
-| WP_SHA1_DIRECT | SHA-1 をwc_Sha APIを使って有効にする。WP_USE_HASHとは同時に指定できません。 |
-| WP_SHA224_DIRECT |  SHA-2 224 を wc_Sha224 APIを使って有効にする。WP_USE_HASHとは同時に指定できません。 |
-| WP_SHA256_DIRECT |  SHA-2 256 を wc_Sha256 APIを使って有効にする。WP_USE_HASHとは同時に指定できません。 |
-| WP_HAVE_SHA3_224 |  SHA-3  224を有効にする（OpenSSL 1.0.2では利用不可）|
-| WP_HAVE_SHA3_256 |  SHA-3  256を有効にする（OpenSSL 1.0.2では利用不可）|
-| WP_HAVE_SHA3_384 |  SHA-3  384を有効にする（OpenSSL 1.0.2では利用不可）|
-| WP_HAVE_SHA3_512 |  SHA-3  512を有効にする（OpenSSL 1.0.2では利用不可）|
-| WP_HAVE_EVP_PKEY | EVP_PKEY APIを使用する機能を有効にする（RSA, DH等も含む） |
-| WP_HAVE_CMAC |  CMACを有効にする |
-| WP_HAVE_HMAC |  HMACを有効にする |
-| WP_HAVE_DES3CBC |  DES3-CBCを有効にする |
-| WP_HAVE_AESECB |  AES-ECBを有効にする |
-| WP_HAVE_AESCBC |  AES-CBCを有効にする |
-| WP_HAVE_AESCTR |  AES-countee modeを有効にする |
-| WP_HAVE_AESGCM |  AES-GCMを有効にする |
-| WP_HAVE_AESCCM | AES-CCMを有効にする |
-| WP_HAVE_RANDOM |  wolfCryptの疑似乱数生成実装を有効にする |
-| WP_HAVE_RSA |  RSA操作(署名、検証、鍵生成等)を有効にする |
-| WP_HAVE_DH |  Diffie-Hellman操作(鍵生成、共有シークレット計算等)を有効にする |
-| WP_HAVE_ECC |  楕円曲線暗号を有効にする |
-| WP_HAVE_EC_KEY | EC_KEY_METHODのサポートを有効にする（OpenSSL 1.0.2では利用不可） |
-| WP_HAVE_ECDSA |  ECDSA を有効にする |
-| WP_HAVE_ECDH |  EC Diffie-Hellman操作を有効にする |
-| WP_HAVE_ECKEYGEN |  EC鍵生成を有効にする |
-| WP_HAVE_EC_P192 |  EC Curve P192を有効にする |
-| WP_HAVE_EC_P224 |  EC Curve P224を有効にする |
-| WP_HAVE_EC_P256 |  EC Curve P256を有効にする |
-| WP_HAVE_EC_P384 |  EC Curve P384を有効にする |
-| WP_HAVE_EC_P512 |  EC Curve P512を有効にする |
-| WP_HAVE_DIGEST | ダイジェストアルゴリズムをベンチマークとユニットテストのコードに含めてコンパイルする |
-| WOLFPROVIDER_USER_SETTINGS | ユーザーの指定した定義をuser_settings.hファイルから読み込む |
-
+| 定義 | 説明 |
+| :---------------- | :----------------------------- |
+| WOLFPROVIDER_USER_SETTINGS | user_settings.hを使用する |
+| WOLFPROV_DEBUG | デバッグ情報を出力する |
+| WP_CHECK_FORCE_FAIL | テスト目的で障害チェックを強制する |
+| WP_ALLOW_NON_FIPS | FIPSモードで特定の非FIPSアルゴリズムを許可する |
+| WP_HAVE_AESCCM | CCM (Counter with CBC-MAC) モードでのAES暗号化を有効化 |
+| WP_HAVE_AESCFB | CFB (Cipher Feedback) モードでのAES暗号化を有効化 |
+| WP_HAVE_AESCBC | CBC (Cipher Block Chaining) モードでのAES暗号化を有効化 |
+| WP_HAVE_AESCTR | CTR (Counter) モードでのAES暗号化を有効化 |
+| WP_HAVE_AESCTS | CTS (Ciphertext Stealing) モードのAES暗号化を有効化 |
+| WP_HAVE_AESECB | ECB (Electronic Codebook) モードのAES暗号化を有効化 |
+| WP_HAVE_AESGCM | GCM (Galois/Counter Mode) モードのAES暗号化を有効化 |
+| WP_HAVE_CMAC | CMAC (Cipher-based Message Authentication Code)を有効化 |
+| WP_HAVE_DES3CBC | CBCモードのTriple DES暗号化を有効化 |
+| WP_HAVE_DH | Diffie-Hellman鍵交換を有効化 |
+| WP_HAVE_DIGEST | 汎用ダイジェスト/ハッシュアルゴリズムを有効化 |
+| WP_HAVE_ECC | 汎用楕円曲線暗号を有効化 |
+| WP_HAVE_EC_P192 | P-192 楕円曲線を有効化 |
+| WP_HAVE_EC_P224 | P-224 楕円曲線を有効化 |
+| WP_HAVE_EC_P256 | P-256 楕円曲線を有効化 |
+| WP_HAVE_EC_P384 | P-384 楕円曲線を有効化 |
+| WP_HAVE_EC_P521 | P-521 楕円曲線を有効化 |
+| WP_HAVE_ECDH | ECDH (楕円曲線 Diffie-Hellman) 鍵交換を有効化 |
+| WP_HAVE_ECDSA | ECDSA (楕円曲線デジタル署名アルゴリズム) を有効化 |
+| WP_HAVE_ECKEYGEN | 楕円曲線鍵生成を有効化 |
+| WP_HAVE_ED25519 | Ed25519 楕円曲線署名を有効化 |
+| WP_HAVE_ED448 | Ed448 楕円曲線署名を有効化 |
+| WP_HAVE_GMAC | GMAC (ガロア/カウンターモード認証) を有効化 |
+| WP_HAVE_HKDF | HKDF (HMACベースの鍵導出関数) を有効化 |
+| WP_HAVE_HMAC | HMAC (ハッシュベースのメッセージ認証コード) を有効化 |
+| WP_HAVE_KRB5KDF | Kerberos 5 鍵導出関数を有効化 |
+| WP_HAVE_MD5 | MD5 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_MD5_SHA1 | MD5+SHA1 の組み合わせを有効化 |
+| WP_HAVE_PBE | パスワードベースの暗号化を有効化 |
+| WP_HAVE_RANDOM | 乱数生成を有効化 |
+| WP_HAVE_RSA | RSA 暗号化と署名を有効化 |
+| WP_HAVE_SHA1 | SHA1 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHA224 | SHA224 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHA256 | SHA256 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHA384 | SHA384 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHA3 | SHA3 ファミリ ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHA3_224 | SHA3-224 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHA3_256 | SHA3-256 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHA3_384 | SHA3-384 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHA3_512 | SHA3-512 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHA512 | SHA512 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHA512_224 | SHA512/224 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHA512_256 | SHA512/256 ハッシュアルゴリズムを有効化 |
+| WP_HAVE_SHAKE_256 | SHAKE256 拡張出力関数を有効化 |
+| WP_HAVE_TLS1_PRF | TLS1 擬似乱数関数を有効化 |
+| WP_HAVE_X25519 | X25519 楕円曲線を有効化 |
+| WP_HAVE_X448 | X448 楕円曲線を有効化 |
+| WP_RSA_PSS_ENCODING | RSA-PSS (確率的署名スキーム) エンコードを有効化 |
