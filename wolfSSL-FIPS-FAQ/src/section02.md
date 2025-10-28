@@ -166,7 +166,9 @@ Example:
 ```
 wolfCrypt_SetCb_fips(myFipsCb);
 
-/* Alternatively call wolfSSL_INit() or comparable API */
+/* Alternatively call wolfSSL_Init() or comparable API
+ * that sets up the seed callback by default
+ */
 #ifdef WC_RNG_SEED_CB
    wc_SetSeed_Cb(wc_GenerateSeed);
 #endif
