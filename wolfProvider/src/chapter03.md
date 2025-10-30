@@ -10,6 +10,7 @@ The general wolfProvider package is structured as follows:
 
 ```
 certs/                      (Test certificates and keys, used with unit tests)
+debian/                     (Scripts for building Debian packages)
 examples/                   (Code examples)
 include/
     wolfprovider/           (wolfProvider header files)
@@ -48,6 +49,40 @@ For a full list of environment variables and script arguments do `./scripts/buil
 
 If desired, each component can be manually compiled using the following guide.
 
+### Forcing use of wolfProvider via `--replace-default`
+With stock OpenSSL, it's still possible to access the default provider delivered with OpenSSL, even with the proper configuration. For example, software may call into OpenSSL EVP functions with a specific provider context, similar to how the unit tests work:
+
+```
+osslLibCtx = OSSL_LIB_CTX_new();
+osslProv = OSSL_PROVIDER_load(osslLibCtx, "default");
+EVP_PKEY_keygen(osslLibCtx, &myKey);
+```
+
+For many use cases, this is not ideal because it allows calls to silently bypass wolfProvider and utilize OpenSSL cryptographic functions.
+
+As an alternative, the OpenSSL build created by this repo can optionally disable the stock provider from OpenSSL and replace it with wolfProvider. We belive this to be a more robust way of ensuring wolfProvider is the crypto backend.
+
+Use option `--replace-default` with `build-wolfprovider.sh` to enable this mode.
+
+To check if OpenSSL contains this functionality, look for the `wolfProvider-replace-default` string in the version output for both OpenSSL and the libssl3 library as shown:
+
+```
+$ openssl version
+OpenSSL 3.0.17+wolfProvider-replace-default 29 Oct 2025 (Library: OpenSSL 3.0.17+wolfProvider-replace-default 29 Oct 2025)
+```
+
+Note that libwolfssl and libwolfprov are agnostic of the `--replace-default` flag.
+
+### Building Debian packages
+*Note: wolfProvider supports Debian Bookworm only for the time being. Other versions of Debian and Ubuntu require minor porting.*
+
+wolfProvider supports building .deb files for installation on Debian systems. To build the packages, run:
+
+```
+scripts/build-wolfprovider.sh --debian --replace-default
+```
+
+Upon build success, the .deb files are placed in the parent directory. When installing, install all `../*.deb` files with `apt` or `dpkg` to get the default replacement functionality. Alternatively, when using a pre-installed version of OpenSSL, install just the libwolfssl and libwolfprov packages from the parent directory.
 
 ### Building OpenSSL
 
