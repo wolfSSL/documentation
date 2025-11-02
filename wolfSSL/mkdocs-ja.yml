@@ -78,10 +78,12 @@ nav:
       - "暗号アルゴリズム - RSA": group__RSA.md
       - "暗号アルゴリズム - SHA 128/224/256/384/512": group__SHA.md
       - "暗号アルゴリズム - SipHash": group__SipHash.md
+      - "暗号アルゴリズム - SrtpKdf": group__SrtpKdf.md
       - "暗号アルゴリズム - SRP": group__SRP.md
     - "C. API ヘッダーファイル":
       - aes_8h.md
       - arc4_8h.md
+      - ascon_8h.md
       - asn_8h.md
       - asn__public_8h.md
       - blake2_8h.md
@@ -109,11 +111,13 @@ nav:
       - hash_8h.md
       - hmac_8h.md
       - iotsafe_8h.md
+      - kdf_8h.md
       - logging_8h.md
       - md2_8h.md
       - md4_8h.md
       - md5_8h.md
       - memory_8h.md
+      - ocsp_8h.md
       - pem_8h.md
       - pkcs11_8h.md
       - pkcs7_8h.md
@@ -126,6 +130,7 @@ nav:
       - rsa_8h.md
       - sakke_8h.md
       - sha256_8h.md
+      - sha3_8h.md
       - sha512_8h.md
       - sha_8h.md
       - signature_8h.md
