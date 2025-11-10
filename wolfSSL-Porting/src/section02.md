@@ -127,11 +127,225 @@ If wolfSSL needs to be used in a multithreaded environment, the wolfSSL mutex la
 ## Random Seed
 
 Q:  When do I need to read this section?
-A:  Either /dev/random or /dev/urandom is not available or you want to integrate into a hardware RNG.
+A:  Either /dev/random or /dev/urandom is not available, you want to integrate into a hardware RNG, or you need to understand wolfSSL's random number generation architecture.
 
-By default, wolfSSL uses /dev/urandom or /dev/random to generate a RNG seed.  The NO_DEV_RANDOM define can be used when building wolfSSL to disable the default GenerateSeed() function.  If this is defined, you need to write a custom GenerateSeed() function in ./wolfcrypt/src/random.c, specific to your target platform.  This allows you to seed wolfSSL’s PRNG with a hardware-based random entropy source if available.
+### Overview
 
-For examples of how GenerateSeed() needs to be written, reference wolfSSL’s existing GenerateSeed() implementations in ./wolfcrypt/src/random.c.
+wolfSSL uses a FIPS-certified Hash_DRBG (Deterministic Random Bit Generator) based on SHA-256 by default. This DRBG is compliant with NIST SP 800-90A and provides cryptographically secure random number generation for all SSL/TLS operations. The DRBG requires an entropy source (seed) to initialize and periodically reseed itself.
+
+### Default Behavior
+
+By default, wolfSSL's DRBG obtains entropy from the following sources in order of preference:
+
+1. **Hardware entropy sources** (if available and enabled):
+   - Intel RDSEED instruction (`HAVE_INTEL_RDSEED`)
+   - AMD RDSEED instruction (`HAVE_AMD_RDSEED`)
+   - Platform-specific hardware RNG (various embedded platforms)
+
+2. **Operating system entropy sources**:
+   - `/dev/urandom` (preferred on Unix-like systems)
+   - `/dev/random` (fallback if /dev/urandom is unavailable)
+   - `getrandom()` system call on Linux (when `WOLFSSL_GETRANDOM` is defined)
+
+The DRBG is enabled by default and can be found in `./wolfcrypt/src/random.c`. The Hash_DRBG implementation uses SHA-256 and maintains internal state that is periodically reseeded to ensure continued entropy.
+
+### Disabling /dev/urandom or /dev/random
+
+If your platform does not have `/dev/urandom` or `/dev/random`, or you want to disable their use, you can define:
+
+- **`NO_DEV_URANDOM`**: Disables use of `/dev/urandom` (will fall back to `/dev/random`)
+- **`NO_DEV_RANDOM`**: Disables use of both `/dev/urandom` and `/dev/random`
+
+When `NO_DEV_RANDOM` is defined, you must provide an alternative entropy source using one of the methods described below.
+
+### Disabling the DRBG
+
+The entire Hash_DRBG can be disabled by defining `WC_NO_HASHDRBG`. However, when the DRBG is disabled, you **must** provide a custom random number generator using `CUSTOM_RAND_GENERATE_BLOCK`.
+
+Example in `user_settings.h`:
+```c
+#define WC_NO_HASHDRBG
+#define CUSTOM_RAND_GENERATE_BLOCK myHardwareRNG
+```
+
+Where `myHardwareRNG` is a function with the signature:
+```c
+int myHardwareRNG(unsigned char* output, unsigned int sz);
+```
+
+This function should fill the `output` buffer with `sz` bytes of random data from your hardware RNG and return 0 on success.
+
+### Custom Seed Generation Methods
+
+wolfSSL provides several methods to customize how the DRBG obtains its seed:
+
+#### 1. CUSTOM_RAND_GENERATE_SEED
+
+Define a custom function that generates seed data. This is the most direct way to provide entropy.
+
+```c
+#define CUSTOM_RAND_GENERATE_SEED myGenerateSeed
+
+int myGenerateSeed(unsigned char* output, unsigned int sz)
+{
+    // Fill output buffer with sz bytes of entropy from your source
+    // Return 0 on success, non-zero on error
+}
+```
+
+#### 2. CUSTOM_RAND_GENERATE
+
+Define a function that returns random values one at a time. wolfSSL will call this function repeatedly to fill the seed buffer.
+
+```c
+#define CUSTOM_RAND_GENERATE myRandFunc
+#define CUSTOM_RAND_TYPE unsigned int
+
+unsigned int myRandFunc(void)
+{
+    // Return a random value from your entropy source
+}
+```
+
+The `CUSTOM_RAND_TYPE` should match the return type of your function (e.g., `unsigned int`, `unsigned long`, etc.).
+
+Example from `./wolfcrypt/src/random.c` (lines 2707-2736):
+```c
+int wc_GenerateSeed(OS_Seed* os, byte* output, word32 sz)
+{
+    word32 i = 0;
+    while (i < sz) {
+        if ((i + sizeof(CUSTOM_RAND_TYPE)) > sz ||
+            ((wc_ptr_t)&output[i] % sizeof(CUSTOM_RAND_TYPE)) != 0) {
+            output[i++] = (byte)CUSTOM_RAND_GENERATE();
+        }
+        else {
+            *((CUSTOM_RAND_TYPE*)&output[i]) = CUSTOM_RAND_GENERATE();
+            i += sizeof(CUSTOM_RAND_TYPE);
+        }
+    }
+    return 0;
+}
+```
+
+#### 3. wc_SetSeed_Cb (Runtime Callback)
+
+Set a seed generation callback at runtime using `wc_SetSeed_Cb()`. This requires defining `WC_RNG_SEED_CB` at build time.
+
+Build configuration:
+```c
+#define WC_RNG_SEED_CB
+```
+
+Runtime usage:
+```c
+#include <wolfssl/wolfcrypt/random.h>
+
+int myCustomSeedFunc(OS_Seed* os, byte* seed, word32 sz)
+{
+    // Generate sz bytes of entropy into seed buffer
+    // Return 0 on success
+}
+
+// Set the callback before initializing RNG
+wc_SetSeed_Cb(myCustomSeedFunc);
+
+// Now initialize and use RNG as normal
+WC_RNG rng;
+wc_InitRng(&rng);
+```
+
+The callback function is defined in `./wolfcrypt/src/random.c` (lines 319-323).
+
+#### 4. Crypto Callbacks (WC_ALGO_TYPE_SEED)
+
+Use wolfSSL's crypto callback mechanism to provide seed generation through a hardware security module or custom crypto device. This requires `WOLF_CRYPTO_CB` to be defined.
+
+Build configuration:
+```c
+#define WOLF_CRYPTO_CB
+```
+
+Implementation example (from `wolfssl-examples/tls/cryptocb-common.c`):
+```c
+int myCryptoCb(int devIdArg, wc_CryptoInfo* info, void* ctx)
+{
+    if (info->algo_type == WC_ALGO_TYPE_SEED) {
+        // Generate random seed data
+        // info->seed.seed = output buffer
+        // info->seed.sz = requested size
+        
+        // Example: Fill with entropy from hardware
+        while (info->seed.sz > 0) {
+            word32 len = min(info->seed.sz, BLOCK_SIZE);
+            // Get entropy from your hardware
+            getHardwareEntropy(info->seed.seed, len);
+            info->seed.seed += len;
+            info->seed.sz -= len;
+        }
+        return 0;
+    }
+    return CRYPTOCB_UNAVAILABLE;
+}
+
+// Register the callback
+int devId = 1;
+wc_CryptoCb_RegisterDevice(devId, myCryptoCb, NULL);
+
+// Use the device ID when initializing RNG
+WC_RNG rng;
+wc_InitRng_ex(&rng, NULL, devId);
+```
+
+This method is particularly useful for integrating with HSMs, TPMs, or other hardware security devices.
+
+### Testing and Development
+
+#### WOLFSSL_GENSEED_FORTEST
+
+For development and testing purposes only, you can define `WOLFSSL_GENSEED_FORTEST` to use a fake, predictable seed. **This should never be used in production** as it provides no security.
+
+```c
+#define WOLFSSL_GENSEED_FORTEST
+```
+
+This will generate a deterministic seed pattern (0x00, 0x01, 0x02, ...) suitable only for testing and debugging. The implementation is in `./wolfcrypt/src/random.c` (lines 4269-4285).
+
+### Platform-Specific Examples
+
+For examples of platform-specific `wc_GenerateSeed()` implementations, reference the existing implementations in `./wolfcrypt/src/random.c`:
+
+- **Windows**: Uses `CryptGenRandom()` or `BCryptGenRandom()` (lines 2753+)
+- **SGX**: Uses `sgx_read_rand()` (lines 2738-2751)
+- **Embedded platforms**: Various implementations for FreeRTOS, Zephyr, Micrium, etc.
+- **Hardware RNG**: Examples for STM32, NXP, Renesas, Infineon, and other platforms
+
+### Summary of Configuration Options
+
+| Define | Purpose | Requires |
+|--------|---------|----------|
+| `NO_DEV_URANDOM` | Disable /dev/urandom | Falls back to /dev/random |
+| `NO_DEV_RANDOM` | Disable /dev/urandom and /dev/random | Alternative seed source |
+| `WC_NO_HASHDRBG` | Disable Hash_DRBG entirely | `CUSTOM_RAND_GENERATE_BLOCK` |
+| `CUSTOM_RAND_GENERATE_BLOCK` | Provide complete RNG replacement | Function implementation |
+| `CUSTOM_RAND_GENERATE_SEED` | Custom seed generation function | Function implementation |
+| `CUSTOM_RAND_GENERATE` | Custom random value function | Function + `CUSTOM_RAND_TYPE` |
+| `WC_RNG_SEED_CB` | Enable runtime seed callback | `wc_SetSeed_Cb()` usage |
+| `WOLF_CRYPTO_CB` | Enable crypto callbacks | Callback registration |
+| `WOLFSSL_GENSEED_FORTEST` | Fake seed for testing | **Testing only!** |
+
+### Recommendations
+
+1. **Use the default DRBG** when possible - it's FIPS-certified and well-tested
+2. **For embedded systems without /dev/random**: Use `CUSTOM_RAND_GENERATE_SEED` with your hardware RNG
+3. **For HSM/TPM integration**: Use crypto callbacks with `WC_ALGO_TYPE_SEED`
+4. **For maximum flexibility**: Use `wc_SetSeed_Cb()` to set callbacks at runtime
+5. **Never use** `WOLFSSL_GENSEED_FORTEST` in production
+
+For additional examples and reference implementations, see:
+- `./wolfcrypt/src/random.c` - All seed generation implementations
+- `wolfssl-examples/tls/cryptocb-common.c` - Crypto callback example with WC_ALGO_TYPE_SEED
+- Platform-specific examples in `./wolfcrypt/src/port/` directoriesc.
 
 ## Memory
 
