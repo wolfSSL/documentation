@@ -188,8 +188,8 @@ Define a custom function that generates seed data. This is the most direct way t
 
 int myGenerateSeed(unsigned char* output, unsigned int sz)
 {
-    // Fill output buffer with sz bytes of entropy from your source
-    // Return 0 on success, non-zero on error
+    /* Fill output buffer with sz bytes of entropy from your source */
+    /* Return 0 on success, non-zero on error */
 }
 ```
 
@@ -203,13 +203,13 @@ Define a function that returns random values one at a time. wolfSSL will call th
 
 unsigned int myRandFunc(void)
 {
-    // Return a random value from your entropy source
+    /* Return a random value from your entropy source */
 }
 ```
 
 The `CUSTOM_RAND_TYPE` should match the return type of your function (e.g., `unsigned int`, `unsigned long`, etc.).
 
-Example from `./wolfcrypt/src/random.c` (lines 2707-2736):
+Example from `./wolfcrypt/src/random.c`:
 ```c
 int wc_GenerateSeed(OS_Seed* os, byte* output, word32 sz)
 {
@@ -243,19 +243,19 @@ Runtime usage:
 
 int myCustomSeedFunc(OS_Seed* os, byte* seed, word32 sz)
 {
-    // Generate sz bytes of entropy into seed buffer
-    // Return 0 on success
+    /* Generate sz bytes of entropy into seed buffer */
+    /* Return 0 on success */
 }
 
-// Set the callback before initializing RNG
+/* Set the callback before initializing RNG */
 wc_SetSeed_Cb(myCustomSeedFunc);
 
-// Now initialize and use RNG as normal
+/* Now initialize and use RNG as normal */
 WC_RNG rng;
 wc_InitRng(&rng);
 ```
 
-The callback function is defined in `./wolfcrypt/src/random.c` (lines 319-323).
+The `wc_SetSeed_Cb` function is defined in `./wolfcrypt/src/random.c`.
 
 #### 4. Crypto Callbacks (WC_ALGO_TYPE_SEED)
 
@@ -271,14 +271,14 @@ Implementation example (from `wolfssl-examples/tls/cryptocb-common.c`):
 int myCryptoCb(int devIdArg, wc_CryptoInfo* info, void* ctx)
 {
     if (info->algo_type == WC_ALGO_TYPE_SEED) {
-        // Generate random seed data
-        // info->seed.seed = output buffer
-        // info->seed.sz = requested size
+        /* Generate random seed data */
+        /* info->seed.seed = output buffer */
+        /* info->seed.sz = requested size */
         
-        // Example: Fill with entropy from hardware
+        /* Example: Fill with entropy from hardware */
         while (info->seed.sz > 0) {
-            word32 len = min(info->seed.sz, BLOCK_SIZE);
-            // Get entropy from your hardware
+            word32 len = (info->seed.sz < BLOCK_SIZE) ? info->seed.sz : BLOCK_SIZE;
+            /* Get entropy from your hardware */
             getHardwareEntropy(info->seed.seed, len);
             info->seed.seed += len;
             info->seed.sz -= len;
@@ -288,11 +288,11 @@ int myCryptoCb(int devIdArg, wc_CryptoInfo* info, void* ctx)
     return CRYPTOCB_UNAVAILABLE;
 }
 
-// Register the callback
+/* Register the callback */
 int devId = 1;
 wc_CryptoCb_RegisterDevice(devId, myCryptoCb, NULL);
 
-// Use the device ID when initializing RNG
+/* Use the device ID when initializing RNG */
 WC_RNG rng;
 wc_InitRng_ex(&rng, NULL, devId);
 ```
@@ -309,14 +309,14 @@ For development and testing purposes only, you can define `WOLFSSL_GENSEED_FORTE
 #define WOLFSSL_GENSEED_FORTEST
 ```
 
-This will generate a deterministic seed pattern (0x00, 0x01, 0x02, ...) suitable only for testing and debugging. The implementation is in `./wolfcrypt/src/random.c` (lines 4269-4285).
+This will generate a deterministic seed pattern (0x00, 0x01, 0x02, ...) suitable only for testing and debugging. The implementation can be found in `./wolfcrypt/src/random.c`.
 
 ### Platform-Specific Examples
 
 For examples of platform-specific `wc_GenerateSeed()` implementations, reference the existing implementations in `./wolfcrypt/src/random.c`:
 
-- **Windows**: Uses `CryptGenRandom()` or `BCryptGenRandom()` (lines 2753+)
-- **SGX**: Uses `sgx_read_rand()` (lines 2738-2751)
+- **Windows**: Uses `CryptGenRandom()` or `BCryptGenRandom()`
+- **SGX**: Uses `sgx_read_rand()`
 - **Embedded platforms**: Various implementations for FreeRTOS, Zephyr, Micrium, etc.
 - **Hardware RNG**: Examples for STM32, NXP, Renesas, Infineon, and other platforms
 
@@ -345,7 +345,7 @@ For examples of platform-specific `wc_GenerateSeed()` implementations, reference
 For additional examples and reference implementations, see:
 - `./wolfcrypt/src/random.c` - All seed generation implementations
 - `wolfssl-examples/tls/cryptocb-common.c` - Crypto callback example with WC_ALGO_TYPE_SEED
-- Platform-specific examples in `./wolfcrypt/src/port/` directoriesc.
+- Platform-specific examples in `./wolfcrypt/src/port/` directories
 
 ## Memory
 
