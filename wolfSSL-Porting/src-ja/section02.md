@@ -146,9 +146,224 @@ wolfSSLをマルチスレッド環境で使用する場合、wolfSSLミューテ
 
 A: `/dev/random` や `/dev/urandom` を利用できない、あるいはハードウェアRNGに統合する必要がある場合です。
 
-デフォルトでは、wolfSSLは `/dev/urandom` または `/dev/random` を使用して RNG シードを生成します。wolfSSLをビルドするときに `NO_DEV_RANDOM` 定義を使用して、デフォルトの `GenerateSeed()` 関数を無効にすることができます。これが定義されている場合は、ターゲットプラットフォームに固有の `./wolfcrypt/src/random.c` にカスタム `GenerateSeed()` 関数を記述する必要があります。これにより、ハードウェアベースのランダムエントロピーソースが利用可能な場合は、wolfSSLのPRNGにシードを設定できます。
+### 概要
 
-`GenerateSeed()` の記述方法の例については、`./wolfcrypt/src/random.c` にある wolfSSL の既存の `GenerateSeed()` 実装を参照してください。
+wolfSSLはデフォルトでSHA-256に基づくFIPS認証済みのHash_DRBG（Deterministic Random Bit Generator）を使用します。このDRBGはNIST SP 800-90Aに準拠しており、すべてのSSL/TLS操作に対して暗号学的に安全な乱数生成を提供します。DRBGは初期化および定期的な再シードのためにエントロピーソース（シード）を必要とします。
+
+### デフォルトの動作
+
+デフォルトでは、wolfSSLのDRBGは以下の優先順位でエントロピーソースを選択します。
+
+1. **ハードウェアエントロピーソース**（利用可能で有効な場合）
+   - Intel RDSEED命令（`HAVE_INTEL_RDSEED`）
+   - AMD RDSEED命令（`HAVE_AMD_RDSEED`）
+   - プラットフォーム固有のハードウェアRNG（各種組み込みプラットフォーム）
+
+2. **オペレーティングシステムのエントロピーソース**
+   - `/dev/urandom`（Unix系システムで優先）
+   - `/dev/random`（/dev/urandomが利用できない場合のフォールバック）
+   - Linuxでの`getrandom()`システムコール（`WOLFSSL_GETRANDOM`が定義されている場合）
+
+DRBGはデフォルトで有効になっており、`./wolfcrypt/src/random.c`に実装されています。Hash_DRBG実装はSHA-256を使用し、継続的なエントロピーを確保するために定期的に再シードされる内部状態を維持します。
+
+### /dev/urandomまたは/dev/randomの無効化
+
+お使いのプラットフォームに`/dev/urandom`や`/dev/random`がない場合、またはこれらを使用しないように構成したい場合は、以下のいずれかを定義してください。
+
+- **`NO_DEV_URANDOM`**：`/dev/urandom`の使用を無効化（`/dev/random`にフォールバック）
+- **`NO_DEV_RANDOM`**：`/dev/urandom`と`/dev/random`の両方の使用を無効化
+
+`NO_DEV_RANDOM`を定義する場合、以下の方法のいずれかを使用して代替のエントロピーソースを提供する必要があります。
+
+### DRBGの無効化
+
+Hash_DRBG全体を`WC_NO_HASHDRBG`を定義することで無効化できます。ただし、DRBGを無効化した場合、`CUSTOM_RAND_GENERATE_BLOCK`を使用してカスタム乱数生成器を別途提供する必要があります。
+
+`user_settings.h`には、次のように定義します。
+```c
+#define WC_NO_HASHDRBG
+#define CUSTOM_RAND_GENERATE_BLOCK myHardwareRNG
+```
+
+`myHardwareRNG`は以下のシグネチャを持つ関数です。
+```c
+int myHardwareRNG(unsigned char* output, unsigned int sz);
+```
+
+この関数は`output`バッファにハードウェアRNGから`sz`バイトのランダムデータを書き込み、成功時に0を返す必要があります。
+
+### カスタムシード生成方法
+
+wolfSSLはDRBGがシードを取得する方法をカスタマイズするためのいくつかの方法を提供しています。
+
+#### 1. CUSTOM_RAND_GENERATE_SEED
+
+シードデータを生成するカスタム関数を定義します。これはエントロピーを提供する最も直接的な方法です。
+
+```c
+#define CUSTOM_RAND_GENERATE_SEED myGenerateSeed
+
+int myGenerateSeed(unsigned char* output, unsigned int sz)
+{
+    /* エントロピーソースからszバイトのエントロピーでoutputバッファを埋める */
+    /* 成功時は0を、エラー時は非ゼロを返す */
+}
+```
+
+#### 2. CUSTOM_RAND_GENERATE
+
+一度に1つずつランダム値を返す関数を定義します。wolfSSLはシードバッファを埋めるためにこの関数を繰り返し呼び出します。
+
+```c
+#define CUSTOM_RAND_GENERATE myRandFunc
+#define CUSTOM_RAND_TYPE unsigned int
+
+unsigned int myRandFunc(void)
+{
+    /* エントロピーソースからランダム値を返す */
+}
+```
+
+`CUSTOM_RAND_TYPE`は関数の戻り値の型と一致する必要があります（例：`unsigned int`、`unsigned long`など）。
+
+`./wolfcrypt/src/random.c`における使用例：
+```c
+int wc_GenerateSeed(OS_Seed* os, byte* output, word32 sz)
+{
+    word32 i = 0;
+    while (i < sz) {
+        if ((i + sizeof(CUSTOM_RAND_TYPE)) > sz ||
+            ((wc_ptr_t)&output[i] % sizeof(CUSTOM_RAND_TYPE)) != 0) {
+            output[i++] = (byte)CUSTOM_RAND_GENERATE();
+        }
+        else {
+            *((CUSTOM_RAND_TYPE*)&output[i]) = CUSTOM_RAND_GENERATE();
+            i += sizeof(CUSTOM_RAND_TYPE);
+        }
+    }
+    return 0;
+}
+```
+
+#### 3. wc_SetSeed_Cb（ランタイムコールバック）
+
+`wc_SetSeed_Cb()`を使用してランタイムにシード生成コールバックを設定します。有効にするにはビルド時に`WC_RNG_SEED_CB`の定義が必要です。
+
+ビルド設定：
+```c
+#define WC_RNG_SEED_CB
+```
+
+ランタイムでの使用：
+```c
+#include <wolfssl/wolfcrypt/random.h>
+
+int myCustomSeedFunc(OS_Seed* os, byte* seed, word32 sz)
+{
+    /* seedバッファにszバイトのエントロピーを生成 */
+    /* 成功時は0を返す */
+}
+
+/* RNGを初期化する前にコールバックを設定 */
+wc_SetSeed_Cb(myCustomSeedFunc);
+
+/* 通常通りRNGを初期化して使用 */
+WC_RNG rng;
+wc_InitRng(&rng);
+```
+
+`wc_SetSeed_Cb`関数は`./wolfcrypt/src/random.c`で定義されています。
+
+#### 4. 暗号コールバック（WC_ALGO_TYPE_SEED）
+
+wolfSSLの暗号コールバックメカニズムを使用して、ハードウェアセキュリティモジュールやカスタム暗号デバイスを通じてシード生成を提供します。有効にするには`WOLF_CRYPTO_CB`の定義が必要です。
+
+ビルド設定：
+```c
+#define WOLF_CRYPTO_CB
+```
+
+実装例（`wolfssl-examples/tls/cryptocb-common.c`）：
+```c
+int myCryptoCb(int devIdArg, wc_CryptoInfo* info, void* ctx)
+{
+    if (info->algo_type == WC_ALGO_TYPE_SEED) {
+        /* ランダムシードデータを生成 */
+        /* info->seed.seed = 出力バッファ */
+        /* info->seed.sz = 要求されたサイズ */
+        
+        /* 例：ハードウェアからのエントロピーで埋める場合 */
+        while (info->seed.sz > 0) {
+            word32 len = (info->seed.sz < BLOCK_SIZE) ? info->seed.sz : BLOCK_SIZE;
+            /* ハードウェアからエントロピーを取得 */
+            getHardwareEntropy(info->seed.seed, len);
+            info->seed.seed += len;
+            info->seed.sz -= len;
+        }
+        return 0;
+    }
+    return CRYPTOCB_UNAVAILABLE;
+}
+
+/* コールバックを登録 */
+int devId = 1;
+wc_CryptoCb_RegisterDevice(devId, myCryptoCb, NULL);
+
+/* RNGを初期化する際にデバイスIDを使用 */
+WC_RNG rng;
+wc_InitRng_ex(&rng, NULL, devId);
+```
+
+この方法は、HSM、TPM、またはその他のハードウェアセキュリティデバイスとの統合に特に有用です。
+
+### テストと開発
+
+#### WOLFSSL_GENSEED_FORTEST
+
+開発およびテスト目的のみで、`WOLFSSL_GENSEED_FORTEST`を定義して偽の予測可能なシードを使用できます。**これは本番環境では絶対にお使いにならないでください**。一切の安全性がなくなります。
+
+```c
+#define WOLFSSL_GENSEED_FORTEST
+```
+
+これはテストとデバッグにのみ適した決定論的なシードパターン（0x00、0x01、0x02、...）を生成します。実装は`./wolfcrypt/src/random.c`にあります。
+
+### プラットフォーム固有の例
+
+プラットフォーム固有の`wc_GenerateSeed()`実装の例については、`./wolfcrypt/src/random.c`の既存の実装をご参照ください：
+
+- **Windows**：`CryptGenRandom()`または`BCryptGenRandom()`を使用
+- **SGX**：`sgx_read_rand()`を使用
+- **組み込みプラットフォーム**：FreeRTOS、Zephyr、Micriumなどの各種実装
+- **ハードウェアRNG**：STM32、NXP、Renesas、Infineonおよびその他のプラットフォームの例
+
+### 設定オプションの概要
+
+| 定義 | 目的 | 必要条件 |
+|--------|---------|----------|
+| `NO_DEV_URANDOM` | `/dev/urandom`を無効化 | `/dev/random`にフォールバック |
+| `NO_DEV_RANDOM` | `/dev/urandom`と`/dev/random`を無効化 | 代替シードソース |
+| `WC_NO_HASHDRBG` | Hash_DRBG全体を無効化 | `CUSTOM_RAND_GENERATE_BLOCK` |
+| `CUSTOM_RAND_GENERATE_BLOCK` | 完全なRNG代替を提供 | 関数の実装 |
+| `CUSTOM_RAND_GENERATE_SEED` | カスタムシード生成関数 | 関数の実装 |
+| `CUSTOM_RAND_GENERATE` | カスタムランダム値関数 | 関数 + `CUSTOM_RAND_TYPE` |
+| `WC_RNG_SEED_CB` | ランタイムシードコールバックを有効化 | `wc_SetSeed_Cb()`の使用 |
+| `WOLF_CRYPTO_CB` | 暗号コールバックを有効化 | コールバックの登録 |
+| `WOLFSSL_GENSEED_FORTEST` | テスト用の偽シード | **テスト専用** |
+
+### 推奨事項
+
+1. 可能な限り**デフォルトのDRBGを**お使いください。FIPS認証済みであり、十分にテストされています。
+2. **/dev/randomがない組み込みシステムの場合**：ハードウェアRNGと共に`CUSTOM_RAND_GENERATE_SEED`をお使いください。
+3. **HSM/TPMを使用する場合**：`WC_ALGO_TYPE_SEED`と共に暗号コールバックをお使いください。
+4. **最大限の柔軟性を必要とする場合**：`wc_SetSeed_Cb()`を使用して、ランタイムにコールバックを設定ください。
+5. **本番環境では絶対に**`WOLFSSL_GENSEED_FORTEST`を**お使いにならないでください**。
+
+さらなる実装例とリファレンス実装を、以下にも掲載しております。
+
+- `./wolfcrypt/src/random.c` - すべてのシード生成実装
+- `wolfssl-examples/tls/cryptocb-common.c` - `WC_ALGO_TYPE_SEED`を使用した暗号コールバックの例
+- `./wolfcrypt/src/port/`ディレクトリ内のプラットフォーム固有の例
 
 
 ## メモリー
