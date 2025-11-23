@@ -6,21 +6,21 @@ copyright: Copyright © 2025 wolfSSL Inc.
 nav:
     - "1. 序章": index.md
     - "2. wolfSSLのビルド": chapter02.md
-    - "3. wolfSSL入門": chapter03.md
+    - "3. 入門": chapter03.md
     - "4. 機能": chapter04.md
-    - "5. ポータビリティ": chapter05.md
+    - "5. 移植性": chapter05.md
     - "6. コールバック": chapter06.md
     - "7. 鍵と証明書": chapter07.md
     - "8. デバッグ": chapter08.md
-    - "9. ライブラリー設計方針": chapter09.md
-    - "10. wolfCrypt レファレンス": chapter10.md
-    - "11. SSLチュートリアル": chapter11.md
-    - "12. 組み込みシステムへの適用": chapter12.md
-    - "13. OpenSSL 互換": chapter13.md
+    - "9. ライブラリデザイン": chapter09.md
+    - "10. wolfCryptの使用法": chapter10.md
+    - "11. SSL/TLSチュートリアル": chapter11.md
+    - "12. 組み込みデバイスのベストプラクティス": chapter12.md
+    - "13. OpenSSL互換性": chapter13.md
     - "14. ライセンス": chapter14.md
     - "15. サポートとコンサルティング": chapter15.md
     - "16. wolfSSLのアップデート": chapter16.md
-    - "A. wolfSSL API レファレンス":
+    - "A. wolfSSL APIリファレンス":
       - "証明書管理 API": group__CertManager.md
       - "メモリー操作": group__Memory.md
       - "OpenSSL API": group__openSSL.md
@@ -29,7 +29,7 @@ nav:
       - "wolfSSL コンテクストの設定": group__Setup.md
       - "wolfSSL エラーの扱いとレポート": group__Debug.md
       - "wolfSSL 初期化": group__TLS.md
-    - "B. wolfCrypt API レファレンス":
+    - "B. wolfCrypt APIリファレンス":
       - "ASN.1": group__ASN.md
       - "ベースエンコーディング": group__Base__Encoding.md
       - "圧縮": group__Compression.md
@@ -56,11 +56,11 @@ nav:
       - "暗号アルゴリズム - ECC": group__ECC.md
       - "暗号アルゴリズム - ED25519": group__ED25519.md
       - "暗号アルゴリズム - ED448": group__ED448.md
-      - "ECCSI API レファレンス":
+      - "ECCSI API リファレンス":
         - "ECCSI概要": group__ECCSI__Overview.md
         - "ECCSI鍵の設定": group__ECCSI__Setup.md
         - "ECCSI鍵による署名、検証": group__ECCSI__Operations.md
-      - "SAKKE API レファレンス":
+      - "SAKKE API リファレンス":
         - "SAKKE鍵の概要": group__SAKKE__Overview.md
         - "SAKKE鍵の設定": group__SAKKE__Setup.md
         - "SAKKE RSK操作": group__SAKKE__RSK.md
@@ -80,7 +80,7 @@ nav:
       - "暗号アルゴリズム - SipHash": group__SipHash.md
       - "暗号アルゴリズム - SrtpKdf": group__SrtpKdf.md
       - "暗号アルゴリズム - SRP": group__SRP.md
-    - "C. API ヘッダーファイル":
+    - "C. APIヘッダーファイル":
       - aes_8h.md
       - arc4_8h.md
       - ascon_8h.md
@@ -143,7 +143,7 @@ nav:
       - wc__port_8h.md
       - wolfio_8h.md
     - "D. SSL/TLS の概要": appendix04.md
-    - "E. RFC, 仕様および参照": appendix05.md
+    - "E. RFC・仕様・リファレンス": appendix05.md
     - "F. エラーコード": appendix06.md
     - "G. ポスト量子暗号の実験": appendix07.md
     - "H. wolfSSL 移植ガイド": appendix08.md

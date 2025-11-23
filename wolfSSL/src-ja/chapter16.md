@@ -1,4 +1,4 @@
-# wolfSSL(旧称：Cyassl)の更新
+# wolfSSLのアップデート
 
 ## 製品のリリース情報
 
