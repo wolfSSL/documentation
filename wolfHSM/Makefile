@@ -1,11 +1,17 @@
 -include ../common/common.am
 
-# Override SRC AFTER including common.am so it points to cloned repo
+# Override SRC to point to cloned wolfHSM repo's docs directory.
+# Use new location (wolfhsm/docs/src) if it exists, otherwise fallback to local
+# src/ for backwards compatibility during transition period.
 ifeq ($(DOC_LANG),JA)
-    SRC = wolfhsm/docs/src-ja
+    SRC_NEW = wolfhsm/docs/src-ja
+    SRC_OLD = src-ja
 else
-    SRC = wolfhsm/docs/src
+    SRC_NEW = wolfhsm/docs/src
+    SRC_OLD = src
 endif
+SRC = $(shell if [ -d "$(SRC_NEW)" ]; then echo "$(SRC_NEW)"; else echo "$(SRC_OLD)"; fi)
+
 .DEFAULT_GOAL := all
 
 all: pdf html
@@ -36,7 +42,11 @@ wolfhsm:
 
 .PHONY: wolfhsm-update
 wolfhsm-update: wolfhsm
-	-$(Q)cd wolfhsm && git pull --ff-only
+	$(Q)if [ -L wolfhsm ]; then \
+		echo "Skipping git pull for symlink (local testing)"; \
+	else \
+		cd wolfhsm && git pull --ff-only; \
+	fi
 
 .PHONY: api
 api: wolfhsm-update
@@ -44,6 +54,11 @@ api: wolfhsm-update
 	$(Q)cd wolfhsm && doxygen ../Doxyfile
 	$(Q)cd ..
 	$(Q)doxybook2 --input docs/xml --output api/md --config doxybook.cfg
+
+# NOTE: html-setup and pdf-setup are overridden from common/common.am to inject
+# the wolfhsm-update dependency. If common.am changes these targets, the changes
+# will need to be manually synchronized here. This duplication is intentional to
+# ensure the wolfHSM repo is cloned before attempting to copy docs from it.
 
 # Override html-setup to ensure wolfhsm repo is cloned first
 .PHONY: html-setup
@@ -72,7 +87,6 @@ pdf-setup: wolfhsm-update builddir
 # 3. Fix the titles of the header files markdown
 .PHONY: html-prep
 html-prep: api
-	$(Q)cp $(SRC)/*.png build/html/
 	$(Q)cp -a api/md/*8h* build/html/
 
 	$(Q)perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
@@ -88,7 +102,6 @@ html-prep: api
 # 6. Two regexes to handle bad Doxygen that didn't convert and the LaTeX processor thinks is LaTeX commands
 .PHONY: pdf-prep
 pdf-prep: api
-	$(Q)cp $(SRC)/*.png build/pdf/
 	$(Q)cp -a api/md/*8h* build/pdf/
 
 	$(Q)perl -i -pe "s/# /## /g" build/pdf/*.md
