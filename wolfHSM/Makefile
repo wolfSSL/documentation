@@ -1,11 +1,11 @@
-# Override SRC BEFORE including common.am so it points to cloned repo
+-include ../common/common.am
+
+# Override SRC AFTER including common.am so it points to cloned repo
 ifeq ($(DOC_LANG),JA)
     SRC = wolfhsm/docs/src-ja
 else
     SRC = wolfhsm/docs/src
 endif
-
--include ../common/common.am
 .DEFAULT_GOAL := all
 
 all: pdf html
@@ -36,7 +36,7 @@ wolfhsm:
 
 .PHONY: wolfhsm-update
 wolfhsm-update: wolfhsm
-	$(Q)cd wolfhsm && git pull --ff-only
+	-$(Q)cd wolfhsm && git pull --ff-only
 
 .PHONY: api
 api: wolfhsm-update
