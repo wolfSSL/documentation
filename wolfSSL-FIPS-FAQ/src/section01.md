@@ -21,7 +21,7 @@ Last Updated: 8 Dec 2025
 	4. [Threading consideration for all CASTs():](./section02.md#threading-and-casts)
 	5. [wc_SetSeedCb() a bit unique with relation to CAST's:](./section02.md#setseedcb-and-casts)
 	6. [Key Access Management](./section02.md#key-access-management)
-	5. [wc_SetSeedCb() a bit unique with relation to CAST's:](./section02.md#setseedcb-and-casts)
+	7. [wc_SetSeedCb() a bit unique with relation to CAST's:](./section02.md#setseedcb-and-casts)
 		1. [API's that require UNLOCK before first use (should also be re-LOCKED after use):](./section02.md#apis-to-unlock)
 
 
