@@ -1,13 +1,10 @@
 -include ../common/common.am
 
 ifeq ($(DOC_LANG),JA)
-    SRC_NEW = wolfhsm/docs/src-ja
-    SRC_OLD = src-ja
+    SRC = wolfhsm/docs/src-ja
 else
-    SRC_NEW = wolfhsm/docs/src
-    SRC_OLD = src
+    SRC = wolfhsm/docs/src
 endif
-SRC = $(shell if [ -d "$(SRC_NEW)" ]; then echo "$(SRC_NEW)"; else echo "$(SRC_OLD)"; fi)
 
 .DEFAULT_GOAL := all
 
