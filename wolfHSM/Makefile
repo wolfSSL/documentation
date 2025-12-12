@@ -1,8 +1,5 @@
 -include ../common/common.am
 
-# Override SRC to point to cloned wolfHSM repo's docs directory.
-# Use new location (wolfhsm/docs/src) if it exists, otherwise fallback to local
-# src/ for backwards compatibility during transition period.
 ifeq ($(DOC_LANG),JA)
     SRC_NEW = wolfhsm/docs/src-ja
     SRC_OLD = src-ja
