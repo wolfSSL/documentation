@@ -149,17 +149,64 @@ extern unsigned int my_rng_seed_gen(void);
 level */
 ```
 
+## The wc_SetSeed_Cb() callback and a custom seed generation function:
+
+To avoid potential implementation bugs users should follow the known good procedure for adding a custom seed function.
+    Step 1) In either user_settings.h or settings.h header add the following:
+
+        ```
+            /* Seed Source */
+            extern unsigned int my_rng_seed_gen(byte* output, word32 sz);
+            #undef  CUSTOM_RAND_GENERATE_SEED
+            #define CUSTOM_RAND_GENERATE_SEED  my_rng_seed_gen
+        ```
+
+    Definition: A ***Consuming Application*** is anything outside the module boundary
+                that consumes the FIPS 140-3 crypto but is not subject to the
+                FIPS 140-3 validation (may be subject to ESV but that is
+                separate from 140-3)
+
+    Step 2) At the ***Consuming Application*** level implement the callback function:
+
+        ```
+            /* @param output The buffer to fill with entropy bits one byte at a time,
+             *           if the solution returns bits instead of bytes be sure
+             *           to gather 8 times 'sz' instead of just 'sz'
+             * @param sz The number of bytes the output buffer can hold based on
+             *           declared size in the Consuming Application
+             */
+            unsigned int my_rng_seed_gen(byte* output, word32 sz)
+            {
+                /* Pseudo code */
+                fill buffer 'output' with 'sz' bytes of entropy
+                if filling fails return the appropriate error code for this system
+                otherwise return 0 to indicate success
+            }
+        ```
+
+    Step 3) Finally ***ONLY*** use the wolfSSL supplied callback wc_GenerateSeed()
+            as your seeding mechanism. Register it in the ***Consuming Application***
+            with:
+
+        ```
+            #ifdef WC_RNG_SEED_CB
+                wc_SetSeed_Cb(wc_GenerateSeed);
+            #else
+                #error "Module was not compiled with required setting WC_RNG_SEED_CB"
+            #endif
+        ```
+
 ## The POST
 Under 140-2 POST stood for "Power On Self Test" and ran EVERY algorithm self-test leading to slow power-on / boot times.
 Under 140-3 POST stands for "Pre-Operational Self Test" and only runs the integrity check of the module (and any dependency self-test to support the integrity check). Since HMAC-SHA2-256 self-test must first run and then the integrity check is performed. No other self-tests run at this stage in the 140-3.
 
-## Threading considertation for all CASTs():
+## Threading consideration for all CASTs():
 
 Calling a CAST in a thread for the first time or allowing a CAST to run automatically by using a service for the first time in a thread may result in another thread getting a "FIPS_CAST_STATE_PROCESSING" error (meaning that another thread is actively running the CAST) if it attempts to exercise the same CAST in parallel. This will result in the module dropping into the degraded mode of operation.
 
 Once degraded mode is active the only recovery from degraded mode is a power cycle of the module or by re-running the integrity test to simulate a reload/power cycle of the module. To simulate reload or power cycle of the module, shut down all threads then call wolfCrypt_IntegrityTest_fips(); before starting threads up again.
 
-To avoid this problem one can simply call wc_RunAllCast_fips()^1 on startup along with the other FIPS specific initializers. 
+To avoid this problem one can simply call wc_RunAllCast_fips() on startup along with the other FIPS specific initializers. 
 
 Example:
 
@@ -212,7 +259,7 @@ if (wc_RunCast_fips(FIPS_CAST_RSA_SIGN_PKCS1v15) != 0){
 }
 ```
 
-## wc_SetSeedCb() a bit unique:
+## wc_SetSeedCb() a bit unique with relation to CAST's:
 
 wc_SetSeed_Cb(); is the first operational use of the DRBG and as such the CAST will run when the callback is set for the first time. To avoid a race condition on the CAST users should set the seed callback one time on startup and not on a per-thread basis or one time globally and then once per thread is also acceptable if the CAST has passed by the time threads are launched. This would be for a scenario where thread-A needs entropy-source-A and thread-B uses a different entropy source. Please remember that calling wolfSSL_Init() will set the seed callback and therefore should not be called on a per-thread basis unless called at least once globally first. A good practice if setting per thread might be:
 
@@ -239,7 +286,7 @@ int main(void) {
 
 By checking the return value of the call the function should block prior to threads starting up avoiding any race conditions on the CAST completing prior to threads consuming the DRBG.
 
-##Key Access Management
+## Key Access Management
 
 1. Users calling wolfSSL (SSL/TLS) APIs’ do not need to worry about this item
 2. Users invoking wolfcrypt (wc_XXX) APIs’ directly that involve loading or using a private key must manage the key access at the application level. To be able to read in or use a private key the application must allow this by calling
@@ -304,9 +351,10 @@ static inline int true_lock(void)
 #endif
 ```
 
-API's that require UNLOCK before first use (should also be re-LOCKED after use):
+## API's that require UNLOCK before first use (should also be re-LOCKED after use):
 
 ```
+v5.2.1 (and all other v5.X.X modules)
 * wc_PRF
 * wc_PRF_TLSv12
 * wc_HKDF_Extract
@@ -329,6 +377,8 @@ API's that require UNLOCK before first use (should also be re-LOCKED after use):
 * wc_ecc_shared_secret_ex
 * wc_DhGenerateKeyPair
 * wc_DhAgree
+
+v6.0.0 and newer module add some new ones in addition to the above list:
 * wc_SRTP_KDF
 * wc_SRTCP_KDF
 * wc_SRTCP_KDF_ex
@@ -342,5 +392,8 @@ API's that require UNLOCK before first use (should also be re-LOCKED after use):
 * wc_ed448_export_key
 * wc_PBKDF2_ex
 * wc_PBKDF2
+
+v7.0.0 (upcoming)
+* Will have some additional services listed here for Post Quantum key material
 ```
 
