@@ -4,6 +4,8 @@
 wolfSSL FIPSの構築/実装に関する一般的な質問を解決するのに役立ちます。
 ご質問がこのドキュメントに記されていない場合は、wolfSSLマニュアルをご確認いただくか、[support@wolfssl.com](mailto:support@wolfssl.com)までお気軽にお問い合わせください。
 
+最終更新：2025/12/8
+
 ## 目次
 
 1. バージョンX.X.X.Xで検証したにも関わらず、`wolfSSL_Y.Y.Y_commercial-fips-OE-v2.7z`が届きました。
@@ -20,7 +22,9 @@ wolfSSL FIPSの構築/実装に関する一般的な質問を解決するのに�
 このほか、以下についての情報も掲載しています。
 
 - `wc_SetSeed_Cd()`コールバックとTLSレイヤーについて
+- `wc_SetSeed_Cb()`コールバックとカスタムシード生成関数について
 - POST
 - すべての`CAST()`のスレッドに関する考慮事項
-- `wc_SetSeedCb()`は少し特殊です
+- `wc_SetSeedCb()`はCAST'sとの関係において少し特殊です
 - 鍵アクセス管理
+- 使用前にアンロック、使用後に再ロックが必要なAPIリスト

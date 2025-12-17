@@ -202,6 +202,54 @@ extern unsigned int my_rng_seed_gen(void);
 /* アプリケーションレベルにおけるmy_rng_seed_gen()実装 */
 ```
 
+## wc_SetSeed_Cb() コールバックとカスタムシード生成関数について
+
+潜在的な実装バグを避けるため、以下の手順でカスタムシード関数を追加することを推奨しています。
+
+ステップ 1) `user_settings.h` または `settings.h` に以下を追加します。
+
+```c
+/* シードソース */
+extern unsigned int my_rng_seed_gen(byte* output, word32 sz);
+#undef  CUSTOM_RAND_GENERATE_SEED
+#define CUSTOM_RAND_GENERATE_SEED  my_rng_seed_gen
+```
+
+ここで、FIPS 140-3暗号処理を使用するもののFIPS 140-3検証の対象ではない、
+モジュール境界外のあらゆるものを ***Consuming Application*** と定義します。
+（ESVの対象となる可能性はありますが、それは140-3とは別のものです。）
+
+ステップ 2) ***Consuming Application*** レベルでコールバック関数を実装します。
+
+``` c
+/* @param output エントロピービットを1バイトずつ埋め込むバッファ。
+	*           ソリューションがバイトではなくビットを返す場合、
+	*			'sz' ではなく、'sz' の8倍の値を取得するようにしてください。
+	* @param sz 出力バッファが保持できるバイト数。
+	*			使用アプリケーションで宣言されたサイズに基づきます。
+	*/
+unsigned int my_rng_seed_gen(byte* output, word32 sz)
+{
+	/* 以下のように実装してください。 */
+
+	/* バッファ 'output' に 'sz' バイトのエントロピーを書き込みます。
+	 * 埋め込みに失敗した場合は、このシステムの適切なエラーコードを返します。
+	 * それ以外の場合は、成功を示す 0 を返します。
+	 */
+}
+```
+
+ステップ 3) 最後に、シード生成メカニズムとして ***のみ*** wolfSSL提供のコールバック `wc_GenerateSeed()` を使用してください。
+これを ***Consuming Application*** 内で以下のように登録します。
+
+```c
+#ifdef WC_RNG_SEED_CB
+	wc_SetSeed_Cb(wc_GenerateSeed);
+#else
+	#error "Module was not compiled with required setting WC_RNG_SEED_CB"
+#endif
+```
+
 ## POST
 
 FIPS 140-2において、POSTは「Power On Self Test」を意味していました。
@@ -275,7 +323,7 @@ if (wc_RunCast_fips(FIPS_CAST_RSA_SIGN_PKCS1v15) != 0){
 }
 ```
 
-## `wc_SetSeedCb()`は少し特殊です
+## `wc_SetSeedCb()`はCAST'sとの関係において少し特殊です
 
 `wc_SetSeed_Cb()`はDRBGの最初のオペレーショナル使用であり、そのためコールバックが初めて設定されるときにCASTが実行されます。
 CASTでの競合状態を避けるため、ユーザーはスレッドごとではなく起動時に1回シードコールバックを設定します。
@@ -384,7 +432,7 @@ static inline int true_lock(void)
 #endif
 ```
 
-### 使用前にアンロック、使用後に再ロックが必要なAPIリスト
+## 使用前にアンロック、使用後に再ロックが必要なAPIリスト
 
 ```
 * wc_PRF
