@@ -316,7 +316,7 @@ echoclientがechoserverに接続するとき、サーバーの識別情報を確
 パス値はPEM形式のCA証明書を含むべきディレクトリを指します。
 証明書を検索するとき、wolfSSLはパスの場所を見る前に証明書ファイルの値を調べます。
 この場合、1つのCAファイルを指定するためパスを指定する必要はありません。
-したがって、パス引数には0を使用します。
+したがって、パス引数には`NULL`を使用します。
 [`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)関数は`SSL_SUCCESS`または`SSL_FAILURE`のいずれかを返します。
 
 ```c
@@ -340,10 +340,10 @@ if ( (ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method())) == NULL) {
 }
 
 /* Load CA certificates into WOLFSSL_CTX */
-if (wolfSSL_CTX_load_verify_locations(ctx,"../certs/ca-cert.pem",0) !=
+if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", NULL) !=
     SSL_SUCCESS) {
-    fprintf(stderr, "Error loading ../certs/ca-cert.pem, please check"
-        "the file.\n");
+    fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
+        "please check the file.\n");
     exit(EXIT_FAILURE);
 }
 ```
@@ -367,7 +367,7 @@ if ( (ctx = wolfSSL_CTX_new(wolfTLSv1_2_server_method())) == NULL) {
 }
 
 /* Load CA certificates into WOLFSSL_CTX */
-if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", 0) !=
+if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", NULL) !=
          SSL_SUCCESS) {
     fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
         "please check the file.\n");
@@ -375,7 +375,7 @@ if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", 0) !=
 }
 
 /* Load server certificates into WOLFSSL_CTX */
-if (wolfSSL_CTX_use_certificate_file(ctx,"../certs/server-cert.pem",
+if (wolfSSL_CTX_use_certificate_file(ctx, "../certs/server-cert.pem",
         SSL_FILETYPE_PEM) != SSL_SUCCESS) {
     fprintf(stderr, "Error loading ../certs/server-cert.pem, please"
         "check the file.\n");
@@ -383,7 +383,7 @@ if (wolfSSL_CTX_use_certificate_file(ctx,"../certs/server-cert.pem",
 }
 
 /* Load keys */
-if (wolfSSL_CTX_use_PrivateKey_file(ctx,"../certs/server-key.pem",
+if (wolfSSL_CTX_use_PrivateKey_file(ctx, "../certs/server-key.pem",
         SSL_FILETYPE_PEM) != SSL_SUCCESS) {
     fprintf(stderr, "Error loading ../certs/server-key.pem, please check"
         "the file.\n");
@@ -408,11 +408,11 @@ wolfSSL_Cleanup();
 ### EchoClient
 
 TCP接続の後に`WOLFSSL`オブジェクトを作成し、ソケットファイルディスクリプタをセッションに関連付ける必要があります。
-echoclientの実装例では、以下に示す`Connect()`の呼び出しの後にこれを行います。
+echoclientの実装例では、以下に示す`connect()`の呼び出しの後にこれを行います。
 
 ```c
 /* Connect to socket file descriptor */
-Connect(sockfd, (SA *) &servaddr, sizeof(servaddr));
+connect(sockfd, (SA *) &servaddr, sizeof(servaddr));
 ```
 
 接続直後に、[`wolfSSL_new()`](group__Setup.md#function-wolfssl_new)関数を使用して新しい`WOLFSSL`オブジェクトを作成します。

@@ -321,8 +321,7 @@ CBC暗号化/復号は[`wc_CamelliaCbcEnrypt()`](group__Camellia.md#function-wc_
 **注意**：ARC4は古く、安全でないと考えられています。
 他のストリーム暗号を使用してください。
 
-当時、インターネットで最も一般的に使用されるストリーム暗号はARC4でした。
-wolfCryptはヘッダー`wolfssl/wolfcrypt/arc4.h`を通じてそれをサポートしています。
+wolfCryptはヘッダー`wolfssl/wolfcrypt/arc4.h`を通じてARC4をサポートしています。
 ブロックサイズがなく、鍵の長さも任意の長さにできるため、使用方法はブロック暗号よりも簡単です。
 以下はARC4の典型的な使用方法です。
 

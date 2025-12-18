@@ -190,7 +190,7 @@ NIST Special Publication [SP800-57](https://csrc.nist.gov/publications/detail/sp
 
 **メッセージ認証コード（MAC）アルゴリズム**（MD2、MD5、SHA-1、SHA-256、SHA-512、RIPEMD）は、メッセージダイジェストを作成するために使用されるハッシュ関数です。
 
-以下の表は、`<wolfssl_root>/wolfssl/internal.h`（約706行目以降に記載）にある暗号スイート（およびカテゴリ）に対応しています。
+以下の表は、`<wolfssl_root>/wolfssl/internal.h`（約1097行目以降に記載）にある暗号スイート（およびカテゴリ）に対応しています。
 以下のリストにない暗号スイートをお探しの場合は、お問い合わせください。
 
 #### ECC暗号スイート
@@ -380,6 +380,21 @@ wolfSSLはいくつかの異なるハッシュ関数をサポートしていま�
 wolfSSLは **RSA**、**ECC**、**DSA/DSS**、**DH** の公開鍵オプションに加え、wolfSSLサーバー上での **EDH**（Ephemeral Diffie-Hellman）もサポートしています。
 これらの関数の詳細な使用方法は、[第10章 wolfCryptの使用法](chapter10.md)の「公開鍵暗号」節で確認できます。
 
+#### ML-KEM、ML-DSA
+
+ML-KEM (Module Lattice Key Encapsulation Mechanism) は、NISTが標準化した格子ベースの耐量子アルゴリズムです。
+Kyberをベースとして標準化されました。
+2者間で鍵カプセル化メカニズムを使用して、安全でないチャネル上で共有鍵を確立します。
+これにより、従来型および量子コンピュータを用いた攻撃者の両方から保護できます。
+
+ML-DSA (Module Lattice Digital Signature Algorithm) は、同じくNISTが標準化した格子ベースの耐量子デジタル署名方式です。
+Kyberをベースとして標準化されました。
+これにより、送信者はメッセージの送信元と完全性を証明する検証可能な署名を生成できます。
+
+ML-KEMとML-DSAはどちらも、暗号の復号に特化した量子コンピュータに耐性を持つように設計された公開鍵アルゴリズムです。
+これらはNISTの耐量子暗号標準(FIPS 203およびFIPS 204)の一部です。
+量子コンピューティング時代に備えるために、ほとんどのケースでハイブリッド形式にてすぐに導入できます。
+
 ### ECC サポート
 
 wolfSSLは楕円曲線暗号（ECC）をサポートしています。
@@ -437,7 +452,7 @@ wolfSSLはPBKDF1とPBKDF2に加えて、PKCS #12からのPBKDF関数もサポー
 
 ```c
 int PBKDF2(byte* output, const byte* passwd, int pLen,
-           const byte* salt,int sLen, int iterations,
+           const byte* salt, int sLen, int iterations,
            int kLen, int hashType);
 
 int PKCS12_PBKDF(byte* output, const byte* passwd, int pLen,
@@ -615,9 +630,9 @@ ESP32とは異なり、ESP8266ではハードウェアベースの暗号化は�
 ESP8266用にコンパイルするには、`user_settings.h` に `WOLFSSL_ESP8266` を定義します。
 autoconfにより`./configure CFLAGS="-DWOLFSSL_ESP8266"` とすることも可能です。
 
-### ERF32
+### EFR32
 
-wolfSSLはERF32ファミリーのハードウェアベースの暗号化を使用できます。
+wolfSSLはEFR32ファミリーのハードウェアベースの暗号化を使用できます。
 
 サポートを有効にするには、`user_settings.h` で `WOLFSSL_SILABS_SE_ACCEL` を定義します。
 wolfSSLは現在、EFR32プラットフォーム上で RNG、AES-CBC、AES-GCM、AES-CCM、SHA-1、SHA-2、ECDHE、ECDSA のハードウェアアクセラレーションをサポートしています。
@@ -866,6 +881,95 @@ ret = wolfSSL_CTX_load_static_memory(
 
 `WOLFSSL_CTX`構造体の使用を終了した後は、通常の`wolfSSL_CTX_free()`を使って解放してください。
 
+### TLSなしでの静的メモリの使用（暗号のみ）
+
+wolfSSLは、TLS機能を必要とせずに、wolfCrypt操作のための静的メモリ割り当ての使用もサポートしています。
+これは、TLS接続のオーバーヘッドなしに暗号操作（ハッシュ化、暗号化、乱数生成など）のみを必要とするアプリケーションに役立ちます。
+
+`wc_LoadStaticMemory()`関数は、wolfCryptで使用するための静的メモリを確保するために使用されます。
+メモリは、作成されたヒープヒントをそれをサポートする関数に渡すことで使用できます。
+この例として、`wc_InitRng_ex()`を呼び出す場合があります。
+
+**例:**
+
+```c
+WOLFSSL_HEAP_HINT hint;
+int ret;
+unsigned char memory[MAX];
+int memorySz = MAX;
+int flag = WOLFMEM_GENERAL;
+
+// 使用するメモリをロード
+ret = wc_LoadStaticMemory(&hint, memory, memorySz, flag, 0);
+if (ret != SSL_SUCCESS) {
+    // エラーケースを処理
+}
+
+ret = wc_InitRng_ex(&rng, hint, 0);
+// ret値を確認
+```
+
+**グローバルヒープヒントを使用する例:**
+
+```c
+WOLFSSL_HEAP_HINT hint;
+void* oldHint;
+int ret;
+unsigned char memory[MAX];
+
+// 静的メモリをセットアップ
+ret = wc_LoadStaticMemory(&hint, memory, MAX, WOLFMEM_GENERAL, 0);
+if (ret != SSL_SUCCESS) {
+    // エラーケースを処理
+}
+
+// グローバルヒープヒントとして設定（スレッドセーフではない）
+oldHint = wolfSSL_SetGlobalHeapHint(hint);
+
+// これ以降、すべてのNULLヒープヒント呼び出しはこのグローバルヒントを使用する
+// ... wolfSSL関数を使用 ...
+
+// 完了時に以前のグローバルヒープヒントを復元
+wolfSSL_SetGlobalHeapHint(oldHint);
+wc_UnloadStaticMemory(hint);
+```
+
+
+**カスタムバッファサイズを使用する例:**
+
+```c
+WOLFSSL_HEAP_HINT hint;
+word32 customSizes[] = {64, 128, 256, 512, 1024};
+word32 customDist[] = {10, 5, 3, 2, 1};
+int requiredSize, ret;
+unsigned char memory[MAX];
+
+// カスタム設定に必要なバッファサイズを計算
+requiredSize = wolfSSL_StaticBufferSz_ex(5, customSizes, customDist, 
+                                        NULL, 0, WOLFMEM_GENERAL);
+printf("必要なバッファサイズ: %d バイト\n", requiredSize);
+
+// メモリバッファを割り当て
+if (requiredSize <= MAX) {
+    // カスタムバケット設定で静的メモリをロード
+    ret = wc_LoadStaticMemory_ex(&hint, 5, customSizes, customDist,
+                                memory, requiredSize, WOLFMEM_GENERAL, 0);
+    if (ret != SSL_SUCCESS) {
+        // エラーケースを処理
+    }
+    
+    // カスタム設定された静的メモリを使用
+    // ... ヒントを使用してwolfSSL関数を使用 ...
+    
+    // 完了時にクリーンアップ
+    wc_UnloadStaticMemory(hint);
+}
+
+// パディングオーバーヘッドを計算
+int paddingSize = wolfSSL_MemoryPaddingSz();
+printf("バケットごとのメモリパディング: %d バイト\n", paddingSize);
+```
+
 #### グローバルヒープヒントの設定
 
 関数`void* wolfSSL_SetGlobalHeapHint(void* heap)`を使用して、グローバルヒープヒントを設定できます。
@@ -879,6 +983,48 @@ ret = wolfSSL_CTX_load_static_memory(
 ゲッター関数`void* wolfSSL_GetGlobalHeapHint(void)`を使用して、現在設定されているグローバルヒープヒントを取得できます。
 
 この機能はwolfSSL 5.7.0で追加されました。
+
+#### デバッグメモリコールバック
+
+`WOLFSSL_STATIC_MEMORY_DEBUG_CALLBACK`ビルドオプションを使用して静的メモリ割り当てを使用する場合、`void wolfSSL_SetDebugMemoryCb(DebugMemoryCb cb)`を使用してデバッグコールバック関数を設定できます。
+このコールバックはメモリの割り当てと解放操作中に呼び出され、メモリ使用に関するデバッグ情報を提供します。
+
+コールバック関数のシグネチャは次のとおりです。
+
+```c
+typedef void (*DebugMemoryCb)(size_t sz, int bucketSz, byte st, int type);
+```
+
+各パラメータの詳細は次のとおりです。
+
+- `sz`: 要求されたサイズ
+- `bucketSz`: 使用されたバケットサイズ
+- `st`: ステータス（0=割り当て、1=失敗、2=解放、3=初期化）
+- `type`: メモリタイプ
+
+#### 静的メモリのアンロード
+
+静的メモリ割り当ての使用が終了したら`void wc_UnloadStaticMemory(WOLFSSL_HEAP_HINT* heap)`を呼び出して、静的メモリヒープと関連するミューテックスを適切に解放する必要があります。
+これにより、リソースの適切なクリーンアップが保証されます。
+
+#### 高度な静的バッファサイズの計算
+
+関数`int wolfSSL_StaticBufferSz_ex(unsigned int listSz, const word32 *sizeList, const word32 *distList, byte* buffer, word32 sz, int flag)`は、提供されたバケットサイズと分布に基づいて、特定のバッファのうちどれだけが静的メモリ割り当てに効果的に使用できるかを計算する事前割り当て計画ツールです。
+使用できない余剰スペースを除いた、完全なバケットに適合するバッファの使用可能な部分を返します。
+静的メモリプールのサイジングとチューニングを行うことで利用効率を最大化し、全体的なメモリ使用量を削減するのに役立ちます。
+
+各パラメータの詳細は次のとおりです。
+
+- `listSz`: リスト内のバケットサイズの数
+- `sizeList`: バケットサイズの配列
+- `distList`: 各バケットサイズの分布カウントの配列
+- `buffer`: テストするバッファ（計算のみの場合はNULLも可）
+- `sz`: バッファのサイズ
+- `flag`: メモリフラグ（WOLFMEM_GENERAL、WOLFMEM_IO_POOLなど）
+
+#### メモリパディングの計算
+
+関数`int wolfSSL_MemoryPaddingSz(void)`は、アライメントパディングを含む、各メモリバケットに必要な管理メモリのサイズを計算します。これは、静的メモリ割り当てのオーバーヘッドを理解し、正確なメモリ計画を立てるのに役立ちます。
 
 ### 静的バッファ確保の調整
 
@@ -1065,7 +1211,14 @@ DTLSサーバー用
 |[`wolfSSL_CTX_is_static_memory`](group__Memory.md#function-wolfSSL_CTX_is_static_memory)| 静的バッファ確保が設定されているかと、設定されている場合にはその使用状況を取得します。 |
 |[`wolfSSL_is_static_memory`](group__Memory.md#function-wolfSSL_is_static_memory)| 静的バッファ確保が設定されているかと、設定されている場合にはその使用状況を取得します。 |
 |[`wc_LoadStaticMemory`](group__Memory.md#function-wc_LoadStaticMemory)| wolfCrypt用に静的メモリを確保するために使用されます。|
+|[`wc_LoadStaticMemory_ex`](group__Memory.md#function-wc_LoadStaticMemory_ex)| カスタムバケットサイズと分布でwolfCryptで使用する静的メモリを確保するために使用されます。 |
+|[`wolfSSL_SetGlobalHeapHint`](group__Memory.md#function-wolfSSL_SetGlobalHeapHint)| メモリ割り当て関数にNULLヒープヒントが渡されたときに使用されるグローバルヒープヒントを設定します。以前のグローバルヒープヒントを返します。 |
+|[`wolfSSL_GetGlobalHeapHint`](group__Memory.md#function-wolfSSL_GetGlobalHeapHint)| メモリ割り当て関数にNULLヒープヒントが渡されたときに使用される現在のグローバルヒープヒントを取得します。 |
+|[`wolfSSL_SetDebugMemoryCb`](group__Memory.md#function-wolfSSL_SetDebugMemoryCb)| 静的メモリ割り当て追跡用のデバッグコールバック関数を設定します。WOLFSSL_STATIC_MEMORY_DEBUG_CALLBACKビルドオプションと共に使用されます。 |
+|[`wc_UnloadStaticMemory`](group__Memory.md#function-wc_UnloadStaticMemory)| 静的メモリヒープと関連するミューテックスを解放します。静的メモリ割り当ての使用が終了したときに呼び出す必要があります。 |
 |[`wolfSSL_StaticBufferSz`](group__Memory.md#function-wolfssl_staticbuffersz)| `/wolfssl/wolfcrypt/memory.h`で定義されたマクロに基づいて、静的バッファ確保に必要なバッファサイズを計算します。 |
+|[`wolfSSL_StaticBufferSz_ex`](group__Memory.md#function-wolfSSL_StaticBufferSz_ex)| カスタムバケットサイズと分布を使用した静的メモリ割り当てに必要なバッファサイズを計算します。 |
+|[`wolfSSL_MemoryPaddingSz`](group__Memory.md#function-wolfSSL_MemoryPaddingSz)| アライメントパディングを含む、各メモリバケットに必要な管理メモリのサイズを計算します。 |
 
 ## 圧縮
 
@@ -1148,9 +1301,9 @@ wolfSSL_CTX_load_verify_locations(ctx, caCert, 0);
 [`wolfSSL_CTX_set_verify()`](group__Setup.md#function-wolfssl_ctx_set_verify)のその他のオプションには、`SSL_VERIFY_NONE`および`SSL_VERIFY_CLIENT_ONCE`があります。
 
 ```c
-wolfSSL_CTX_set_verify(ctx,SSL_VERIFY_PEER | ((usePskPlus)?
+wolfSSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | (usePskPlus ?
                        SSL_VERIFY_FAIL_EXCEPT_PSK :
-                       SSL_VERIFY_FAIL_IF_NO_PEER_CERT),0);
+                       SSL_VERIFY_FAIL_IF_NO_PEER_CERT), 0);
 ```
 
 クライアント認証の例は、wolfSSLリポジトリに含まれるサンプルサーバー（`server.c`）（`/examples/server/server.c`）で提供しています。
@@ -1220,50 +1373,6 @@ wolfSSLで短縮HMACを有効にするには、次のようにします。
 ```sh
 ./configure --enable-tlsx
 ```
-
-## ユーザー暗号モジュール
-
-ユーザー暗号モジュールでは、サポートされている処理の実行中に、ユーザーが使用したいカスタム暗号をプラグインできます。
-(現在はRSA操作をサポートしています。)
-モジュールの例は、IPPライブラリを使用した`wolfssl/wolfcrypt/user-crypto/`ディレクトリにあります。
-ユーザー暗号モジュールを有効にしてwolfSSLをビルドするには、次のようにします。
-
-```sh
-./configure --with-user-crypto
-```
-
-特定のディレクトリを指定するには、次のようにします。
-
-```sh
-./configure --with-user-crypto=/dir/to
-```
-
-RSA操作を実行するユーザー暗号モジュールを作成する場合、RSA用のヘッダーファイル`user_rsa.h`が必須です。
-すべてのユーザー暗号操作では、ユーザーのライブラリが`libusercrypto`と命名されていることが必須条件です。
-これらは、wolfSSL autoconfツールがユーザー暗号モジュールをリンクして使用する際に探す名前です。
-wolfSSLで提供している実装例では、ヘッダーファイル`user_rsa.h`は`wolfcrypt/user-crypto/include/`ディレクトリにあり、作成後のライブラリは`wolfcrypt/user-crypto/lib/`ディレクトリにあります。
-必要なAPIのリストについては、提供されているヘッダーファイルをご参照ください。
-
-IPPライブラリをインストールした後、実装例をビルドするには、wolfSSLのルートディレクトリから次のコマンドを実行する必要があります。
-
-```sh
-cd wolfcrypt/user-crypto/
-./autogen.sh
-./configure
-make
-sudo make install
-```
-
-wolfSSLに含まれる例ではIPPの使用が必要であり、プロジェクトをビルドする前にIPPライブラリをインストールする必要があります。
-IPPライブラリがなくても実装例をビルドすることはできますが、あくまでファイル名の選択とAPIインターフェースの例を提供することを目的としています。
-ライブラリ`libusercrypto`とヘッダーファイルの両方を作成してインストールした後、wolfSSLに暗号モジュールを使用させるには追加の手順は必要ありません。
-単に[`--with-user-crypto`](chapter02.md#--with-user-crypto)設定フラグを使用するだけで、通常のwolfSSL暗号からユーザー暗号モジュールへのすべての関数呼び出しがマッピングされます。
-
-wolfSSLの`XMALLOC`を使用してメモリ割り当てを行う場合は、`DYNAMIC_TYPE_USER_CRYPTO`でタグ付けする必要があります。
-これにより、モジュールによって使用されるメモリ割り当ての分析が可能になります。
-
-ユーザー暗号モジュールは、wolfSSLのconfigureオプション`fast-rsa`や`fips`と**一緒に**使用することはできません。
-FIPSは特定の認証済みコードの使用を要求し、fast-rsaはRSA操作を実行するためのサンプルユーザー暗号モジュールを使用します。
 
 ## wolfSSLのタイミング耐性
 
