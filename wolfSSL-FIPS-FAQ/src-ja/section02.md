@@ -152,7 +152,9 @@ wolfSSLスタッフがNVLAP認定FIPSラボと連携してレビューするま�
 /* 従前より使用しているコールバック呼び出し */
 wolfCrypt_SetCb_fips(myFipsCb);
 
-/* 追加すべきコールバック呼び出し */
+/* 代わりにwolfSSL_Init()または同等のAPIを呼び出すことで、
+ * デフォルトでシードコールバックがセットアップされます。
+ */
 +#ifdef WC_RNG_SEED_CB
 +   wc_SetSeed_Cb(wc_GenerateSeed);
 +#endif
