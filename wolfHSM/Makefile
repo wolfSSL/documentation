@@ -1,4 +1,11 @@
 -include ../common/common.am
+
+ifeq ($(DOC_LANG),JA)
+    SRC = wolfhsm/docs/src-ja
+else
+    SRC = wolfhsm/docs/src
+endif
+
 .DEFAULT_GOAL := all
 
 all: pdf html
@@ -29,7 +36,11 @@ wolfhsm:
 
 .PHONY: wolfhsm-update
 wolfhsm-update: wolfhsm
-	$(Q)cd wolfhsm && git pull --ff-only
+	$(Q)if [ -L wolfhsm ]; then \
+		echo "Skipping git pull for symlink (local testing)"; \
+	else \
+		cd wolfhsm && git pull --ff-only; \
+	fi
 
 .PHONY: api
 api: wolfhsm-update
@@ -38,6 +49,31 @@ api: wolfhsm-update
 	$(Q)cd ..
 	$(Q)doxybook2 --input docs/xml --output api/md --config doxybook.cfg
 
+# NOTE: html-setup and pdf-setup are overridden from common/common.am to inject
+# the wolfhsm-update dependency. If common.am changes these targets, the changes
+# will need to be manually synchronized here. This duplication is intentional to
+# ensure the wolfHSM repo is cloned before attempting to copy docs from it.
+
+# Override html-setup to ensure wolfhsm repo is cloned first
+.PHONY: html-setup
+html-setup: wolfhsm-update
+	$(Q)git submodule update --init
+	-cd ../mkdocs-material; patch -p1 < $(PATCH) --ignore-whitespace -N
+	$(Q)cp -a $(SRC)/* build/html/
+	$(Q)cp ../common/*.png build/html/
+	$(Q)cp ../common/*.css build/html/
+	$(Q)perl -i -pe 's/    ```/```/g' build/html/*.md
+	$(Q)perl -i -pe "s/\#--/\#-/g" build/html/*.md
+	$(Q)mv build/html/$(word 1,$(SOURCES)) build/html/index.md
+
+# Override pdf-setup to ensure wolfhsm repo is cloned first
+.PHONY: pdf-setup
+pdf-setup: wolfhsm-update builddir
+	$(Q)cp -a $(SRC)/* build/pdf/
+	$(Q)cp ../common/*.png build/pdf/
+	$(Q)perl -i -pe "s/chapter[0-9][0-9].md|appendix[0-9][0-9].md//g" build/pdf/*.md
+	$(Q)perl -i -pe "s/\#--/\#/g" build/pdf/*.md
+
 # Need an index.md, so let's make it chapter01.
 # Perl regex to fix two things:
 # 1. Doxybook2 replaces underscores with dashes in anchor tags (which breaks them)
@@ -45,7 +81,6 @@ api: wolfhsm-update
 # 3. Fix the titles of the header files markdown
 .PHONY: html-prep
 html-prep: api
-	$(Q)cp src/*.png build/html/
 	$(Q)cp -a api/md/*8h* build/html/
 
 	$(Q)perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
@@ -61,7 +96,6 @@ html-prep: api
 # 6. Two regexes to handle bad Doxygen that didn't convert and the LaTeX processor thinks is LaTeX commands
 .PHONY: pdf-prep
 pdf-prep: api
-	$(Q)cp src/*.png build/pdf/
 	$(Q)cp -a api/md/*8h* build/pdf/
 
 	$(Q)perl -i -pe "s/# /## /g" build/pdf/*.md
