@@ -2451,7 +2451,7 @@ Enabling this option will turn on User Atomic Record Layer Processing callbacks.
 
 Enable Public Key Callbacks
 
-Eabling this option will turn on Public Key callbacks, allowing the application to register its own ECC sign/verify and RSA sign/verify and encrypt/decrypt callbacks.
+Enabling this option will turn on Public Key callbacks, allowing the application to register its own ECC sign/verify and RSA sign/verify and encrypt/decrypt callbacks.
 
 ### `--enable-sniffer`
 

@@ -20,10 +20,24 @@ wolfSSLチームは以前、実験的なポスト量子暗号アルゴリズム�
 しかし、「あらかじめデータを収集、蓄積し、後に時間をかけて解読を進めていく」といった脅威モデルが存在します。
 すなわち、暗号の復号に特化した量子コンピューターが出現するよりも早いうちに準備が必要です。
 
-NISTが、量子コンピューターに対して脆弱になる公開鍵暗号アルゴリズムを置き換えるように設計された、新しいクラスのアルゴリズムの標準化を進めています。
-この章の執筆時点で、NISTはすでにML-DSA、ML-KEM、SLH-DSAを標準化しています。
-現在、標準化団体はOIDとコードポイントを記述する様々なドラフト文書を持っています。
-NISTはこれらのアルゴリズムをCMVP規制フレームワークの下に置き、これらのアルゴリズムの実装のFIPS-140-3検証を可能にする作業を進めています。
+NISTは量子コンピュータに対して脆弱になる公開鍵暗号アルゴリズムを置き換えるために設計された、新しいアルゴリズムの標準化を主導しています。
+この文章の執筆時点において、NISTはすでにML-DSA、ML-KEM、SLH-DSAを標準化しました。
+
+ML-KEM (Module Lattice Key Encapsulation Mechanism) は、NISTが標準化した格子ベースの耐量子アルゴリズムです。
+Kyberをベースとして標準化されました。
+2者間で鍵カプセル化メカニズムを使用して、安全でないチャネル上で共有鍵を確立します。
+これにより、従来型および量子コンピュータを用いた攻撃者の両方から保護できます。
+
+ML-DSA (Module Lattice Digital Signature Algorithm) は、同じくNISTが標準化した格子ベースの耐量子デジタル署名方式です。
+Kyberをベースとして標準化されました。
+これにより、送信者はメッセージの送信元と完全性を証明する検証可能な署名を生成できます。
+
+ML-KEMとML-DSAはどちらも、暗号の復号に特化した量子コンピュータに耐性を持つように設計された公開鍵アルゴリズムです。
+これらはNISTの耐量子暗号標準(FIPS 203およびFIPS 204)の一部です。
+量子コンピューティング時代に備えるために、ほとんどのケースでハイブリッド形式にてすぐに導入できます。
+
+現在、各標準化団体はOIDとコードポイントを示すさまざまなドラフト文書を有しています。
+NISTはこれらのアルゴリズムをCMVP規制フレームワークの傘下に置き、実装に対するFIPS-140-3検証を可能にする取り組みを進めています。
 
 ### 私たちは自分自身をどのように守るのですか？
 
@@ -96,19 +110,19 @@ wolfSSLリポジトリの[INSTALLファイル](https://github.com/wolfSSL/wolfss
 次のようにして、サーバーとクライアントを別々のターミナルで実行します。
 
 ```sh
-    $ examples/server/server -v 4 -l TLS_AES_256_GCM_SHA384 \
-      -A certs/mldsa87_root_cert.pem \
-      -c certs/mldsa44_entity_cert.pem \
-      -k certs/mldsa44_entity_key.pem \
-      --pqc P521_ML_KEM_1024
+examples/server/server -v 4 -l TLS_AES_256_GCM_SHA384 \
+      -A ../osp/oqs/mldsa87_root_cert.pem \
+      -c ../osp/oqs/mldsa44_entity_cert.pem \
+      -k ../osp/oqs/mldsa44_entity_key.pem \
+      --pqc SecP521r1MLKEM1024
 ```
 
 ```sh
-    $ examples/client/client -v 4 -l TLS_AES_256_GCM_SHA384 \
-      -A certs/mldsa44_root_cert.pem \
-      -c certs/mldsa87_entity_cert.pem \
-      -k certs/mldsa87_entity_key.pem \
-      --pqc P521_ML_KEM_1024
+examples/client/client -v 4 -l TLS_AES_256_GCM_SHA384 \
+      -A ../osp/oqs/mldsa44_root_cert.pem \
+      -c ../osp/oqs/mldsa87_entity_cert.pem \
+      -k ../osp/oqs/mldsa87_entity_key.pem \
+      --pqc SecP521r1MLKEM1024
 ```
 
 これで、対称暗号化にAES-256、認証にML-DSA署名スキーム、鍵確立にECDHEとML-KEMをハイブリッド化した完全な量子安全なTLS 1.3接続を実現しました。
@@ -1253,4 +1267,5 @@ Benchmark complete
 ```
 
 ### 開発者ノート
+
 * 「今収穫し、後で復号する」脅威モデルを阻止しようとしていて、相互運用性の一部を犠牲にしても構わない場合は、Supported Groups拡張機能で従来のアルゴリズムのサポートを広告したくないことと思います。選択したアルゴリズムで`wolfSSL_UseKeyShare()`と`wolfSSL_set_groups()`を必ず呼び出してください。`wolfSSL_UseKeyShare()`だけを呼び出すだけでは不十分です。なぜなら、それは量子的に脆弱なアルゴリズムのサポートを広告することになるからです。ピアがポスト量子アルゴリズムをサポートしていない場合、`HelloRetryRequest`を送信し、その結果として、従来のアルゴリズムとの接続が確立されます。
