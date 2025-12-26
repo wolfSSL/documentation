@@ -320,15 +320,15 @@ Cortex-A53を搭載したRaspberry Pi用の`Makefile.common`変更例を示し�
 
 ```sh
 ./configure \
-  --host=arm-non-eabi \
+  --host=arm-none-eabi \
   CC=arm-none-eabi-gcc \
   AR=arm-none-eabi-ar \
   STRIP=arm-none-eabi-strip \
   RANLIB=arm-none-eabi-ranlib \
-  --prefix=/path/to/build/wolfSSL-arm \
+  --prefix=/path/to/build/wolfssl-arm \
   CFLAGS="-march=armv8-a --specs=nosys.specs \
-      -DHAVE_PK_CALLBACKS -DWOLFSSL_USER_IO -DNO_WRITEV" \
-  --disable-filesystem --enable-fastmath \
+      -DHAVE_PK_CALLBACKS -DWOLFSSL_USER_IO -DWOLFSSL_NO_SOCK -DNO_WRITEV" \
+  --disable-filesystem --enable-crypttests \
   --disable-shared
 make
 make install
