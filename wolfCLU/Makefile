@@ -26,6 +26,7 @@ SOURCES = Intro.md \
 		  rsa.md \
 		  sha.md \
 		  s_client.md \
+		  s_server.md \
 		  verify.md \
 		  x509.md \
 		  base64.md

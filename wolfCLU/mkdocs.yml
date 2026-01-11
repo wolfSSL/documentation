@@ -23,6 +23,7 @@ nav:
       - "REQ Command": req.md
       - "RSA Command": rsa.md
       - "S_CLIENT Command": s_client.md
+      - "S_SERVER Command": s_server.md
       - "VERIFY Command": verify.md
       - "X509 Command": x509.md
       - "BASE64 Command": base64.md

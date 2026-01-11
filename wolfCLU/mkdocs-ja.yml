@@ -28,6 +28,7 @@ nav:
       - "RSA コマンド": rsa.md
       - "SHA コマンド": sha.md
       - "S_CLIENT コマンド": s_client.md
+      - "S_SERVER コマンド": s_server.md
       - "VERIFY コマンド": verify.md
       - "X509 コマンド": x509.md
       - "BASE64 コマンド": base64.md
