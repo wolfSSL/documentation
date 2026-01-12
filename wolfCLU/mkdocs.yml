@@ -27,6 +27,8 @@ nav:
       - "VERIFY Command": verify.md
       - "X509 Command": x509.md
       - "BASE64 Command": base64.md
+    - "4. Appendix":
+      - "Configuration File Format": Appendix01.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
