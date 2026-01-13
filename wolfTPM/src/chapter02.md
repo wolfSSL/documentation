@@ -28,36 +28,36 @@ $ make
 ### Build options and defines
 
 ```
---enable-debug          Add debug code/turns off optimizations (yes|no|verbose|io) 
+--enable-debug          Add debug code/turns off optimizations (yes|no|verbose|io)
                         - DEBUG_WOLFTPM, WOLFTPM_DEBUG_VERBOSE, WOLFTPM_DEBUG_IO
 --enable-examples       Enable Examples (default: enabled)
 --enable-wrapper        Enable wrapper code (default: enabled) - WOLFTPM2_NO_WRAPPER
---enable-wolfcrypt      Enable wolfCrypt hooks for RNG, Auth Sessions and Parameter encryption 
+--enable-wolfcrypt      Enable wolfCrypt hooks for RNG, Auth Sessions and Parameter encryption
                         (default: enabled) - WOLFTPM2_NO_WOLFCRYPT
 --enable-advio          Enable Advanced IO (default: disabled) - WOLFTPM_ADV_IO
 --enable-i2c            Enable I2C TPM Support (default: disabled, requires advio) - WOLFTPM_I2C
---enable-checkwaitstate Enable TIS / SPI Check Wait State support (default: depends on chip) 
+--enable-checkwaitstate Enable TIS / SPI Check Wait State support (default: depends on chip)
                         - WOLFTPM_CHECK_WAIT_STATE
 --enable-smallstack     Enable options to reduce stack usage
---enable-tislock        Enable Linux Named Semaphore for locking access to SPI device for 
+--enable-tislock        Enable Linux Named Semaphore for locking access to SPI device for
                         concurrent access between processes - WOLFTPM_TIS_LOCK
 
---enable-autodetect     Enable Runtime Module Detection (default: enable - when no module 
+--enable-autodetect     Enable Runtime Module Detection (default: enable - when no module
                         specified) - WOLFTPM_AUTODETECT
 --enable-infineon       Enable Infineon SLB9670 TPM Support (default: disabled)
 --enable-st             Enable ST ST33TPM Support (default: disabled) - WOLFTPM_ST33
 --enable-microchip      Enable Microchip ATTPM20 Support (default: disabled) - WOLFTPM_MCHP
---enable-nuvoton        Enable Nuvoton NPCT65x/NPCT75x Support (default: disabled) 
+--enable-nuvoton        Enable Nuvoton NPCT65x/NPCT75x Support (default: disabled)
                         - WOLFTPM_NUVOTON
 
---enable-devtpm         Enable using Linux kernel driver for /dev/tpmX (default: disabled) 
+--enable-devtpm         Enable using Linux kernel driver for /dev/tpmX (default: disabled)
                         - WOLFTPM_LINUX_DEV
---enable-swtpm          Enable using SWTPM TCP protocol. For use with simulator. 
+--enable-swtpm          Enable using SWTPM TCP protocol. For use with simulator.
                         (default: disabled) - WOLFTPM_SWTPM
 --enable-winapi         Use Windows TBS API. (default: disabled) - WOLFTPM_WINAPI
 
 WOLFTPM_USE_SYMMETRIC   Enables symmetric AES/Hashing/HMAC support for TLS examples.
-WOLFTPM2_USE_SW_ECDHE   Disables use of TPM for ECC ephemeral key generation and shared secret 
+WOLFTPM2_USE_SW_ECDHE   Disables use of TPM for ECC ephemeral key generation and shared secret
                         for TLS examples.
 TLS_BENCH_MODE          Enables TLS benchmarking mode.
 NO_TPM_BENCH            Disables the TPM benchmarking example.
@@ -380,3 +380,352 @@ cd ..
 #### Running on Windows
 
 To confirm presence and status of TPM on the machine run `tpm.msc`
+
+### Building for Bare-Metal
+
+wolfTPM can be built for bare-metal embedded environments where no operating system is present. This section covers the steps needed to integrate wolfTPM directly into your project by compiling the source files rather than using autotools or CMake.
+
+This approach is common for microcontrollers such as ARM Cortex-M, RISC-V, UltraScale+/Versal, Microblaze, and others.
+
+#### Prerequisites
+
+- wolfCrypt library source code
+- wolfTPM library source code
+- A TPM 2.0 module connected via SPI (or I2C)
+
+#### Step 1: Define Preprocessor Macros
+
+Add the following preprocessor macros to your project build settings or compiler command line:
+
+```
+WOLFTPM_USER_SETTINGS
+WOLFSSL_USER_SETTINGS
+```
+
+These macros tell wolfTPM and wolfSSL to look for a `user_settings.h` file instead of using autoconf-generated `options.h` file.
+
+#### Step 2: Create a user_settings.h File
+
+Create a `user_settings.h` file in your project that contains the build configuration options for both wolfSSL and wolfTPM.
+
+A reference configuration file is available in the wolfSSL repository:
+[examples/configs/user_settings_wolftpm.h](https://github.com/wolfSSL/wolfssl/blob/master/examples/configs/user_settings_wolftpm.h)
+
+Example `user_settings.h` for wolfTPM:
+
+```h
+/* System */
+#define WOLFSSL_GENERAL_ALIGNMENT 4
+#define SINGLE_THREADED
+#define WOLFCRYPT_ONLY
+#define SIZEOF_LONG_LONG 8
+
+/* Platform - bare metal */
+#define NO_FILESYSTEM
+#define NO_WRITEV
+#define NO_MAIN_DRIVER
+#define NO_DEV_RANDOM
+#define NO_ERROR_STRINGS
+#define NO_SIG_WRAPPER
+
+/* wolfTPM required features */
+#define WOLF_CRYPTO_CB
+#define WOLFSSL_PUBLIC_MP
+#define WOLFSSL_AES_CFB
+#define HAVE_AES_DECRYPT
+
+/* ECC options */
+#define HAVE_ECC
+#define ECC_TIMING_RESISTANT
+
+/* RSA options */
+#undef NO_RSA
+#define WOLFSSL_KEY_GEN
+#define WC_RSA_BLINDING
+
+/* Big math library */
+#define WOLFSSL_SP_MATH_ALL /* sp_int.c */
+#define WOLFSSL_SP_SMALL
+#define SP_INT_BITS 4096
+//#define SP_WORD_SIZE 32
+
+/* SHA options */
+#define NO_SHA /* on by default */
+#define NO_SHA256 /* on by default */
+#define WOLFSSL_SHA512
+#define WOLFSSL_SHA384
+
+/* Disable unneeded features to reduce footprint */
+#define NO_PKCS8
+#define NO_PKCS12
+#define NO_PWDBASED
+#define NO_DSA
+#define NO_DES3
+#define NO_RC4
+#define NO_PSK
+#define NO_MD4
+#define NO_MD5
+#define WOLFSSL_NO_SHAKE128
+#define WOLFSSL_NO_SHAKE256
+#define NO_DH
+
+/* Other interesting size reduction options */
+#if 0
+    #define RSA_LOW_MEM
+    #define WOLFSSL_AES_SMALL_TABLES
+    #define USE_SLOW_SHA
+    #define USE_SLOW_SHA256
+    #define USE_SLOW_SHA512
+    #define NO_AES_192
+#endif
+
+/* Custom random seed source - implement your own */
+#define HAVE_HASHDRBG
+#define CUSTOM_RAND_GENERATE_SEED my_rng_seed
+```
+
+You will need to implement your own RNG seed function if using `CUSTOM_RAND_GENERATE_SEED`:
+
+```c
+int my_rng_seed(byte* seed, word32 sz)
+{
+    int rc;
+    (void)os;
+    /* enable parameter encryption for the RNG request */
+    rc = wolfTPM2_SetAuthSession(&wolftpm_dev, 0, &wolftpm_session,
+        (TPMA_SESSION_decrypt | TPMA_SESSION_encrypt |
+        TPMA_SESSION_continueSession));
+    if (rc == 0) {
+        rc = wolfTPM2_GetRandom(&wolftpm_dev, seed, sz);
+    }
+    wolfTPM2_UnsetAuthSession(&wolftpm_dev, 0, &wolftpm_session);
+    return rc;
+}
+```
+
+#### Step 3: Configure Include Paths
+
+Add the following directories to your project's include paths:
+
+1. **wolfSSL root directory** - e.g., `/path/to/wolfssl`
+2. **wolfTPM root directory** - e.g., `/path/to/wolftpm`
+3. **Your user_settings.h location** - must be findable by the compiler
+
+Example compiler flags:
+
+```
+-I/path/to/wolfssl
+-I/path/to/wolftpm
+-I/path/to/your/project/include
+```
+
+#### Step 4: Add Source Files
+
+Add the required source files from wolfSSL and wolfTPM to your project.
+
+**wolfCrypt source files** (minimum required for wolfTPM):
+
+```
+wolfssl/wolfcrypt/src/aes.c
+wolfssl/wolfcrypt/src/asn.c
+wolfssl/wolfcrypt/src/cryptocb.c
+wolfssl/wolfcrypt/src/ecc.c
+wolfssl/wolfcrypt/src/hash.c
+wolfssl/wolfcrypt/src/hmac.c
+wolfssl/wolfcrypt/src/random.c
+wolfssl/wolfcrypt/src/rsa.c
+wolfssl/wolfcrypt/src/sha.c
+wolfssl/wolfcrypt/src/sha256.c
+wolfssl/wolfcrypt/src/sha512.c
+wolfssl/wolfcrypt/src/sp_int.c
+wolfssl/wolfcrypt/src/wc_port.c
+wolfssl/wolfcrypt/src/wolfmath.c
+```
+
+**wolfTPM source files**:
+
+```
+wolftpm/src/tpm2.c
+wolftpm/src/tpm2_packet.c
+wolftpm/src/tpm2_tis.c
+wolftpm/src/tpm2_wrap.c
+wolftpm/src/tpm2_param_enc.c
+```
+
+#### Step 5: Implement the SPI HAL Callback
+
+wolfTPM requires a single SPI transmit/receive callback to communicate with the TPM module. You need to implement this function for your specific hardware platform.
+
+Reference implementations are available in the wolfTPM repository under `hal/`:
+
+- [hal/tpm_io_xilinx.c](https://github.com/wolfSSL/wolfTPM/blob/master/hal/tpm_io_xilinx.c) - Xilinx Microblaze
+- [hal/tpm_io_stm32.c](https://github.com/wolfSSL/wolfTPM/blob/master/hal/tpm_io_stm32.c) - STM32
+- [hal/tpm_io_infineon.c](https://github.com/wolfSSL/wolfTPM/blob/master/hal/tpm_io_infineon.c) - Infineon Tricore
+- [hal/tpm_io_microchip.c](https://github.com/wolfSSL/wolfTPM/blob/master/hal/tpm_io_microchip.c) - Microchip
+
+##### Standard I/O Callback
+
+The standard SPI callback has the following signature:
+
+```c
+typedef int (*TPM2HalIoCb)(
+    TPM2_CTX* ctx,
+    const byte* txBuf, byte* rxBuf,
+    word16 xferSz,
+    void* userCtx
+);
+```
+
+Example implementation:
+
+```c
+#include <wolftpm/tpm2.h>
+#include <wolftpm/tpm2_tis.h>
+
+int TPM2_IoCb(TPM2_CTX* ctx,
+    const byte* txBuf, byte* rxBuf, word16 xferSz,
+    void* userCtx)
+{
+    int ret = TPM_RC_FAILURE;
+
+    /* TODO: Assert SPI chip select */
+    spi_cs_assert();
+
+    /* Perform SPI transfer - simultaneously send txBuf and receive to rxBuf */
+    if (spi_transfer(txBuf, rxBuf, xferSz) == 0) {
+        ret = TPM_RC_SUCCESS;
+    }
+
+    /* TODO: De-assert SPI chip select */
+    spi_cs_deassert();
+
+    (void)ctx;
+    (void)userCtx;
+
+    return ret;
+}
+```
+
+##### Advanced I/O Callback
+
+For platforms that need more control, enable `WOLFTPM_ADV_IO` to use the advanced callback:
+
+```c
+typedef int (*TPM2HalIoCb)(
+    TPM2_CTX* ctx,
+    INT32 isRead, UINT32 addr,
+    BYTE* xferBuf, UINT16 xferSz,
+    void* userCtx
+);
+```
+
+This provides access to the register address and read/write direction for platforms that require separate read and write operations.
+
+#### Step 6: Initialize and Use wolfTPM
+
+After completing the setup, you can initialize wolfTPM and start communicating with the TPM:
+
+```c
+#include <wolftpm/tpm2_wrap.h>
+
+int main(void)
+{
+    int rc;
+    WOLFTPM2_DEV dev;
+
+    /* Initialize wolfTPM */
+    rc = wolfTPM2_Init(&dev, TPM2_IoCb, NULL);
+    if (rc != TPM_RC_SUCCESS) {
+        /* Handle error */
+        return rc;
+    }
+
+    /* Get TPM capabilities */
+    WOLFTPM2_CAPS caps;
+    rc = wolfTPM2_GetCapabilities(&dev, &caps);
+    if (rc == TPM_RC_SUCCESS) {
+        /* Use TPM ... */
+    }
+
+    /* Cleanup */
+    wolfTPM2_Cleanup(&dev);
+
+    return 0;
+}
+```
+
+#### Optional Build Configurations
+
+##### Reducing Memory Footprint
+
+For constrained environments, consider these options in `user_settings.h`:
+
+```c
+/* Reduce stack usage */
+#define WOLFTPM_SMALL_STACK
+
+/* Disable wrapper layer if using native API only */
+#define WOLFTPM2_NO_WRAPPER
+
+/* Use smaller RSA key sizes only */
+#define MAX_RSA_BITS 2048
+```
+
+##### Selecting TPM Module Type
+
+If you know your TPM module type at compile time:
+
+```c
+/* For Infineon */
+#define WOLFTPM_SLB9670
+#define WOLFTPM_SLB9672
+#define WOLFTPM_SLB9673
+
+/* For ST ST33 */
+#define WOLFTPM_ST33
+
+/* For Nuvoton */
+#define WOLFTPM_NUVOTON
+
+/* For Microchip ATTPM20 */
+#define WOLFTPM_MICROCHIP
+```
+
+If not specified, wolfTPM will attempt to auto-detect the module at runtime using `WOLFTPM_AUTODETECT` (default behavior).
+
+##### I2C Support
+
+For TPM modules connected via I2C instead of SPI:
+
+```c
+#define WOLFTPM_I2C
+#define WOLFTPM_ADV_IO
+```
+
+You will need to implement the advanced I/O callback for I2C communication.
+
+#### Cryptographic Key Storage
+
+In bare-metal environments, the TPM provides secure storage for cryptographic keys that is isolated from main processor memory. The key material never leaves the TPM in plaintext form.
+
+- Keys created with `TPM2_CreatePrimary` reside in the TPM and return a handle
+- Keys created with `TPM2_Create` return an encrypted blob that can be stored in non-volatile memory and reloaded using `TPM2_Load`
+- Use `TPM2_EvictControl` to store keys persistently in the TPM's NVRAM
+
+This separation ensures that cryptographic keys are protected even if the main processor's memory is compromised.
+
+#### Troubleshooting
+
+##### SPI Communication Issues
+
+1. Verify SPI clock polarity and phase (typically CPOL=0, CPHA=0 for TPM)
+2. Check SPI clock speed - start with a slower speed (1-10 MHz) and increase
+3. Verify chip select is asserted low during entire send/recieve
+4. Some TPMs require wait states during SPI operations which requires extra bytes until the MSB is set to signal response readiness (enabled with `WOLFTPM_CHECK_WAIT_STATE`)
+5. Enable debug output with `#define DEBUG_WOLFTPM` (general), `WOLFTPM_DEBUG_VERBOSE` (detailed), or `WOLFTPM_DEBUG_IO` (SPI/I2C transactions)
+
+##### Build Errors
+
+1. Ensure `WOLFSSL_USER_SETTINGS` and `WOLFTPM_USER_SETTINGS` are defined
+2. Verify include paths are correctly set
+3. Check that all required source files are included in the build
