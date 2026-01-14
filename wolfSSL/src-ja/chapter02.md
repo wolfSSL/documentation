@@ -149,6 +149,41 @@ cd wolfSSL
 make
 make check
 ```
+## 各社IDEによるビルド
+
+wolfSSLサイトからwolfSSLソースコード一式をダウンロード、解凍して以下の設定をします。
+
+### 1. wolfSSLライブラリー生成プロジェクト
+- コンパイル対象のソースファイルの登録
+./srcの下の*.cファイルと./wolfcrypt/srcの*.cファイル一式を登録します。
+ただし、以下のファイルを除きます。
+
+```
+./src/ssl_*.c, ./src/x509_*.c, 
+src/conf.c, src/bio.c
+wolfcrypt/src/misc.c, ./wolfcrypt/src/evp.c
+```
+
+- コンフィグレーションオプションの定義
+ファイル名 "user_settings.h" のヘッダーファイルにコンフィグレーション定義を格納します。
+
+wolfssl/examples/configs/README.md, user_settings_template.h を参照してください。
+
+- プリディファインドマクロ名の登録
+WOLFSSL_USER_SETTINGS を定義すると、ビルド時に上記のuser_setttings.hファイルがインクルードされます。
+
+- インクルードパスの登録
+wolfSSLソースファイルルートのパスと上記user_settings.hのパスを登録します。
+
+
+### 2. アプリケーション実行ファイル生成プロジェクト
+
+- 1.で生成したwolfSSLライブラリーをリンク対象として登録します。wolfSSLソースファイルルートのパスと
+- 1. で定義したコンフィグレーションオプション(user_settings.h)のパスを
+　インクルードパスとして登録します。
+- プリディファインドマクロ名として"WOLFSSL_USER_SETTINGS "を指定します。
+- アプリケーションのプログラム先頭付近で "wolfssl/wolfcrypt/settings.h" をインクルードします。
+
 
 ## 非標準環境でのビルド
 

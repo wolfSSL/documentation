@@ -129,6 +129,44 @@ make
 make check
 ```
 
+## Building with Various Vendor IDEs
+
+Download the complete wolfSSL source code package from the wolfSSL website, extract it, and apply the following settings.
+
+### 1. wolfSSL Library Build Project
+
+- **Register source files to be compiled**  
+  Register all `*.c` files under `./src` and all `*.c` files under `./wolfcrypt/src`.  
+  Exclude the following files:
+
+./src/ssl_.c, ./src/x509_.c,
+src/conf.c, src/bio.c
+wolfcrypt/src/misc.c, ./wolfcrypt/src/evp.c
+
+- **Define configuration options**  
+Store the configuration definitions in a header file named `user_settings.h`.
+
+Refer to:
+- `wolfssl/examples/configs/README.md`
+- `wolfssl/examples/configs/user_settings_template.h`
+
+- **Register predefined macro names**  
+When `WOLFSSL_USER_SETTINGS` is defined, the above `user_settings.h` file is included at build time.
+
+- **Register include paths**  
+Register the path to the wolfSSL source file root and the path to the above `user_settings.h`.
+
+---
+
+### 2. Application Executable Build Project
+
+- Register the wolfSSL library generated in step 1 as a link target.
+- Register the wolfSSL source file root path and the configuration option path (`user_settings.h`) defined in step 1 as include paths.
+- Specify `"WOLFSSL_USER_SETTINGS"` as a predefined macro name.
+
+
+
+
 ## Building in a non-standard environment
 
 While not officially supported, we try to help users wishing to build wolfSSL in a non-standard environment, particularly with embedded and cross-compilation systems. Below are some notes on getting started with this.
