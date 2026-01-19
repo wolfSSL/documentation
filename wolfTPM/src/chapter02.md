@@ -509,7 +509,7 @@ Add the following directories to your project's include paths:
 
 1. **wolfSSL root directory** - e.g., `/path/to/wolfssl`
 2. **wolfTPM root directory** - e.g., `/path/to/wolftpm`
-3. **Your user_settings.h location** - must be findable by the compiler
+3. **Your user_settings.h location** - must be discoverable by the compiler (in your include path)
 
 Example compiler flags:
 
