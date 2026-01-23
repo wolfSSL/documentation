@@ -48,6 +48,39 @@ for (Provider prov:providers) {
 }
 ```
 
+### Java Module System (JPMS) Support
+
+wolfJSSE includes Java ServiceLoader support for compatibility with the Java
+Module System (JPMS). This allows the wolfJSSE provider to be automatically
+discovered and loaded when the JAR is on the module path.
+
+The wolfJSSE JAR contains a `META-INF/services/java.security.Provider` file
+that registers `com.wolfssl.provider.jsse.WolfSSLProvider` for automatic
+discovery. Applications can discover and load the provider using the standard
+Java ServiceLoader API:
+
+```
+import java.security.Provider;
+import java.security.Security;
+import java.util.ServiceLoader;
+
+ServiceLoader<Provider> loader = ServiceLoader.load(Provider.class);
+for (Provider provider : loader) {
+    if (provider.getName().equals("wolfJSSE")) {
+        Security.addProvider(provider);
+        break;
+    }
+}
+```
+
+For modular applications, wolfJSSE can be used as an automatic module or
+included as a dependency in your `module-info.java`.
+
+**Note:** ServiceLoader-based provider discovery relies on the
+`META-INF/services` mechanism which is a JAR/module system feature. On Android,
+applications should register the provider directly using
+`Security.addProvider(new WolfSSLProvider())` instead.
+
 ##  Installation at OS / System Level
 
 ###  Unix/Linux

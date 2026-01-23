@@ -34,6 +34,27 @@ location. For example:
 $ ./java.sh /path/to/wolfssl/install
 ```
 
+A second optional argument specifies a custom wolfSSL library name to link
+against. This is useful when wolfSSL was compiled with `--with-libsuffix`:
+
+```
+$ ./java.sh /usr/local wolfssljsse
+```
+
+The script will attempt to auto-detect `JAVA_HOME` if not set. To explicitly
+specify a Java installation, set the `JAVA_HOME` environment variable before
+running.
+
+Preset `CFLAGS` can be passed to the script via the environment:
+
+```
+$ CFLAGS="-DWOLFJNI_USE_IO_SELECT" ./java.sh
+```
+
+On Aarch64 hosts, `-fPIC` is automatically added to CFLAGS.
+
+## Building with ant
+
 To compile the Java sources, `ant` is used:
 
 ```
@@ -81,6 +102,73 @@ is used:
 ```
 $ ant examples
 ```
+
+## Building with Maven
+
+wolfJSSE supports building and packaging with Maven for projects that consume
+Maven packages.
+
+First, compile the native JNI shared library using `java.sh` as described above.
+This creates the native library under `./lib`:
+
+```
+$ ./java.sh
+```
+
+Compile the Java sources (output to `./target/classes`):
+
+```
+$ mvn compile
+```
+
+Compile and run JUnit tests:
+
+```
+$ mvn test
+```
+
+Package the JAR file (runs tests, then creates `target/wolfssl-jsse-X.X.X-SNAPSHOT.jar`):
+
+```
+$ mvn package
+```
+
+Generate Javadoc API documentation (output to `./docs/apidocs`):
+
+```
+$ mvn javadoc:javadoc
+```
+
+Install the JAR to the local Maven repository:
+
+```
+$ mvn install
+```
+
+The JAR will be installed to a location similar to:
+
+```
+~/.m2/repository/com/wolfssl/wolfssl-jsse/X.X.X-SNAPSHOT/wolfssl-jsse-X.X.X-SNAPSHOT.jar
+```
+
+The native `libwolfssljni.so` (or `.dylib`) library must be installed on the
+native library search path (e.g., `/usr/local/lib`) or the path can be set via
+`LD_LIBRARY_PATH` (Linux) or `DYLD_LIBRARY_PATH` (macOS).
+
+Applications can include wolfJSSE as a Maven dependency:
+
+```xml
+<dependency>
+    <groupId>com.wolfssl</groupId>
+    <artifactId>wolfssl-jsse</artifactId>
+    <version>1.16.0-SNAPSHOT</version>
+</dependency>
+```
+
+## Windows Visual Studio Build
+
+wolfJSSE can be compiled on Windows using Visual Studio. For detailed
+instructions, see the `IDE/WIN/README.md` file in the wolfssljni package.
 
 ## Android Studio Build
 
