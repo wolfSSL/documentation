@@ -10,7 +10,8 @@ on the following:
     + Oracle JDK
     + OpenJDK
     + Zulu JDK
-    + Amazon Coretto
+    + Amazon Corretto
+    + Eclipse Temurin
 - Mac OSX
 - Windows (Visual Studio)
 - Android Studio

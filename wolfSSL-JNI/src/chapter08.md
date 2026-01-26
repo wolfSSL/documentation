@@ -10,6 +10,13 @@ Examples should be run from the package root directory, and using the provided
 wrapper scripts. The wrapper scripts set up the correct environment variables
 for use with the wolfjni jar included in the wolfssljni package.
 
+To build examples run:
+```
+$ ./java.sh
+$ ant
+$ ant examples
+```
+
 ## Notes on Debug and Logging
 
 wolfJSSE debug logging can be enabled by using `-Dwolfjsse.debug=true` at
@@ -58,16 +65,6 @@ $ cd <wolfssljni_root>
 $ ./examples/provider/ServerJSSE.sh
 $ ./examples/provider/ClientJSSE.sh
 ```
-
-## Notes on Debug and Logging
-
-wolfJSSE debug logging can be enabled by using `-Dwolfjsse.debug=true` at
-runtime.
-
-wolfSSL native debug logging can be enabled by using `-Dwolfssl.debug=true` at
-runtime, if native wolfSSL has been compiled with `--enable-debug`.
-
-JDK debug logging can be enabled using the `-Djavax.net.debug=all` option.
 
 ## wolfJSSE Example Client and Server
 
@@ -187,4 +184,41 @@ Example usage:
 
 ```
 $ ./examples/provider/ThreadedSSLSocketClientServer.sh
+```
+
+## DtlsClientEngine.java and DtlsServerEngine.java
+
+Example client/server applications that demonstrate how to use SSLEngine with DTLS 1.3.
+
+**DtlsServerEngine.java** - Example DTLS 1.3 server using SSLEngine
+**DtlsClientEngine.java** - Example DTLS 1.3 client using SSLEngine
+
+These examples show how to implement DTLS 1.3 with SSLEngine for datagram-based
+secure communication. Unlike the TCP-based examples, these use DatagramSocket for
+UDP transport and handle the complexities of DTLS, including session tickets
+and handshake state management.
+
+Run the examples with the provided bash scripts:
+
+```
+$ ./examples/provider/DtlsServerEngine.sh
+$ ./examples/provider/DtlsClientEngine.sh
+```
+
+The client connects to the server, sends a message, and receives the echoed response.
+Both examples support various command-line options that can be viewed with the -? flag.
+
+## Java Remote Method Invocation (RMI) Example
+
+Example client, server, and remote interface applications for Java Remote
+Method Invocation implementation in wolfJSSE.
+
+**RmiServer.java** - Example server, implements `RmiRemoteInterface` with methods `getMessage()`, `sendMessage()`, `getByteArray()`, `sendByteArray()`, and `getRegistryPorts()`. Creates one or more RMI registries over TLS/SSL using wolfJSSE.
+
+**RmiClient.java** - Example client, gets an object stub from the remote registry, and makes remote method invocations including `getMessage()`, `sendMessage()`, `getByteArray()`, `sendByteArray()`, and `getRegistryPorts()`. Supports multiple concurrent client connections.
+
+Start the server and client:
+```
+$ ./examples/provider/rmi/RmiServer.sh
+$ ./examples/provider/rmi/RmiClient.sh
 ```

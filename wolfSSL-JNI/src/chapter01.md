@@ -4,6 +4,6 @@ wolfSSL JNI/JSSE is a provider implementation of the Java Secure Socket Extensio
 
 The Java Secure Socket Extension ( **JSSE** ) framework supports the installation of security providers. These providers can implement a subset of the functionality used by the Java JSSE security APIs, including SSL/TLS.
 
-This document describes wolfSSL’s JSSE provider implementation, named “**wolfJSSE / wolfSSLProvider**”. wolfJSSE wraps the native wolfSSL SSL/TLS library. This interface gives Java applications access to all the benefits of using wolfSSL, including current SSL/TLS standards up to [TLS 1.3](https://www.wolfssl.com/tls13), [FIPS 140-2 and 140-3](https://www.wolfssl.com/license/fips/) support, performance optimizations, hardware cryptography support, [commercial support](https://www.wolfssl.com/products/support-and-maintenance/), and more!
+This document describes wolfSSL’s JSSE provider implementation, named “**wolfJSSE / wolfSSLProvider**”. wolfJSSE wraps the native wolfSSL SSL/TLS library. This interface gives Java applications access to all the benefits of using wolfSSL, including current SSL/TLS standards up to [TLS 1.3](https://www.wolfssl.com/tls13), [DTLS 1.3](https://www.wolfssl.com/wolfssl-java-jsse-provider-supports-dtls-1-3/), and [FIPS 140-2 and 140-3](https://www.wolfssl.com/license/fips/) support, performance optimizations, hardware cryptography support, [commercial support](https://www.wolfssl.com/products/support-and-maintenance/), and more!
 
 wolfJSSE is distributed as part of the “ **wolfssljni** ”package.
