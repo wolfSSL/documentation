@@ -1,7 +1,7 @@
 ### CA Command
 Used for signing Certificates. Can handle some basic config file parsing.
 
-See [REQ Command - Configuration File Format](req.md#configuration-file-format) for details on config file directives.
+See [Configuration File](config.md) for details on config file directives.
 
 Arguments:    
 
@@ -79,21 +79,4 @@ wolfssl ca -config ca.conf -extensions v3_ca -in server.csr -out server-signed.p
 
 ### Limitations
 
-#### Serial Number
-
-Without a configuration file, wolfCLU generates a random serial number for each signed certificate.
-
-The configuration file supports the following directives for serial number management:
-
-```ini
-[CA_default]
-serial = /path/to/serial.txt    # File containing serial number in hex
-new_certs_dir = /path/to/certs  # Output directory for certificates
-```
-
-The serial file format (OpenSSL compatible):
-```
-01
-```
-
-**Note:** In the current version (v0.1.8), the configuration file-based serial number management has known issues with path handling. It is recommended to use the command-line arguments (`-out`, `-keyfile`, `-cert`) directly instead of relying on config file paths until this is resolved.
+Without a configuration file, wolfCLU generates a random serial number for each signed certificate. See [Configuration File - Limitations](config.md#limitations) for details on config file-based serial number management and its current limitations.

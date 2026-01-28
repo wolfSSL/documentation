@@ -31,6 +31,8 @@ nav:
       - "VERIFY コマンド": verify.md
       - "X509 コマンド": x509.md
       - "BASE64 コマンド": base64.md
+    - "付録":
+      - "設定ファイル": config.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
