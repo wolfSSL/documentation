@@ -7,9 +7,13 @@ nav:
     - "1. Introduction": index.md
     - "2. Building wolfCLU": build.md
     - "3. Commands":
+      - "Command List": command_list.md
       - "BENCH Command": bench.md
+      - "CA Command": ca.md
       - "CRL Command": crl.md
+      - "DSAPARAM Command": dsaparam.md
       - "DGST Command": dgst.md
+      - "DHPARAM Command": dhparam.md
       - "ECPARAM Command": ecparam.md
       - "ENC Command": enc.md
       - "GENKEY Command": genkey.md
@@ -22,6 +26,7 @@ nav:
       - "RAND Command": rand.md
       - "REQ Command": req.md
       - "RSA Command": rsa.md
+      - "SHA Command": sha.md
       - "S_CLIENT Command": s_client.md
       - "VERIFY Command": verify.md
       - "X509 Command": x509.md

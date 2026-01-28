@@ -1,8 +1,8 @@
 
 # wolfCLU マニュアル
 
- wolfSSL コマンドラインユーティリティ (version 0.0.7)    
-2021/Nov/24
+wolfSSL コマンドラインユーティリティ (version 0.1.8)
+2025/April/4
 
 
 ## 始めに

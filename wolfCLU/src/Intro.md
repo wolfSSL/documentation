@@ -1,8 +1,8 @@
 
 # wolfCLU Manual
 
- wolfSSL's Command Line Utility (version 0.0.7)    
-Nov, 24, 2021
+wolfSSL's Command Line Utility (version 0.1.8)
+April 4, 2025
 
 
 ## Intro
