@@ -1,26 +1,31 @@
-## List Of Commands:
+## List Of Commands
+
 - base64
 - bench
 - ca
 - crl
-- dsaparam
 - dgst
+- dhparam
+- dsaparam
+- ecc
 - ecparam
-- enc
+- ed25519
+- enc / encrypt / decrypt
 - genkey
 - hash
 - md5
-- pkcs12
 - pkcs7
 - pkcs8
+- pkcs12
 - pkey
 - rand
 - req
 - rsa
 - s_client
-- verify
-- x509
-- dhparam
+- s_server
 - sha256
 - sha384
 - sha512
+- verify
+- version
+- x509
