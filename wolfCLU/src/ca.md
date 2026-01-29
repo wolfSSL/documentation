@@ -77,6 +77,3 @@ Sign CSR with extensions from config:
 wolfssl ca -config ca.conf -extensions v3_ca -in server.csr -out server-signed.pem -keyfile ca.priv -cert ca.pem -days 365 -md sha256
 ```
 
-### Limitations
-
-Without a configuration file, wolfCLU generates a random serial number for each signed certificate. See [Configuration File - Limitations](config.md#limitations) for details on config file-based serial number management and its current limitations.
