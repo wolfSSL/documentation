@@ -272,16 +272,7 @@ Usage:
 wolfssl req -new -config simple.conf -key server.priv -out server.csr
 ```
 
-## Limitations
-
-### Output Path Handling with new_certs_dir
-
-When using the `-out` option together with `new_certs_dir` in the configuration file, there is a path handling bug in versions up to v0.1.9:
-
-- If `-out` specifies an **absolute path** (e.g., `/tmp/output/signed.pem`), it is incorrectly concatenated with `new_certs_dir`, resulting in an invalid path.
-- **Workaround:** Use a relative path for `-out` (e.g., `signed.pem`), which will be correctly placed in the `new_certs_dir` directory.
-
-### Serial Number File
+## Serial Number File
 
 The `serial` directive specifies a file containing the serial number in hexadecimal format:
 

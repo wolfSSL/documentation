@@ -77,9 +77,3 @@ DNS.2 = www.example.com
 wolfssl ca -config ca.conf -extensions v3_ca -in server.csr -out server-signed.pem -keyfile ca.priv -cert ca.pem -days 365 -md sha256
 ```
 
-### 制限事項
-
-- 設定ファイルを使用しない場合、wolfCLUは署名された各証明書にランダムなシリアル番号を生成します。
-- 設定ファイルの`new_certs_dir`と`-out`を併用する場合、`-out`には**相対パス**を使用してください。絶対パスはv0.1.9までのバージョンで正しく処理されません。
-
-詳細は[設定ファイル - 制限事項](config.md#制限事項)を参照してください。

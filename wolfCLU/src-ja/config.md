@@ -272,16 +272,7 @@ commonName = myserver
 wolfssl req -new -config simple.conf -key server.priv -out server.csr
 ```
 
-## 制限事項
-
-### new_certs_dirと-outオプションのパス処理
-
-設定ファイルの`new_certs_dir`と`-out`オプションを同時に使用する場合、v0.1.9までのバージョンでパス処理のバグがあります：
-
-- `-out`に**絶対パス**（例：`/tmp/output/signed.pem`）を指定すると、`new_certs_dir`と不正に結合され、無効なパスになります。
-- **回避策:** `-out`には**相対パス**（例：`signed.pem`）を使用してください。相対パスは`new_certs_dir`ディレクトリ内に正しく配置されます。
-
-### シリアル番号ファイル
+## シリアル番号ファイル
 
 `serial` ディレクティブは、16進形式のシリアル番号を含むファイルを指定します：
 
