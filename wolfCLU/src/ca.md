@@ -79,4 +79,7 @@ wolfssl ca -config ca.conf -extensions v3_ca -in server.csr -out server-signed.p
 
 ### Limitations
 
-Without a configuration file, wolfCLU generates a random serial number for each signed certificate. See [Configuration File - Limitations](config.md#limitations) for details on config file-based serial number management and its current limitations.
+- Without a configuration file, wolfCLU generates a random serial number for each signed certificate.
+- When using `-out` with `new_certs_dir` in the config file, use a **relative path** for `-out`. Absolute paths are not handled correctly in versions up to v0.1.9.
+
+See [Configuration File - Limitations](config.md#limitations) for more details.

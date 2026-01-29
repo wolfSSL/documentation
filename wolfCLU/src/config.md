@@ -274,6 +274,13 @@ wolfssl req -new -config simple.conf -key server.priv -out server.csr
 
 ## Limitations
 
+### Output Path Handling with new_certs_dir
+
+When using the `-out` option together with `new_certs_dir` in the configuration file, there is a path handling bug in versions up to v0.1.9:
+
+- If `-out` specifies an **absolute path** (e.g., `/tmp/output/signed.pem`), it is incorrectly concatenated with `new_certs_dir`, resulting in an invalid path.
+- **Workaround:** Use a relative path for `-out` (e.g., `signed.pem`), which will be correctly placed in the `new_certs_dir` directory.
+
 ### Serial Number File
 
 The `serial` directive specifies a file containing the serial number in hexadecimal format:
@@ -282,4 +289,4 @@ The `serial` directive specifies a file containing the serial number in hexadeci
 01
 ```
 
-**Note:** In the current version (v0.1.8), the configuration file-based serial number management has known issues with path handling. It is recommended to use command-line arguments directly until this is resolved. Without a configuration file, wolfCLU generates a random serial number for each signed certificate.
+The serial number is incremented after each certificate is signed. Without a configuration file specifying a serial file, wolfCLU generates a random serial number for each signed certificate.
