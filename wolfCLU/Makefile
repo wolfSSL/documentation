@@ -8,12 +8,14 @@ SOURCES = Intro.md \
 		  command_list.md \
 		  bench.md \
 		  ca.md \
-          crl.md \
+		  crl.md \
 		  dsaparam.md \
-          dgst.md \
+		  dgst.md \
 		  dhparam.md \
-          ecparam.md \
-          enc.md \
+		  ecc.md \
+		  ecparam.md \
+		  ed25519.md \
+		  enc.md \
 		  genkey.md \
 		  hash.md \
 		  md5.md \
@@ -26,9 +28,12 @@ SOURCES = Intro.md \
 		  rsa.md \
 		  sha.md \
 		  s_client.md \
+		  s_server.md \
 		  verify.md \
+		  version.md \
 		  x509.md \
-		  base64.md
+		  base64.md \
+		  config.md
 
 ifeq ($(DOC_LANG),JA)
     PDF  = wolfCLU-Manual-jp.pdf

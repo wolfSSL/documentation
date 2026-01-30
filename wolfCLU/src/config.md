@@ -272,9 +272,7 @@ Usage:
 wolfssl req -new -config simple.conf -key server.priv -out server.csr
 ```
 
-## Limitations
-
-### Serial Number File
+## Serial Number File
 
 The `serial` directive specifies a file containing the serial number in hexadecimal format:
 
@@ -282,4 +280,4 @@ The `serial` directive specifies a file containing the serial number in hexadeci
 01
 ```
 
-**Note:** In the current version (v0.1.8), the configuration file-based serial number management has known issues with path handling. It is recommended to use command-line arguments directly until this is resolved. Without a configuration file, wolfCLU generates a random serial number for each signed certificate.
+The serial number is incremented after each certificate is signed. Without a configuration file specifying a serial file, wolfCLU generates a random serial number for each signed certificate.

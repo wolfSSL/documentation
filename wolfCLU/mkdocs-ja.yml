@@ -14,7 +14,9 @@ nav:
       - "DSAPARAM コマンド": dsaparam.md
       - "DGST コマンド": dgst.md
       - "DHPARAM コマンド": dhparam.md
+      - "ECC コマンド": ecc.md
       - "ECPARAM コマンド": ecparam.md
+      - "ED25519 コマンド": ed25519.md
       - "ENC コマンド": enc.md
       - "GENKEY コマンド": genkey.md
       - "HASH コマンド": hash.md
@@ -28,7 +30,9 @@ nav:
       - "RSA コマンド": rsa.md
       - "SHA コマンド": sha.md
       - "S_CLIENT コマンド": s_client.md
+      - "S_SERVER コマンド": s_server.md
       - "VERIFY コマンド": verify.md
+      - "VERSION コマンド": version.md
       - "X509 コマンド": x509.md
       - "BASE64 コマンド": base64.md
     - "付録":
