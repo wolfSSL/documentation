@@ -49,6 +49,35 @@ argument:
 $ ./examples/server.sh --help
 ```
 
+## SimpleThreadedClient.java and SimpleThreadedServer.java
+
+Multi-threaded JNI client and server examples. These demonstrate using the
+wolfSSL JNI wrapper in a multi-threaded environment.
+
+```
+$ ./examples/SimpleThreadedServer.sh
+$ ./examples/SimpleThreadedClient.sh
+```
+
+## X509v3CertificateGeneration.java
+
+Example application demonstrating X.509v3 certificate generation using the
+wolfSSL JNI `WolfSSLCertificate` API. Shows how to programmatically create
+and sign X.509v3 certificates.
+
+```
+$ ./examples/X509v3CertificateGeneration.sh
+```
+
+## X509CertRequest.java
+
+Example application demonstrating X.509 Certificate Signing Request (CSR)
+generation using the wolfSSL JNI `WolfSSLCertRequest` API.
+
+```
+$ ./examples/X509CertRequest.sh
+```
+
 # wolfJSSE Provider Examples
 
 The `examples/provider` directory contains examples for the wolfSSL JSSE
@@ -216,6 +245,10 @@ Method Invocation implementation in wolfJSSE.
 **RmiServer.java** - Example server, implements `RmiRemoteInterface` with methods `getMessage()`, `sendMessage()`, `getByteArray()`, `sendByteArray()`, and `getRegistryPorts()`. Creates one or more RMI registries over TLS/SSL using wolfJSSE.
 
 **RmiClient.java** - Example client, gets an object stub from the remote registry, and makes remote method invocations including `getMessage()`, `sendMessage()`, `getByteArray()`, `sendByteArray()`, and `getRegistryPorts()`. Supports multiple concurrent client connections.
+
+**RmiRemoteInterface.java** - Remote interface definition that both the server and client use.
+
+**RmiTLSClientSocketFactory.java** / **RmiTLSServerSocketFactory.java** - Custom TLS socket factory implementations for RMI, using wolfJSSE for the underlying SSL/TLS connections.
 
 Start the server and client:
 ```

@@ -13,7 +13,7 @@ JNI C source files into a shared library for either Unix/Linux or Mac OSX.
 This script tries to auto-detect between OSX (Darwin) and Linux to set up
 include paths and shared library extension type. This script directly calls gcc
 on the JNI C source files, producing `./lib/libwolfssljni.so` or
-`./lib/libwolfssljni.jnilib`.
+`./lib/libwolfssljni.dylib`.
 
 ```
 $ ./java.sh
@@ -51,7 +51,7 @@ Preset `CFLAGS` can be passed to the script via the environment:
 $ CFLAGS="-DWOLFJNI_USE_IO_SELECT" ./java.sh
 ```
 
-On Aarch64 hosts, `-fPIC` is automatically added to CFLAGS.
+On x86_64 and Aarch64 Linux hosts, `-fPIC` is automatically added to CFLAGS.
 
 ## Building with ant
 
@@ -300,14 +300,14 @@ from `src/java`. This will be the following packages:
 ```
 com.wolfssl
 com.wolfssl.provider.jsse
-com.wolfssl.wolfcrypt
+com.wolfssl.provider.jsse.adapter
 ```
 
 Run java.sh from the command line or have the IDE execute `java.sh` to generate
 the native shim layer linking against wolfSSL.
 
 Add native library reference to the project. It should look in the lib
-directory for libwolfssl.jnilib (i.e. wolfssljni/lib/).
+directory for libwolfssljni.so or libwolfssljni.dylib (i.e. wolfssljni/lib/).
  
 To compile test cases add the packages `com.wolfssl.provider.jsse.test` and
 `com.wolfssl.test` from the directory `src/test`. The project will also need

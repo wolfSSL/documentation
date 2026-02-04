@@ -21,6 +21,8 @@ wolfJSSE extends or implements the following JSSE classes:
     javax.security.cert.X509Certificate
 
 **Note:** `DTLSv1.3` is only supported through the `SSLEngine` interface.
+DTLSv1.0 and DTLSv1.2 are available through the lower-level wolfSSL JNI API
+but are not currently registered as JSSE SSLContext types.
 
 ## Secure Renegotiation
 
