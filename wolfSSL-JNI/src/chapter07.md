@@ -44,6 +44,9 @@ The following Security properties are specific to wolfJSSE:
 | `wolfjsse.keystore.type.required` | | Require specific KeyStore type |
 | `wolfjsse.clientSessionCache.disabled` | "false" | Disable client session cache |
 | `wolfjsse.X509KeyManager.disableCache` | "false" | Disable X509KeyManager caching |
+| `wolfssl.readWriteByteBufferPool.disabled` | "false" | Disable direct ByteBuffer pool for read/write |
+| `wolfssl.readWriteByteBufferPool.size` | | Set max number of ByteBuffers in per-thread pool |
+| `wolfssl.readWriteByteBufferPool.bufferSize` | | Set size of individual ByteBuffers in pool |
 
 Example cipher suite restriction:
 
@@ -80,10 +83,14 @@ The following standard Java System properties are supported by wolfJSSE:
 | `javax.net.ssl.trustStore` | KeyStore file for TrustManager |
 | `javax.net.ssl.trustStoreType` | KeyStore type for TrustManager |
 | `javax.net.ssl.trustStorePassword` | KeyStore password for TrustManager |
-| `jdk.tls.client.enableSessionTicketExtension` | Enable session tickets (Java 13+) |
+| `jdk.tls.client.enableSessionTicketExtension` | Enable client session tickets (Java 13+) |
+| `jdk.tls.server.enableSessionTicketExtension` | Enable server session tickets (Java 13+, client-side only currently) |
 | `jdk.tls.client.SignatureSchemes` | Client signature algorithms (partial support) |
 | `jdk.tls.server.SignatureSchemes` | Server signature algorithms (partial support) |
 | `jdk.tls.useExtendedMasterSecret` | Enable/disable Extended Master Secret |
+| `jdk.tls.ephemeralDHKeySize` | Control ephemeral DH key size |
+| `jdk.tls.trustNameService` | Enable reverse DNS lookup for hostname verification |
+| `jsse.enableSNIExtension` | Enable/disable SNI extension (default: true) |
 
 ### wolfJSSE-Specific System Properties
 
@@ -97,7 +104,7 @@ wolfJSSE supports several System properties:
 | `wolfjsse.debugFormat` | | "JSON" | Output debug logs in JSON format |
 | `wolfsslengine.debug` | "false" | "true" | SSLEngine debug logging |
 | `wolfsslengine.io.debug` | "false" | "true" | SSLEngine I/O bytes logging |
-| `wolfjsse.autoSNI` | "false" | Auto-set SNI from hostname |
+| `wolfjsse.autoSNI` | "false" | "true" | Auto-set SNI from hostname |
 
 ## Debugging
 
@@ -167,7 +174,7 @@ params.setServerNames(Arrays.asList(new SNIHostName("example.com")));
 sslSocket.setSSLParameters(params);
 ```
 
-The `wolfjsse.autoSNI` Security property can enable automatic SNI configuration
+The `wolfjsse.autoSNI` System property can enable automatic SNI configuration
 from the hostname for `HttpsURLConnection`.
 
 On the server, `SSLSession.getRequestedServerNames()` returns the SNI requested

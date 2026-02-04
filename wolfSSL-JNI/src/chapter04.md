@@ -87,21 +87,26 @@ applications should register the provider directly using
 
 To install the wolfJSSE provider at the system/OS level, copy the `wolfssl.jar`
 and/or `wolfssl-jsse.jar` into the correct Java installation directory for your
-OS and verify the `libwolfssljni.so` or `libwolfssljni.jnilib` shared library
+OS and verify the `libwolfssljni.so` or `libwolfssljni.dylib` shared library
 is on your library search path.
 
 Add the JAR files (`wolfssl.jar`, `wolfssl-jsse.jar`) and shared library
-(`libwolfssljni.so`) to the following directory:
+(`libwolfssljni.so` or `libwolfssljni.dylib`) to the following directory.
+
+For **JDK 8**:
 
 ```
 $JAVA_HOME/jre/lib/ext
 ```
 
-On Ubuntu with OpenJDK this path may be similar to:
+On Ubuntu with OpenJDK 8 this path may be similar to:
 
 ```
 /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext
 ```
+
+**Note:** The `jre/lib/ext` extension mechanism was removed in JDK 9. For
+JDK 9 and newer, place the JAR files on the classpath or module path instead.
 
 Next, add an entry to the `java.security` file similar to the following:
 
@@ -111,8 +116,16 @@ security.provider.N=com.wolfssl.provider.jsse.WolfSSLProvider
 
 The java.security file will be located at:
 
+For **JDK 8**:
+
 ```
-$JAVA_HOME /jre/lib/security/java.security
+$JAVA_HOME/jre/lib/security/java.security
+```
+
+For **JDK 9+**:
+
+```
+$JAVA_HOME/conf/security/java.security
 ```
 
 Replacing “N” with the order of priority you would like wolfJSSE to have in
