@@ -8,9 +8,9 @@ JUnit is required to be installed on the development system in order to run unit
 
 To install JUnit4 on a Unix/Linux/OSX system:
 
-1) Download “ **junit-4.13.jar** ” and “ **hamcrest-all-1.3.jar** ”from [junit.org/junit4/](). At the time of writing, the mentioned .jar files could be downloaded from the following links:
+1) Download " **junit-4.13.2.jar** " and " **hamcrest-all-1.3.jar** "from [junit.org/junit4/](). At the time of writing, the mentioned .jar files could be downloaded from the following links:
 
-Junit: [junit-4.13.jar](https://search.maven.org/search?q=g:junit%20AND%20a:junit)
+Junit: [junit-4.13.2.jar](https://search.maven.org/search?q=g:junit%20AND%20a:junit)
 
 Hamcrest: [hamcrest-all-1.3.jar](https://search.maven.org/artifact/org.hamcrest/hamcrest-all/1.3/jar)
 
@@ -42,16 +42,7 @@ $ make check
 $ sudo make install
 ```
 
-**wolfSSL FIPSv1 Build**:
-
-```
-$ cd wolfssl-x.x.x-commercial-fips
-$ ./configure --enable-fips --enable-jni
-$ make check
-$ sudo make install
-```
-
-**wolfSSL FIPSv2 Build**:
+**wolfSSL FIPSv2 Build (FIPS 140-2, Certificate #3389)**:
 
 ```
 $ cd wolfssl-x.x.x-commercial-fips
@@ -60,7 +51,7 @@ $ make check
 $ sudo make install
 ```
 
-**wolfSSL FIPSv5 Build**:
+**wolfSSL FIPSv5 Build (FIPS 140-3, Certificate #4718)**:
 
 ```
 $ cd wolfssl-x.x.x-commercial-fips
