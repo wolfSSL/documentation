@@ -28,7 +28,7 @@ wolfcrypt-jni /
     jni/                           Native C JNI binding source files
     lib/                           Compiled library artifacts
     makefile.linux                 Linux-specific Makefile
-    makefile.osx                   OSX-specific Makefile
+    makefile.macosx                macOS-specific Makefile
     pom.xml                        Maven build file
     rpm/                           Linux rpm files
     scripts/                       Test scripts (Facebook Infer, etc)
