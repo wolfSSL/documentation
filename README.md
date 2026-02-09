@@ -22,6 +22,7 @@ To build the documentation you will need Docker running on your system. In this 
 * `make wolftpm`
 * `make porting`
 * `make fips-ready`
+* `make bc-migration`
 
 ## Contributing
 
