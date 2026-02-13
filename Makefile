@@ -6,7 +6,7 @@ endif
 # Handy debugging trick: `DOCKER_CMD_EXTRA_ARGS="--progress=plain" make` to see all the output
 DOCKER_CMD=DOCKER_BUILDKIT=1 docker build $(DOCKER_CMD_EXTRA_ARGS) -t doc_build --build-arg MANPATH=$(MANPATH) --build-arg PDFFILE=$(PDFFILE) --build-arg V=$(V) --target=manual --output=build -f Dockerfile .
 
-all: wolfssl wolfssh wolfboot wolfclu wolfcrypt-jni wolfmqtt wolfsentry wolfssl-jni wolftpm wolfhsm wolfengine wolfprovider fips-ready tuning porting faq fips-faq
+all: wolfssl wolfssh wolfboot wolfclu wolfcrypt-jni wolfmqtt wolfsentry wolfssl-jni wolftpm wolfhsm wolfengine wolfprovider fips-ready tuning porting faq fips-faq bc-migration
 
 build:
 	$(Q)mkdir -p build
@@ -112,6 +112,12 @@ fips-faq: MANPATH=wolfSSL-FIPS-FAQ
 fips-faq: PDFFILE=wolfSSL-FIPS-FAQ.pdf
 fips-faq: build
 	@$(DOCKER_CMD)
+
+.PHONY: bc-migration
+bc-migration: MANPATH=BouncyCastle-Migration
+bc-migration: PDFFILE=BouncyCastle-wolfSSL-Migration-Guide.pdf
+bc-migration: build
+	$(Q)$(DOCKER_CMD)
 
 clean:
 	$(Q)rm -rf build
