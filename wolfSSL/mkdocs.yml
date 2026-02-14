@@ -117,6 +117,8 @@ nav:
       - md4_8h.md
       - md5_8h.md
       - memory_8h.md
+      - dilithium_8h.md
+      - mlkem_8h.md
       - ocsp_8h.md
       - pem_8h.md
       - pkcs11_8h.md
