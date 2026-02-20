@@ -286,6 +286,26 @@ for (AccessDescription ad : aia.getAccessDescriptions()) {
 }
 ```
 
+**Downloading intermediate certificates from AIA CA Issuer URIs:**
+
+A common use of the AIA extension is downloading intermediate CA certificates
+for chain building. With Bouncy Castle, the application must iterate over
+`AccessDescription` entries and filter by OID to obtain the URIs:
+
+```java
+for (AccessDescription ad : aia.getAccessDescriptions()) {
+    GeneralName accessLocation = ad.getAccessLocation();
+
+    if (accessLocation != null &&
+        ad.getAccessMethod().equals(
+            X509ObjectIdentifiers.id_ad_caIssuers)) {
+
+        String url = accessLocation.getName().toString();
+        /* download certificate from url for chain building */
+    }
+}
+```
+
 #### wolfSSL Approach
 
 `WolfSSLCertificate` parses the AIA extension when the certificate is loaded
@@ -321,6 +341,30 @@ String[] ocspUris = wolfCert.getOcspUris();
 if (ocspUris != null) {
     for (String url : ocspUris) {
         /* url contains an OCSP responder URI */
+    }
+}
+```
+
+**Downloading intermediate certificates from AIA CA Issuer URIs:**
+
+With wolfSSL the AIA parsing and OID filtering are handled internally, so
+the download logic starts directly from the URI array rather than requiring
+manual `AccessDescription` iteration:
+
+```java
+WolfSSLCertificate wolfCert = null;
+try {
+    wolfCert = new WolfSSLCertificate(certificate.getEncoded());
+
+    String[] caIssuers = wolfCert.getCaIssuerUris();
+    if (caIssuers != null) {
+        for (String url : caIssuers) {
+            /* download certificate from url for chain building */
+        }
+    }
+} finally {
+    if (wolfCert != null) {
+        wolfCert.free();
     }
 }
 ```
@@ -749,6 +793,435 @@ import com.wolfssl.wolfcrypt.WolfCrypt;
 
 byte[] pem = Files.readAllBytes(Paths.get("pubkey.pem"));
 byte[] der = WolfCrypt.pubKeyPemToDer(pem);
+```
+
+## CRL Generation
+
+Bouncy Castle provides CRL (Certificate Revocation List) generation through its
+`X509v2CRLBuilder` and `JcaX509v2CRLBuilder` classes in the
+`org.bouncycastle.cert` package. These require constructing a builder, adding
+revoked entries, configuring extensions, building with a `ContentSigner`, and
+then converting the result using `JcaX509CRLConverter`. wolfSSL JNI provides
+equivalent functionality through the `WolfSSLCRL` class, which wraps native
+wolfSSL CRL generation and offers a more direct API.
+
+### Bouncy Castle Approach
+
+CRL generation in Bouncy Castle involves creating a `JcaX509v2CRLBuilder` (or
+the lower-level `X509v2CRLBuilder`), setting validity dates, adding revoked
+certificate entries with optional reason codes, signing via a
+`JcaContentSignerBuilder`, and converting the resulting `X509CRLHolder` to a
+standard `java.security.cert.X509CRL` object.
+
+**Creating and signing a CRL:**
+
+```java
+import org.bouncycastle.cert.X509v2CRLBuilder;
+import org.bouncycastle.cert.X509CRLHolder;
+import org.bouncycastle.cert.jcajce.JcaX509v2CRLBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CRLConverter;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.asn1.x509.CRLReason;
+
+import java.security.PrivateKey;
+import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
+import java.math.BigInteger;
+import java.util.Date;
+
+/* Create CRL builder from issuer certificate */
+Date now = new Date();
+JcaX509v2CRLBuilder crlBuilder = new JcaX509v2CRLBuilder(issuerCert, now);
+
+/* Set next update date */
+Date nextUpdate = new Date(now.getTime() + (30L * 24 * 60 * 60 * 1000));
+crlBuilder.setNextUpdate(nextUpdate);
+
+/* Add revoked certificate entries */
+crlBuilder.addCRLEntry(
+    revokedCert.getSerialNumber(),   /* serial number */
+    now,                              /* revocation date */
+    CRLReason.keyCompromise);         /* revocation reason */
+
+/* Sign the CRL */
+X509CRLHolder crlHolder = crlBuilder.build(
+    new JcaContentSignerBuilder("SHA256withRSA")
+        .setProvider("BC")
+        .build(issuerPrivateKey));
+
+/* Convert to standard JCA X509CRL */
+X509CRL crl = new JcaX509CRLConverter()
+    .setProvider("BC")
+    .getCRL(crlHolder);
+
+/* Get DER encoding */
+byte[] crlDer = crl.getEncoded();
+```
+
+### wolfSSL Approach
+
+The `WolfSSLCRL` class provides CRL generation through direct method calls
+without requiring separate builder, signer, and converter objects. The CRL is
+created, configured, signed, and exported using a single object.
+
+**Creating and signing a CRL:**
+
+```java
+import com.wolfssl.WolfSSLCRL;
+import com.wolfssl.WolfSSLCertificate;
+import com.wolfssl.WolfSSLX509Name;
+import com.wolfssl.WolfSSL;
+
+import java.security.PrivateKey;
+import java.util.Date;
+
+/* Create a new empty CRL */
+WolfSSLCRL crl = new WolfSSLCRL();
+
+/* Set CRL version (1 = v2) */
+crl.setVersion(1);
+
+/* Set issuer name from a WolfSSLX509Name */
+WolfSSLCertificate issuerWolfCert =
+    new WolfSSLCertificate(issuerCert.getEncoded());
+try {
+    WolfSSLX509Name issuerName = issuerWolfCert.getSubjectName();
+    crl.setIssuerName(issuerName);
+} finally {
+    issuerWolfCert.free();
+}
+
+/* Set validity dates */
+Date now = new Date();
+Date nextUpdate = new Date(now.getTime() + (30L * 24 * 60 * 60 * 1000));
+crl.setLastUpdate(now);
+crl.setNextUpdate(nextUpdate);
+
+/* Add revoked certificate entries (by serial number) */
+crl.addRevoked(revokedCert.getSerialNumber().toByteArray(), now);
+
+/* Or add revoked entries directly from a DER-encoded certificate */
+crl.addRevokedCert(revokedCert.getEncoded(), now);
+
+/* Or add from a WolfSSLCertificate object */
+WolfSSLCertificate revokedWolfCert =
+    new WolfSSLCertificate(revokedCert.getEncoded());
+try {
+    crl.addRevokedCert(revokedWolfCert, now);
+} finally {
+    revokedWolfCert.free();
+}
+
+/* Sign the CRL with RSA or EC private key */
+crl.sign(issuerPrivateKey, "SHA256");
+
+/* Get DER or PEM encoding */
+byte[] crlDer = crl.getDer();
+byte[] crlPem = crl.getPem();
+
+/* Or write directly to file (ASN1/DER or PEM format) */
+crl.writeToFile("/path/to/output.crl", WolfSSL.SSL_FILETYPE_ASN1);
+crl.writeToFile("/path/to/output.pem", WolfSSL.SSL_FILETYPE_PEM);
+
+/* Free native resources when done */
+crl.free();
+```
+
+### API Comparison Summary
+
+The following table summarizes the mapping between Bouncy Castle CRL generation
+classes and the wolfSSL JNI equivalent methods:
+
+| Operation | Bouncy Castle | wolfSSL (`WolfSSLCRL`) |
+|---|---|---|
+| Create CRL builder | `new JcaX509v2CRLBuilder(issuer, date)` | `new WolfSSLCRL()` |
+| Set version | Set implicitly (v2 builder) | `setVersion(int)` |
+| Set issuer | Set via constructor | `setIssuerName(WolfSSLX509Name)` |
+| Set lastUpdate/thisUpdate | Set via constructor (thisUpdate) | `setLastUpdate(Date)` |
+| Set next update | `setNextUpdate(Date)` | `setNextUpdate(Date)` |
+| Add revoked entry | `addCRLEntry(BigInteger, Date, int)` | `addRevoked(byte[], Date)` |
+| Add revoked cert | N/A (serial number only) | `addRevokedCert(byte[], Date)` or `addRevokedCert(WolfSSLCertificate, Date)` |
+| Sign CRL | `build(ContentSigner)` | `sign(PrivateKey, String)` |
+| Get DER encoding | `X509CRLHolder.getEncoded()` | `getDer()` |
+| Get PEM encoding | Manual conversion needed | `getPem()` |
+| Write to file | Manual I/O needed | `writeToFile(String, int)` |
+| Free resources | Garbage collected | `free()` |
+
+**Note:** wolfSSL CRL generation requires native wolfSSL to be compiled with
+CRL generation support enabled. Applications can check for this at runtime
+using `WolfSSL.CrlGenerationEnabled()`.
+
+## X.509 Certificate Generation
+
+Applications that generate and sign X.509v3 certificate chains using the
+Bouncy Castle `X509v3CertificateBuilder` API (or its JCA wrapper
+`JcaX509v3CertificateBuilder`) can migrate to the `WolfSSLCertificate` class
+in wolfSSL JNI. Bouncy Castle certificate generation involves constructing a
+builder, adding extensions one at a time through `X509ExtensionUtils` helpers,
+signing with a `JcaContentSignerBuilder`, and converting the result with
+`JcaX509CertificateConverter`. wolfSSL provides direct setter methods on the
+`WolfSSLCertificate` object for each extension.
+
+### Bouncy Castle Approach
+
+Bouncy Castle certificate generation requires assembling several objects: a
+certificate builder, extension utilities for computing key identifiers, and a
+content signer for the final signature.
+
+**Creating and signing a certificate with standard extensions:**
+
+```java
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
+
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+import javax.security.auth.x500.X500Principal;
+
+/* Set certificate validity period */
+Date notBefore = new Date();
+Date notAfter = new Date(notBefore.getTime() + (365L * 24 * 60 * 60 * 1000));
+
+/* Create certificate builder */
+JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
+    issuerCert,                                     /* issuer */
+    BigInteger.valueOf(1),  /* serial */
+    notBefore,                                       /* validity start */
+    notAfter,                                        /* validity end */
+    new X500Principal("CN=Example"),                 /* subject */
+    subjectKeyPair.getPublic());                     /* subject public key */
+
+/* Add extensions */
+JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
+
+certBuilder.addExtension(Extension.subjectKeyIdentifier, false,
+    extUtils.createSubjectKeyIdentifier(subjectKeyPair.getPublic()));
+
+certBuilder.addExtension(Extension.authorityKeyIdentifier, false,
+    extUtils.createAuthorityKeyIdentifier(issuerCert));
+
+certBuilder.addExtension(Extension.basicConstraints, true,
+    new BasicConstraints(false));
+
+certBuilder.addExtension(Extension.keyUsage, true,
+    new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
+
+certBuilder.addExtension(Extension.extendedKeyUsage, false,
+    new ExtendedKeyUsage(new KeyPurposeId[] {
+        KeyPurposeId.id_kp_serverAuth,
+        KeyPurposeId.id_kp_clientAuth
+    }));
+
+certBuilder.addExtension(Extension.subjectAlternativeName, false,
+    new GeneralNames(new GeneralName(GeneralName.iPAddress, "192.168.1.1")));
+
+/* Add CRL Distribution Points */
+DistributionPoint dp = new DistributionPoint(
+    new DistributionPointName(new GeneralNames(
+        new GeneralName(GeneralName.uniformResourceIdentifier,
+            "http://crl.example.com/ca.crl"))),
+    null, null);
+certBuilder.addExtension(Extension.cRLDistributionPoints, false,
+    new CRLDistPoint(new DistributionPoint[] { dp }));
+
+/* Sign and convert */
+X509Certificate cert = new JcaX509CertificateConverter()
+    .setProvider("BC")
+    .getCertificate(certBuilder.build(
+        new JcaContentSignerBuilder("SHA256withRSA")
+            .setProvider("BC")
+            .build(issuerPrivateKey)));
+```
+
+### wolfSSL Approach
+
+`WolfSSLCertificate` provides setter methods for each extension and handles
+ASN.1 encoding internally. The certificate is created as an empty object,
+configured through method calls, and signed in place.
+
+**Creating and signing a certificate with standard extensions:**
+
+```java
+import com.wolfssl.WolfSSLCertificate;
+import com.wolfssl.WolfSSLX509Name;
+import com.wolfssl.WolfSSL;
+
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.util.Date;
+
+/* Load issuer certificate for setting issuer name and AKID */
+WolfSSLCertificate issuerWolfCert =
+    new WolfSSLCertificate(issuerCert.getEncoded());
+
+/* Create empty certificate for generation */
+WolfSSLCertificate cert = new WolfSSLCertificate();
+try {
+    /* Set subject and issuer names */
+    WolfSSLX509Name subject = new WolfSSLX509Name();
+    subject.setCommonName("Example");
+    cert.setSubjectName(subject);
+    cert.setIssuerName(issuerWolfCert);
+
+    /* Set serial number and validity period */
+    cert.setSerialNumber(BigInteger.valueOf(1));
+    Date notBefore = new Date();
+    Date notAfter =
+        new Date(notBefore.getTime() + (365L * 24 * 60 * 60 * 1000));
+    cert.setNotBefore(notBefore);
+    cert.setNotAfter(notAfter);
+
+    /* Set subject public key */
+    cert.setPublicKey(subjectKeyPair.getPublic());
+
+    /* Subject Key Identifier (from the certificate's own public key) */
+    cert.setSubjectKeyIdEx();
+
+    /* Authority Key Identifier (from the issuer certificate) */
+    cert.setAuthorityKeyIdEx(issuerWolfCert);
+
+    /* Basic Constraints (non-CA) */
+    cert.addExtension(WolfSSL.NID_basic_constraints, false, false);
+
+    /* Key Usage */
+    cert.addExtension(WolfSSL.NID_key_usage,
+        "digitalSignature,keyEncipherment", true);
+
+    /* Extended Key Usage */
+    cert.addExtension(WolfSSL.NID_ext_key_usage,
+        "serverAuth,clientAuth", false);
+
+    /* Subject Alternative Name (IP address) */
+    cert.addAltNameIP("192.168.1.1");
+
+    /* CRL Distribution Point */
+    cert.addCrlDistPoint("http://crl.example.com/ca.crl", false);
+
+    /* Netscape Certificate Type (if needed) */
+    cert.setNsCertType(WolfSSL.SSL_CLIENT | WolfSSL.SSL_SERVER);
+
+    /* Sign with issuer private key */
+    cert.signCert(issuerPrivateKey, "SHA256");
+
+    /* Get DER or PEM encoding of the signed certificate */
+    byte[] certDer = cert.getDer();
+    byte[] certPem = cert.getPem();
+
+} finally {
+    cert.free();
+    issuerWolfCert.free();
+}
+```
+
+### API Comparison Summary
+
+| Operation | Bouncy Castle | wolfSSL (`WolfSSLCertificate`) |
+|---|---|---|
+| Create builder | `new JcaX509v3CertificateBuilder(...)` | `new WolfSSLCertificate()` |
+| Set subject name | Set via constructor | `setSubjectName(WolfSSLX509Name)` |
+| Set issuer name | Set via constructor | `setIssuerName(WolfSSLCertificate)` or `setIssuerName(X509Certificate)` |
+| Set serial number | Set via constructor | `setSerialNumber(BigInteger)` |
+| Set validity dates | Set via constructor | `setNotBefore(Date)` / `setNotAfter(Date)` |
+| Set public key | Set via constructor | `setPublicKey(PublicKey)` |
+| Subject Key Identifier | `extUtils.createSubjectKeyIdentifier(...)` | `setSubjectKeyIdEx()` or `setSubjectKeyId(byte[])` |
+| Authority Key Identifier | `extUtils.createAuthorityKeyIdentifier(...)` | `setAuthorityKeyIdEx(WolfSSLCertificate)` or `setAuthorityKeyId(byte[])` |
+| Basic Constraints | `new BasicConstraints(boolean)` | `addExtension(NID_basic_constraints, boolean, boolean)` |
+| Key Usage | `new KeyUsage(int)` | `addExtension(NID_key_usage, String, boolean)` |
+| Extended Key Usage | `new ExtendedKeyUsage(KeyPurposeId[])` | `addExtension(NID_ext_key_usage, String, boolean)` |
+| SAN (IP address) | `new GeneralName(iPAddress, ...)` | `addAltNameIP(String)` |
+| SAN (other types) | `new GeneralName(type, ...)` | `addAltName(String, int)` |
+| CRL Distribution Points | `new CRLDistPoint(DistributionPoint[])` | `addCrlDistPoint(String, boolean)` or `setCrlDistPoints(byte[])` |
+| Netscape Cert Type | `addExtension(netscapeCertType, ...)` | `setNsCertType(int)` |
+| Sign certificate | `JcaContentSignerBuilder` + `build()` | `signCert(PrivateKey, String)` |
+| Convert to JCA type | `JcaX509CertificateConverter.getCertificate()` | N/A (native wrapper) |
+| Get DER encoding | `X509CertificateHolder.getEncoded()` | `getDer()` |
+| Get PEM encoding | Manual conversion needed | `getPem()` |
+| Free resources | Garbage collected | `free()` |
+
+## Certificate Verification with CertManager
+
+Bouncy Castle provides `X509CertificateHolder` and related classes for
+certificate verification and chain validation. wolfSSL provides the
+`WolfSSLCertManager` class, which wraps the native wolfSSL certificate
+manager and supports loading trusted CA certificates, verifying certificates
+against those CAs, and checking OCSP responses.
+
+### Bouncy Castle Approach
+
+```java
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertPathValidator;
+import java.security.cert.PKIXParameters;
+import java.security.cert.TrustAnchor;
+import java.security.cert.X509Certificate;
+import java.security.KeyStore;
+
+/* Load trusted CA into a KeyStore */
+KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+trustStore.load(null, null);
+trustStore.setCertificateEntry("ca", caCert);
+
+/* Build PKIX parameters from trust anchors */
+PKIXParameters params = new PKIXParameters(trustStore);
+params.setRevocationEnabled(false);
+
+/* Validate certificate chain */
+CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
+CertPathValidator validator = CertPathValidator.getInstance("PKIX", "BC");
+validator.validate(cf.generateCertPath(certChain), params);
+```
+
+### wolfSSL Approach
+
+`WolfSSLCertManager` loads trusted CAs and verifies certificates in a single
+method call without requiring `CertPath` or `PKIXParameters` construction.
+
+```java
+import com.wolfssl.WolfSSLCertManager;
+import com.wolfssl.WolfSSL;
+
+WolfSSLCertManager cm = new WolfSSLCertManager();
+
+/* Load trusted CA from file */
+cm.CertManagerLoadCA("/path/to/ca-cert.pem", null);
+
+/* Or load from byte array */
+cm.CertManagerLoadCABuffer(caDer, caDer.length, WolfSSL.SSL_FILETYPE_ASN1);
+
+/* Or load all CAs from a KeyStore */
+cm.CertManagerLoadCAKeyStore(trustStore);
+
+/* Verify a certificate against loaded CAs */
+int ret = cm.CertManagerVerifyBuffer(certDer, certDer.length,
+    WolfSSL.SSL_FILETYPE_ASN1);
+if (ret == WolfSSL.SSL_SUCCESS) {
+    /* Certificate verified successfully */
+}
+
+/* Check OCSP response for revocation status */
+cm.CertManagerCheckOCSPResponse(ocspResponse, certDer, issuerDer);
+
+/* Unload CAs when done */
+cm.CertManagerUnloadCAs();
 ```
 
 ## RSA Miller-Rabin Primality Test Configuration
