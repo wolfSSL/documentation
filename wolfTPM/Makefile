@@ -63,6 +63,9 @@ html-prep: api
 # 4. Three regexes to remove metadata which outputs in the PDF text
 # 5. Fix titles of the header files Markdown
 # 6. Two regexes to handle bad Doxygen that didn't convert and the LaTeX processor thinks is LaTeX commands
+# 7. For oversized enum table rows (>2000 chars), keep table formatting intact
+#    by splitting enum values across continuation rows to avoid LaTeX
+#    "Dimension too large" errors in longtable
 .PHONY: pdf-prep
 pdf-prep: api
 	$(Q)perl -i -pe "s/# /## /g" api/md/*.md
@@ -78,6 +81,7 @@ pdf-prep: api
 	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
 	$(Q)perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
 	$(Q)perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
+	$(Q)perl -i -pe 's!^\| enum\| (\*\*\[.*?\]\(.*?\)\*\*) \{(.*)\} \|\s*$$!do { my ($$name, $$vals) = ($$1, $$2); my @items = split(/, /, $$vals); my @chunks; my $$cur = ""; for my $$item (@items) { my $$cand = $$cur eq "" ? $$item : "$$cur, $$item"; if (length($$cand) > 220 && $$cur ne "") { push @chunks, $$cur; $$cur = $$item; } else { $$cur = $$cand; } } push @chunks, $$cur if $$cur ne ""; @chunks <= 1 ? "| enum| $$name { $$vals} |" : "| enum| $$name { $$chunks[0] |\n" . join("", map { "| | $$chunks[$$_]" . ($$_ == $$#chunks ? " }" : "") . " |\n" } 1..$$#chunks) }!ge if length > 2000' api/md/*.md
 	$(Q)rm -rf build/pdf/chapter05.md
 	$(Q)echo '# API Reference' >> build/pdf/chapter05.md
   ifeq ($(DOC_LANG),JA)
