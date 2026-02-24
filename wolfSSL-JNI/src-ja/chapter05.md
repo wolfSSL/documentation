@@ -8,34 +8,38 @@ wolfJSSE / wolfSSL JNI パッケージ構成は以下の通りです:
 
 ```
 wolfssljni/
-    build.xml  ant build script
+    build.xml       antビルドスクリプト
+    pom.xml         Mavenビルド構成
     COPYING
-    docs/      Javadocs
-    examples/  Example apps
-    IDE/       Example IDE project, Android Studio
-    java.sh    Script to build native C JNI sources
+    docs/           Javadocs
+    examples/       アプリケーションの実装例
+    IDE/            IDEプロジェクト
+        Android/    Android Studio
+        WIN/        Windows Visual Studio
+    java.sh         ネイティブC JNIソースをビルドするスクリプト
     LICENSING
     Makefile
-    lib/       Output directory for compiled library
-    native/    Native C JNI binding source files
-    platform/  Android AOSP build files
+    lib/            コンパイルされたライブラリの出力先
+    native/         ネイティブC JNIバインディングソースファイル
+    platform/       Android AOSPビルドファイル
     README.md
-    rpm/       rpm spec files
+    rpm/            rpmスペックファイル
     src/
-        java/  Java source files
-        test/  Test source files
+        java/       Javaソースファイル
+        test/       テストソースファイル
 ```
+
 **wolfJSSE** プロバイダーのソース コードは、
 `src/java/com/wolfssl/provider/jsse` ディレクトリにあり、"**com.wolfssl.provider.jsse**" Java パッケージの一部です。
 
 **wolfSSL JNI** ラッパーは `src/java/com/wolfssl` ディレクトリにあり、"**com.wolfssl**" Java パッケージの一部です。 このパッケージは wolfJSSE クラスによって利用されるため、JSSE のユーザーはこのパッケージを直接使用する必要はありません。
 
-wolfSSL JNI と wolfJSSE がコンパイルされると、2 つの JAR ファイルと 1 つのネイティブ共有ライブラリが`./lib` ディレクトリに生成されます。オペレーティングシステムに応じて異なりますが、ネイティブ共有ライブラリには`libwolfssljni.jnilib`と名前をつけることもできます。
+wolfSSL JNI と wolfJSSE がコンパイルされると、2 つの JAR ファイルと 1 つのネイティブ共有ライブラリが`./lib` ディレクトリに生成されます。オペレーティングシステムに応じて異なりますが、ネイティブ共有ライブラリには`libwolfssljni.dylib`と名前をつけることもできます。
 
 
 ```
 lib/
-    libwolfSSL.so     (Native C JNI wrapper shared library)
+    libwolfssljni.so  (Native C JNI wrapper shared library)
     wolfssl.jar       (JAR with ONLY wolfSSL JNI Java classes)
     wolfssl-jsse.jar  (JAR with BOTH wolfSSL JNI and wolfJSSE classes)
 ```
