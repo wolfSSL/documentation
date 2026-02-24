@@ -26,7 +26,7 @@ wolfcrypt-jni /
    jni/                           ネイティブC JNIバインディングソースファイル
    lib/                           コンパイル成果物（ライブラリ）の出力先
    makefile.linux                 Linux用のMakefile
-   makefile.osx                   OSX用のMakefile
+   makefile.macosx                macOS用のMakefile
    pom.xml                        Mavenビルドファイル
    rpm/                           Linux rpmファイル
    scripts/                       テストスクリプト（Facebook Infer等）
