@@ -14,7 +14,9 @@ nav:
       - "DSAPARAM Command": dsaparam.md
       - "DGST Command": dgst.md
       - "DHPARAM Command": dhparam.md
+      - "ECC Command": ecc.md
       - "ECPARAM Command": ecparam.md
+      - "ED25519 Command": ed25519.md
       - "ENC Command": enc.md
       - "GENKEY Command": genkey.md
       - "HASH Command": hash.md
@@ -28,7 +30,9 @@ nav:
       - "RSA Command": rsa.md
       - "SHA Command": sha.md
       - "S_CLIENT Command": s_client.md
+      - "S_SERVER Command": s_server.md
       - "VERIFY Command": verify.md
+      - "VERSION Command": version.md
       - "X509 Command": x509.md
       - "BASE64 Command": base64.md
     - "Appendix":
