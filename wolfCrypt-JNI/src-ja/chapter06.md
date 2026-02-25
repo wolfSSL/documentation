@@ -111,6 +111,8 @@ wolfJCE は現在、次のアルゴリズムとクラスをサポートしてい
     CertPathValidator Class
         PKIX
 
+    CertPathBuilder Class
+        PKIX
     SecretKeyFactory Class
         PBKDF2WithHmacSHA1
         PBKDF2WithHmacSHA224
