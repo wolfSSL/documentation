@@ -14,7 +14,7 @@ $ ant
 $ ant examples
 ```
 
-## デバッグとログに間する注意事項
+## デバッグとログに関する注意事項
 
 実行時に `-Dwolfjsse.debug=true` を使用することで、wolfJSSE デバッグログ出力を有効にできます。
 
