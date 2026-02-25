@@ -10,7 +10,7 @@ wolfJCE では、ホストシステムに Java をインストールする必要
 単体テストを実行するには、JUnit4 が開発システムにインストールされている必要があります。 JUnit4 は、プロジェクトの Web サイト (www.junit.org) からダウンロードできます
 
 Unix/Linux/OSX システムに JUnit4 をインストールするには:
-1) [junit.org/junit4/]() から "**junit-4.13.2.jar**" と "**hamcrest-all-1.3.jar**" をダウンロードします。 執筆時点では、前述の .jar ファイルは次のリンクからダウンロードできます:
+1) [junit.org/junit4/](https://junit.org/junit4/) から "**junit-4.13.2.jar**" と "**hamcrest-all-1.3.jar**" をダウンロードします。 執筆時点では、前述の .jar ファイルは次のリンクからダウンロードできます:
 
 Junit: [junit-4.13.2.jar](https://search.maven.org/search?q=g:junit%20AND%20a:junit)
 
