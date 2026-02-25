@@ -92,8 +92,6 @@ wolfJSSEは以下のプロパティに対応しています。
 
 wolfJSSEは以下のプロパティに対応しています。
 
-wolfJSSE supports several System properties:
-
 | プロパティ | デフォルト値 | 設定可能値 | 説明 |
 | --- | --- | --- | --- |
 | `wolfssl.debug` | "false" | "true" | wolfSSLのネイティブデバッグログ |
@@ -175,7 +173,7 @@ sslSocket.setSSLParameters(params);
 システムプロパティ`wolfjsse.autoSNI`によって、ホスト名に基づくSNIの自動設定を有効化できます。`HttpsURLConnection`に適用されます。
 
 サーバサイドでは、`SSLSession.getRequestedServerNames()`を実行することでクライアントがSNIを求めているか確認できます。
-このとき、`WolfSSLSocker`によるSNI一致ロジックが実行されます。
+このとき、`WolfSSLSocket`によるSNI一致ロジックが実行されます。
 
 ## DTLS 1.3の使い方
 
