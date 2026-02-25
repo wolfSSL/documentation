@@ -63,8 +63,55 @@ $ ant clean
 $ make clean
 ```
 
+## Mavenによるコンパイル
+
+wolfCrypt JNI/JCEはMavenによるビルドにも対応しています。
+まずは前セクションに示したように`make`を使用してJNI共有ライブラリをコンパイルします。
+
+次に、Mavenを用いてJavaソースをコンパイルします。
+
+```
+$ mvn compile
+```
+
+JUnitテストをコンパイル、実行するには次のようにします。
+
+```
+$ mvn test
+```
+
+JARファイルにパッケージングするには、次のようにします。
+
+```
+$ mvn package
+```
+
+JARファイルをローカルのMavenリポジトリにインストールするには、次のようにします。
+
+```
+$ mvn install
+```
+
+インストール後は、ユーザのMavenプロジェクトにおいて次のようにして使用できるようになります。
+
+```xml
+<dependency>
+    <groupId>com.wolfssl</groupId>
+    <artifactId>wolfcrypt-jni</artifactId>
+    <version>1.9.0-SNAPSHOT</version>
+</dependency>
+```
+
 ## APIマニュアル（Javadoc）
 
 `ant` を実行すると、`wolfcrypt-jni/docs/javadoc` ディレクトリの下に一連の Javadoc が生成されます。 Javadocインデックスを表示するには、Web ブラウザで次のファイルを開きます：
 
 `wolfcrypt-jni/docs/javadoc/index.html`
+
+Mavenを使用している場合、Javadocは次のようにして生成できます。
+
+```
+$ mvn javadoc:javadoc
+```
+
+成果物は`./docs/apidocs`ディレクトリに保存されます。
