@@ -6,12 +6,19 @@
 
 サンプルプログラムは、パッケージのルート ディレクトリから、提供されたラッパー スクリプトを使用して実行する必要があります。 ラッパー スクリプトは、wolfssljni パッケージに含まれる wolfjni jar で使用するための正しい環境変数を設定します。
 
+実装例をビルドして実行するには、以下を実行します。
 
-## デバッグとログに間する注意事項
+```
+$ ./java.sh
+$ ant
+$ ant examples
+```
 
-実行時に -Dwolfjsse.debug=true` を使用することで、wolfJSSE デバッグログ出力を有効にできます。
+## デバッグとログに関する注意事項
 
-ネイティブ wolfSSL が "--enable-debug" でコンパイルされている場合、実行時に "-Dwolfssl.debug=true" を使用して wolfSSL ネイティブ デバッグログ出力を有効にできます。
+実行時に `-Dwolfjsse.debug=true` を使用することで、wolfJSSE デバッグログ出力を有効にできます。
+
+ネイティブ wolfSSL が `--enable-debug` でコンパイルされている場合、実行時に `-Dwolfssl.debug=true` を使用して wolfSSL ネイティブ デバッグログ出力を有効にできます。
 
 `-Djavax.net.debug=all` オプションを使用して、JDK デバッグログ出力を有効にできます。
 
@@ -34,9 +41,33 @@ $ ./examples/client.sh <options>
 ```
 サンプルプログラムの使用方法と使用可能なオプションを表示するには、"-?" を指定します:
 
-
 ```
 $ ./examples/server.sh --help
+```
+
+## SimpleThreadedClient.java and SimpleThreadedServer.java
+
+マルチスレッドのJNIサーバ/クライアントのサンプルプログラム。
+
+```
+$ ./examples/SimpleThreadedServer.sh
+$ ./examples/SimpleThreadedClient.sh
+```
+
+## X509v3CertificateGeneration.java
+
+wolfSSL JNI `WolfSSLCertificate` APIを使用してX.509v3証明書を作成するサンプルプログラム。
+
+```
+$ ./examples/X509v3CertificateGeneration.sh
+```
+
+## X509CertRequest.java
+
+wolfSSL JNI `WolfSSLCertRequest` APIを使用してX.509証明書発行要求(CSR)を作成するサンプルプログラム。
+
+```
+$ ./examples/X509CertRequest.sh
 ```
 
 # wolfJSSE Provider サンプルプログラム
@@ -51,14 +82,6 @@ $ cd <wolfssljni_root>
 $ ./examples/provider/ServerJSSE.sh
 $ ./examples/provider/ClientJSSE.sh
 ```
-
-## デバッグとログ出力に間する注意事項
-
-wolfJSSE デバッグ ログは、実行時に -Dwolfjsse.debug=true` を使用して有効にできます。
-
-ネイティブ wolfSSL が `--enable-debug` でコンパイルされている場合、実行時に -Dwolfssl.debug=true` を使用して wolfSSL ネイティブ デバッグ ロギングを有効にできます。
-
-`-Djavax.net.debug=all` オプションを使用して、JDK デバッグ ロギングを有効にできます。
 
 ## wolfJSSE Example Client and Server
 
@@ -163,4 +186,45 @@ wolfJSSE が OS システム レベルでインストールされていない場
 
 ```
 $ ./examples/provider/ThreadedSSLSocketClientServer.sh
+```
+
+## DtlsClientEngine.java and DtlsServerEngine.java
+
+DTLS 1.3とSSLEngineを使用するクライアント/サーバアプリケーションのサンプルプログラム。
+
+**DtlsServerEngine.java** - SSLEngineを使用するDTLS 1.3サーバの実装例
+**DtlsClientEngine.java** - SSLEngineを使用するDTLS 1.3クライアントの実装例
+
+これらの実装例では、データグラムベースのセキュア通信をSSLEngine/DTLS 1.3を使用して示しています。
+TCPベースの実装と異なり、ここではUDPベースのデータ転送とDTLSの複雑さを吸収するため、DatagramSocketを使用しています。
+また、セッションチケットやハンドシェイクステート管理にも対応しています。
+
+Bashスクリプトによる実行例は次の通りです。
+
+```
+$ ./examples/provider/DtlsServerEngine.sh
+$ ./examples/provider/DtlsClientEngine.sh
+```
+
+クライアントはサーバに接続し、メッセージを送信、サーバから送り返されたメッセージを受信します。
+いずれの実装例においても、多数のコマンドライン引数をサポートしています。
+詳細は`-?`フラグをつけて実行することで確認できます。
+
+## Java Remote Method Invocation (RMI) の例
+
+クライアントとサーバ、Java Remote Method Invocationのためのリモートインタフェースアプリケーションのサンプルプログラム。
+
+**RmiServer.java** - サーバの実装例。`getMessage()`, `sendMessage()`, `getByteArray()`, `sendByteArray()`, `getRegistryPorts()`に対応した`RmiRemoteInterface`を実装。wolfJSSEを使用して、TLS/SSL上で1つ以上のRMIレジストリを作成。
+
+**RmiClient.java** - クライアントの実装例。リモートリポジトリからオブジェクトスタブを取得し、 `getMessage()`, `sendMessage()`, `getByteArray()`, `sendByteArray()`, `getRegistryPorts()`を実行。 複数のクライアントによる接続に対応。
+
+**RmiRemoteInterface.java** - サーバとクライアントの両者が使用するリモートインタフェースの定義
+
+**RmiTLSClientSocketFactory.java** / **RmiTLSServerSocketFactory.java** - RMIのためのカスタムTLSソケット。wolfJSSEをSSL/TLS接続のもとで動作させるために使用。
+
+サーバおよびクライアントを起動するには以下のようにします。
+
+```
+$ ./examples/provider/rmi/RmiServer.sh
+$ ./examples/provider/rmi/RmiClient.sh
 ```
