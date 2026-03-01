@@ -396,3 +396,361 @@ cd ..
 #### Windows上での実行
 
 マシン上でのTPMの存在とその状態を確認する為には"tpm.msc"を実行してください。
+
+### ベアメタル環境向けのビルド
+
+wolfTPMは、OSが存在しないベアメタルの組み込み環境向けにもビルドできます。
+このセクションでは、wolfTPMをユーザのプロジェクトへ導入し、autotoolsやCMakeを使用せずにコンパイルする手順を解説します。
+
+このセクションで示す手順は、ARM Cortex-MやRISC-V、UltraScale+/Versal、Microblazeのような一般的なマイコンボードに適用できます。
+
+#### 準備
+
+- wolfCryptのソースコード (wolfSSLリポジトリに含まれます)
+- wolfTPMのソースコード
+- SPIまたはI2Cで接続されたTPM 2.0チップ
+
+#### ステップ1：プリプロセッサマクロの定義
+
+ユーザのプロジェクトにおけるビルド設定やコンパイルコマンドに、以下のプリプロセッサマクロを追加します。
+
+```
+WOLFTPM_USER_SETTINGS
+WOLFSSL_USER_SETTINGS
+```
+
+これらのマクロを定義することで、wolfTPMとwolfSSLはautoconfが作成した`options.h`ではなく`user_settings.h`を参照するようになります。
+
+
+#### ステップ2：user_settings.hの作成
+
+ユーザのプロジェクトに、wolfTPMとwolfSSLの構成オプションを記した`user_settings.h`を作成します。
+
+詳細はwolfSSLリポジトリ内で提供しているリファレンスファイル[examples/configs/user_settings_wolftpm.h](https://github.com/wolfSSL/wolfssl/blob/master/examples/configs/user_settings_wolftpm.h)をご覧ください。
+
+wolfTPM向けの`user_settings.h`のサンプルは次のとおりです。
+
+
+```h
+/* System */
+#define WOLFSSL_GENERAL_ALIGNMENT 4
+#define SINGLE_THREADED
+#define WOLFCRYPT_ONLY
+#define SIZEOF_LONG_LONG 8
+
+/* Platform - bare metal */
+#define NO_FILESYSTEM
+#define NO_WRITEV
+#define NO_MAIN_DRIVER
+#define NO_DEV_RANDOM
+#define NO_ERROR_STRINGS
+#define NO_SIG_WRAPPER
+
+/* wolfTPM required features */
+#define WOLF_CRYPTO_CB
+#define WOLFSSL_PUBLIC_MP
+#define WOLFSSL_AES_CFB
+#define HAVE_AES_DECRYPT
+
+/* ECC options */
+#define HAVE_ECC
+#define ECC_TIMING_RESISTANT
+
+/* RSA options */
+#undef NO_RSA
+#define WOLFSSL_KEY_GEN
+#define WC_RSA_BLINDING
+
+/* Big math library */
+#define WOLFSSL_SP_MATH_ALL /* sp_int.c */
+#define WOLFSSL_SP_SMALL
+#define SP_INT_BITS 4096
+//#define SP_WORD_SIZE 32
+
+/* SHA options */
+#define NO_SHA /* on by default */
+#define NO_SHA256 /* on by default */
+#define WOLFSSL_SHA512
+#define WOLFSSL_SHA384
+
+/* Disable unneeded features to reduce footprint */
+#define NO_PKCS8
+#define NO_PKCS12
+#define NO_PWDBASED
+#define NO_DSA
+#define NO_DES3
+#define NO_RC4
+#define NO_PSK
+#define NO_MD4
+#define NO_MD5
+#define WOLFSSL_NO_SHAKE128
+#define WOLFSSL_NO_SHAKE256
+#define NO_DH
+
+/* Other interesting size reduction options */
+#if 0
+    #define RSA_LOW_MEM
+    #define WOLFSSL_AES_SMALL_TABLES
+    #define USE_SLOW_SHA
+    #define USE_SLOW_SHA256
+    #define USE_SLOW_SHA512
+    #define NO_AES_192
+#endif
+
+/* Custom random seed source - implement your own */
+#define HAVE_HASHDRBG
+#define CUSTOM_RAND_GENERATE_SEED my_rng_seed
+```
+
+`CUSTOM_RAND_GENERATE_SEED`を使用する場合、ユーザは別途独自のRNGシード関数を定義する必要があります。
+
+```c
+int my_rng_seed(byte* seed, word32 sz)
+{
+    int rc;
+    (void)os;
+    /* enable parameter encryption for the RNG request */
+    rc = wolfTPM2_SetAuthSession(&wolftpm_dev, 0, &wolftpm_session,
+        (TPMA_SESSION_decrypt | TPMA_SESSION_encrypt |
+        TPMA_SESSION_continueSession));
+    if (rc == 0) {
+        rc = wolfTPM2_GetRandom(&wolftpm_dev, seed, sz);
+    }
+    wolfTPM2_UnsetAuthSession(&wolftpm_dev, 0, &wolftpm_session);
+    return rc;
+}
+```
+
+#### ステップ3：インクルードパスの設定
+
+ユーザのプロジェクトにて、以下のディレクトリをインクルードパスに追加します。
+
+1. **wolfSSLルートディレクトリ** - 例：`/path/to/wolfssl`
+2. **wolfTPMルートディレクトリ** - 例：`/path/to/wolftpm`
+3. **ステップ2で作成した user_settings.h** - 必ず、コンパイラが辿れるように構成する必要があります。
+
+コンパイラフラグの例を以下に示します。
+
+```sh
+-I/path/to/wolfssl
+-I/path/to/wolftpm
+-I/path/to/your/project/include
+```
+
+#### ステップ4：ソースファイルの追加
+
+必要なソースファイルを、wolfSSL/wolfTPMリポジトリからユーザのプロジェクトに追加します。
+
+
+**wolfCryptソースファイル** (wolfTPMを使用するための最小構成)：
+
+```
+wolfssl/wolfcrypt/src/aes.c
+wolfssl/wolfcrypt/src/asn.c
+wolfssl/wolfcrypt/src/cryptocb.c
+wolfssl/wolfcrypt/src/ecc.c
+wolfssl/wolfcrypt/src/hash.c
+wolfssl/wolfcrypt/src/hmac.c
+wolfssl/wolfcrypt/src/random.c
+wolfssl/wolfcrypt/src/rsa.c
+wolfssl/wolfcrypt/src/sha.c
+wolfssl/wolfcrypt/src/sha256.c
+wolfssl/wolfcrypt/src/sha512.c
+wolfssl/wolfcrypt/src/sp_int.c
+wolfssl/wolfcrypt/src/wc_port.c
+wolfssl/wolfcrypt/src/wolfmath.c
+```
+
+**wolfTPMソースファイル**：
+
+```
+wolftpm/src/tpm2.c
+wolftpm/src/tpm2_packet.c
+wolftpm/src/tpm2_tis.c
+wolftpm/src/tpm2_wrap.c
+wolftpm/src/tpm2_param_enc.c
+```
+
+#### ステップ5：SPI HALコールバックの実装
+
+wolfTPMはTPMチップと通信するために、単一のSPI送受信コールバックを使用します。
+ユーザは使用するハードウェアプラットフォームに対応するコールバック関数を別途実装する必要があります。
+
+なお、wolfTPMリポジトリ内`hal/`ディレクトリにて、このコールバック関数の実装例をいくつか提供しています。
+ぜひお使いください。
+
+- [hal/tpm_io_xilinx.c](https://github.com/wolfSSL/wolfTPM/blob/master/hal/tpm_io_xilinx.c) - Xilinx Microblaze
+- [hal/tpm_io_stm32.c](https://github.com/wolfSSL/wolfTPM/blob/master/hal/tpm_io_stm32.c) - STM32
+- [hal/tpm_io_infineon.c](https://github.com/wolfSSL/wolfTPM/blob/master/hal/tpm_io_infineon.c) - Infineon Tricore
+- [hal/tpm_io_microchip.c](https://github.com/wolfSSL/wolfTPM/blob/master/hal/tpm_io_microchip.c) - Microchip
+
+##### 標準的な入出力コールバック
+
+SPIコールバックは以下のように定義されます。
+
+```c
+typedef int (*TPM2HalIoCb)(
+    TPM2_CTX* ctx,
+    const byte* txBuf, byte* rxBuf,
+    word16 xferSz,
+    void* userCtx
+);
+```
+
+これに基づいて、以下のように実装します。
+
+```c
+#include <wolftpm/tpm2.h>
+#include <wolftpm/tpm2_tis.h>
+
+int TPM2_IoCb(TPM2_CTX* ctx,
+    const byte* txBuf, byte* rxBuf, word16 xferSz,
+    void* userCtx)
+{
+    int ret = TPM_RC_FAILURE;
+
+    /* TODO: Assert SPI chip select */
+    spi_cs_assert();
+
+    /* Perform SPI transfer - simultaneously send txBuf and receive to rxBuf */
+    if (spi_transfer(txBuf, rxBuf, xferSz) == 0) {
+        ret = TPM_RC_SUCCESS;
+    }
+
+    /* TODO: De-assert SPI chip select */
+    spi_cs_deassert();
+
+    (void)ctx;
+    (void)userCtx;
+
+    return ret;
+}
+```
+
+##### 応用的な入出力コールバック
+
+さらなる制御を必要とするプラットフォームを使用する場合、`WOLFTPM_ADV_IO`を定義することで以下のようなコールバックを利用できます。
+
+```c
+typedef int (*TPM2HalIoCb)(
+    TPM2_CTX* ctx,
+    INT32 isRead, UINT32 addr,
+    BYTE* xferBuf, UINT16 xferSz,
+    void* userCtx
+);
+```
+
+これにより、レジスタアドレスへのアクセスや、読み込み・書き込み操作を分ける必要のあるプラットフォーム向けの読み書き方向の提示(`isRead`)ができるようになります。
+
+#### ステップ6：wolfTPMの初期化と使用
+
+ここまでの手順を終えると、以下のようにしてwolfTPMを使用してTPMとの通信を行えます。
+
+```c
+#include <wolftpm/tpm2_wrap.h>
+
+int main(void)
+{
+    int rc;
+    WOLFTPM2_DEV dev;
+
+    /* Initialize wolfTPM */
+    rc = wolfTPM2_Init(&dev, TPM2_IoCb, NULL);
+    if (rc != TPM_RC_SUCCESS) {
+        /* Handle error */
+        return rc;
+    }
+
+    /* Get TPM capabilities */
+    WOLFTPM2_CAPS caps;
+    rc = wolfTPM2_GetCapabilities(&dev, &caps);
+    if (rc == TPM_RC_SUCCESS) {
+        /* Use TPM ... */
+    }
+
+    /* Cleanup */
+    wolfTPM2_Cleanup(&dev);
+
+    return 0;
+}
+```
+
+#### 任意のビルド構成オプション
+
+##### メモリ使用量の削減
+
+制約の厳しい環境では、`user_settings.h`に以下のオプションを追加することをご検討ください。
+
+```c
+/* Reduce stack usage */
+#define WOLFTPM_SMALL_STACK
+
+/* Disable wrapper layer if using native API only */
+#define WOLFTPM2_NO_WRAPPER
+
+/* Use smaller RSA key sizes only */
+#define MAX_RSA_BITS 2048
+```
+
+##### TPMチップタイプの選択
+
+コンパイル時にTPMチップのタイプが判明している場合、以下のフラグを使用できます。
+
+```c
+/* For Infineon */
+#define WOLFTPM_SLB9670
+#define WOLFTPM_SLB9672
+#define WOLFTPM_SLB9673
+
+/* For ST ST33 */
+#define WOLFTPM_ST33
+
+/* For Nuvoton */
+#define WOLFTPM_NUVOTON
+
+/* For Microchip ATTPM20 */
+#define WOLFTPM_MICROCHIP
+```
+
+指定されていない場合、wolfTPMはチップタイプを自動で検出します。
+この機能はデフォルトで定義されている`WOLFTPM_AUTODETECT`により実行されます。
+
+##### I2C対応
+
+TPMチップがSPIではなくI2Cで接続されている場合、以下のオプションを追加してください。
+
+```c
+#define WOLFTPM_I2C
+#define WOLFTPM_ADV_IO
+```
+
+I2C通信で使用する応用的な入出力コールバックは別途実装する必要があります。
+
+#### 暗号鍵ストレージ
+
+TPMチップにより、メインメモリから隔離された暗号鍵のための安全な記憶域を使用できます。
+保存された鍵情報が平文でTPMから外に出ることはありません。
+
+- `TPM2_CreatePrimary`を使用して鍵を作成すると、TPM内で保管されます。
+- `TPM2_Create`を使用して鍵を作成すると、NVRAMに保管できるよう暗号化されたものが返却されます。これは`TPM2_Load`を使用することで再びTPMに読み込むことが可能です。
+- `TPM2_EvictControl`を使用することで、鍵を永続的にTPMのNVRAMに格納できます。
+
+この分離により、万一メインプロセッサのメモリが侵害されても暗号鍵は保護されます。
+
+#### トラブルシューティング
+
+##### SPI通信に関する問題
+
+1. SPIのクロック極性と周期を確認します。CPOL=0, CPHA=0 のような値です。
+2. SPIのクロック速度を確認します。まずは1〜10MHzのようなゆっくりとした速度でお試しになることをおすすめします。
+3. 送受信フローでチップ選択が行われていることを確認します。
+4. いくつかのTPMでは、SPI操作の中に待機ステートを含めることが求められます。これはMSBに到達するまでのすべてのデータを読み込むために必要な場合があります。その場合、`WOLFTPM_CHECK_WAIT_STATE`を有効化してください。
+5. `#define DEBUG_WOLFTPM`(標準)や、`WOLFTPM_DEBUG_VERBOSE`(詳細)、`WOLFTPM_DEBUG_IO`(SPI/I2C関連)を有効化し、デバッグ出力を確認します。
+
+##### ビルドエラーが発生する場合
+
+1. `WOLFSSL_USER_SETTINGS`および`WOLFTPM_USER_SETTINGS`が有効化されていることを確認します。
+2. インクルードパスが正しく設定されていることを確認します。
+3. 必要なソースファイルのすべてが用意されていることを確認します。
+
+詳しい手順は本セクション「ベアメタル環境向けのビルド」ステップ1〜6をご参照ください。
