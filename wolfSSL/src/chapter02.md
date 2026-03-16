@@ -366,6 +366,18 @@ Likewise removes calls specific to the server side.
 
 Removes the use of DES3 encryptions. DES3 is built-in by default because some older servers still use it and it's required by SSL 3.0. `NO_DH` and `NO_AES` are the same as the two above, they are widely used.
 
+#### WOLFSSL_DES_ECB
+
+Enables DES-ECB (Electronic Codebook) mode. Off by default. Used by some legacy protocols.
+
+#### WC_ASYNC_ENABLE_3DES
+
+Enables asynchronous 3DES operations via the wolfSSL async crypto framework.
+
+#### FREESCALE_LTC_DES
+
+Enables Freescale/NXP LTC hardware DES/3DES acceleration.
+
 #### NO_DSA
 
 Removes DSA since it's being phased out of popular use.
@@ -380,6 +392,30 @@ Removes HMAC from the build.
 
 **NOTE**: SSL/TLS depends on HMAC but if you are only using wolfCrypt IE build option `WOLFCRYPT_ONLY` then HMAC can be disabled in this case.
 
+#### HAVE_HKDF
+
+Enables HKDF (HMAC-based Extract-and-Expand Key Derivation Function) per RFC 5869. Used for TLS 1.3 key derivation and general-purpose key derivation from shared secrets.
+
+#### WOLFSSL_HMAC_COPY_HASH
+
+Copies the hash state instead of re-initializing for each HMAC operation. Improves performance when the same key is used for multiple HMAC computations.
+
+#### STM32_HMAC
+
+Enables STM32 hardware HMAC acceleration using the STM32 HASH peripheral.
+
+#### WC_ASYNC_ENABLE_HMAC
+
+Enables asynchronous HMAC operations via the wolfSSL async crypto framework.
+
+#### WOLFSSL_DEVCRYPTO_HMAC
+
+Enables HMAC acceleration via the Linux `/dev/crypto` interface.
+
+#### WOLFSSL_KCAPI_HMAC
+
+Enables HMAC operations through the Linux kernel crypto API (AF_ALG).
+
 #### NO_MD4
 
 Removes MD4 from the build, MD4 is broken and shouldn't be used.
@@ -387,6 +423,18 @@ Removes MD4 from the build, MD4 is broken and shouldn't be used.
 #### NO_MD5
 
 Removes MD5 from the build.
+
+#### HAVE_MD5_CUST_API
+
+Enables a custom MD5 API. Allows user-provided MD5 implementation.
+
+#### STM32_NOMD5
+
+Disables STM32 hardware MD5 acceleration. Use when STM32 crypto is enabled but MD5 should use the software implementation.
+
+#### WC_ASYNC_ENABLE_MD5
+
+Enables asynchronous MD5 operations via the wolfSSL async crypto framework.
 
 #### NO_SHA
 
@@ -403,6 +451,42 @@ Turns off the use of the pre-shared key extension. It is built-in by default.
 #### NO_PWDBASED
 
 Disables password-based key derivation functions such as PBKDF1, PBKDF2, and PBKDF from PKCS #12.
+
+#### HAVE_PKCS7
+
+Enables PKCS#7 (Cryptographic Message Syntax) support for signed data, enveloped data, encrypted data, and compressed data content types.
+
+#### NO_PKCS7_STREAM
+
+Disables PKCS#7 streaming mode. Streaming mode allows processing PKCS#7 data incrementally.
+
+#### NO_PKCS7_ENCRYPTED_DATA
+
+Disables the PKCS#7 EncryptedData content type. Reduces code size when only SignedData or EnvelopedData are needed.
+
+#### NO_PKCS7_COMPRESSED_DATA
+
+Disables the PKCS#7 CompressedData content type. Requires zlib ([`HAVE_LIBZ`](#have_libz)) when enabled.
+
+#### WC_PKCS7_STREAM_DEBUG
+
+Enables debug output for PKCS#7 streaming operations.
+
+#### WOLFSSL_PKCS7_MAX_DECOMPRESSION
+
+Sets the maximum size for PKCS#7 decompression output. Prevents memory exhaustion from maliciously crafted compressed data.
+
+#### HAVE_PKCS7_RSA_RAW_SIGN_CALLBACK
+
+Enables a custom callback for raw RSA signing in PKCS#7. Allows HSM or external signing integration.
+
+#### HAVE_PKCS7_ECC_RAW_SIGN_CALLBACK
+
+Enables a custom callback for raw ECC signing in PKCS#7. Allows HSM or external signing integration.
+
+#### HAVE_X963_KDF
+
+Enables ANSI X9.63 Key Derivation Function. Used for ECC-based key agreement in PKCS#7 EnvelopedData.
 
 #### NO_RC4
 
@@ -551,6 +635,226 @@ Used for disabliing TLS cipher suites thst use AES GCM. It is used internally wh
 #### NO_ASN_TIME
 
 Disables time checking for ASN. Note: This should be used with caution because all certificate begin/end date checking will be skipped.
+
+#### WOLFSSL_CERT_PIV
+
+Enables PIV (Personal Identity Verification) certificate support for government smart card applications.
+
+#### WOLFSSL_CERT_GEN_CACHE
+
+Caches the DER encoding during certificate generation for reuse without re-encoding.
+
+#### WOLFSSL_CERT_SIGN_CB
+
+Enables a callback function for certificate signing, allowing external signing operations (e.g., HSM).
+
+#### WOLFSSL_CERT_NAME_ALL
+
+Stores all certificate name components including initials, given name, and DN qualifier. Uses more memory but provides full name access.
+
+#### WOLFSSL_MULTI_ATTRIB
+
+Enables multi-valued Relative Distinguished Name (RDN) attributes in certificates.
+
+#### WOLFSSL_DER_TO_PEM
+
+Enables DER to PEM format conversion functions.
+
+#### WOLFSSL_PUB_PEM_TO_DER
+
+Enables public key PEM to DER format conversion.
+
+#### WOLFSSL_KEY_TO_DER
+
+Enables key to DER encoding functions for RSA and ECC private keys.
+
+#### ASN_BER_TO_DER
+
+Enables BER (Basic Encoding Rules) to DER (Distinguished Encoding Rules) conversion. Required for parsing BER-encoded certificates and CMS/PKCS#7 data.
+
+#### WOLFSSL_DUP_CERTPOL
+
+Allows duplicate certificate policy OIDs in the certificate policies extension. By default, duplicates cause a validation error.
+
+#### NO_VERIFY_OID
+
+Disables OID verification during certificate parsing.
+
+#### NO_SKID
+
+Disables Subject Key Identifier extension processing.
+
+#### NO_STRICT_ECDSA_LEN
+
+Relaxes strict ECDSA signature length checking. Allows non-minimal DER encoding of ECDSA signatures for interoperability.
+
+#### ALLOW_SELFSIGNED_INVALID_CERTSIGN
+
+Allows self-signed certificates that do not have the keyCertSign bit set in the Key Usage extension.
+
+#### ALLOW_V1_EXTENSIONS
+
+Allows X.509 v1 certificates to contain extensions. Per RFC 5280, extensions are only valid in v3 certificates.
+
+#### USE_WOLF_VALIDDATE
+
+Uses wolfSSL's own date validation implementation instead of the platform's.
+
+#### WC_ASN_RUNTIME_DATE_CHECK_CONTROL
+
+Enables runtime control of certificate date checking. Allows enabling or disabling date validation at runtime via API.
+
+#### WOLFSSL_AFTER_DATE_CLOCK_SKEW
+
+Sets the clock skew tolerance (in seconds) for certificate not-after date checking. Allows certificates to be valid slightly past their expiration.
+
+#### WOLFSSL_BEFORE_DATE_CLOCK_SKEW
+
+Sets the clock skew tolerance (in seconds) for certificate not-before date checking. Allows certificates to be accepted slightly before their validity period.
+
+#### NO_WOLFSSL_SKIP_TRAILING_PAD
+
+Disables skipping of trailing padding bytes in ASN.1 parsing.
+
+#### WOLFSSL_ALT_NAMES
+
+Enables Subject Alternative Name (SAN) support in certificate generation and parsing.
+
+#### WOLFSSL_ALT_NAMES_NO_REV
+
+Stores Subject Alternative Names without reversing the order. By default, SANs are stored in reverse order.
+
+#### WOLFSSL_IP_ALT_NAME
+
+Enables IP address entries in Subject Alternative Names.
+
+#### WOLFSSL_RID_ALT_NAME
+
+Enables Registered ID entries in Subject Alternative Names.
+
+#### WOLFSSL_EKU_OID
+
+Enables Extended Key Usage OID support for additional OIDs beyond the standard set.
+
+#### WOLFSSL_ACERT
+
+Enables X.509 attribute certificate support (RFC 5755).
+
+#### IGNORE_KEY_EXTENSIONS
+
+Ignores key usage and extended key usage extensions during certificate validation.
+
+#### WOLFSSL_ALLOW_CRIT_AIA
+
+Allows the Authority Information Access (AIA) extension to be marked as critical. By default, a critical AIA causes a validation error.
+
+#### WOLFSSL_ALLOW_CRIT_AKID
+
+Allows the Authority Key Identifier extension to be marked as critical.
+
+#### WOLFSSL_ALLOW_CRIT_SKID
+
+Allows the Subject Key Identifier extension to be marked as critical.
+
+#### WC_ASN_UNKNOWN_EXT_CB
+
+Enables a callback for handling unknown certificate extensions. The callback receives the OID and extension data for custom processing.
+
+#### WOLFSSL_ASN_ALL
+
+Enables all optional ASN.1 features at once.
+
+#### WOLFSSL_ASN_CA_ISSUER
+
+Enables parsing of the CA Issuer field in the Authority Information Access extension.
+
+#### WOLFSSL_ASN_PRINT
+
+Enables ASN.1 structure printing functions for debugging and inspection of DER-encoded data.
+
+#### WOLFSSL_ASN_INT_LEAD_0_ANY
+
+Allows any leading zero byte in ASN.1 INTEGER encoding. By default, only minimal encoding is accepted.
+
+#### WOLFSSL_ASN_PARSE_KEYUSAGE
+
+Enables parsing of the Key Usage extension during certificate processing.
+
+#### WOLFSSL_ASN_TIME_STRING
+
+Enables conversion of ASN.1 time values to human-readable string format.
+
+#### ASN_TEMPLATE_SKIP_ISCA_CHECK
+
+Skips the isCA check in ASN.1 template-based certificate parsing.
+
+#### HAVE_OID_ENCODING
+
+Enables OID (Object Identifier) encoding support for generating ASN.1 OIDs from dotted-decimal notation.
+
+#### WOLFSSL_OLD_OID_SUM
+
+Uses the old OID sum calculation method. For backwards compatibility with applications that depend on specific OID sum values.
+
+#### HAVE_OCSP_RESPONDER
+
+Enables OCSP responder functionality. Allows wolfSSL to act as an OCSP responder that signs and sends OCSP responses.
+
+#### WOLFSSL_OCSP_PARSE_STATUS
+
+Enables parsing of OCSP response status fields for detailed status information.
+
+#### HAVE_PKCS8
+
+Enables PKCS#8 private key format support for importing and exporting encrypted and unencrypted private keys.
+
+#### HAVE_PKCS12
+
+Enables PKCS#12 (PFX) format support for bundling private keys, certificates, and CA chains into a single encrypted file.
+
+#### WOLFSSL_DILITHIUM_NO_ASN1
+
+Disables ASN.1 encoding/decoding for Dilithium keys and signatures. Uses raw format instead.
+
+#### WOLFSSL_DILITHIUM_FIPS204_DRAFT
+
+Enables FIPS 204 draft version of Dilithium parameters.
+
+#### HAVE_SPHINCS
+
+Enables SPHINCS+ post-quantum signature scheme support.
+
+#### WC_ENABLE_ASYM_KEY_IMPORT
+
+Enables generic asymmetric key import functions for Ed25519, Ed448, Curve25519, and Curve448.
+
+#### WC_ENABLE_ASYM_KEY_EXPORT
+
+Enables generic asymmetric key export functions for Ed25519, Ed448, Curve25519, and Curve448.
+
+#### WOLFSSL_X509_NAME_AVAILABLE
+
+Enables the X509_NAME API for OpenSSL-compatible certificate name access.
+
+#### WOLFSSL_HAVE_ISSUER_NAMES
+
+Stores pointers to issuer name components, their lengths and encodings for efficient access.
+
+#### WOLFSSL_ASN_KEY_SIZE_ENUM
+
+Uses an enum for AES key size representation in ASN.1 processing instead of raw integers.
+
+#### HAVE_SMIME
+
+Enables S/MIME (Secure/Multipurpose Internet Mail Extensions) support for email signing and encryption.
+
+#### WC_RC2
+
+Enables RC2 cipher support. Primarily needed for legacy PKCS#12 file compatibility.
+
+#### WOLFSSL_MD2
+
+Enables MD2 hash algorithm support. Only needed for legacy certificate compatibility. Not recommended for new applications.
 
 #### NO_CHECK_PRIVATE_KEY
 
@@ -1014,6 +1318,14 @@ Enables ChaCha20 support.
 
 Enables Poly1305 support.
 
+#### POLY130564
+
+Uses the 64-bit Poly1305 implementation for better performance on 64-bit platforms. Automatically selected on platforms with 64-bit support.
+
+#### USE_INTEL_POLY1305_SPEEDUP
+
+Enables Intel AVX/AVX2 optimized Poly1305 implementation for maximum throughput on Intel/AMD processors.
+
 #### HAVE_CRL
 
 Enables Certificate Revocation List (CRL) support.
@@ -1339,6 +1651,22 @@ Used for building a subset of the wolfSSL library when linking with cURL.
 #### HAVE_CURVE448
 
 Define for Curve448 support. Additional macro settings can be changed. The default is to enable shared secret, key export, and import.
+
+#### HAVE_CURVE448_SHARED_SECRET
+
+Enables Curve448 shared secret computation. On by default when [`HAVE_CURVE448`](#have_curve448) is enabled.
+
+#### HAVE_CURVE448_KEY_EXPORT
+
+Enables Curve448 public key export. On by default when [`HAVE_CURVE448`](#have_curve448) is enabled.
+
+#### HAVE_CURVE448_KEY_IMPORT
+
+Enables Curve448 public key import. On by default when [`HAVE_CURVE448`](#have_curve448) is enabled.
+
+#### WOLFSSL_ECDHX_SHARED_NOT_ZERO
+
+Validates that ECDH shared secrets are not all zeros. Provides protection against invalid curve attacks.
 
 #### HAVE_DANE
 
@@ -2390,6 +2718,38 @@ When defined CRT is not used which saves on some memory but slows down RSA opera
 
 When SHA3 is enabled this macro will reduce build size.
 
+#### WOLFSSL_SHAKE128
+
+Enables SHAKE128 extendable-output function (XOF) based on SHA-3. Provides variable-length output.
+
+#### WOLFSSL_SHAKE256
+
+Enables SHAKE256 extendable-output function (XOF) based on SHA-3. Provides variable-length output.
+
+#### SHA3_BY_SPEC
+
+Uses the specification-ordered Keccak-f permutation. By default, wolfSSL uses an optimized bit-interleaved ordering.
+
+#### WC_SHA3_NO_ASM
+
+Disables assembly-optimized SHA-3 implementation. Forces use of the portable C implementation.
+
+#### WC_SHA3_FAULT_HARDEN
+
+Hardens SHA-3 against fault injection attacks by performing redundant computations and verifying consistency.
+
+#### WC_ASYNC_ENABLE_SHA3
+
+Enables asynchronous SHA-3 operations via the wolfSSL async crypto framework.
+
+#### STM32_HASH_SHA3
+
+Enables STM32 hardware SHA-3 acceleration.
+
+#### PSOC6_HASH_SHA3
+
+Enables Cypress/Infineon PSoC6 hardware SHA-3 acceleration.
+
 #### WOLFSSL_SMALL_CERT_VERIFY
 
 Verify the certificate signature without using DecodedCert. Doubles up on some code but allows smaller peak heap memory usage. Cannot be used with [`WOLFSSL_NONBLOCK_OCSP`](#wolfssl_nonblock_ocsp).
@@ -2414,6 +2774,38 @@ Use small memory option for ed25519. This uses less memory, but is slower.
 
 Reduces code size by not unrolling loops, which reduces performance for SHA.
 
+#### WC_HASH_DATA_ALIGNMENT
+
+Specifies required data alignment for hash input. Some hardware backends require aligned input buffers.
+
+#### WC_ASYNC_ENABLE_SHA
+
+Enables asynchronous SHA-1 operations via the wolfSSL async crypto framework.
+
+#### WOLFSSL_PIC32MZ_HASH
+
+Enables Microchip PIC32MZ hardware hash acceleration for SHA-1 and SHA-256.
+
+#### WOLFSSL_TI_HASH
+
+Enables Texas Instruments hardware hash acceleration.
+
+#### WOLFSSL_RENESAS_RX64_HASH
+
+Enables Renesas RX64 hardware hash acceleration.
+
+#### FREESCALE_LTC_SHA
+
+Enables Freescale/NXP LTC (Low Power Trusted Cryptography) SHA acceleration.
+
+#### FREESCALE_MMCAU_SHA
+
+Enables Freescale/NXP MMCAU (Memory-Mapped Cryptographic Acceleration Unit) SHA acceleration.
+
+#### PSOC6_HASH_SHA1
+
+Enables Cypress/Infineon PSoC6 hardware SHA-1 acceleration.
+
 #### USE_SLOW_SHA256
 
 Reduces code size by not unrolling loops, which reduces performance for SHA. About 2k smaller and about 25% slower.
@@ -2421,6 +2813,58 @@ Reduces code size by not unrolling loops, which reduces performance for SHA. Abo
 #### USE_SLOW_SHA512
 
 Reduces code size by not unrolling loops, which reduces performance for SHA. Over twice as small, but 50% slower.
+
+#### WOLFSSL_NOSHA512_224
+
+Disables the SHA-512/224 variant. Reduces code size when SHA-512/224 is not needed.
+
+#### WOLFSSL_NOSHA512_256
+
+Disables the SHA-512/256 variant. Reduces code size when SHA-512/256 is not needed.
+
+#### USE_SLOW_SHA2
+
+Disables loop unrolling for all SHA-2 family algorithms. Reduces code size at the cost of performance.
+
+#### WOLFSSL_HASH_FLAGS
+
+Enables hash flags for tracking hash state (e.g., whether the hash has been finalized). Used by some hardware backends.
+
+#### WOLFSSL_HASH_KEEP
+
+Keeps the hash input data in memory for potential reuse. Allows re-hashing of data without re-feeding it.
+
+#### WC_ASYNC_ENABLE_SHA512
+
+Enables asynchronous SHA-512 operations via the wolfSSL async crypto framework.
+
+#### WC_ASYNC_ENABLE_SHA384
+
+Enables asynchronous SHA-384 operations via the wolfSSL async crypto framework.
+
+#### WOLFSSL_KCAPI_HASH
+
+Enables hash operations through the Linux kernel crypto API (AF_ALG). Offloads SHA and other hashes to the kernel.
+
+#### WOLFSSL_SE050_HASH
+
+Enables hash acceleration on the NXP SE050 secure element.
+
+#### WOLFSSL_SILABS_SHA384
+
+Enables Silicon Labs hardware acceleration for SHA-384.
+
+#### WOLFSSL_SILABS_SHA512
+
+Enables Silicon Labs hardware acceleration for SHA-512.
+
+#### WOLFSSL_ARMASM_CRYPTO_SHA512
+
+Enables ARM crypto extension instructions for SHA-512 acceleration.
+
+#### WOLFSSL_RENESAS_RSIP
+
+Enables Renesas RSIP (Renesas Security IP) hardware acceleration for hashing and crypto operations.
 
 #### ECC_USER_CURVES
 
