@@ -428,6 +428,90 @@ Removes support for the RSA algorithm.
 
 Removes code for OAEP padding.
 
+#### WOLFSSL_RSA_VERIFY_INLINE
+
+Enables inline RSA verify, returning a pointer into the input buffer rather than copying the output. Reduces memory usage for RSA verify operations.
+
+#### WC_RSA_DIRECT
+
+Enables the direct RSA encrypt/decrypt API (`wc_RsaDirect`). Provides raw RSA operations without padding, useful for custom protocols.
+
+#### WC_RSA_NO_PADDING
+
+Enables the no-padding RSA mode. Allows RSA operations without any padding scheme applied. Use with caution - typically only for custom implementations.
+
+#### WOLFSSL_RSA_KEY_CHECK
+
+Enables RSA key pair consistency checking via `wc_CheckRsaKey()`. Validates that the public and private key components are mathematically consistent.
+
+#### WOLFSSL_RSA_CHECK_D_ON_DECRYPT
+
+Validates the RSA private exponent `d` before each decrypt operation. Provides additional security against fault injection attacks at the cost of performance.
+
+#### WOLFSSL_RSA_DECRYPT_TO_0_LEN
+
+Allows RSA decrypt operations to return a zero-length result (empty plaintext). By default, a zero-length decryption result is treated as an error.
+
+#### NO_RSA_BOUNDS_CHECK
+
+Disables bounds checking on RSA input data. By default, wolfSSL validates that the input value is less than the RSA modulus.
+
+#### SHOW_GEN
+
+Enables progress indicator (dots) during RSA key generation. Useful for user feedback during long key generation operations.
+
+#### WOLFSSL_PSS_LONG_SALT
+
+Allows RSA-PSS signatures to use a salt length longer than the hash output length. Some implementations use salt length equal to the key size minus overhead.
+
+#### WOLFSSL_PSS_SALT_LEN_DISCOVER
+
+Enables automatic discovery of the PSS salt length during RSA-PSS signature verification. Tries different salt lengths to find a match.
+
+#### WC_RSA_NONBLOCK_TIME
+
+Enables time-based non-blocking RSA operations. Allows RSA operations to yield after a configurable time period. Requires [`WC_RSA_NONBLOCK`](#wc_rsa_nonblock).
+
+#### WOLFSSL_MP_INVMOD_CONSTANT_TIME
+
+Uses constant-time modular inverse computation. Protects against timing side-channel attacks during RSA private key operations.
+
+#### WC_RSA_NO_FERMAT_CHECK
+
+Disables the Fermat factorization proximity check during RSA key generation. By default, wolfSSL verifies that `p` and `q` are not too close together, which would make the key vulnerable to Fermat's factorization method.
+
+#### FP_MAX_BITS
+
+Sets the maximum key size in bits when using fast math (`USE_FAST_MATH`). The value should be set to key size times 2. For example, for RSA 3072 set to 6144. Default is 4096 (supporting up to RSA 2048).
+
+#### WOLFSSL_HAVE_SP_RSA
+
+Enables Single Precision (SP) math optimizations for RSA operations. SP math provides significant performance improvements for common key sizes (2048, 3072, 4096).
+
+#### WOLFSSL_SP_ASM
+
+Enables assembly-optimized SP math routines. Provides maximum performance for RSA, ECC, and DH operations on supported platforms (x86_64, ARM, RISC-V).
+
+#### WC_ASYNC_ENABLE_RSA
+
+Enables asynchronous RSA operations via the wolfSSL async crypto framework. Allows RSA operations to be offloaded to hardware accelerators.
+
+#### WOLFSSL_KCAPI_RSA
+
+Enables RSA operations through the Linux kernel crypto API (AF_ALG). Offloads RSA to the kernel's crypto subsystem.
+
+#### WOLFSSL_AFALG_XILINX_RSA
+
+Enables RSA acceleration through AF_ALG on Xilinx platforms using Xilinx crypto hardware.
+
+#### WOLFSSL_SE050_NO_RSA
+
+Disables RSA through the NXP SE050 secure element. Other SE050 operations remain available.
+
+#### WOLFSSL_XILINX_CRYPT
+
+Enables Xilinx hardware crypto acceleration for RSA and other algorithms on Xilinx FPGA/SoC platforms.
+
 #### NO_AES_CBC
 
 Turns off AES-CBC algorithm support.
@@ -564,10 +648,6 @@ Define to exlude TLS 1.2.
 
 Key and cert generation feature support for disabling PEM to DER.
 
-#### NO_DEV_URANDOM
-
-Disables the use of `/dev/urandom`
-
 #### WOLFSSL_NO_SIGALG
 
 Disables the signature algorithms extension
@@ -645,6 +725,102 @@ Allows loading DER-formatted CA certs into the wolfSSL context (`WOLFSSL_CTX`) u
 #### WOLFSSL_DTLS
 
 Turns on the use of DTLS, or datagram TLS. This isn't widely supported or used.
+
+#### WOLFSSL_DTLS_CID
+
+Enables DTLS Connection ID support (RFC 9146). Allows DTLS connections to survive IP address changes by identifying connections with a CID rather than the transport address.
+
+#### WOLFSSL_ALLOW_TLSV10
+
+Allows TLS 1.0 connections. TLS 1.0 is disabled by default for security reasons. Only enable when legacy compatibility is required.
+
+#### WOLFSSL_EITHER_SIDE
+
+Allows the same `WOLFSSL_CTX` to be used for both client and server connections. By default, a context is configured for either client or server at creation time.
+
+#### HAVE_SNI
+
+Enables Server Name Indication (SNI) TLS extension support (RFC 6066). Allows clients to indicate which hostname they are connecting to, enabling virtual hosting over TLS.
+
+#### WOLFSSL_ALWAYS_KEEP_SNI
+
+Keeps the SNI value in the SSL session after the handshake completes. By default, the SNI data is freed after the handshake to save memory.
+
+#### HAVE_TRUNCATED_HMAC
+
+Enables the Truncated HMAC TLS extension (RFC 6066). Allows using 80-bit HMAC tags instead of the full size to reduce bandwidth.
+
+#### HAVE_SECURE_RENEGOTIATION
+
+Enables secure renegotiation support (RFC 5746). Allows TLS connections to renegotiate cipher suites and keys during an active session.
+
+#### HAVE_SERVER_RENEGOTIATION_INFO
+
+Enables the server-side renegotiation info extension. Indicates secure renegotiation support in server hello messages.
+
+#### HAVE_SESSION_TICKET
+
+Enables TLS session ticket support (RFC 5077). Allows the server to issue session tickets for faster resumption without server-side session state. Required for TLS 1.3 resumption.
+
+#### HAVE_TRUSTED_CA
+
+Enables the Trusted CA Indication TLS extension (RFC 4366). Allows the client to indicate which CA certificates it trusts, helping the server select the appropriate certificate chain.
+
+#### HAVE_RPK
+
+Enables Raw Public Key support (RFC 7250). Allows using raw public keys instead of X.509 certificates in TLS, reducing handshake overhead for constrained environments.
+
+#### HAVE_ECH
+
+Enables Encrypted Client Hello (ECH) support. Encrypts the ClientHello to protect sensitive fields like SNI from passive observers.
+
+#### WOLFSSL_NO_CA_NAMES
+
+Disables sending CA names in the CertificateRequest message. Reduces handshake message size when the server has many trusted CAs.
+
+#### WOLFSSL_NO_SERVER_GROUPS_EXT
+
+Prevents the server from sending its supported groups in a TLS extension when the server's top preference is not in the client's list.
+
+#### HAVE_FFDHE
+
+Enables Finite Field Diffie-Hellman Ephemeral (FFDHE) key exchange using standardized groups from RFC 7919.
+
+#### HAVE_SECRET_CALLBACK
+
+Enables the TLS secret callback, allowing applications to receive TLS key material during the handshake. Used for key logging, debugging, and integration with external tools.
+
+#### HAVE_PK_CALLBACKS
+
+Enables public key operation callbacks, allowing applications to override the default RSA, ECC, and DH operations with custom implementations (e.g., HSM or secure element integration).
+
+#### WOLFSSL_SNIFFER
+
+Enables TLS packet sniffing support. Allows decrypting and inspecting TLS traffic using the wolfSSL sniffer library with the private key.
+
+#### HAVE_WEBSERVER
+
+Enables web server-oriented features in wolfSSL, such as additional HTTP helper functions.
+
+#### NO_CERTS
+
+Disables all certificate processing in wolfSSL. Use for PSK-only configurations where no certificate handling is needed, significantly reducing code size.
+
+#### WOLFSSL_HAVE_PRF
+
+Enables access to the TLS Pseudo-Random Function (PRF). Allows applications to derive additional keying material using the TLS PRF.
+
+#### WOLFSSL_REQUIRE_TCA
+
+Requires that the client send the Trusted CA extension. If the extension is missing, the handshake will fail.
+
+#### WOLFSSL_DH_EXTRA
+
+Stores additional DH key information in the SSL object. Provides access to DH parameters and keys after the handshake.
+
+#### WOLFSSL_CURVE25519_BLINDING
+
+Enables blinding for Curve25519 operations during TLS key exchange. Protects against timing side-channel attacks.
 
 #### WOLFSSL_KEY_GEN
 
@@ -912,10 +1088,6 @@ OpenSSL compatibility specific. Enable DH Extra for QT, OpenSSL all, OpenSSH, an
 
 OpenSSL compatibility specific macro.
 
-#### WOLFSSL_ASN_TEMPLATE
-
-Use newer ASN template asn.c code (default). Daul algo certificate features. Dual alg cert support requires the ASN.1 template feature.
-
 #### WOLFSSL_ASYNC_IO
 
 Used in async cleanup.
@@ -1159,10 +1331,6 @@ Used for Certificate revocation as a cert status request feature.
 #### HAVE_CERTIFICATE_STATUS_REQUEST_V2
 
 Used for Certificate revocation as a cert status request feature.
-
-#### HAVE_IO_TIMEOUT
-
-Certificate revocation. IO options enable support for connect timeout, but the default is off.
 
 #### HAVE_CURL
 
@@ -1419,6 +1587,50 @@ Enable middlebox compatibility in the TLS 1.3 handshake. This includes sending C
 #### WOLFSSL_TLS13_SHA512
 
 Allow generation of SHA-512 digests in handshake - no ciphersuite requires SHA-512 at this time. This enables calculation of a SHA2-512 hash for the handshake messages even though its not used by TLS v1.3 yet.
+
+#### WOLFSSL_TLS13_TICKET_BEFORE_FINISHED
+
+Allows the server to send a NewSessionTicket message before receiving the client's Finished message. See TLS 1.3 specification, Section 4.6.1, Paragraph 4.
+
+#### WOLFSSL_EARLY_DATA
+
+Enables TLS 1.3 0-RTT (Zero Round Trip Time) early data support. Allows clients to send application data in the first flight of the handshake for faster connection establishment. Requires session resumption via PSK or session tickets.
+
+#### WOLFSSL_EARLY_DATA_GROUP
+
+Groups the early data message with the ClientHello when sending. Reduces the number of network round trips by combining messages.
+
+#### WOLFSSL_CHECK_SIG_FAULTS
+
+Verifies the ECC signature after signing to detect fault injection attacks. Useful in environments where hardware fault attacks are a concern.
+
+#### WOLFSSL_PSK_ID_PROTECTION
+
+Enables PSK identity protection in TLS 1.3. Encrypts the PSK identity to prevent passive observers from tracking clients by their PSK identity.
+
+#### WOLFSSL_NO_CLIENT_CERT_ERROR
+
+When enabled, the server requires the client to send a valid certificate. If the client does not provide one, the handshake fails with an error.
+
+#### WOLFSSL_NONBLOCK_OCSP
+
+Enables non-blocking OCSP stapling processing. Allows OCSP lookups to be performed asynchronously during the TLS handshake.
+
+#### WOLFSSL_TLS_OCSP_MULTI
+
+Enables support for multiple OCSP responses in TLS, allowing stapling of OCSP responses for intermediate certificates in addition to the end-entity certificate.
+
+#### WOLFSSL_CERT_SETUP_CB
+
+Enables a certificate setup callback that is invoked during the TLS 1.3 handshake. Allows dynamic certificate and key selection based on the ClientHello contents.
+
+#### WOLFSSL_RW_THREADED
+
+Enables read/write threading support, allowing separate threads to perform TLS read and write operations concurrently on the same SSL session.
+
+#### WOLFSSL_PRIORITIZE_PSK
+
+During a TLS 1.3 handshake, prioritizes PSK order instead of ciphersuite order when selecting a cipher suite. The PSK callback order determines preference.
 
 #### WOLFSSL_UIP
 
