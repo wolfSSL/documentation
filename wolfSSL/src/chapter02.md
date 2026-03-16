@@ -726,6 +726,106 @@ Enables AES-GCM support.
 
 Enables AES-XTS support.
 
+#### WOLFSSL_AES_128
+
+Enables AES-128 key size support. Enabled by default. Disable to remove AES-128 and reduce code size when only larger key sizes are needed.
+
+#### WOLFSSL_AES_192
+
+Enables AES-192 key size support. Enabled by default. Disable to remove AES-192 and reduce code size.
+
+#### WOLFSSL_AES_256
+
+Enables AES-256 key size support. Enabled by default. Disable to remove AES-256 when not needed.
+
+#### AES_MAX_KEY_SIZE
+
+Sets the maximum AES key size in bits. Defaults to 256. Can be set to 128 or 192 to reduce code and memory usage.
+
+#### HAVE_AES_ECB
+
+Enables AES-ECB (Electronic Codebook) mode. Off by default. ECB mode encrypts each block independently and is generally not recommended for most applications, but is needed by some protocols.
+
+#### HAVE_AES_DECRYPT
+
+Enables AES decryption support. On by default. Can be disabled to save code size on platforms that only need AES encryption (e.g., GCM encryption-only).
+
+#### WOLFSSL_AES_COUNTER
+
+Enables AES-CTR (Counter) mode. Turns a block cipher into a stream cipher using an incrementing counter.
+
+#### WOLFSSL_AES_CFB
+
+Enables AES-CFB (Cipher Feedback) mode. Includes CFB-1, CFB-8, CFB-64, and CFB-128 sub-modes unless restricted by [`WOLFSSL_NO_AES_CFB_1_8`](#wolfssl_no_aes_cfb_1_8).
+
+#### WOLFSSL_NO_AES_CFB_1_8
+
+Disables AES-CFB-1 and AES-CFB-8 sub-modes when [`WOLFSSL_AES_CFB`](#wolfssl_aes_cfb) is enabled. Reduces code size when only CFB-64/128 are needed.
+
+#### WOLFSSL_AES_OFB
+
+Enables AES-OFB (Output Feedback) mode. OFB mode turns AES into a stream cipher and does not require padding.
+
+#### WOLFSSL_AES_CTS
+
+Enables AES-CTS (Ciphertext Stealing) mode. CTS allows encrypting data that is not a multiple of the block size without padding.
+
+#### WOLFSSL_AES_SIV
+
+Enables AES-SIV (Synthetic Initialization Vector) mode (RFC 5297). A nonce-misuse resistant AEAD mode that provides deterministic authenticated encryption.
+
+#### WOLFSSL_AES_EAX
+
+Enables AES-EAX AEAD mode. EAX is a two-pass AEAD scheme built from CTR mode and OMAC (CMAC), providing authenticated encryption with associated data.
+
+#### HAVE_AES_KEYWRAP
+
+Enables AES Key Wrap support (RFC 3394). Used for wrapping (encrypting) cryptographic keys for secure transport.
+
+#### WOLFSSL_AES_CBC_LENGTH_CHECKS
+
+Enables strict validation of input data length for AES-CBC operations. When enabled, CBC encrypt/decrypt will return an error if the input length is not a multiple of the AES block size.
+
+#### HAVE_AESGCM_DECRYPT
+
+Enables AES-GCM decryption support. On by default when [`HAVE_AESGCM`](#have_aesgcm) is enabled. Can be disabled on constrained devices that only need GCM encryption.
+
+#### WOLFSSL_AESGCM_STREAM
+
+Enables streaming AES-GCM API. Allows processing AES-GCM data incrementally rather than all at once, useful for large data or memory-constrained environments.
+
+#### WC_AES_GCM_DEC_AUTH_EARLY
+
+Authenticates the GCM tag before performing decryption. Provides fail-fast behavior when the authentication tag does not match, avoiding unnecessary decryption of invalid ciphertext.
+
+#### GCM_TABLE
+
+Use a pre-computed 4-bit lookup table for AES-GCM Galois field multiplication. Faster than [`GCM_SMALL`](#gcm_small) but uses more memory. See also [`GCM_TABLE_4BIT`](#gcm_table_4bit) and [`GCM_WORD32`](#gcm_word32).
+
+#### GCM_TABLE_4BIT
+
+Explicit option for 4-bit GCM lookup table mode. Functions similarly to [`GCM_TABLE`](#gcm_table).
+
+#### GCM_WORD32
+
+Use a 32-bit word implementation for AES-GCM Galois field multiplication. An alternative to [`GCM_SMALL`](#gcm_small) and [`GCM_TABLE`](#gcm_table) that works well on platforms without 64-bit support.
+
+#### GCM_GMULT_LEN
+
+Enables GCM GMULT length optimization for processing multiple blocks of AAD or ciphertext in a single GMULT call.
+
+#### WOLFSSL_AESXTS_STREAM
+
+Enables streaming AES-XTS API. Allows processing AES-XTS data incrementally across multiple update calls rather than a single operation.
+
+#### WC_AESXTS_STREAM_NO_REQUEST_ACCOUNTING
+
+Disables request accounting in the streaming AES-XTS API. Removes overhead of tracking data unit boundaries when not needed.
+
+#### WC_AES_XTS_SUPPORT_SIMULTANEOUS_ENC_AND_DEC_KEYS
+
+Allows an AES-XTS context to hold both encryption and decryption keys simultaneously. By default, XTS contexts support only one direction at a time to save memory.
+
 #### HAVE_CAMELLIA
 
 Enables Camellia support.
@@ -1705,6 +1805,178 @@ Or
 extern int custom_rand_generate_block(unsigned char* output, unsigned int sz);
 ```
 
+#### WC_NO_RNG
+
+Disables all RNG (Random Number Generator) support. Use when the application provides its own random data or when no randomness is needed (e.g., deterministic operations only).
+
+#### HAVE_HASHDRBG
+
+Enables the Hash-based Deterministic Random Bit Generator (DRBG) per NIST SP 800-90A. This is the default RNG implementation in wolfSSL using SHA-256 as the underlying hash.
+
+#### WC_RNG_BLOCKING
+
+Makes RNG operations blocking, retrying on transient failures rather than returning an error. Useful on platforms where the entropy source may temporarily be unavailable.
+
+#### WC_VERBOSE_RNG
+
+Enables verbose debug output for RNG operations. Prints detailed information about seed generation, DRBG state, and health test results.
+
+#### WC_RNG_SEED_CB
+
+Enables a custom seed callback function for the DRBG. Allows the application to provide its own entropy source via `wc_SetSeed_Cb()`.
+
+#### WC_RNG_BANK_SUPPORT
+
+Enables RNG bank support for pre-generating random data. Allows buffering random bytes in advance for faster subsequent random number requests.
+
+#### WOLFSSL_RNG_USE_FULL_SEED
+
+Uses the full seed length (384 bits) for DRBG seeding instead of the minimum required. Provides additional entropy margin.
+
+#### WOLFSSL_GENSEED_FORTEST
+
+Uses a deterministic seed source for testing purposes. WARNING: This produces predictable random output and must never be used in production.
+
+#### WOLFSSL_KEEP_RNG_SEED_FD_OPEN
+
+Keeps the `/dev/random` or `/dev/urandom` file descriptor open between seed operations instead of opening and closing it each time. Reduces overhead on systems with frequent reseeding.
+
+#### CUSTOM_RAND_GENERATE
+
+Allows the user to define a custom random word generator function. The function should return a single random word (`unsigned int`).
+
+#### CUSTOM_RAND_GENERATE_SEED_OS
+
+Allows the user to define a custom OS-level seed generator function, replacing the default platform-specific `GenerateSeed()` while still using the wolfSSL DRBG on top.
+
+#### HAVE_ENTROPY_MEMUSE
+
+Enables the memory-use based entropy source. This entropy source measures timing variations in memory access patterns (cache hits/misses) to generate entropy for DRBG seeding.
+
+#### ENTROPY_MEMUSE_FORCE_FAILURE
+
+Forces the memory-use entropy source to fail. Used for testing error handling paths in the entropy collection code.
+
+#### HAVE_GETRANDOM
+
+Indicates that the Linux `getrandom()` syscall is available for entropy collection. Automatically detected on supported platforms.
+
+#### WOLFSSL_GETRANDOM
+
+Enables use of the `getrandom()` syscall as the entropy source for DRBG seeding on Linux systems. More reliable than reading from `/dev/urandom` as it blocks until sufficient entropy is available.
+
+#### FORCE_FAILURE_GETRANDOM
+
+Forces the `getrandom()` syscall to fail. Used for testing fallback entropy source paths.
+
+#### NO_DEV_URANDOM
+
+Disables use of `/dev/urandom` for random seeding. When defined along with [`NO_DEV_RANDOM`](#no_dev_random), an alternative seed source must be provided.
+
+#### HAVE_AMD_RDSEED
+
+Enables use of AMD's RDSEED instruction for direct hardware entropy. Similar to [`HAVE_INTEL_RDSEED`](#have_intel_rdseed) but for AMD processors.
+
+#### IDIRECT_DEV_RANDOM
+
+Specifies a custom path for the random device on iDirect platforms instead of the default `/dev/random`.
+
+#### WIN_REUSE_CRYPT_HANDLE
+
+Reuses the Windows `CryptContext` handle between random number generation calls instead of acquiring and releasing it each time. Improves performance on Windows.
+
+#### WC_RNG_SEED_APT_CUTOFF
+
+Sets the cutoff value for the DRBG Adaptive Proportion Test (APT). The APT detects degradation in the entropy source by checking if any single value appears too frequently within a window.
+
+#### WC_RNG_SEED_APT_WINDOW
+
+Sets the window size for the DRBG Adaptive Proportion Test (APT). Defines how many samples are examined in each test window.
+
+#### WC_RNG_SEED_RCT_CUTOFF
+
+Sets the cutoff value for the DRBG Repetition Count Test (RCT). The RCT detects catastrophic entropy source failure by checking for consecutive identical outputs.
+
+#### STM32_RNG
+
+Enables the STM32 hardware Random Number Generator peripheral for entropy collection.
+
+#### STM32_NUTTX_RNG
+
+Enables STM32 hardware RNG access through the NuttX RTOS `/dev/random` interface.
+
+#### WOLFSSL_STM32F427_RNG
+
+Enables hardware RNG support specific to the STM32F427 microcontroller.
+
+#### WOLFSSL_STM32_RNG_NOLIB
+
+Enables direct register access to the STM32 RNG peripheral without using the STM32 HAL library. Useful for bare-metal deployments.
+
+#### WOLFSSL_PIC32MZ_RNG
+
+Enables the Microchip PIC32MZ hardware Random Number Generator for entropy collection.
+
+#### FREESCALE_RNGA
+
+Enables the Freescale/NXP RNGA (Random Number Generator Accelerator) hardware peripheral.
+
+#### FREESCALE_K70_RNGA
+
+Enables RNGA support specific to the Freescale/NXP Kinetis K70 microcontroller family.
+
+#### FREESCALE_RNGB
+
+Enables the Freescale/NXP RNGB (Random Number Generator version B) hardware peripheral.
+
+#### FREESCALE_KSDK_2_0_RNGA
+
+Enables Freescale/NXP RNGA through the KSDK 2.0 SDK driver interface.
+
+#### FREESCALE_KSDK_2_0_TRNG
+
+Enables Freescale/NXP TRNG (True Random Number Generator) through the KSDK 2.0 SDK driver interface.
+
+#### MAX3266X_RNG
+
+Enables the Maxim MAX3266X hardware Random Number Generator.
+
+#### QAT_ENABLE_RNG
+
+Enables hardware RNG through the Intel QuickAssist Technology (QAT) accelerator.
+
+#### WOLFSSL_ATECC_RNG
+
+Enables hardware RNG from the Microchip ATECC508A/ATECC608A secure element.
+
+#### WOLFSSL_SILABS_TRNG
+
+Enables the Silicon Labs True Random Number Generator (TRNG) for entropy collection.
+
+#### WOLFSSL_SCE_NO_TRNG
+
+Disables the TRNG on Renesas Secure Crypto Engine (SCE). AES and other SCE features remain available but RNG uses a software implementation.
+
+#### WOLFSSL_SCE_TRNG_HANDLE
+
+Specifies the Renesas SCE TRNG handle to use for random number generation.
+
+#### WOLFSSL_SE050_NO_TRNG
+
+Disables the TRNG on NXP SE050 secure element. Other SE050 crypto operations remain available.
+
+#### WOLFSSL_PSA_NO_RNG
+
+Disables RNG through the Platform Security Architecture (PSA) crypto API. Use when PSA is enabled but RNG should use a different source.
+
+#### HAVE_IOTSAFE_HWRNG
+
+Enables hardware RNG from an IoT-Safe compliant SIM card or secure element.
+
+#### WOLFSSL_XILINX_CRYPT_VERSAL
+
+Enables crypto hardware support on Xilinx Versal platforms, including the hardware TRNG for entropy collection.
+
 #### NO_PUBLIC_GCM_SET_IV
 
 Use this if you have done your own custom hardware port and not provided a public implementation of [`wc_AesGcmSetIV()`](group__AES.md#function-wc_aesgcmsetiv)
@@ -1976,6 +2248,94 @@ Enables use of Intel’s AVX/AVX2 instructions for accelerating AES, ChaCha20, P
 #### WOLFSSL_AESNI
 
 Enables use of AES accelerated operations which are built into some Intel and AMD chipsets. When using this define, the `aes_asm.asm` (for Windows with at&t syntax) or `aes_asm.S` file is used to optimize via the Intel AES new instruction set (AESNI).
+
+#### WOLFSSL_AESNI_BY4
+
+Enables 4-block parallel AES-NI processing. Processes four AES blocks simultaneously using AES-NI pipelining for improved throughput. Requires [`WOLFSSL_AESNI`](#wolfssl_aesni).
+
+#### WOLFSSL_AESNI_BY6
+
+Enables 6-block parallel AES-NI processing. Processes six AES blocks simultaneously using AES-NI pipelining for maximum throughput. Requires [`WOLFSSL_AESNI`](#wolfssl_aesni).
+
+#### WOLFSSL_AES_SMALL_TABLES
+
+Uses smaller AES S-box lookup tables. Reduces code/data size at the cost of slightly slower AES operations. Useful for memory-constrained embedded targets.
+
+#### WOLFSSL_AES_NO_UNROLL
+
+Disables loop unrolling in AES round functions. Reduces code size at the cost of performance. Useful for constrained environments where code size matters more than speed.
+
+#### WOLFSSL_AES_TOUCH_LINES
+
+Touch all AES table cache lines before lookups to provide side-channel resistance. Mitigates cache-timing attacks by ensuring all table entries are in cache before use.
+
+#### WC_AES_BITSLICED
+
+Enables bitsliced AES implementation. Uses a bitwise-parallel technique that processes multiple blocks simultaneously and provides constant-time execution for side-channel resistance.
+
+#### AES_GCM_GMULT_NCT
+
+Enables non-constant-time GCM GMULT implementation. Faster but not protected against cache-timing side-channel attacks. Only use when side-channel resistance is not required.
+
+#### NO_WOLFSSL_ALLOC_ALIGN
+
+Disables aligned memory allocation for AES contexts. By default, AES contexts are aligned to cache line boundaries for performance. Disable on platforms that do not support aligned allocation.
+
+#### WC_ASYNC_ENABLE_AES
+
+Enables asynchronous AES operations. Allows AES encrypt/decrypt to be offloaded to hardware accelerators using the wolfSSL async crypto framework.
+
+#### WOLFSSL_CRYPTOCELL_AES
+
+Enables AES acceleration using ARM CryptoCell hardware. Requires the CryptoCell SDK and [`WOLFSSL_CRYPTOCELL`](#wolfssl_cryptocell).
+
+#### WOLFSSL_DEVCRYPTO_AES
+
+Enables AES acceleration via Linux `/dev/crypto` interface. Requires [`WOLFSSL_DEVCRYPTO`](#wolfssl_devcrypto).
+
+#### WOLFSSL_DEVCRYPTO_CBC
+
+Enables AES-CBC acceleration via Linux `/dev/crypto` interface. Requires [`WOLFSSL_DEVCRYPTO`](#wolfssl_devcrypto).
+
+#### WOLFSSL_KCAPI_AES
+
+Enables AES operations through the Linux kernel crypto API (AF_ALG). Offloads AES to the kernel's crypto subsystem.
+
+#### WOLFSSL_NO_KCAPI_AES_CBC
+
+Disables AES-CBC through KCAPI when [`WOLFSSL_KCAPI_AES`](#wolfssl_kcapi_aes) is enabled. Useful when only non-CBC AES modes are needed through the kernel crypto API.
+
+#### WOLFSSL_PSA_NO_AES
+
+Disables AES through the Platform Security Architecture (PSA) crypto API. Use when PSA is enabled but AES should use the software implementation instead.
+
+#### WOLFSSL_SCE_NO_AES
+
+Disables AES through the Renesas Secure Crypto Engine (SCE). Use when SCE is enabled but AES should use the software implementation.
+
+#### NO_IMX6_CAAM_AES
+
+Disables AES acceleration on NXP i.MX6 CAAM (Cryptographic Acceleration and Assurance Module). Use when CAAM is enabled but AES should use the software implementation.
+
+#### WOLFSSL_AFALG_XILINX_AES
+
+Enables AES acceleration through AF_ALG on Xilinx platforms. Uses the Xilinx crypto hardware via the Linux AF_ALG interface.
+
+#### NO_WOLFSSL_ESP32_CRYPT_AES
+
+Disables ESP32 hardware AES acceleration. Use when building for ESP32 but AES should use the software implementation.
+
+#### STM32_CRYPTO_AES_ONLY
+
+Restricts STM32 hardware crypto to AES operations only. Other algorithms will use software implementations even when STM32 crypto hardware is available.
+
+#### WC_DEBUG_CIPHER_LIFECYCLE
+
+Enables debug logging for AES cipher context lifecycle events (init, set key, free). Useful for debugging resource leaks or double-free issues with AES contexts.
+
+#### WOLFSSL_HW_METRICS
+
+Enables tracking of hardware acceleration usage metrics. When enabled, wolfSSL counts how many operations were offloaded to hardware vs. handled in software, accessible via `wolfCrypt_GetHwMetrics()`.
 
 #### HAVE_INTEL_RDSEED
 
