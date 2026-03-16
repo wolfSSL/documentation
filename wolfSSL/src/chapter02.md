@@ -1568,6 +1568,54 @@ This extension allows debugging callbacks through the use of signals in an envir
 
  Enable crypto callback support. This feature is also enabled automatically when [`--enable-cryptocb`](#enable-cryptocb) is used.
 
+#### WOLF_CRYPTO_CB_FIND
+
+Enable find device callback functions for looking up registered crypto devices by device ID. Requires [`WOLF_CRYPTO_CB`](#wolf_crypto_cb).
+
+#### WOLF_CRYPTO_CB_CMD
+
+Enable command callback functions that are invoked during register and unregister of crypto callback devices. Requires [`WOLF_CRYPTO_CB`](#wolf_crypto_cb).
+
+#### WOLF_CRYPTO_CB_COPY
+
+Enable copy callback for algorithm structures, allowing hash and cipher state to be copied via the crypto callback framework. Requires [`WOLF_CRYPTO_CB`](#wolf_crypto_cb).
+
+#### WOLF_CRYPTO_CB_FREE
+
+Enable free callback for algorithm structures, allowing cleanup of crypto objects via the crypto callback framework. Requires [`WOLF_CRYPTO_CB`](#wolf_crypto_cb).
+
+#### WOLF_CRYPTO_CB_AES_SETKEY
+
+Enable crypto callback support for AES key setup operations. Allows hardware to handle key scheduling. Requires [`WOLF_CRYPTO_CB`](#wolf_crypto_cb).
+
+#### WOLF_CRYPTO_CB_RSA_PAD
+
+Enable crypto callback support for RSA padding operations, allowing custom padding handling by hardware or external modules. Requires [`WOLF_CRYPTO_CB`](#wolf_crypto_cb).
+
+#### DEBUG_CRYPTOCB
+
+Enable debug InfoString functions for crypto callback operations. Useful for debugging which crypto operations are being routed to hardware.
+
+#### WC_USE_DEVID
+
+Specify a default device ID to use for crypto callbacks when no hardware-specific device (such as CAAM) is detected.
+
+#### WC_NO_DEFAULT_DEVID
+
+Disable automatic default device ID selection in the crypto callback framework. When defined, applications must explicitly pass a device ID for all crypto operations.
+
+#### WOLFSSL_CAAM_DEVID
+
+Defines the device ID constant (value 7) for NXP CAAM hardware crypto. Used in default device ID selection logic.
+
+#### NO_SHA2_CRYPTO_CB
+
+Disable crypto callback support for SHA-384 and SHA-512 operations. When defined, these hash operations will always use software implementations.
+
+#### WOLF_CRYPTO_CB_ONLY_RSA
+
+Restricts RSA operations to use only crypto callbacks, disabling all software RSA implementations. Useful when RSA should be delegated entirely to hardware.
+
 #### WOLFSSL_DYN_CERT
 
 Allow allocation of subjectCN and publicKey fields when parsing certificates even with WOLFSSL_NO_MALLOC set. If using the WOLFSSL_NO_MALLOC option with RSA certificates the public key needs to be retained for CA's for validate certificates on the peer's certificate. This appears as a ConfirmSignature error -173 BAD_FUNC_ARG, since the ca->publicKey is NULL.
@@ -1742,6 +1790,106 @@ A Fusion RTOS implementation is used for tickets to represent the difference bet
 
 Can be used for devices which have a small stack size. This increases the use of dynamic memory in `wolfcrypt/src/integer.c`, but can lead to slower performance.
 
+#### WOLFSSL_PTHREADS
+
+Use pthread-based mutex and threading implementations. Auto-detected on most POSIX systems.
+
+#### WOLFSSL_MUTEX_INITIALIZER
+
+Use static mutex initialization (e.g., `PTHREAD_MUTEX_INITIALIZER`) instead of dynamic `pthread_mutex_init`. Useful for reducing initialization overhead.
+
+#### WC_MUTEX_OPS_INLINE
+
+Use inlined mutex operations instead of function calls. Can improve performance on platforms where mutex operations are frequent.
+
+#### WOLFSSL_USE_RWLOCK
+
+Enable reader-writer lock support for improved concurrency in read-heavy workloads.
+
+#### WOLFSSL_THREAD_NO_JOIN
+
+Create threads without join capability (detached threads). Useful on platforms that do not support thread joining.
+
+#### WOLFSSL_ALGO_HW_MUTEX
+
+Enable per-algorithm hardware mutex locks for AES, hash, public-key, and RNG operations. Useful when hardware crypto engines require serialized access.
+
+#### WOLFSSL_CRYPT_HW_MUTEX
+
+Master control for hardware crypto mutex initialization. When enabled, provides `wolfSSL_CryptHwMutexInit`, `Lock`, and `UnLock` functions.
+
+#### USE_WOLFSSL_MEMORY
+
+Enable custom memory allocation hooks (`wolfSSL_SetAllocators`). On by default. Allows replacing malloc/realloc/free with custom implementations.
+
+#### WOLFSSL_TRACK_MEMORY
+
+Enable memory allocation tracking and statistics. Useful for profiling memory usage in wolfSSL/wolfCrypt.
+
+#### WOLFSSL_TRACK_MEMORY_VERBOSE
+
+Enable verbose memory tracking output with per-allocation details. Extends [`WOLFSSL_TRACK_MEMORY`](#wolfssl_track_memory).
+
+#### WOLFSSL_MEM_FAIL_COUNT
+
+Count malloc failures for testing. Allows testing error handling paths by failing after a specified number of allocations.
+
+#### WOLFSSL_CHECK_MEM_ZERO
+
+Verify that sensitive memory (key material, etc.) is properly zeroed on free. Debug tool for detecting potential key material leaks.
+
+#### WOLFSSL_GMTIME
+
+Provide a custom gmtime implementation for platforms without standard C library time functions.
+
+#### STRING_USER
+
+User provides all string function implementations. Disables built-in string function wrappers.
+
+#### USE_WOLF_STRTOK
+
+Use wolfSSL's built-in strtok implementation for portability on platforms without strtok_r.
+
+#### USE_WOLF_STRSEP
+
+Use wolfSSL's built-in strsep implementation for portability.
+
+#### USE_WOLF_STRLCPY
+
+Use wolfSSL's built-in strlcpy implementation for portability on platforms without BSD strlcpy.
+
+#### USE_WOLF_STRLCAT
+
+Use wolfSSL's built-in strlcat implementation for portability.
+
+#### USE_WOLF_STRCASECMP
+
+Use wolfSSL's built-in case-insensitive string comparison for portability.
+
+#### USE_WOLF_STRNCASECMP
+
+Use wolfSSL's built-in length-limited case-insensitive string comparison for portability.
+
+#### USE_WOLF_STRDUP
+
+Use wolfSSL's built-in strdup implementation for portability.
+
+#### WOLFSSL_ATOMIC_OPS
+
+Enable atomic operations for thread-safe reference counting and other operations without requiring full mutexes.
+
+#### WOLFSSL_USER_DEFINED_ATOMICS
+
+User-provided atomic operation implementations. Define this when the platform requires custom atomic primitives.
+
+#### WOLFSSL_LEANPSK
+
+Lean PSK (Pre-Shared Key) build with minimal features. Reduces code size by disabling non-essential features.
+
+#### WOLF_C89
+
+Enable C89 compatibility mode. Ensures the codebase compiles with strict C89/ANSI C compilers.
+
 #### ALT_ECC_SIZE
 
 If using fast math and RSA/DH you can define this to reduce your ECC memory consumption. Instead of using stack for ECC points it will allocate from the heap.
@@ -1840,6 +1988,94 @@ Enable Intel’s RDRAND instruction for wolfSSL’s random source.
 #### FP_ECC
 
 Enables ECC Fixed Point Cache, which speeds up repeated operations against same private key. Can also define number of entries and LUT bits using `FP_ENTRIES` and `FP_LUT` to reduce default static memory usage.
+
+#### FP_ENTRIES
+
+Defines the number of cache entries (default 15) for the ECC fixed-point multiplication lookup table. Requires [`FP_ECC`](#fp_ecc). Adjust to balance memory usage and performance.
+
+#### FP_LUT
+
+Sets the lookup table bit size (2-12, default 8) for ECC fixed-point precomputation. Larger values use more memory but provide faster verification. Requires [`FP_ECC`](#fp_ecc).
+
+#### FP_ECC_CONTROL
+
+Auto-selects cached fixed-point ECC verification using SP functions when [`WOLFSSL_HAVE_SP_ECC`](#wolfssl_have_sp_ecc) is available. Enabled by default when applicable.
+
+#### HAVE_ECC_CHECK_PUBKEY_ORDER
+
+Enables ECC public key order validation during import to detect invalid keys. Auto-enabled unless [`NO_ECC_CHECK_PUBKEY_ORDER`](#no_ecc_check_pubkey_order) is defined or hardware accelerators are in use.
+
+#### HAVE_ECC_MAKE_PUB
+
+Enables the `wc_ecc_make_pub` function to compute a public key from a private key. Enabled by default.
+
+#### HAVE_ECC_VERIFY_HELPER
+
+Enables ECC signature verification helper functions. Auto-enabled unless hardware accelerators are in use.
+
+#### NO_ECC_CHECK_PUBKEY_ORDER
+
+Disables ECC public key order validation checks during key import. Not recommended for production use as it skips important security validation.
+
+#### WC_NO_CACHE_RESISTANT
+
+Disables cache-resistant operations (conditional swaps) in ECC scalar multiplication to reduce overhead. Not recommended as it may expose operations to cache-based side-channel attacks.
+
+#### WOLFSSL_ECC_NO_SMALL_STACK
+
+Disables `WOLFSSL_SMALL_STACK` optimizations for ECC operations, forcing stack allocation instead of heap. Useful when stack space is plentiful and heap allocation overhead is undesirable.
+
+#### WOLFSSL_PUBLIC_ECC_ADD_DBL
+
+Makes `ecc_projective_add_point` and `ecc_projective_dbl_point` public APIs instead of internal-only functions. Useful for applications that need direct access to ECC point arithmetic.
+
+#### SQRTMOD_USE_MOD_EXP
+
+Computes square root modulo prime using modular exponentiation instead of the Jacobi symbol method for compressed key decompression. Off by default.
+
+#### WOLFSSL_ECIES_OLD
+
+Uses the original wolfSSL ECIES format where the public key is not included in the shared secret material. Off by default.
+
+#### WOLFSSL_ECIES_ISO18033
+
+Uses the ISO 18033 ECIES standard which includes the public key in the shared secret derivation. Off by default.
+
+#### WOLFSSL_ECIES_GEN_IV
+
+Generates a random IV for ECIES encryption instead of deriving it from the KDF output. Off by default.
+
+#### WOLFSSL_SP_521
+
+Enables single-precision (SP) math optimized implementation for the P-521 ECC curve. Off by default; auto-enabled when [`WOLFSSL_SP_MATH`](#wolfssl_sp_math) or [`WOLFSSL_SP_MATH_ALL`](#wolfssl_sp_math_all) is set and `HAVE_ECC521` is defined.
+
+#### WOLFSSL_SP_SM2
+
+Enables single-precision (SP) math optimized implementation for the SM2 curve (Chinese cryptographic standard). Auto-enabled when [`WOLFSSL_SM2`](#wolfssl_sm2) is set.
+
+#### WOLF_CRYPTO_CB_ONLY_ECC
+
+Restricts ECC operations to use only crypto callbacks, disabling all software ECC implementations. Useful when all ECC operations should be delegated to hardware or an external module. Off by default.
+
+#### WC_ASYNC_ENABLE_ECC
+
+Enables asynchronous (non-blocking) ECC operations with crypto callbacks. Requires [`WOLFSSL_ASYNC_CRYPT`](#wolfssl_async_crypt). Off by default.
+
+#### WC_ASYNC_ENABLE_ECC_KEYGEN
+
+Enables asynchronous ECC key generation, allowing key generation to be offloaded to hardware accelerators. Requires [`WOLFSSL_ASYNC_CRYPT`](#wolfssl_async_crypt). Off by default.
+
+#### PLUTON_CRYPTO_ECC
+
+Enables use of ARM Pluton trusted execution environment for ECC operations. Off by default.
+
+#### WOLFSSL_CAAM_BLACK_KEY_SM
+
+Uses NXP CAAM secure memory for encrypted black key storage in ECC operations. Off by default.
+
+#### WOLFSSL_KCAPI_ECC
+
+Offloads ECC operations to the Linux Kernel Crypto API (kcAPI) for hardware acceleration. Off by default.
 
 #### WOLFSSL_ASYNC_CRYPT
 
