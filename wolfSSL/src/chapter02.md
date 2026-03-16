@@ -636,6 +636,11 @@ Used for disabliing TLS cipher suites thst use AES GCM. It is used internally wh
 
 Disables time checking for ASN. Note: This should be used with caution because all certificate begin/end date checking will be skipped.
 
+
+#### NO_BIO
+
+Disables the BIO (Basic I/O) abstraction layer. Reduces code size when BIO functionality such as `BIO_new()`, `BIO_read()`, `BIO_write()` is not needed.
+
 #### WOLFSSL_CERT_PIV
 
 Enables PIV (Personal Identity Verification) certificate support for government smart card applications.
@@ -700,6 +705,11 @@ Allows X.509 v1 certificates to contain extensions. Per RFC 5280, extensions are
 
 Uses wolfSSL's own date validation implementation instead of the platform's.
 
+
+#### USE_WOLF_TM
+
+Uses wolfSSL's own `struct tm` definition instead of the system-provided one. Needed on platforms without a standard `struct tm`.
+
 #### WC_ASN_RUNTIME_DATE_CHECK_CONTROL
 
 Enables runtime control of certificate date checking. Allows enabling or disabling date validation at runtime via API.
@@ -716,6 +726,11 @@ Sets the clock skew tolerance (in seconds) for certificate not-before date check
 
 Disables skipping of trailing padding bytes in ASN.1 parsing.
 
+
+#### NO_WOLFSSL_STUB
+
+Disables stub implementations of unimplemented OpenSSL compatibility functions. Without stubs, calling unimplemented functions will result in a linker error rather than a runtime failure.
+
 #### WOLFSSL_ALT_NAMES
 
 Enables Subject Alternative Name (SAN) support in certificate generation and parsing.
@@ -724,9 +739,19 @@ Enables Subject Alternative Name (SAN) support in certificate generation and par
 
 Stores Subject Alternative Names without reversing the order. By default, SANs are stored in reverse order.
 
+
+#### WOLFSSL_ALTERNATIVE_DOWNGRADE
+
+Uses an alternative protocol downgrade detection mechanism instead of the standard approach.
+
 #### WOLFSSL_IP_ALT_NAME
 
 Enables IP address entries in Subject Alternative Names.
+
+
+#### WOLFSSL_JNI
+
+Enables APIs and behaviors needed for Java JNI (wolfSSL JNI/JSSE) compatibility.
 
 #### WOLFSSL_RID_ALT_NAME
 
@@ -755,6 +780,21 @@ Allows the Authority Key Identifier extension to be marked as critical.
 #### WOLFSSL_ALLOW_CRIT_SKID
 
 Allows the Subject Key Identifier extension to be marked as critical.
+
+
+#### WOLFSSL_ALLOW_MAX_FRAGMENT_ADJUST
+
+Allows runtime adjustment of the maximum fragment size after the initial TLS negotiation has completed.
+
+
+#### WOLFSSL_ALLOW_NO_SUITES
+
+Allows creation of SSL/CTX objects even when no cipher suites are available. Normally an error is raised if no suites match the build configuration.
+
+
+#### WOLFSSL_ALLOW_NO_CN_IN_SAN
+
+Allows certificates that have a Subject Alternative Name (SAN) extension but no Common Name (CN) in the subject.
 
 #### WC_ASN_UNKNOWN_EXT_CB
 
@@ -796,6 +836,11 @@ Enables OID (Object Identifier) encoding support for generating ASN.1 OIDs from 
 
 Uses the old OID sum calculation method. For backwards compatibility with applications that depend on specific OID sum values.
 
+
+#### WOLFSSL_OPENVPN
+
+Enables OpenVPN compatibility behaviors in wolfSSL. Required when using wolfSSL as the TLS provider for OpenVPN.
+
 #### HAVE_OCSP_RESPONDER
 
 Enables OCSP responder functionality. Allows wolfSSL to act as an OCSP responder that signs and sends OCSP responses.
@@ -815,6 +860,11 @@ Enables PKCS#12 (PFX) format support for bundling private keys, certificates, an
 #### WOLFSSL_DILITHIUM_NO_ASN1
 
 Disables ASN.1 encoding/decoding for Dilithium keys and signatures. Uses raw format instead.
+
+
+#### WOLFSSL_DISABLE_EARLY_SANITY_CHECKS
+
+Disables early sanity checks on incoming TLS messages. May be needed for interoperability with non-compliant TLS implementations.
 
 #### WOLFSSL_DILITHIUM_FIPS204_DRAFT
 
@@ -859,6 +909,16 @@ Enables MD2 hash algorithm support. Only needed for legacy certificate compatibi
 #### NO_CHECK_PRIVATE_KEY
 
 This macro disables additional private key checking that is on by default. This enables checking to validate the private key is a pair for the public key. It is supported for RSA, ECDSA, ED25519, ED448, Falcon, Dilithium and Sphincs.
+
+
+
+#### NO_CIPHER_SUITE_ALIASES
+
+Disables cipher suite name aliases. Only the primary cipher suite name will be recognized, not alternative names.
+
+#### NO_CHAPOL_AEAD
+
+Disables ChaCha20-Poly1305 AEAD cipher suites. Use when ChaCha20-Poly1305 support is not desired even though the algorithms are compiled in.
 
 #### NO_DH
 
@@ -928,6 +988,11 @@ Used as a mask to blind the private key. The blinding is used to proctect aginst
 
 If defined, a DTLS server will not do a cookie exchange on successful client resumption: the resumption will be faster (one RTT less) and will consume less bandwidth (one ClientHello and one HelloVerifyRequest/HelloRetryRequest less). On the other hand, if a valid SessionID/ticket/psk is collected, forged clientHello messages will consume resources on the server. For DTLS 1.3, using this option also allows for the server to process Early Data/0-RTT Data. Without this, the Early Data would be dropped since the server doesn't enter stateful processing until receiving a verified ClientHello with the cookie. To allow DTLS 1.3 resumption without the cookie exchange:- Compile wolfSSL with `WOLFSSL_DTLS13_NO_HRR_ON_RESUME` defined - Call wolfSSL_dtls13_no_hrr_on_resume(ssl, 1) on the WOLFSSL object to disable the cookie exchange on resumption - Continue like with a normal connection.
 
+
+#### WOLFSSL_DTLS13_SEND_MOREACK_DEFAULT
+
+Enables sending more ACK messages by default in DTLS 1.3 for improved reliability on lossy networks.
+
 #### WOLFSSL_NO_CLIENT_AUTH
 
 Disables the caching code required for using Ed25519 and Ed448.
@@ -940,9 +1005,29 @@ Portability macro for platforms that do not support ./ for test paths in wolfssl
 
 No default ticket encryption callback, server only. The application must set its own callback to use session tickets.
 
+
+#### WOLFSSL_NO_DTLS_SIZE_CHECK
+
+Disables DTLS record size validation checks. May be needed for interoperability with implementations that send non-standard record sizes.
+
+
+#### WOLFSSL_NO_ETM_ALERT
+
+Suppresses the alert message when Encrypt-Then-MAC extension negotiation fails. Silently falls back to MAC-then-encrypt.
+
 #### WOLFSSL_NO_SOCK
 
 Portability macro for disabling built-in socket support. If using TLS without sockets typically `WOLFSSL_USER_IO` would be defined and callbacks used for send/recv.
+
+
+#### WOLFSSL_NO_STRICT_CIPHER_SUITE
+
+Relaxes strict cipher suite validation requirements. Allows cipher suites that may not perfectly match the negotiated protocol version.
+
+
+#### WOLFSSL_NO_TICKET_EXPIRE
+
+Disables session ticket expiration checking. Session tickets will be accepted regardless of their age.
 
 #### WOLFSSL_NO_TLS12
 
@@ -1013,6 +1098,11 @@ Enables the new version of ASN parsing code that uses template-based ASN.1 proce
 #### WOLFSSL_DEBUG_ASN_TEMPLATE
 Enables debugging output when using ASN.1 templates. Only relevant when used with `WOLFSSL_ASN_TEMPLATE`.
 
+
+#### WOLFSSL_DEBUG_CERTS
+
+Enables debug logging for certificate processing operations including parsing, validation, and chain building.
+
 #### WOLFSSL_ASN_TEMPLATE_TYPE_CHECK
 Use ASN functions to better test compiler type issues for testing. Only relevant when used with `WOLFSSL_ASN_TEMPLATE`
 
@@ -1034,13 +1124,33 @@ Turns on the use of DTLS, or datagram TLS. This isn't widely supported or used.
 
 Enables DTLS Connection ID support (RFC 9146). Allows DTLS connections to survive IP address changes by identifying connections with a CID rather than the transport address.
 
+
+#### WOLFSSL_DTLS_DROP_STATS
+
+Enables tracking of DTLS packet drop statistics for monitoring and debugging DTLS connection quality.
+
+
+#### WOLFSSL_DTLS_DISALLOW_FUTURE
+
+Rejects DTLS records that have a future epoch number. Provides stricter epoch validation during DTLS communication.
+
 #### WOLFSSL_ALLOW_TLSV10
 
 Allows TLS 1.0 connections. TLS 1.0 is disabled by default for security reasons. Only enable when legacy compatibility is required.
 
+
+#### WOLFSSL_ALLOW_TLS_SHA1
+
+Allows SHA-1 based cipher suites and signatures in TLS, even when SHA-1 is otherwise restricted by security policy.
+
 #### WOLFSSL_EITHER_SIDE
 
 Allows the same `WOLFSSL_CTX` to be used for both client and server connections. By default, a context is configured for either client or server at creation time.
+
+
+#### WOLFSSL_EGD_NBLOCK
+
+Enables non-blocking EGD (Entropy Gathering Daemon) support for random number generation on systems using EGD.
 
 #### HAVE_SNI
 
@@ -1050,9 +1160,19 @@ Enables Server Name Indication (SNI) TLS extension support (RFC 6066). Allows cl
 
 Keeps the SNI value in the SSL session after the handshake completes. By default, the SNI data is freed after the handshake to save memory.
 
+
+#### WOLFSSL_ALWAYS_VERIFY_CB
+
+Always invokes the certificate verify callback, even when verification succeeds. By default the callback is only called on failure.
+
 #### HAVE_TRUNCATED_HMAC
 
 Enables the Truncated HMAC TLS extension (RFC 6066). Allows using 80-bit HMAC tags instead of the full size to reduce bandwidth.
+
+
+#### HAVE_TIME_T_TYPE
+
+Indicates the platform provides a `time_t` type definition. Set automatically on most platforms.
 
 #### HAVE_SECURE_RENEGOTIATION
 
@@ -1106,9 +1226,24 @@ Enables TLS packet sniffing support. Allows decrypting and inspecting TLS traffi
 
 Enables web server-oriented features in wolfSSL, such as additional HTTP helper functions.
 
+
+
+#### HAVE_WOLF_EVENT
+
+Enables wolf event-driven processing support for async operations. Provides an event queue for managing pending async crypto operations.
+
+#### HAVE_WRITE_DUP
+
+Enables write duplication support, allowing separate threads to perform SSL read and write operations simultaneously on the same SSL object.
+
 #### NO_CERTS
 
 Disables all certificate processing in wolfSSL. Use for PSK-only configurations where no certificate handling is needed, significantly reducing code size.
+
+
+#### NO_CLIENT_CACHE
+
+Disables the client-side session cache. Only the server session cache will be used for session resumption.
 
 #### WOLFSSL_HAVE_PRF
 
@@ -1366,6 +1501,11 @@ OpenSSL compat layer. Needs old names disabled. Mode to allow wolfSSL and OpenSS
 
 Specifies the version number to implement OpenSSL compatibility.
 
+
+#### OLD_HELLO_ALLOWED
+
+Allows SSLv2-format ClientHello messages for backward compatibility with legacy clients that use the SSLv2 record format to negotiate higher protocol versions.
+
 #### WOLFSSL_NGINX
 
 OpenSSL compatibility application specific. Use, nginx `(--enable-nginx) WOLFSSL_NGINX`.
@@ -1396,6 +1536,11 @@ OpenSSL compatibility specific macro.
 
 OpenSSL compatibility specific. Enable DH Extra for QT, OpenSSL all, OpenSSH, and static ephemeral.
 
+
+#### WOLFSSL_QNX_CAAM
+
+Enables QNX CAAM (Cryptographic Acceleration and Assurance Module) support for hardware-accelerated crypto on QNX-based systems.
+
 #### WOLFSSL_HAPROXY
 
 OpenSSL compatibility specific macro.
@@ -1403,6 +1548,11 @@ OpenSSL compatibility specific macro.
 #### WOLFSSL_ASYNC_IO
 
 Used in async cleanup.
+
+
+#### WOLFSSL_ASYNC_CRYPT_SW
+
+Enables software-based async crypto simulation for testing. Simulates async behavior without requiring actual async hardware.
 
 #### WOLFSSL_ATMEL
 
@@ -1467,6 +1617,11 @@ Defines max quic capacity as 1024*1024 -- 1 MB.
 #### WOLFSSL_RENESAS_FSPSM_TLS
 
 Not yet supported TLS related capabilities.
+
+
+#### WOLFSSL_REFCNT_ERROR_RETURN
+
+Returns errors on reference counting failures in SSL objects instead of silently continuing. Helps detect resource management issues.
 
 #### WOLFSSL_RENESAS_TSIP_TLS
 
@@ -1552,6 +1707,16 @@ It requires `WOLFSSL_STATIC_MEMORY` to be defined. It uses smaller type sizes fo
 
 Turns on the use of DTLS session export and import. This allows for serializing and sending/receiving the current state of a DTLS session.
 
+
+#### WOLFSSL_SESSION_EXPORT_DEBUG
+
+Enables debug logging for session export and import operations. Helps diagnose issues with session serialization.
+
+
+#### WOLFSSL_SESSION_EXPORT_NOPEER
+
+Exports sessions without including peer certificate information. Reduces exported session size when peer cert is not needed.
+
 #### WOLFSSL_ARMASM
 
 Turns on the use of ARMv8 hardware acceleration.
@@ -1592,9 +1757,19 @@ Allows CA's to be presented by peer, but not part of a valid chain. Default wolf
 
 Allows wolfSSL to use trusted system CA certificates for verification when [`wolfSSL_CTX_load_system_CA_certs()`](group__CertsKeys.html#function-wolfssl_ctx_load_system_ca_certs) is called, either by loading them into wolfSSL certificate manager, or by invoking system authentication APIs. See [`wolfSSL_CTX_load_system_CA_certs()`](group__CertsKeys.html#function-wolfssl_ctx_load_system_ca_certs) for more details. This preprocessor macro is automatically set by the `--enable-sys-ca-certs` configure option.
 
+
+#### WOLFSSL_SYS_CRYPTO_POLICY
+
+Honors system-level crypto policy settings (e.g., `/etc/crypto-policies`) for restricting available algorithms and key sizes.
+
 #### WOLFSSL_APPLE_NATIVE_CERT_VERIFICATION
 
 Enables the use of Apple's native trust APIs when authenticating TLS peer certificates. Requires [WOLFSSL_SYS_CA_CERTS](#WOLFSSL_SYS_CA_CERTS) to be defined. This macro does not need to be set by the user if building with `configure` or `CMake` on iOS or other apple devices, but should be explicitly set on MacOS if you wish to use the native verification methods.
+
+
+#### WOLFSSL_TEST_APPLE_NATIVE_CERT_VALIDATION
+
+Enables testing mode for Apple native certificate validation. Used for unit testing the Apple cert validation integration.
 
 #### WOLFSSL_CUSTOM_CURVES
 
@@ -1608,9 +1783,29 @@ Enables ECC compressed key support.
 
 Enables additional alerts to be sent during a TLS connection. This feature is also enabled automatically when [`--enable-opensslextra`](#--enable-opensslextra) is used.
 
+
+#### WOLFSSL_EXTRA
+
+Enables extra SSL session information tracking and APIs beyond the standard set. Provides additional session details for debugging and monitoring.
+
 #### WOLFSSL_DEBUG_TLS
 
 Enables additional debugging print outs during a TLS connection
+
+
+
+
+#### WOLFSSL_DEBUG_TRACE_ERROR_CODES
+
+Enables tracing of error code origins for debugging. Logs where error codes are generated in the wolfSSL source code.
+
+#### WOLFSSL_DEBUG_MEMORY
+
+Enables memory allocation debugging. Logs `malloc()` and `free()` calls with file name and line number information.
+
+#### WOLFSSL_DEBUG_OPENSSL
+
+Enables debug logging for the OpenSSL compatibility layer functions. Helps trace which OpenSSL compatibility APIs are being called.
 
 #### HAVE_BLAKE2
 
@@ -1676,6 +1871,11 @@ This option is only supported with `HAVE_RPK` (Raw Public Keys) and is a placeho
 
 Enable to include DILITHIUM post quantum cryptography/signature algo.
 
+
+#### HAVE_DH_DEFAULT_PARAMS
+
+Includes default DH parameters for key exchange when the application does not explicitly load its own DH parameters.
+
 #### HAVE_ED25519_KEY_IMPORT
 
 ED25519 config. Enables Ed255519 and Curve25519 options for granular control of sign, verify, shared secret, import, and export.
@@ -1688,6 +1888,11 @@ Enable "extra" EX data APIs for user information in CTX/WOLFSSL.
 
 Set the extra data and cleanup callback against the RSA key at an index.
 
+
+#### HAVE_EX_DATA_CRYPTO
+
+Enables extra data (ex_data) support for wolfCrypt objects such as RSA and ECC keys, in addition to SSL/CTX/X509 objects.
+
 #### HAVE_FALCON
 
 Enables post-quantum crypto FALCON from OpenQuantumSafe.
@@ -1695,6 +1900,11 @@ Enables post-quantum crypto FALCON from OpenQuantumSafe.
 #### HAVE_FIPS
 
 Used when implementing different FIPS versions.
+
+
+#### HAVE_FUZZER
+
+Enables fuzzing callback support for security testing. Allows a callback to be set that can modify or inspect TLS records during processing.
 
 #### HAVE_KEYING_MATERIAL
 
@@ -1708,9 +1918,19 @@ Included in ASN template code. Used to decode in some cases.
 
 Sets maximum fragment size. TLS extension.
 
+
+#### HAVE_MEMCACHED
+
+Enables APIs and behaviors needed for memcached compatibility with wolfSSL.
+
 #### WOLFSSL_PSK_ONE_ID
 
 Enables support for only one PSK ID with TLS 1.3.
+
+
+#### WOLFSSL_PSK_IDENTITY_ALERT
+
+Sends a specific TLS alert when PSK identity lookup fails during the handshake, rather than a generic handshake failure.
 
 #### SHA256_MANY_REGISTERS
 
@@ -1747,6 +1967,11 @@ Defines max size of date either used as byte lastdate, or byte nextdate.
 #### MAX_EARLY_DATA_SZ
 
 Used to define the maximum early data size.
+
+
+#### MAX_EX_DATA
+
+Sets the maximum number of extra data (ex_data) entries that can be stored per SSL/CTX/X509 object. Default is 5 if not defined.
 
 #### WOLFSSL_MAX_SEND_SZ
 
@@ -1808,9 +2033,34 @@ Enables user-defined PSK cipher.
 
 Enable feature which uses faster DH and RSA prime checking.
 
+
+#### WOLFSSL_OLD_SET_CURVES_LIST
+
+Uses the old-style curve list parsing for backward compatibility with applications that set curves using the older format.
+
+
+
+#### WOLFSSL_OLD_TIMINGPADVERIFY
+
+Uses the old timing-based padding verification for CBC cipher suites. The new method provides better constant-time behavior.
+
+#### WOLFSSL_OLDTLS_AEAD_CIPHERSUITES
+
+Enables AEAD cipher suites (GCM, CCM) for TLS versions prior to 1.2. These suites are normally only available in TLS 1.2 and later.
+
+
+#### WOLFSSL_OLDTLS_SHA2_CIPHERSUITES
+
+Enables SHA-2 based cipher suites for TLS versions prior to 1.2. These suites are normally only available in TLS 1.2 and later.
+
 #### WOLFSSL_STATIC_RSA
 
 Static ciphers are strongly discouraged and should never be used if avoidable. However there are still legacy systems that ONLY support static cipher suites. To that end if you need to connect to a legacy peer only supporting static RSA cipher suites use this to enable support for static RSA in wolfSSL. (See also [`WOLFSSL_STATIC_PSK`](#wolfssl_static_psk) and [`WOLFSSL_STATIC_DH`](#wolfssl_static_dh))
+
+
+#### WOLFSSL_STRONGEST_HASH_SIG
+
+Prefers the strongest available hash algorithm when performing signature operations during the TLS handshake.
 
 #### WOLFSSL_STATIC_PSK
 
@@ -1828,9 +2078,19 @@ Turns on support for NULL ciphers. This option is highly discouraged from a secu
 
 Turns on support for anonymous cipher suites. (Never recommended, some valid use cases involving closed or private networks detached from the web)
 
+
+#### HAVE_ATEXIT
+
+Registers `wolfSSL_Cleanup()` as an `atexit()` handler for automatic cleanup when the program exits.
+
 #### HAVE_LIBOQS
 
 Turn on support for the OpenQuantumSafe team's liboqs integration. Please see the appendix "Experimenting with Quantum-Safe Cryptography" in this document for more details.
+
+
+#### HAVE_LIGHTY
+
+Enables APIs and behaviors needed for lighttpd web server compatibility with wolfSSL.
 
 #### WOLFSSL_SP_4096
 
@@ -1908,9 +2168,19 @@ Enable TLS 1.3 protocol implementation.
 
 Limits specified by https://www.rfc-editor.org/rfc/rfc9147.html#name-aead-limits. We specify the limit by which we need to do a key update as the halfway point to the hard decryption fail limit.
 
+
+#### WOLFSSL_TLS13_DRAFT
+
+Uses draft TLS 1.3 specification parameters for testing against draft implementations. Not for production use.
+
 #### WOLFSSL_TLS13_MIDDLEBOX_COMPAT
 
 Enable middlebox compatibility in the TLS 1.3 handshake. This includes sending ChangeCipherSpec before encrypted messages and including a session ID.
+
+
+#### WOLFSSL_TLS13_IGNORE_PT_ALERT_ON_ENC
+
+Ignores plaintext alerts received when encrypted records are expected in TLS 1.3. May improve interoperability with some implementations.
 
 #### WOLFSSL_TLS13_SHA512
 
@@ -1931,6 +2201,11 @@ Groups the early data message with the ClientHello when sending. Reduces the num
 #### WOLFSSL_CHECK_SIG_FAULTS
 
 Verifies the ECC signature after signing to detect fault injection attacks. Useful in environments where hardware fault attacks are a concern.
+
+
+#### WOLFSSL_CIPHER_INTERNALNAME
+
+Uses wolfSSL internal cipher suite names instead of IANA-standard names when reporting cipher suite information through the API.
 
 #### WOLFSSL_PSK_ID_PROTECTION
 
@@ -1972,6 +2247,11 @@ Specifies Max ticket age. For TLS 1.3, this is 7 days.
 
 TLS13_TICKET_NONCE_STATIC_SZ is not supported in this `FIPS_VERSION_GE`.
 
+
+#### TIME_OVERRIDES
+
+Application provides custom time functions (`XTIME`, `XGMTIME`, etc.) instead of using the system time functions.
+
 #### TLS13_TICKET_NONCE_MAX_SZ
 
 Defines version max size for ticket nonce. Max size is defined as 255 bytes.
@@ -1987,6 +2267,11 @@ Use AES256-GCM to encrypt/decrypt session tickets in default callback. Server on
 #### WOLFSSL_TICKET_ENC_CHACHA20_POLY1305
 
 Use ChaCha20-Poly1305 to encrypt/decrypt session tickets in the default callback. If none are defined, the default algorithm is used, and algorithms are compiled. This is server-only.
+
+
+#### WOLFSSL_TICKET_ENC_CBC_HMAC
+
+Uses CBC+HMAC for session ticket encryption instead of an AEAD cipher. Provides an alternative for builds without AEAD support.
 
 #### WOLFSSL_TICKET_EXTRA_PADDING_SZ
 
@@ -2011,6 +2296,11 @@ Show certs will output certs when defined. Use for embedded debugging.
 #### SHOW_SECRETS
 
 Used for debugging. It will show applicable secrets.
+
+
+#### SHOW_SIZES
+
+Displays sizes of major wolfSSL structures at initialization. Useful for debugging and memory analysis on constrained systems.
 
 #### DEBUG_UNIT_TEST_CERTS
 
@@ -2056,6 +2346,11 @@ Portability improvement with DTLS 1.3. Used in DTLS 1.3 to identify size before 
 #### WOLFSSL_DTLS_FRAG_POOL_SZ
 
 Defines the allowed number of fragments per specified time.
+
+
+#### WOLFSSL_DTLS_MTU
+
+Enables DTLS MTU (Maximum Transmission Unit) management APIs for controlling the maximum datagram size during DTLS communication.
 
 #### WOLFSSL_CLIENT_SESSION_DEFINED
 
@@ -2109,6 +2404,11 @@ DTLS multicast feature.
 
 Multicast feature defined as max allowed 100 peers.
 
+
+#### WOLFSSL_MYSQL_COMPATIBLE
+
+Enables MySQL protocol compatibility behaviors in wolfSSL. Required when using wolfSSL as the TLS provider for MySQL.
+
 #### WOLFSSL_NAMES_STATIC
 
 Uses static ECC structs for Position Independent Code (PIC).
@@ -2121,6 +2421,11 @@ TLS extension used by DTLS 1.3.
 
 Feature certificate policy set extension.
 
+
+#### WOLFSSL_SECURE_RENEGOTIATION_ON_BY_DEFAULT
+
+Enables secure renegotiation by default for all new SSL contexts without requiring an explicit API call.
+
 #### WOLFSSL_SESSION_ID_CTX
 
 Used to copy over application session context ID.
@@ -2128,6 +2433,11 @@ Used to copy over application session context ID.
 #### WOLFSSL_SESSION_TIMEOUT
 
 Default session resumption cache timeout in seconds is used to define timeout manually.
+
+
+#### WOLFSSL_SET_CIPHER_BYTES
+
+Enables setting cipher suites by raw two-byte values instead of name strings. Useful for programmatic cipher suite configuration.
 
 #### KEEP_OUR_CERT
 
@@ -2360,6 +2670,11 @@ Makes RNG operations blocking, retrying on transient failures rather than return
 #### WC_VERBOSE_RNG
 
 Enables verbose debug output for RNG operations. Prints detailed information about seed generation, DRBG state, and health test results.
+
+
+#### WC_X25519_NONBLOCK
+
+Enables non-blocking X25519 key agreement operations. Allows X25519 computations to yield and resume, useful for cooperative multitasking.
 
 #### WC_RNG_SEED_CB
 
@@ -2622,6 +2937,11 @@ Enable reader-writer lock support for improved concurrency in read-heavy workloa
 
 Create threads without join capability (detached threads). Useful on platforms that do not support thread joining.
 
+
+#### WOLFSSL_THREADED_CRYPT
+
+Enables multi-threaded cryptographic operations for improved performance on multi-core systems. Allows encryption/decryption to run in parallel.
+
 #### WOLFSSL_ALGO_HW_MUTEX
 
 Enable per-algorithm hardware mutex locks for AES, hash, public-key, and RNG operations. Useful when hardware crypto engines require serialized access.
@@ -2690,6 +3010,11 @@ Use wolfSSL's built-in strdup implementation for portability.
 
 Enable atomic operations for thread-safe reference counting and other operations without requiring full mutexes.
 
+
+#### WOLFSSL_ATOMIC_INITIALIZER
+
+Provides a static initializer for atomic variables used in thread-safe cleanup operations.
+
 #### WOLFSSL_USER_DEFINED_ATOMICS
 
 User-provided atomic operation implementations. Define this when the platform requires custom atomic primitives.
@@ -2717,6 +3042,11 @@ When defined CRT is not used which saves on some memory but slows down RSA opera
 #### WOLFSSL_SHA3_SMALL
 
 When SHA3 is enabled this macro will reduce build size.
+
+
+#### WOLFSSL_SHUTDOWNONCE
+
+Ensures `wolfSSL_shutdown()` only sends one `close_notify` alert even if called multiple times. Prevents duplicate shutdown messages.
 
 #### WOLFSSL_SHAKE128
 
@@ -2895,6 +3225,11 @@ This allows overriding the maximum name support for an X.509 certificate field.
 Special small OpenSSL compat layer for certs.
 
 
+
+#### OPENSSL_EXTRA_NO_ASN1
+
+Enables OpenSSL extra compatibility APIs but excludes ASN1 object functions. Useful when ASN1 compatibility is not needed to reduce code size.
+
 ### Increasing Performance
 
 #### USE_INTEL_SPEEDUP
@@ -3045,6 +3380,11 @@ Disables `WOLFSSL_SMALL_STACK` optimizations for ECC operations, forcing stack a
 
 Makes `ecc_projective_add_point` and `ecc_projective_dbl_point` public APIs instead of internal-only functions. Useful for applications that need direct access to ECC point arithmetic.
 
+
+#### WOLFSSL_PYTHON
+
+Enables APIs and behaviors needed for the Python wolfSSL module compatibility.
+
 #### SQRTMOD_USE_MOD_EXP
 
 Computes square root modulo prime using modular exponentiation instead of the Jacobi symbol method for compressed key decompression. Off by default.
@@ -3052,6 +3392,11 @@ Computes square root modulo prime using modular exponentiation instead of the Ja
 #### WOLFSSL_ECIES_OLD
 
 Uses the original wolfSSL ECIES format where the public key is not included in the shared secret material. Off by default.
+
+
+#### WOLFSSL_ECDSA_MATCH_HASH
+
+Requires the ECDSA signature hash algorithm to match the curve's preferred hash (e.g., P-256 uses SHA-256, P-384 uses SHA-384).
 
 #### WOLFSSL_ECIES_ISO18033
 
@@ -3387,6 +3732,11 @@ Can be defined when building for the FreeRTOS windows simulator (<https://www.fr
 
 Can be defined when building for ChibiOS RTOS.
 
+
+#### WOLFSSL_CLEANUP_THREADSAFE_BY_ATOMIC_OPS
+
+Uses atomic operations to make `wolfSSL_Cleanup()` thread-safe without requiring a mutex.
+
 #### WOLFSSL_CMSIS_RTOS
 
 Can be defined when building for Mbed CMIS-RTOS.
@@ -3455,6 +3805,11 @@ Use when building for devkitPro.
 
 Used only with implementation for VxWorks 6.x only.
 
+
+#### WOLFSSL_VERIFY_CB_ALL_CERTS
+
+Calls the certificate verify callback for all certificates in the chain, not just the peer certificate.
+
 #### WOLFSSL_WICED
 
 Used if building for WICED Studio.
@@ -3503,6 +3858,11 @@ Can be defined when using wolfSSL with the LwIP TCP/IP stack (<https://savannah.
 
 Can be defined when using wolfSSL with the ISO-TP transport protocol, typically used for CAN bus. A usage example can be found in the [wolfssl-examples repository](https://github.com/wolfssl/wolfssl-examples).
 
+
+#### WOLFSSL_IOTSAFE
+
+Enables IoTSAFE (GSMA) applet support for secure element operations. Allows TLS keys and crypto to be handled by an IoTSAFE-compliant SIM.
+
 #### WOLFSSL_GAME_BUILD
 
 Can be defined when building wolfSSL for a game console.
@@ -3510,6 +3870,11 @@ Can be defined when building wolfSSL for a game console.
 #### WOLFSSL_LSR
 
 Can be defined if building for LSR.
+
+
+#### WOLFSSL_LOCAL_X509_STORE
+
+Uses a local X509 certificate store per SSL context instead of a global one. Provides better isolation between contexts.
 
 #### FREESCALE_MQX
 
@@ -3554,6 +3919,16 @@ Can be defined to use built-in AES hardware for AES 128 ECB encrypt when porting
 #### WOLFSSL_CONTIKI
 
 Can be defined to enable support for the Contiki operating system.
+
+
+#### WOLFSSL_COPY_CERT
+
+Copies the certificate buffer when loading into an SSL object instead of referencing it, ensuring the SSL object owns its own copy of the data.
+
+
+#### WOLFSSL_COPY_KEY
+
+Copies the private key buffer when loading into an SSL object instead of referencing it, ensuring the SSL object owns its own copy of the data.
 
 #### WOLFSSL_APACHE_MYNEWT
 
@@ -5402,3 +5777,33 @@ expansion (CAAM_ECC_EXPANSION and CAAM_BLOB_EXPANSION). When wolfSSL code finds
 that these macros are defined (the patch has been applied) then it tries to
 compile in use of the expanded driver.
 
+
+
+#### WOLFSSL_HAVE_ERROR_QUEUE
+
+Enables an OpenSSL-compatible error queue for storing and retrieving error information via `ERR_get_error()` and related functions.
+
+
+
+#### WOLFSSL_HAVE_CERT_SERVICE
+
+Enables certificate service callbacks for custom certificate handling during the TLS handshake.
+
+
+#### WOLFSSL_HEAP_TEST
+
+Enables heap-related testing utilities for verifying memory allocation behavior in wolfSSL.
+
+#### WOLFSSL_NO_OPENSSL_RAND_CB
+
+Disables OpenSSL RAND callback compatibility. Prevents the RNG from being overridden via OpenSSL-style `RAND_set_rand_method()` callbacks.
+
+
+#### WOLFSSL_NO_REALLOC
+
+Disables use of `realloc()`. All buffer resizing will be done via `malloc()` + `memcpy()` + `free()` instead.
+
+
+#### WOLFSSL_DEBUG_DTLS
+
+Enables debug logging for DTLS-specific operations including retransmission, epoch management, and record processing.
