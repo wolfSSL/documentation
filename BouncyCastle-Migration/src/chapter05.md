@@ -994,8 +994,13 @@ certBuilder.addExtension(Extension.subjectKeyIdentifier, false,
 certBuilder.addExtension(Extension.authorityKeyIdentifier, false,
     extUtils.createAuthorityKeyIdentifier(issuerCert));
 
+/* Add Basic Constraints (non-CA) */
 certBuilder.addExtension(Extension.basicConstraints, true,
     new BasicConstraints(false));
+
+/* Or for a CA certificate (isCA:true), with path length constraint of 0 */
+/* certBuilder.addExtension(Extension.basicConstraints, true,
+    new BasicConstraints(0)); */
 
 certBuilder.addExtension(Extension.keyUsage, true,
     new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
@@ -1048,6 +1053,7 @@ import java.util.Date;
 /* Load issuer certificate for setting issuer name and AKID */
 WolfSSLCertificate issuerWolfCert = null;
 WolfSSLCertificate cert = null;
+WolfSSLX509Name subject = null;
 try {
     issuerWolfCert =
         new WolfSSLCertificate(issuerCert.getEncoded());
@@ -1055,7 +1061,7 @@ try {
     /* Create empty certificate for generation */
     cert = new WolfSSLCertificate();
     /* Set subject and issuer names */
-    WolfSSLX509Name subject = new WolfSSLX509Name();
+    subject = new WolfSSLX509Name();
     subject.setCommonName("Example");
     cert.setSubjectName(subject);
     cert.setIssuerName(issuerWolfCert);
@@ -1079,6 +1085,9 @@ try {
 
     /* Basic Constraints (non-CA) */
     cert.addExtension(WolfSSL.NID_basic_constraints, false, false);
+
+    /* Or for a CA certificate with pathLen constraint set to 0 */
+    /* cert.addExtension(WolfSSL.NID_basic_constraints, true, 0, true); */
 
     /* Key Usage */
     cert.addExtension(WolfSSL.NID_key_usage,
@@ -1105,6 +1114,9 @@ try {
     byte[] certPem = cert.getPem();
 
 } finally {
+    if (subject != null) {
+        subject.free();
+    }
     if (cert != null) {
         cert.free();
     }
@@ -1127,6 +1139,7 @@ try {
 | Subject Key Identifier | `extUtils.createSubjectKeyIdentifier(...)` | `setSubjectKeyIdEx()` or `setSubjectKeyId(byte[])` |
 | Authority Key Identifier | `extUtils.createAuthorityKeyIdentifier(...)` | `setAuthorityKeyIdEx(WolfSSLCertificate)` or `setAuthorityKeyId(byte[])` |
 | Basic Constraints | `new BasicConstraints(boolean)` | `addExtension(NID_basic_constraints, boolean, boolean)` |
+| Basic Constraints (CA + pathLen) | `new BasicConstraints(int)` | `addExtension(NID_basic_constraints, boolean, int, boolean)` |
 | Key Usage | `new KeyUsage(int)` | `addExtension(NID_key_usage, String, boolean)` |
 | Extended Key Usage | `new ExtendedKeyUsage(KeyPurposeId[])` | `addExtension(NID_ext_key_usage, String, boolean)` |
 | SAN (IP address) | `new GeneralName(iPAddress, ...)` | `addAltNameIP(String)` |
@@ -1138,6 +1151,130 @@ try {
 | Get DER encoding | `X509CertificateHolder.getEncoded()` | `getDer()` |
 | Get PEM encoding | Manual conversion needed | `getPem()` |
 | Free resources | Garbage collected | `free()` |
+
+### CA Certificate Generation with Path Length Constraint
+
+A common Bouncy Castle pattern is generating a self-signed CA certificate
+with a `BasicConstraints` path length constraint. In Bouncy Castle,
+`new BasicConstraints(int)` creates a CA constraint where the integer argument
+specifies the maximum number of intermediate CA certificates allowed below this
+CA in a certification path. wolfSSL JNI supports this through an overloaded
+`addExtension()` method that accepts a `pathLen` parameter.
+
+#### Bouncy Castle Approach
+
+```java
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.RFC4519Style;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+
+KeyPair keyPair = keyPairGenerator.generateKeyPair();
+SubjectPublicKeyInfo subPubKeyInfo =
+    SubjectPublicKeyInfo.getInstance(keyPair.getPublic().getEncoded());
+
+/* Compute Subject Key Identifier from public key hash */
+SubjectKeyIdentifier ski = new SubjectKeyIdentifier(
+    MessageDigest.getInstance("SHA-1")
+        .digest(subPubKeyInfo.getPublicKeyData().getBytes()));
+
+/* Build extensions list */
+KeyUsage keyUsage = new KeyUsage(
+    KeyUsage.digitalSignature | KeyUsage.cRLSign | KeyUsage.keyCertSign);
+
+List<Extension> extensions = new ArrayList<>();
+extensions.add(new Extension(Extension.keyUsage, true,
+    keyUsage.toASN1Primitive().getEncoded(ASN1Encoding.DER)));
+extensions.add(new Extension(Extension.extendedKeyUsage, false,
+    new ExtendedKeyUsage(new KeyPurposeId[]{
+        KeyPurposeId.id_kp_clientAuth,
+        KeyPurposeId.id_kp_serverAuth,
+        KeyPurposeId.id_kp_OCSPSigning})
+    .toASN1Primitive().getEncoded(ASN1Encoding.DER)));
+
+/* BasicConstraints(0) = CA true, pathLen 0 */
+extensions.add(new Extension(Extension.basicConstraints, true,
+    new BasicConstraints(0).toASN1Primitive()
+        .getEncoded(ASN1Encoding.DER)));
+
+extensions.add(new Extension(Extension.subjectKeyIdentifier,
+    false, ski.toASN1Primitive().getEncoded(ASN1Encoding.DER)));
+
+/* Build and sign the certificate */
+X500Name issuer = new X500Name(RFC4519Style.INSTANCE, subject);
+X509v3CertificateBuilder builder =
+    new X509v3CertificateBuilder(
+        issuer, BigInteger.valueOf(System.currentTimeMillis()),
+        Date.from(startDate), Date.from(expiryDate),
+        issuer, subPubKeyInfo);
+for (Extension ext : extensions) {
+    builder.addExtension(ext);
+}
+ContentSigner signer = new JcaContentSignerBuilder("SHA512withRSA")
+    .build(keyPair.getPrivate());
+X509Certificate caCert = new JcaX509CertificateConverter()
+    .getCertificate(builder.build(signer));
+```
+
+#### wolfSSL Approach
+
+```java
+import com.wolfssl.WolfSSLCertificate;
+import com.wolfssl.WolfSSLX509Name;
+import com.wolfssl.WolfSSL;
+
+KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+WolfSSLCertificate cert = new WolfSSLCertificate();
+WolfSSLX509Name subjectName = new WolfSSLX509Name();
+try {
+    /* Set subject name (self-signed: issuer = subject) */
+    subjectName.setCommonName(subject);
+    cert.setSubjectName(subjectName);
+
+    /* Set serial number and validity dates */
+    cert.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
+    cert.setNotBefore(Date.from(startDate));
+    cert.setNotAfter(Date.from(expiryDate));
+
+    /* Set public key */
+    cert.setPublicKey(keyPair.getPublic());
+
+    /* Subject Key Identifier (SHA-1 hash computed internally) */
+    cert.setSubjectKeyIdEx();
+
+    /* Key Usage (critical) */
+    cert.addExtension(WolfSSL.NID_key_usage,
+        "digitalSignature,cRLSign,keyCertSign", true);
+
+    /* Extended Key Usage */
+    cert.addExtension(WolfSSL.NID_ext_key_usage,
+        "clientAuth,serverAuth,OCSPSigning", false);
+
+    /* Basic Constraints: CA=true, pathLen=0 (critical)
+     * BC equivalent: new BasicConstraints(0) */
+    cert.addExtension(WolfSSL.NID_basic_constraints, true, 0, true);
+
+    /* Sign (self-signed with own private key) */
+    cert.signCert(keyPair.getPrivate(), "SHA512");
+
+    byte[] certDer = cert.getDer();
+    byte[] certPem = cert.getPem();
+
+} finally {
+    subjectName.free();
+    cert.free();
+}
+```
 
 ## Certificate Verification with CertManager
 
