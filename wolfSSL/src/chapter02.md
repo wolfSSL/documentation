@@ -466,7 +466,7 @@ Disables the PKCS#7 EncryptedData content type. Reduces code size when only Sign
 
 #### NO_PKCS7_COMPRESSED_DATA
 
-Disables the PKCS#7 CompressedData content type. Requires zlib ([`HAVE_LIBZ`](#have_libz)) when enabled.
+Disables the PKCS#7 CompressedData content type. When CompressedData support is enabled (i.e., this macro is not defined), zlib ([`HAVE_LIBZ`](#have_libz)) is required.
 
 #### WC_PKCS7_STREAM_DEBUG
 
@@ -910,8 +910,6 @@ Enables MD2 hash algorithm support. Only needed for legacy certificate compatibi
 
 This macro disables additional private key checking that is on by default. This enables checking to validate the private key is a pair for the public key. It is supported for RSA, ECDSA, ED25519, ED448, Falcon, Dilithium and Sphincs.
 
-
-
 #### NO_CIPHER_SUITE_ALIASES
 
 Disables cipher suite name aliases. Only the primary cipher suite name will be recognized, not alternative names.
@@ -1098,7 +1096,6 @@ Enables the new version of ASN parsing code that uses template-based ASN.1 proce
 #### WOLFSSL_DEBUG_ASN_TEMPLATE
 Enables debugging output when using ASN.1 templates. Only relevant when used with `WOLFSSL_ASN_TEMPLATE`.
 
-
 #### WOLFSSL_DEBUG_CERTS
 
 Enables debug logging for certificate processing operations including parsing, validation, and chain building.
@@ -1225,8 +1222,6 @@ Enables TLS packet sniffing support. Allows decrypting and inspecting TLS traffi
 #### HAVE_WEBSERVER
 
 Enables web server-oriented features in wolfSSL, such as additional HTTP helper functions.
-
-
 
 #### HAVE_WOLF_EVENT
 
@@ -1792,9 +1787,6 @@ Enables extra SSL session information tracking and APIs beyond the standard set.
 
 Enables additional debugging print outs during a TLS connection
 
-
-
-
 #### WOLFSSL_DEBUG_TRACE_ERROR_CODES
 
 Enables tracing of error code origins for debugging. Logs where error codes are generated in the wolfSSL source code.
@@ -2037,8 +2029,6 @@ Enable feature which uses faster DH and RSA prime checking.
 #### WOLFSSL_OLD_SET_CURVES_LIST
 
 Uses the old-style curve list parsing for backward compatibility with applications that set curves using the older format.
-
-
 
 #### WOLFSSL_OLD_TIMINGPADVERIFY
 
@@ -3223,8 +3213,6 @@ This allows overriding the maximum name support for an X.509 certificate field.
 #### OPENSSL_EXTRA_X509_SMALL
 
 Special small OpenSSL compat layer for certs.
-
-
 
 #### OPENSSL_EXTRA_NO_ASN1
 
@@ -5428,8 +5416,6 @@ CPPFLAGS="-DHAVE_AES_ECB -I$CRYPTODEV_DIR -DDEBUG_SECO -DDEBUG_DEVCRYPTO" \
 
 These are the macros that can be enabled for building without autotools:
 
-
-
 ***CAAM***
 
 - WOLFSSL_CAAM - Main macro switch to enable CAAM support.
@@ -5599,8 +5585,6 @@ Used to delete a key from the keystore.
 ##### Native wolfSSL API With CAAM Support
 
 This is a list of native wolfSSL API that now have CAAM support with the SECO build outlined in this documentation.
-
-
 
 For generation of any AES encrypt and decrypt operations the key can be generated using the following process. Using wc_SECO_GenerateKey(CAAM_GENERATE_KEY, groupID, pubOut, 0, CAAM_KEYTPE_AES128, CAAM_KEY_PERSISTENT, &keyIdOut); where groupID is a specified group number and pubOut is a 32 byte buffer, and the variable keyIdOut gets set to a the new key ID generated. This new key ID generated can then be set in an Aes structure using wc_SECO_AesSetKeyID(Aes, keyIdOut); . Once the key ID has been set in the structure and the Aes structure has been initialized as a WOLFSSL_SECO_DEVID type it will use that key ID for all encrypt and decrypt operations.
 
@@ -5777,13 +5761,9 @@ expansion (CAAM_ECC_EXPANSION and CAAM_BLOB_EXPANSION). When wolfSSL code finds
 that these macros are defined (the patch has been applied) then it tries to
 compile in use of the expanded driver.
 
-
-
 #### WOLFSSL_HAVE_ERROR_QUEUE
 
 Enables an OpenSSL-compatible error queue for storing and retrieving error information via `ERR_get_error()` and related functions.
-
-
 
 #### WOLFSSL_HAVE_CERT_SERVICE
 
