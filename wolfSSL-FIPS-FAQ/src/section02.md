@@ -397,3 +397,75 @@ v7.0.0 (upcoming)
 * Will have some additional services listed here for Post Quantum key material
 ```
 
+## Moving from v5 to v6 or even v7, what's new?
+
+v6 offers new algorithms not available in v5:
+```
+* SRTP-KDF
+* AES-XTS (256, 512)
+* AES-GCM Streaming mode of operation!
+* AES-CFB (1, 8, 128)
+* AES-KW
+* PBKDF2
+* RSA, ECC, DH FIPS 186-5 upgrade from 186-4!
+* ED25519
+* ED448
+* SHAKE128
+* SHAKE256
+* Optional ESV SP800-90B certifiable entropy source w/ SHA3 conditioning function
+```
+
+In addition to v5 and v6 algorithms, v7 offers new algorithms for PQ and NSA 2.0 suite considerations!
+```
+* ML-KEM
+* ML-DSA
+* SLH-DSA
+* LMS (verify only)
+* XMSS (verify only)
+* SHA512-DRBG (+ Option to run-time disable SHA256-DRBG for NSA 2.0 suite)
+* SHA512-based integrity check (no SHA256 use by default for NSA 2.0 suite)
+* SHA512/224 & SHA512/256 truncated variants
+* RSA, ECC, DH getting additional hash modes for SHAKE and SHA512 variants
+* Optional ESV SP800-90B certifiable entropy source w/ SHA3 conditioning function
+```
+
+## Long-running application(s) & DRBG_CONT_FIPS_E or RNG_FAILURE_E errors...
+After millions of calls to wc_InitRng or wc_RNG_GenerateBlock I see these DRBG errors and then
+all subsequent wolfCrypt API calls just return FIPS_NOT_ALLOWED_E. What is happening and how do I resolve this?
+
+A: This is expected behavior related to the DRBG continuous health test (CRNGT) used in the
+FIPS module. The legacy CRNGT has a false-positive rate of roughly 1 in every 134 million
+invocations. For long-running applications that never power cycle, a false positive will
+eventually occur. When it does the DRBG enters an error state and the module will not allow
+any further cryptographic operations that depend on a DRBG. This is required by SP800-90Ar1"
+
+So the module is behaving correctly.
+
+Best practices to mitigate this in long-running applications:
+
+    1) Initialize the WC_RNG instance once globally and protect it with a mutex rather than
+       creating and destroying a new WC_RNG for each operation in every thread.
+       Initializing and freeing the RNG on every call dramatically increases the
+       rate at which you will encounter a false positive (the CRNGT runs during
+       wc_InitRng, so fewer calls to wc_InitRng means fewer opportunities to hit
+       a false positive).
+
+    2) If a DRBG continuous test failure does occur, the application can recover by restarting
+       the executable (or the process using the wolfCrypt shared library). On a modern OS,
+       unloading and reloading the shared object is equivalent to a power cycle of the module
+       from the FIPS perspective. A full device power cycle is NOT required when using a shared object.
+
+    3) wolfSSL strongly recommends that persistent connections be shut down and a new
+       handshake performed at least once every 24 to 48 hours. Re-negotiating ephemeral keys
+       every 8 - 10 minutes (complete shutdown and fresh handshake) is ideal, do
+       not leave a DTLS session active for 24, 38, 72... hours or more, this will
+       increase your chances of hitting a false positive as well.
+
+NOTE: The upcoming v7.0.0 FIPS module will replace the legacy CRNGT with the newer
+Repetition Count Test (RCT) and Adaptive Proportion Test (APT) as defined in SP800-90B.
+These tests are more mathematically robust and will significantly reduce the false-positive
+rate, alleviating this issue for long-lived applications. However, because any change inside
+the FIPS boundary requires re-validation, as such these newer tests cannot be back-ported to older validated
+modules (e.g. v5.x or v6.x). Customers running an older module version will need to use the
+mitigation strategies above until they migrate to the v7.0.0 module once it is validated.
+
