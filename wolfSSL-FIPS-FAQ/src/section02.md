@@ -458,7 +458,7 @@ Best practices to mitigate this in long-running applications:
     3) wolfSSL strongly recommends that persistent connections be shut down and a new
        handshake performed at least once every 24 to 48 hours. Re-negotiating ephemeral keys
        every 8 - 10 minutes (complete shutdown and fresh handshake) is ideal, do
-       not leave a DTLS session active for 24, 38, 72... hours or more, this will
+       not leave a TLS/DTLS session active for 24, 48, 72... hours or more, this will
        increase your chances of hitting a false positive as well.
 
 NOTE: The upcoming v7.0.0 FIPS module will replace the legacy CRNGT with the newer
