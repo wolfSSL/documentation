@@ -22,7 +22,6 @@ Last Updated: 30 Mar 2026
 	5. [Threading consideration for all CASTs():](./section02.md#threading-and-casts)
 	6. [wc_SetSeedCb() a bit unique with relation to CAST's:](./section02.md#setseedcb-and-casts)
 	7. [Key Access Management](./section02.md#key-access-management)
-	8. [wc_SetSeedCb() a bit unique with relation to CAST's:](./section02.md#setseedcb-and-casts)
 		1. [API's that require UNLOCK before first use (should also be re-LOCKED after use):](./section02.md#apis-to-unlock)
 6. [Moving from v5 to v6 or even v7, what's new?](./section02.md#moving-from-v5-to-v6-or-even-v7-whats-new)
 7. [Long-running application(s) & DRBG_CONT_FIPS_E or RNG_FAILURE_E errors](./section02.md#long-running-applications-drbg_cont_fips_e-or-rng_failure_e-errors)
