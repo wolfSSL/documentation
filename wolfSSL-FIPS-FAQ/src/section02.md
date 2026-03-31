@@ -437,7 +437,7 @@ A: This is expected behavior related to the DRBG continuous health test (CRNGT) 
 FIPS module. The legacy CRNGT has a false-positive rate of roughly 1 in every 134 million
 invocations. For long-running applications that never power cycle, a false positive will
 eventually occur. When it does the DRBG enters an error state and the module will not allow
-any further cryptographic operations that depend on a DRBG. This is required by SP800-90Ar1"
+any further cryptographic operations that depend on a DRBG. This is required by SP 800-90A Rev. 1.
 
 So the module is behaving correctly.
 
