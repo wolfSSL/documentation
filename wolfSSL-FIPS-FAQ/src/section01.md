@@ -2,7 +2,7 @@
 
 This page lists some of the most common issues and questions that are recieved by our wolfSSL security experts, along with their responses. This FAQ is useful for solving general questions that pertain to building/implementing wolfSSL FIPS. If this page does not provide an answer to your question, please feel free to check the wolfSSL Manual, or contact us at support@wolfssl.com.
 
-Last Updated: 8 Dec 2025
+Last Updated: 30 Mar 2026
 
 ## Questions
 
@@ -18,10 +18,12 @@ Last Updated: 8 Dec 2025
 	1. [Will my applications that are linked agaist the 140-2 module still work with the 140-3 module?](./section02.md#will-my-app-for-1402-still-work-with-1403)
 	2. [The wc_SetSeed_Cb() callback and the TLS Layer:](./section02.md#wc-setseed-and-tls)
 	3. [The wc_SetSeed_Cb() callback and a custom seed generation function:](./section02.md#wc-setseed-and-custom-genseed)
-	4. [Threading consideration for all CASTs():](./section02.md#threading-and-casts)
-	5. [wc_SetSeedCb() a bit unique with relation to CAST's:](./section02.md#setseedcb-and-casts)
-	6. [Key Access Management](./section02.md#key-access-management)
-	7. [wc_SetSeedCb() a bit unique with relation to CAST's:](./section02.md#setseedcb-and-casts)
+	4. [The POST](./section02.md#the-post)
+	5. [Threading consideration for all CASTs():](./section02.md#threading-and-casts)
+	6. [wc_SetSeedCb() a bit unique with relation to CAST's:](./section02.md#setseedcb-and-casts)
+	7. [Key Access Management](./section02.md#key-access-management)
 		1. [API's that require UNLOCK before first use (should also be re-LOCKED after use):](./section02.md#apis-to-unlock)
+6. [Moving from v5 to v6 or even v7, what's new?](./section02.md#moving-from-v5-to-v6-or-even-v7-whats-new)
+7. [Long-running application(s) & DRBG_CONT_FIPS_E or RNG_FAILURE_E errors](./section02.md#long-running-applications-drbg_cont_fips_e-or-rng_failure_e-errors)
 
 
