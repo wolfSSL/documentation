@@ -443,23 +443,23 @@ So the module is behaving correctly.
 
 Best practices to mitigate this in long-running applications:
 
-    1) Initialize the WC_RNG instance once globally and protect it with a mutex rather than
-       creating and destroying a new WC_RNG for each operation in every thread.
-       Initializing and freeing the RNG on every call dramatically increases the
-       rate at which you will encounter a false positive (the CRNGT runs during
-       wc_InitRng, so fewer calls to wc_InitRng means fewer opportunities to hit
-       a false positive).
+1. Initialize the WC_RNG instance once globally and protect it with a mutex rather than
+   creating and destroying a new WC_RNG for each operation in every thread.
+   Initializing and freeing the RNG on every call dramatically increases the
+   rate at which you will encounter a false positive (the CRNGT runs during
+   wc_InitRng, so fewer calls to wc_InitRng means fewer opportunities to hit
+   a false positive).
 
-    2) If a DRBG continuous test failure does occur, the application can recover by restarting
-       the executable (or the process using the wolfCrypt shared library). On a modern OS,
-       unloading and reloading the shared object is equivalent to a power cycle of the module
-       from the FIPS perspective. A full device power cycle is NOT required when using a shared object.
+2. If a DRBG continuous test failure does occur, the application can recover by restarting
+   the executable (or the process using the wolfCrypt shared library). On a modern OS,
+   unloading and reloading the shared object is equivalent to a power cycle of the module
+   from the FIPS perspective. A full device power cycle is NOT required when using a shared object.
 
-    3) wolfSSL strongly recommends that persistent connections be shut down and a new
-       handshake performed at least once every 24 to 48 hours. Re-negotiating ephemeral keys
-       every 8 - 10 minutes (complete shutdown and fresh handshake) is ideal, do
-       not leave a TLS/DTLS session active for 24, 48, 72... hours or more, this will
-       increase your chances of hitting a false positive as well.
+3. wolfSSL strongly recommends that persistent connections be shut down and a new
+   handshake performed at least once every 24 to 48 hours. Re-negotiating ephemeral keys
+   every 8 - 10 minutes (complete shutdown and fresh handshake) is ideal, do
+   not leave a TLS/DTLS session active for 24, 48, 72... hours or more, this will
+   increase your chances of hitting a false positive as well.
 
 NOTE: The upcoming v7.0.0 FIPS module will replace the legacy CRNGT with the newer
 Repetition Count Test (RCT) and Adaptive Proportion Test (APT) as defined in SP800-90B.
