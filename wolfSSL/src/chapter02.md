@@ -175,7 +175,7 @@ While not officially supported, we try to help users wishing to build wolfSSL in
 2. Some build systems will want to explicitly know where the wolfSSL header files are located, so you may need to specify that. They are located in the `<wolfssl_root>/wolfssl` directory. Typically, you can add the `<wolfssl_root>` directory to your include path to resolve header problems.
 3. wolfSSL defaults to a little endian system unless the configure process detects big endian. Since users building in a non-standard environment aren't using the configure process, `BIG_ENDIAN_ORDER` will need to be defined if using a big endian system.
 4. wolfSSL benefits speed-wise from having a 64-bit type available. The configure process determines if long or long long is 64 bits and if so sets up a define. So if `sizeof(long)` is 8 bytes on your system, define `SIZEOF_LONG 8`. If it isn't but `sizeof(long long)` is 8 bytes, then define `SIZEOF_LONG_LONG 8`.
-5. Try to build the library, and let us know if you run into any problems. If you need help, contact us at [info@wolfssl.com](mailto:info@wolfssl.com).
+5. Try to build the library, and let us know if you run into any problems. If you need help, contact us at [facts@wolfssl.com](mailto:facts@wolfssl.com).
 6. Some defines that can modify the build are listed in the following sub-sections, below. For more verbose descriptions of many options, please see [Build Options](#build-options).
 
 ### Building into Yocto Linux
@@ -4988,7 +4988,7 @@ make
 sudo make install
 ```
 
-If you have any additional tips or feedback about cross compiling wolfSSL, please let us know at [info@wolfssl.com](mailto:info@wolfssl.com).
+If you have any additional tips or feedback about cross compiling wolfSSL, please let us know at [facts@wolfssl.com](mailto:facts@wolfssl.com).
 
 ### Example cross compile configure options for toolchain builds
 

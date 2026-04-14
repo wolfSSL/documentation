@@ -140,7 +140,7 @@ After correctly configuring wolfSSH for cross compilation you should be able to 
 $ make
 $ sudo make install
 ```
-If you have any additional tips or feedback for cross compiling wolfSSH, please let us know at info@wolfssl.com.
+If you have any additional tips or feedback for cross compiling wolfSSH, please let us know at facts@wolfssl.com.
 
 ##  Install to Custom Directory
 

@@ -8,7 +8,7 @@ For general product support, wolfSSL (formerly CyaSSL) maintains an online forum
 
 * Email Support: [support@wolfssl.com](mailto:support@wolfssl.com)
 
-For information regarding wolfSSL products, questions regarding licensing, or general comments, please contact wolfSSL by emailing [info@wolfssl.com](mailto:info@wolfssl.com).  For support packages, please see [Licensing](chapter14.md#licensing).
+For information regarding wolfSSL products, questions regarding licensing, or general comments, please contact wolfSSL by emailing [facts@wolfssl.com](mailto:facts@wolfssl.com).  For support packages, please see [Licensing](chapter14.md#licensing).
 
 ### Bugs Reports and Support Issues
 
@@ -41,7 +41,7 @@ Program Outline:
 3. Normally, up to one week is the right amount of time for us to make the replacement in your code and do initial testing. Additional consulting on a replacement is available as needed.
 4. You will receive the standard wolfSSL royalty free license to ship with your product.
 
-The purpose of this program is to enable users who are currently spending too much on their embedded SSL implementation to move to wolfSSL with ease. If you are interested in learning more, then please contact us at [info@wolfssl.com](mailto:info@wolfssl.com).
+The purpose of this program is to enable users who are currently spending too much on their embedded SSL implementation to move to wolfSSL with ease. If you are interested in learning more, then please contact us at [facts@wolfssl.com](mailto:facts@wolfssl.com).
 
 ### Design Consulting
 
@@ -52,4 +52,4 @@ We offer design consulting for building SSL/TLS security into devices using wolf
 1. _Assessment_:  An evaluation of your current SSL/TLS implementation. We can give you advice on your current setup and how we think you could improve upon this by using wolfSSL.
 2. _Design_:  Looking at your system requirements and parameters, we'll work closely with you to make recommendations on how to implement wolfSSL into your application such that it provides you with optimal security.
 
-If you would like to learn more about design consulting for building SSL into your application or device, please contact [info@wolfssl.com](mailto:info@wolfssl.com) for more information.
+If you would like to learn more about design consulting for building SSL into your application or device, please contact [facts@wolfssl.com](mailto:facts@wolfssl.com) for more information.

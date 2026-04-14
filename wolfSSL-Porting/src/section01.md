@@ -53,4 +53,4 @@ path. This allows users to maintain one single file for their wolfSSL
 build, and makes it much easier to update to newer versions of wolfSSL.
 
 wolfSSL encourages the submission of patches and code changes through either
-direct email (info@wolfssl.com), or through GitHub pull request.
+direct email (facts@wolfssl.com), or through GitHub pull request.

@@ -175,7 +175,7 @@ $ make
 $ sudo make install
 ```
 
-ここでご紹介した以外のTipsをお持ちでしたらぜひ info@wolfssl.comまで お知らせください。
+ここでご紹介した以外のTipsをお持ちでしたらぜひ facts@wolfssl.comまで お知らせください。
 
 ##  カスタムディレクトリへのインストール
 

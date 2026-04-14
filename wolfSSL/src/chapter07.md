@@ -360,7 +360,7 @@ strncpy(myCert.subject.locality, "Portland", CTC_NAME_SIZE);
 strncpy(myCert.subject.org, "yaSSL", CTC_NAME_SIZE);
 strncpy(myCert.subject.unit, "Development", CTC_NAME_SIZE);
 strncpy(myCert.subject.commonName, "www.wolfssl.com", CTC_NAME_SIZE);
-strncpy(myCert.subject.email, "info@wolfssl.com", CTC_NAME_SIZE);
+strncpy(myCert.subject.email, "facts@wolfssl.com", CTC_NAME_SIZE);
 ```
 
 Then, a self-signed certificate can be generated using the variables genKey and rng from the above key generation example (of course any valid RsaKey or RNG can be used):
@@ -470,7 +470,7 @@ strncpy(req.subject.locality, "Portland", CTC_NAME_SIZE);
 strncpy(req.subject.org, "wolfSSL", CTC_NAME_SIZE);
 strncpy(req.subject.unit, "Development", CTC_NAME_SIZE);
 strncpy(req.subject.commonName, "www.wolfssl.com", CTC_NAME_SIZE);
-strncpy(req.subject.email, "info@wolfssl.com", CTC_NAME_SIZE);
+strncpy(req.subject.email, "facts@wolfssl.com", CTC_NAME_SIZE);
 ```
 
 Then, a valid signed CSR can be generated using the variable key from the above key generation example (of course any valid ECC/RSA key or RNG can be used):
