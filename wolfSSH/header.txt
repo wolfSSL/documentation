@@ -8,7 +8,7 @@ header-includes:
     # Fancy page headers
     - \usepackage{fancyhdr}
     - \pagestyle{fancy}
-    - \fancyfoot[LO,RE]{COPYRIGHT \copyright 2024 wolfSSL Inc.}
+    - \fancyfoot[LO,RE]{COPYRIGHT \copyright 2026 wolfSSL Inc.}
     # Wrap long syntax highlighting code blocks
     - \usepackage{fvextra}
     - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
