@@ -1,17 +1,3 @@
-#  Licensing
+#  Notes and Limitations
 
-##  Open Source
-
-wolfSSL, yaSSL, wolfCrypt, yaSSH and TaoCrypt software are free software downloads and may be modified to the needs of the user as long as the user adheres to version two of the GPL License. The GPLv2 license can be found on the gnu.org website: [http://www.gnu.org/licenses/old-licenses/gpl-2.0.html](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
-
-wolfSSH software is a free software download and may be modified to the needs of the user as long as the user adheres to version three of the GPL license. The GPLv3 license can be found on the gnu.org website (https://www.gnu.org/licenses/gpl.html).
-
-##  Commercial Licensing
-
-Businesses and enterprises who wish to incorporate wolfSSL products into proprietary appliances or other commercial software products for re-distribution must license commercial versions. 
-
-Please contact licensing@wolfssl.com with inquiries.
-
-###  Support Packages
-
-Support packages for wolfSSL products are available on an annual basis directly from wolfSSL. With three different package options, you can compare them side-by-side and choose the package that best fits your specific needs. Please see our [Support Packages page](https://www.wolfssl.com/products/support-and-maintenance) for more details.
+In portions of the implementation file attributes are not being considered and default attributes or mode values are used. Specifically in `wolfSSH_SFTP_Open`, getting timestamps from files, and all extended file attributes.
