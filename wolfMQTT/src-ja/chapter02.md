@@ -185,7 +185,7 @@ make
 make
 sudo make install
 ```
-wolfMQTT のクロス コンパイルに関する追加のヒントやフィードバックがある場合は、_info@wolfssl.com_ までお知らせください。
+wolfMQTT のクロス コンパイルに関する追加のヒントやフィードバックがある場合は、_facts@wolfssl.com_ までお知らせください。
 
 
 ### 特定のディレクトリへのインストール

@@ -398,7 +398,7 @@ strncpy(myCert.subject.locality, "Portland", CTC_NAME_SIZE);
 strncpy(myCert.subject.org, "yaSSL", CTC_NAME_SIZE);
 strncpy(myCert.subject.unit, "Development", CTC_NAME_SIZE);
 strncpy(myCert.subject.commonName, "www.wolfssl.com", CTC_NAME_SIZE);
-strncpy(myCert.subject.email, "info@wolfssl.com", CTC_NAME_SIZE);
+strncpy(myCert.subject.email, "facts@wolfssl.com", CTC_NAME_SIZE);
 ```
 
 そして、上記の鍵生成例からの変数`genKey`と`rng`を使用して、自己署名証明書を生成できます。
@@ -525,7 +525,7 @@ strncpy(req.subject.locality, "Portland", CTC_NAME_SIZE);
 strncpy(req.subject.org, "wolfSSL", CTC_NAME_SIZE);
 strncpy(req.subject.unit, "Development", CTC_NAME_SIZE);
 strncpy(req.subject.commonName, "www.wolfssl.com", CTC_NAME_SIZE);
-strncpy(req.subject.email, "info@wolfssl.com", CTC_NAME_SIZE);
+strncpy(req.subject.email, "facts@wolfssl.com", CTC_NAME_SIZE);
 ```
 
 そして、上記の鍵生成例からの変数`key`と`rng`を使用して、署名付きCSRを生成できます。

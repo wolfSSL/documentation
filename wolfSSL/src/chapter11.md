@@ -555,6 +555,6 @@ For production applications, you should obtain correct and legitimate certificat
 
 This tutorial walked through the process of integrating the wolfSSL embedded SSL/TLS library into a simple client and server application. Although this example is simple, the same principles may be applied for adding SSL or TLS into your own application. The wolfSSL embedded SSL/TLS library provides all the features you would need in a compact and efficient package that has been optimized for both size and speed.
 
-Being dual licensed under GPLv2 and standard commercial licensing, you are free to download the wolfSSL source code directly from our website. Feel free to post to our support forums (<https://www.wolfssl.com/forums>) with any questions or comments you might have. If you would like more information about our products, please contact [info@wolfssl.com](mailto:info@wolfssl.com).
+Being dual licensed under GPLv2 and standard commercial licensing, you are free to download the wolfSSL source code directly from our website. Feel free to post to our support forums (<https://www.wolfssl.com/forums>) with any questions or comments you might have. If you would like more information about our products, please contact [facts@wolfssl.com](mailto:facts@wolfssl.com).
 
 We welcome any feedback you have on this SSL tutorial. If you believe it could be improved or enhanced in order to make it either more useful, easier to understand, or more portable, please let us know at [support@wolfssl.com](mailto:support@wolfssl.com).

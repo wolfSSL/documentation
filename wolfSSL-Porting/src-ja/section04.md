@@ -9,7 +9,7 @@ wolfSSLは、お客様が新しい環境にwolfSSLを移植できるためのサ
 
 - Support Packages:  https://wolfssl.jp/license/support-packages/
 - Consulting Services: https://www.wolfssl.com/wolfSSL/wolfssl-consulting.html
-- General Inquiries: info@wolfssl.com
+- General Inquiries: facts@wolfssl.com
 
 ## Document Revision Log
 

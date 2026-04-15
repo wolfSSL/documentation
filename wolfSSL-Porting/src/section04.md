@@ -14,7 +14,7 @@ to help users and customers port wolfSSL to new environments.
 
 - Support Packages:  https://www.wolfssl.com/wolfSSL/Support/support_tiers.php
 - Consulting Services: https://www.wolfssl.com/wolfSSL/wolfssl-consulting.html
-- General Inquiries: info@wolfssl.com
+- General Inquiries: facts@wolfssl.com
 
 ## Document Revision Log
 

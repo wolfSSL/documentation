@@ -7,7 +7,7 @@ For general product support, wolfSSL maintains an online forum for the wolfSSL p
 - wolfSSL Forums: [https://www.wolfssl.com/forums](https://www.wolfssl.com/forums)
 - Email Support: support@wolfssl.com
 
-For information regarding wolfSSL products, questions regarding licensing, or general comments, please contact wolfSSL by emailing **info@wolfssl.com**.
+For information regarding wolfSSL products, questions regarding licensing, or general comments, please contact wolfSSL by emailing **facts@wolfssl.com**.
 
 ###  Bugs Reports and Support Issues
 
@@ -40,7 +40,7 @@ Program Outline:
 3. Normally, up to one week is the right amount of time for us to make the replacement in your code and do initial testing. Additional consulting on a  replacement is available as needed.
 4. You will receive the standard wolfSSL royalty free license to ship with your product.
 
-The purpose of this program is to enable users who are currently spending too much on their embedded SSL implementation to move to wolfSSL with ease. If you are interested in learning more, then please contact us at info@wolfssl.com.
+The purpose of this program is to enable users who are currently spending too much on their embedded SSL implementation to move to wolfSSL with ease. If you are interested in learning more, then please contact us at facts@wolfssl.com.
 
 ###  Design Consulting
 

@@ -162,7 +162,7 @@ After correctly configuring wolfMQTT for cross-compilation, you should be able t
 make
 sudo make install
 ```
-If you have any additional tips or feedback about cross compiling wolfMQTT, please let us know at _info@wolfssl.com_.
+If you have any additional tips or feedback about cross compiling wolfMQTT, please let us know at _facts@wolfssl.com_.
 
 ### Install to Custom Directory
 
