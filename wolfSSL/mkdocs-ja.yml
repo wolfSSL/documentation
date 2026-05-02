@@ -146,9 +146,10 @@ nav:
     - "E. RFC・仕様・リファレンス": appendix05.md
     - "F. エラーコード": appendix06.md
     - "G. 対応暗号スイート・鍵交換グループ・署名アルゴリズム一覧": appendix07.md
-    - "H. ポスト量子暗号の実験": appendix08.md
-    - "I. wolfSSL 移植ガイド": appendix09.md
-    - "J. wolfSM (ShangMi)": appendix10.md
+    - "H. ハードウェア最適化サポート": appendix08.md
+    - "I. ポスト量子暗号の実験": appendix09.md
+    - "J. wolfSSL 移植ガイド": appendix10.md
+    - "K. wolfSM (ShangMi)": appendix11.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
