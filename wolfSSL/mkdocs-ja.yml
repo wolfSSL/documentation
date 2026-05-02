@@ -145,9 +145,10 @@ nav:
     - "D. SSL/TLS の概要": appendix04.md
     - "E. RFC・仕様・リファレンス": appendix05.md
     - "F. エラーコード": appendix06.md
-    - "G. ポスト量子暗号の実験": appendix07.md
-    - "H. wolfSSL 移植ガイド": appendix08.md
-    - "I. wolfSM (ShangMi)": appendix09.md
+    - "G. 対応暗号スイート・鍵交換グループ・署名アルゴリズム一覧": appendix07.md
+    - "H. ポスト量子暗号の実験": appendix08.md
+    - "I. wolfSSL 移植ガイド": appendix09.md
+    - "J. wolfSM (ShangMi)": appendix10.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material

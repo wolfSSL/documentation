@@ -145,9 +145,10 @@ nav:
     - "D. SSL/TLS Overview": appendix04.md
     - "E. RFCs, Specifications, and Reference": appendix05.md
     - "F. Error Codes": appendix06.md
-    - "G. Experimenting with Post-Quantum Cryptography": appendix07.md
-    - "H. wolfSSL Porting Guide": appendix08.md
-    - "I. wolfSM (ShangMi)": appendix09.md
+    - "G. Supported Cipher Suites, Key Exchange Groups, and Signature Algorithms": appendix07.md
+    - "H. Experimenting with Post-Quantum Cryptography": appendix08.md
+    - "I. wolfSSL Porting Guide": appendix09.md
+    - "J. wolfSM (ShangMi)": appendix10.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
