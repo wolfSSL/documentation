@@ -77,6 +77,7 @@ nav:
       - "Algorithms - RIPEMD": group__RIPEMD.md
       - "Algorithms - RSA": group__RSA.md
       - "Algorithms - SHA 128/224/256/384/512": group__SHA.md
+      - "Algorithms - SHE": group__SHE.md
       - "Algorithms - SipHash": group__SipHash.md
       - "Algorithms - SrtpKdf": group__SrtpKdf.md
       - "Algorithms - SRP": group__SRP.md
@@ -137,6 +138,7 @@ nav:
       - siphash_8h.md
       - srp_8h.md
       - ssl_8h.md
+      - wc__she_8h.md
       - tfm_8h.md
       - types_8h.md
       - wc__encrypt_8h.md

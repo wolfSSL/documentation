@@ -4198,6 +4198,26 @@ Enabled by default on x86\_64.
 
 Enable wolfSSL SHA-512 support
 
+### `--enable-she`
+
+Enable SHE (Secure Hardware Extension) key update message generation support. SHE is an automotive security standard for secure key management in ECUs. This module provides software-based generation and verification of SHE key update messages (M1-M5) with optional hardware offload via crypto callbacks.
+
+Two modes are available:
+
+- `--enable-she=standard` - Standard SHE support (defines `WOLFSSL_SHE`)
+- `--enable-she=extended` - Standard plus extended overrides for custom KDF constants and message headers (defines `WOLFSSL_SHE` and `WOLFSSL_SHE_EXTENDED`)
+
+SHE automatically enables its dependencies: AES, AES-CBC, AES-direct, and CMAC.
+
+The following defines can be used to compile out optional features:
+
+- `NO_WC_SHE_GETUID` - Compile out `wc_SHE_GetUID` callback
+- `NO_WC_SHE_GETCOUNTER` - Compile out `wc_SHE_GetCounter` callback
+- `NO_WC_SHE_IMPORT_M123` - Compile out `wc_SHE_ImportM1M2M3`
+- `NO_WC_SHE_EXPORTKEY` - Compile out `wc_SHE_ExportKey` callback
+- `NO_WC_SHE_LOADKEY` - Compile out all `wc_SHE_LoadKey` / `wc_SHE_LoadKey_Verify` convenience wrappers
+- `WC_SHE_SW_DEFAULT` - Enable software-only default UID and counter for testing without hardware
+
 ### `--enable-sessioncerts`
 
 Enable session cert storing
