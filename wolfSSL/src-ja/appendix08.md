@@ -1,328 +1,126 @@
-# wolfSSL 移植ガイド
+# wolfSSL ハードウェア最適化サポート対応表
 
-## 目的
+## A. アーキテクチャ別 ISA/SIMD 最適化
 
-このガイドは、軽量 SSL/TLS ライブラリwolfSSLを新しい組み込みプラットフォーム、オペレーティングシステム、トランスポートメディア(TCP/IP、Bluetoothなど)に移植するエンジニア向けのリファレンスを提供します。wolfSSLを移植する際に通常変更が必要となるwolfSSLコードベースの領域を説明しています。本稿はあくまで「ガイド」で、技術の進化に伴い変更が必要になることもあります。不足していると感じる箇所があれば、気兼ねなくお知らせください。
+| アーキテクチャ | アルゴリズム | user_settings.h マクロ | configure オプション | 備考 |
+|---|---|---|---|---|
+| **Intel x86-64** | AES（全モード） | `WOLFSSL_AESNI` | `--enable-aesni` | AES-NI 命令 |
+| Intel x86-64 | SHA-256, SHA-512 | `USE_INTEL_SPEEDUP` + `HAVE_INTEL_AVX1` | 自動検出 | AVX1 アセンブリ |
+| Intel x86-64 | SHA-512, SHA-3 | `USE_INTEL_SPEEDUP` + `HAVE_INTEL_AVX2` | 自動検出 | AVX2 アセンブリ |
+| Intel x86-64 | ChaCha20, Poly1305 | `USE_INTEL_SPEEDUP` | 自動検出 | |
+| Intel x86-64 | X25519 (Curve25519), Ed25519 | `USE_INTEL_SPEEDUP` | 自動検出 | fe_x25519_asm.S |
+| Intel x86-64 | RSA/ECC/DH (SP) | `WOLFSSL_SP_X86_64_ASM` | 自動検出 | sp_x86_64_asm.S |
+| **ARM AArch64** | AES, SHA-256/512, SHA-3, ChaCha20, Poly1305 | `WOLFSSL_ARMASM` | `--enable-armasm` | ARMv8 CE (Crypto Extension) |
+| ARM AArch64 | X25519 (Curve25519), Ed25519 | `WOLFSSL_ARMASM` | `--enable-armasm` | armv8-curve25519.S |
+| ARM AArch64 | RSA/ECC/DH (SP) | `WOLFSSL_SP_ARM64_ASM` | 自動検出 | sp_arm64.c |
+| **ARM 32-bit (ARMv8-32)** | AES, SHA-256/512, SHA-3, ChaCha20, Poly1305 | `WOLFSSL_ARMASM` | `--enable-armasm` | |
+| ARM 32-bit | X25519 (Curve25519), Ed25519 | `WOLFSSL_ARMASM` | `--enable-armasm` | armv8-32-curve25519.S |
+| ARM 32-bit | RSA/ECC/DH (SP) | `WOLFSSL_SP_ARM32_ASM` | 自動検出 | sp_arm32.c |
+| **ARM Thumb2** | X25519 (Curve25519), Ed25519 | `WOLFSSL_ARMASM` + `WOLFSSL_ARMASM_THUMB2` | `--enable-armasm` | thumb2-curve25519.S |
+| **ARM Thumb** | RSA/ECC/DH (SP) | `WOLFSSL_SP_ARM_THUMB_ASM` | 自動検出 | sp_armthumb.c |
+| **ARM Cortex-M** | RSA/ECC/DH (SP) | `WOLFSSL_SP_ARM_CORTEX_M_ASM` | 自動検出 | sp_cortexm.c |
+| **RISC-V 64-bit** | AES, SHA-256/512, SHA-3, ChaCha20, Poly1305 | `WOLFSSL_RISCV_ASM` | `--enable-riscv` | riscv/riscv-64-*.c |
+| **PowerPC 32-bit** | SHA-256 | `WOLFSSL_PPC32_ASM` | 自動検出 | ppc32/ppc32-sha256-asm.S |
 
+## B. SP 数学ライブラリ（公開鍵暗号）
 
-## 対象読者
+| アーキテクチャ | 対応アルゴリズム | user_settings.h マクロ | configure オプション |
+|---|---|---|---|
+| x86-64 アセンブリ | RSA 2048/3072/4096, ECC P-256/P-384/P-521, DH | `WOLFSSL_SP_X86_64_ASM` | 自動検出 |
+| ARM AArch64 アセンブリ | RSA, ECC, DH | `WOLFSSL_SP_ARM64_ASM` | 自動検出 |
+| ARM 32-bit アセンブリ | RSA, ECC, DH | `WOLFSSL_SP_ARM32_ASM` | 自動検出 |
+| ARM Thumb アセンブリ | RSA, ECC, DH | `WOLFSSL_SP_ARM_THUMB_ASM` | 自動検出 |
+| Cortex-M アセンブリ | RSA, ECC, DH | `WOLFSSL_SP_ARM_CORTEX_M_ASM` | 自動検出 |
+| 汎用 C (32-bit / 64-bit) | RSA, ECC, DH | `WOLFSSL_SP_MATH` | `--enable-sp` |
 
-このガイドは、wolfSSLおよびwolfCryptを、現在サポートされていない新しいプラットフォームまたは環境に移植するエンジニアを対象としています。
+### sp_int.c インラインアセンブリ高速化
 
+`sp_int.c` には、アーキテクチャ専用 SP ファイル（例：`sp_x86_64.c`）が存在しない場合や、RSA/ECC 以外の鍵長に対応するため、多倍長整数の乗算・加算向けの小規模インラインアセンブリが含まれています。以下のマクロで制御されます（自動検出、または `user_settings.h` で明示設定可）：
 
-## 序章
+| アーキテクチャ | user_settings.h マクロ |
+|---|---|
+| Intel x86-64 | `WOLFSSL_SP_X86_64` |
+| Intel x86 (32-bit) | `WOLFSSL_SP_X86` |
+| ARM AArch64 | `WOLFSSL_SP_ARM64` |
+| ARM 32-bit | `WOLFSSL_SP_ARM32` |
+| ARM Thumb | `WOLFSSL_SP_ARM_THUMB` |
+| RISC-V 64-bit | `WOLFSSL_SP_RISCV64` |
+| RISC-V 32-bit | `WOLFSSL_SP_RISCV32` |
+| MIPS 64-bit | `WOLFSSL_SP_MIPS64` |
+| MIPS 32-bit | `WOLFSSL_SP_MIPS` |
+| s390x | `WOLFSSL_SP_S390X` |
 
-組み込みプラットフォームでwolfSSLを実行するには、いくつかの手順を繰り返す必要があります。これらの手順の一部は、[2.4章](chapter02.md#building-in-a-non-standard-environment) で概説しています。
-
-wolfSSLドキュメント第2章に示した手順に加えて、特定のプラットフォームに対応するために移植または変更が必要なコード領域があります。wolfSSLはこれらの領域の多くを抽象化して、新しいプラットフォームへできるだけ簡単に移植できるようにしています。
-
-`./wolfssl/wolfcrypt/settings.h` ファイルには、さまざまなオペレーティングシステム、TCP/IPスタック、およびチップセット (例: MBED、FREESCALE_MQX、MICROCHIP_PIC32、MICRIUM、EBSNET など) に固有の定義がいくつかあります。wolfSSLをコンパイルして新しいプラットフォームに移植するときに、`#defines` を配置する主な場所は2つあります。
-
-1. オペレーティングシステムまたはTCP/IPスタックに対応するための新たなマクロ定義は、通常、wolfSSLのポーティングが完了すると、`settings.h` ファイルに追加しています。これにより、機能のオン/オフを簡単に切り替えたり、そのビルドの「デフォルト」となるビルド設定をカスタマイズしたりできます。wolfSSLを新しいプラットフォームに移植する際にも、このファイルに新しいカスタム定義を追加することでお使いいただけます。新しいプラットフォームへの移植が完了した際、もし差し支えなければ、wolfSSLの [Gitリポジトリ](https://www.github.com/wolfssl/wolfssl) にPull Requestを送信していただけると嬉しく思います。これにより、より多くの環境でwolfSSLを使用しやすくなります。
-
-2. wolfSSL自体に変更を加えたくない場合、または追加のプリプロセッサ定義を使用して wolfSSLビルドをカスタマイズしたい場合、wolfSSLはカスタムヘッダーファイル`user_settings.h`の使用を推奨します。 wolfSSLソースファイルをコンパイルするときに `WOLFSSL_USER_SETTINGS` が定義されている場合、wolfSSLはカスタムヘッダーファイル `user_settings.h` を自動的にインクルードします。このヘッダーはユーザーが作成し、インクルードパスに配置する必要があります。これにより、ユーザーはwolfSSLビルド用に1つのファイルのみを管理すればよく、wolfSSLの新しいバージョンへの更新がはるかに簡単になります。
-
-wolfSSLでは、直接のメール ([info@wolfssl.jp](mailto:infopwolfssl.jp)) または [GitHub Pull Request](https://github.com/wolfssl/wolfssl) を通じてパッチとコード変更をご送信いただくことを推奨しています。
-
-
-## wolfSSLの移植
-
-
-### データ型
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: プラットフォームに適したデータ型のサイズを設定することは常に重要です。
-
-wolfSSL は、64ビット型を利用できることで速度面でメリットを得ています。プラットフォームの `sizeof(long)` と `sizeof(long long)` の結果と一致するように `SIZEOF_LONG` と `SIZEOF_LONG_LONG` を定義します。これは、`settings.h` または `user_settings.h` のカスタム定義に追加できます。たとえば、`MY_NEW_PLATFORM` のサンプル定義の下の `settings.h` では次のように示します。
-
-```c
-#ifdef MY_NEW_PLATFORM
-    #define SIZEOF_LONG 4
-    #define SIZEOF_LONG_LONG 8
-...
-#endif
-```
-
-
-wolfSSLとwolfCryptでは、`word32` と `word16` という2つの追加データ型を使用します。これらのデフォルトの型マッピングは次のとおりです。
-
-
-```c
-#ifndef WOLFSSL_TYPES
-#ifndef byte
-    typedef unsigned char byte
-#endif
-    typedef unsigned short word16;
-    typedef unsigned int word32;
-    typedef byte word24[3];
-#endif
-```
-
-
-`word32` はコンパイラの32ビット型にマッピングされ、`word16` はコンパイラの16ビット型にマッピングされます。これらのデフォルトのマッピングがプラットフォームに適していない場合は、`settings.h` または `user_settings.h` で `WOLFSSL_TYPES` を定義し、word32およびword16に独自のカスタムtypedefを割り当てる必要があります。
-
-wolfSSLのfastmathライブラリは、`fp_digit` および `fp_word` 型を使用します。デフォルトでは、これらはビルド構成に応じて `<wolfssl/wolfcrypt/tfm.h>` にマッピングされます。
-
-`fp_word` は `fp_digit` の2倍のサイズである必要があります。デフォルトのケースがプラットフォームに当てはまらない場合は、`settings.h` または `user_settings.h` で `WOLFSSL_BIGINT_TYPES` を定義し、`fp_word` および `fp_digit` に独自のカスタムtypedefを割り当てる必要があります。
-
-wolfSSLは、一部の操作において使用可能な場合は64ビット型を使用します。ビルド時には、`SIZEOF_LONG` および `SIZEOF_LONG_LONG` の設定に基づいて、`word64` の正しいデータ型を検出して設定しようとします。 真の64ビット型を持たない一部のプラットフォームでは、2つの32ビット型を合わせて使用するため、パフォーマンスが低下する可能性があります。コンパイル時に`NO_64BIT`を定義することで、64ビット型を使用しないこともできます。
-
-
-### エンディアン
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: あなたのプラットフォームがビッグエンディアンの場合です。
-
-お使いのプラットフォームはビッグエンディアンとリトルエンディアン、どちらでしょうか。wolfSSLはデフォルトでリトルエンディアンを使用しています。システムがビッグエンディアンの場合は、wolfSSL をビルドする際に `BIG_ENDIAN_ORDER` を定義します。例えば、`settings.h` で次のように設定できます。
+### SP 鍵サイズ設定
 
 ```c
-#ifdef MY_NEW_PLATFORM
-    ...
-    #define BIG_ENDIAN_ORDER
-    ...
-#endif
+#define WOLFSSL_SP_MATH
+#define WOLFSSL_SP_X86_64_ASM        /* x86-64 */
+#define WOLFSSL_SP_ARM64_ASM         /* AArch64 */
+#define WOLFSSL_SP_ARM_CORTEX_M_ASM  /* Cortex-M */
+
+#define WOLFSSL_SP_2048  /* RSA-2048 */
+#define WOLFSSL_SP_3072  /* RSA-3072 */
+#define WOLFSSL_SP_4096  /* RSA-4096 */
+#define WOLFSSL_SP_256   /* ECC P-256 */
+#define WOLFSSL_SP_384   /* ECC P-384 */
+#define WOLFSSL_SP_521   /* ECC P-521 */
 ```
 
-
-
-### writev
-
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: `<sys/uio.h>` を利用できない場合です。
-
-デフォルトでは、wolfSSL APIは、`writev()` セマンティクスをシミュレートする `wolfSSL_writev()` をアプリケーションに提供します。 `<sys/uio.h>` ヘッダーが利用できないシステムでは、`NO_WRITEV` を定義してこの機能を除外します。
-
-
-### ネットワークI/O
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: BSD スタイルのソケットAPIを利用できない、あるいはカスタムトランスポート層またはTCP/IPスタックを使用している、または静的バッファーのみを使用したい場合です。
-
-wolfSSLはデフォルトでBSDスタイルのソケットインターフェイスを使用します。トランスポート層がBSDソケットインターフェイスを提供する場合、カスタムヘッダーが必要でない限り、wolfSSLはそのまま統合する必要があります。
-
-wolfSSLはカスタムI/O抽象化レイヤーを提供し、ユーザーはwolfSSLのI/O機能をシステムに合わせて調整できます。詳細については、[5.1.2節](chapter05.md#custom-inputoutput-abstraction-layer) をご参照ください。
-
-具体的には `WOLFSSL_USER_IO` を定義し、wolfSSLデフォルトの `EmbedSend()` と `EmbedReceive()` をテンプレートとして使用し、独自のI/Oコールバック関数を記述します。これら2つの関数は `./src/io.c` にあります。
-
-wolfSSLは、入力と出力に動的バッファを使用します。このバッファのデフォルトは0バイトです。バッファよりも大きいサイズの入力レコードを受信した場合、動的バッファが一時的にリクエストの処理に使用され、その後解放されます。
-
-動的メモリを必要としない16kBの大きな静的バッファを使用する場合は、`LARGE_STATIC_BUFFERS` を定義することでこのオプションを使用できます。
-
-動的バッファが使用され、ユーザーがバッファサイズよりも大きい `wolfSSL_write()` を要求した場合、最大 `MAX_RECORD_SIZE` までの動的ブロックを使用してデータを送信します。`RECORD_SIZE` で定義されている現在のバッファサイズの最大のチャンクでのみデータを送信したいユーザーは、`STATIC_CHUNKS_ONLY` を定義することでこれを実現できます。この定義を使用する場合、`RECORD_SIZE` はデフォルトで 128 バイトになります。
-
-
-### ファイルシステム
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: ファイルシステムを利用できない、あるいは標準のファイルシステム機能を利用できない、または独自のファイルシステムを使用している場合です。
-
-wolfSSLは、TLSセッションまたはコンテキストに鍵と証明書をロードするためにファイルシステムを使用します。wolfSSLでは、これらをメモリバッファからロードすることもできます。メモリバッファのみを使用する場合、ファイルシステムは必要ありません。
-
-ライブラリをビルドするときに `NO_FILESYSTEM` を定義することで、wolfSSLによるファイルシステムの使用を無効にできます。つまり、証明書と鍵はファイルではなくメモリバッファからロードする必要があります。`settings.h` で、以下のように設定できます。
-
-
-```c
-#ifdef MY_NEW_PLATFORM
-    ...
-    #define NO_FILESYSTEM
-    ...
-#endif
-```
-
-
-テスト用の鍵と証明書バッファーは、`./wolfssl/certs_test.h` ヘッダーファイルにあります。これらは、`./certs` ディレクトリにある対応する証明書や鍵と一致します。
-
-`certs_test.h` ヘッダーファイルは、必要に応じて `./gencertbuf.pl` スクリプトを使用して更新できます。`gencertbuf.pl` 内には、`fileList_1024` と `fileList_2048` の2つの配列があります。鍵サイズに応じて、追加の証明書またはキーをそれぞれの配列に追加できます。なお、DER形式である必要があります。上記の配列は、証明書・鍵ファイルの場所を目的のバッファー名にマップします。`gencertbuf.pl` を変更した後、wolfSSLルートディレクトリから実行すると、`./wolfssl/certs_test.h` の証明書・鍵のバッファーが更新されます。
-
-
-```sh
-./gencertbuf.pl
-```
-
-
-デフォルト以外のファイルシステムを使用する場合、ファイルシステム抽象化レイヤーは `./wolfssl/wolfcrypt/wc_port.h` にあります。ここには、EBSNET、FREESCALE_MQX、MICRIUM などのさまざまなプラットフォームのファイルシステムポートがあります。必要に応じて、プラットフォームのカスタム定義を追加できます。これにより、`XFILE`、`XFOPEN`、`XFSEEK` などを使用してファイルシステム関数を定義できます。たとえば、Micrium の µC/OS (MICRIUM) の `wc_port.h` のファイルシステムレイヤーは次のとおりです。
-
-```c
-#elif defined(MICRIUM)
-#include <fs.h>
-#define XFILE      FS_FILE*
-#define XFOPEN     fs_fopen
-#define XFSEEK     fs_fseek
-#define XFTELL     fs_ftell
-#define XREWIND    fs_rewind
-#define XFREAD     fs_fread
-#define XFCLOSE    fs_fclose
-#define XSEEK_END  FS_SEEK_END
-#define XBADFILE   NULL
-```
-
-### スレッド化
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: マルチスレッド環境でwolfSSLを使用したい、またはシングルスレッドモードでコンパイルしたい場合です。
-
-wolfSSLをシングルスレッド環境でのみ使用する場合、wolfSSLをコンパイルするときに `SINGLE_THREADED` を定義することでwolfSSLミューテックスレイヤーを無効にできます。これにより、wolfSSLミューテックスレイヤーを移植する必要がなくなります。
-
-wolfSSLをマルチスレッド環境で使用する場合、wolfSSLミューテックスレイヤーを新しい環境に移植する必要があります。ミューテックスレイヤーは `./wolfssl/wolfcrypt/wc_port.h` および `./wolfcrypt/src/wc_port.c` にあります。新しいシステムでは、`wc_port.h` に `wolfSSL_Mutex` を定義し、`wc_port.c` にミューテックス関数 (`wc_InitMutex`、`wc_FreeMutex`、`wc_LockMutex`、`wc_UnLockMutex`) を定義する必要があります。`wc_port.h` と `wc_port.c` を検索すると、既存のプラットフォームポートレイヤー (EBSNET、FREESCALE_MQX など) の例を参照できます。
-
-
-### ランダムシード
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: `/dev/random` や `/dev/urandom` を利用できない、あるいはハードウェアRNGに統合する必要がある場合です。
-
-デフォルトでは、wolfSSLは `/dev/urandom` または `/dev/random` を使用して RNG シードを生成します。wolfSSLをビルドするときに `NO_DEV_RANDOM` 定義を使用して、デフォルトの `GenerateSeed()` 関数を無効にすることができます。これが定義されている場合は、ターゲットプラットフォームに固有の `./wolfcrypt/src/random.c` にカスタム `GenerateSeed()` 関数を記述する必要があります。これにより、ハードウェアベースのランダムエントロピーソースが利用可能な場合は、wolfSSLのPRNGにシードを設定できます。
-
-`GenerateSeed()` の記述方法の例については、`./wolfcrypt/src/random.c` にある wolfSSL の既存の `GenerateSeed()` 実装を参照してください。
-
-
-### メモリー
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: 標準のメモリ関数が利用できない、あるいはオプションの数学ライブラリ間のメモリ使用量の違いに関心がある場合です。
-
-wolfSSL本体はデフォルトで `malloc()` と `free()` の両方を使用します。旧来使用されてきた第1世代の整数演算ライブラリ(Normal Math)を使用する場合、wolfCryptは `realloc()` も使用します。
-
-現在、整数演算ライブラリとして最初期に開発された第1世代のNormal Mathライブラリ、パブリックドメインのTFM(Tom's Fast Math)をベースに開発した第2世代のFast Mathライブラリ、SP(Single Precision)最適化を適用した第3世代のSP Mathライブラリが存在します。
-このうち、第2世代以降のFast Math, SP Mathライブラリでは、暗号操作において動的メモリを使用しません。
-
-メモリ使用量とスピードの観点から、私たちはSP Mathライブラリの使用を推奨しています。
-wolfSSL 5.4.0以降ではデフォルトで採用しており、第1世代のNormal Mathライブラリは廃止予定です。
-詳細は以下のページをご覧ください。
-
-- [wolfSSLの新たな Multi-Precision 演算ライブラリ](https://wolfssl.jp/wolfblog/2021/02/03/multi-precision-math-library/)
-- [wolfSSL Math Library Comparison Matrix](https://www.wolfssl.com/wolfssl-math-library-comparison-matrix/)
-- [レガシー数学ライブラリを廃止します](https://wolfssl.jp/wolfblog/2023/03/13/deprecation-of-wolfssl-normal-math-library/)
-
-wolfSSLのTLSレイヤーは依然としていくらかの動的メモリを使用するため、`malloc()` と `free()` は依然として必要です。
-
-通常の `malloc()`、`free()`、および場合によっては `realloc()` 関数が使用できない場合は、`XMALLOC_USER` を定義し、ターゲット環境に固有の `./wolfssl/wolfcrypt/types.h` でカスタムメモリ関数フックを提供します。
-
-`XMALLOC_USER` の使用の詳細については、[5.1.1.1節](chapter05.md#memory-use) をご参照ください。
-
-
-### 時間
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: 標準の時間関数 (`time()`、`gmtime()`) を利用できない、あるいはカスタムのクロックティック関数を指定する必要がある場合です。
-
-デフォルトでは、wolfSSLは `./wolfcrypt/src/asn.c` で指定されているように、`time()`、`gmtime()`、および `ValidateDate()` を使用します。これらは、`XTIME`、`XGMTIME`、および `XVALIDATE_DATE` に抽象化されています。標準の時間関数と `time.h` を利用できない場合は、ユーザーは `USER_TIME` を定義できます。`USER_TIME` を定義した後、ユーザーは独自の `XTIME`、`XGMTIME`、および `XVALIDATE_DATE` 関数を定義できます。
-
-wolfSSLは、クロックティック関数にデフォルトで `time(0)` を使用します。これは、`LowResTimer()` 関数内の `./src/internal.c` にあります。
-
-`USER_TICKS` を定義すると、`time(0)` が必要ない場合にユーザーが独自のクロックティック関数を定義できるようになります。カスタム関数には秒単位の精度が必要ですが、エポックと相関させる必要はありません。参考として、`./src/internal.c` の `LowResTimer()` 関数を参照してください。
-
-
-### C標準ライブラリ
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: C標準ライブラリを使用できない、あるいは独自のライブラリがある場合です。
-
-wolfSSLは、開発者に高いレベルの移植性と柔軟性を提供するために、C標準ライブラリなしで構築できるようにしています。その場合、ユーザーはC標準の関数の代わりに使用したい関数をマップする必要があります。
-
-第7章では、メモリ関数について説明しました。メモリ関数の抽象化に加えて、wolfSSLは文字列関数と数学関数も抽象化します。特定の関数は通常、`X<FUNC>` 形式の定義に抽象化されます。`<FUNC>` は抽象化される関数の名前です。
-
-詳細については、[5.1章](chapter05.md) をご覧ください。
-
-### ロギング
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: デバッグメッセージを有効にしたいが、stderr を使用できない場合です。
-
-デフォルトでは、wolfSSLはstderrを介してデバッグ出力を提供します。デバッグメッセージを有効にするには、wolfSSLを `DEBUG_WOLFSSL` を定義してコンパイルし、アプリケーションコードから `wolfSSL_Debugging_ON()` を呼び出す必要があります。同様に、アプリケーションから`wolfSSL_Debugging_OFF()` を呼び出すことで、wolfSSLデバッグメッセージをオフにすることもできます。
-
-stderrを使用できない、あるいは別の出力ストリームや別の形式でデバッグメッセージを出力したい環境には、独自のコールバック関数を使用できるようにしています。
-
-詳細については、[8.1章](chapter08.md) をご覧ください。
-
-
-### 公開鍵操作
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: wolfSSLで独自の公開鍵実装を使用したい場合です。
-
-wolfSSLでは、SSL/TLSレイヤーが公開鍵操作を行う必要があるときに呼び出される、独自の公開鍵コールバックをユーザーが作成できます。 ユーザーはオプションで6つの機能を定義できます。
-
-
-
-1. ECC 署名 コールバック
-2. ECC 検証 コールバック
-3. RSA 署名 コールバック
-4. RSA 検証 コールバック
-5. RSA 暗号化コールバック
-6. RSA 復号 コールバック
-
-詳細については、[6.4章](chapter06.md#public-key-callbacks) をご覧ください。
-
-
-### アトミックレコードレイヤーの処理
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: レコードレイヤーの処理、特にMAC/暗号化および復号/検証操作を独自に実行したい場合です。
-
-デフォルトでは、wolfSSLは暗号ライブラリwolfCryptを使用し、ユーザーに代わってレコードレイヤーの処理を行います。wolfSSLは、SSL/TLS接続中に MAC/暗号化および復号/検証機能をより細かく制御したいユーザーのために、アトミックレコード処理コールバックを提供します。
-
-ユーザーは2つの関数を定義できます。
-
-1. MAC/暗号化コールバック関数
-2. 復号/検証コールバック関数
-
-詳細については、[6.3章](chapter06.md#user-atomic-record-layer-processing) をご覧ください。
-
-### 機能
-
-**Q: どんな場合にこの章の内容が役立ちますか?**
-
-A: 特定の機能を無効にしたい場合です。
-
-wolfSSLをビルドする際、マクロ定義を使用して特定の機能を無効化できます。
-使用可能なマクロ定義については、[2章](chapter02.md) をご覧ください。
-
-
-## 次のステップ
-
-
-### wolfCryptテストアプリケーション
-
-wolfSSLをターゲットプラットフォームで適切にビルドできるようになったら、次のステップとして wolfCryptテストアプリケーションを移植するのがよいでしょう。このアプリケーションをターゲットシステムで実行すると、NISTテストベクトルを使用して、すべての暗号アルゴリズムが正しく動作しているかどうか検証されます。
-
-このステップを省略してSSL/TLS接続に進むと、基盤となる暗号操作の失敗によって発生する問題のデバッグが難しくなる可能性があります。
-
-wolfCryptテストアプリケーションは `./wolfcrypt/test/test.c` にあります。組み込みアプリケーションに独自の `main()` 関数がある場合は、`./wolfcrypt/test/test.c` をコンパイルするときに `NO_MAIN_DRIVER` を定義する必要があります。これにより、アプリケーションの `main()` が各暗号/アルゴリズム テストを個別に呼び出すことができます。
-
-組み込みデバイスにwolfCryptテストアプリケーション全体を実行するのに十分なリソースがない場合は、個々のテストを `test.c` から切り離して個別にコンパイルできます。 `test.c` から分離された暗号テストを抽出するときは、特定のテストケースに必要な正しいヘッダーファイルがビルドに含まれていることを確認してください。
-
-
-## サポート
-
-一般的なサポートの質問は、メール、サポートフォーラム(英語)、またはwolfSSLのZendeskチケットトラッキングシステムを介してwolfSSLに直接送信できます。
-
-Webサイト:	           [https://www.wolfssl.com](https://www.wolfssl.com)
-
-サポート用メールアドレス: [support@wolfssl.com](mailto:support@wolfssl.com)
-
-Zendesk: 	          [https://wolfssl.zendesk.com](https://wolfssl.zendesk.com)
-
-フォーラム:        	    [https://www.wolfssl.com/forums](https://www.wolfssl.com/forums)
-
-wolfSSLは、ユーザーと顧客がwolfSSLを新しい環境に移植するのを支援するために、いくつかのサポートパッケージとコンサルティングサービスを提供しています。
-
-サポートパッケージ:  [https://wolfssl.jp/license/support-packages/](https://wolfssl.jp/license/support-packages/)
-
-お問い合わせ: [info@wolfssl.jp](mailto:info@wolfssl.jp)
-
-
+## C. マイコン/SoC チップ別ハードウェアアクセラレータ
+
+| ベンダー / チップ | 対応アルゴリズム | user_settings.h マクロ | configure オプション | ソース |
+|---|---|---|---|---|
+| **STMicroelectronics** | | | | |
+| STM32F2/F4/F7/H7 (CRYP) | AES-ECB/CBC/CTR/GCM | `STM32_CRYPTO` | HAL 自動検出 | port/st/stm32.c |
+| STM32L4/L5/WB55 | AES, SHA（部分） | `STM32_CRYPTO` | HAL 自動検出 | port/st/stm32.c |
+| STM32U5 (DHUK) | 鍵ラップ付き AES | `WOLFSSL_STM32U5_DHUK` | 自動検出 | port/st/stm32.c |
+| STM32MP1/MP13/MP25 | AES, SHA, RSA, ECC | `WOLFSSL_STM32_CRYPT` | 自動検出 | port/st/stm32.c |
+| **NXP** | | | | |
+| i.MX RT (DCP) | AES-ECB/CBC/CTR/GCM, SHA | `WOLFSSL_IMXRT_DCP` | 自動検出 | port/nxp/dcp_port.c |
+| i.MX 6/8 (CAAM) | AES, SHA, RSA, ECC, DH, HMAC | `WOLFSSL_IMX6_CAAM` / `WOLFSSL_SECO_CAAM` | `--enable-caam` | port/caam/* |
+| SE050 セキュアエレメント | AES, SHA, RSA, ECC, X25519, ECDH | `WOLFSSL_SE050` + `WOLFSSL_SE050_CRYPT` | 自動検出 | port/nxp/se050_port.c |
+| **Espressif** | | | | |
+| ESP32 / ESP32-S2 / ESP32-S3 | AES, SHA-1/256/384/512, RSA, ECC | `WOLFSSL_ESP32_CRYPT` | `--enable-esp32` | port/Espressif/esp32_*.c |
+| ESP32-C3 / C6 / H2 | AES, SHA-256/384/512（部分） | `WOLFSSL_ESP32_CRYPT` | `--enable-esp32` | port/Espressif/esp32_*.c |
+| **Renesas** | | | | |
+| RX64M/RX71M/RX72M | SHA-1, SHA-256 | `WOLFSSL_RENESAS_RX64_HASH` | 自動検出 | port/Renesas/renesas_rx64_*.c |
+| RX65N (SCE) | AES, SHA, RSA, ECC, RNG | `WOLFSSL_RENESAS_SCEPROTECT` | 自動検出 | port/Renesas/renesas_*.c |
+| RZ/A1/A2 (TSIP) | AES, SHA, RSA, ECC, RNG | `WOLFSSL_RENESAS_TSIP` | 自動検出 | port/Renesas/renesas_tsip_*.c |
+| RA4M4/RA6M4 (RSIP) | AES, SHA, RSA, ECC, RNG | `WOLFSSL_RENESAS_RSIP` | 自動検出 | port/Renesas/renesas_rsip*.c |
+| RA FSP Secure Manager | AES, SHA, RSA, ECC, HMAC | `WOLFSSL_RENESAS_FSPSM` | 自動検出 | port/Renesas/renesas_fspsm_*.c |
+| **Cypress** | | | | |
+| PSoC 6 | AES, SHA, ECC, RNG | `WOLFSSL_PSOC6_CRYPTO` | 自動検出 | port/cypress/psoc6_crypto.c |
+| **Silicon Labs** | | | | |
+| EFR32 / EFM32 (SE) | AES, SHA, ECC, RNG | `WOLFSSL_SILABS_SE_ACCEL` | 自動検出 | port/silabs/silabs_*.c |
+| **Maxim** | | | | |
+| MAX3266X | AES-ECB/CBC, RSA | `WOLFSSL_MAX3266X` | 自動検出 | port/maxim/max3266x.c |
+| MAXQ10XX | AES, SHA, RSA, ECC, RNG | `WOLFSSL_MAXQ10XX_CRYPTO` | `--with-maxq10xx=PART` | port/maxim/maxq10xx.c |
+| **Microchip** | | | | |
+| PIC32MZ | AES, SHA, RNG | `WOLFSSL_PIC32MZ_CRYPT` | 自動検出 | port/pic32/ |
+| ATECC508A / 608A | AES, SHA, ECC (ECDH/ECDSA) | `WOLFSSL_ATECC` | 自動検出 | port/atmel/atmel.c |
+| **Xilinx** | | | | |
+| Zynq / Zynq-7000 | AES, SHA, RSA, ECC | `WOLFSSL_XILINX_CRYPT` | `--enable-xilinx` | port/xilinx/xil-*.c |
+| Versal | AES-GCM, SHA-3, RNG | `WOLFSSL_XILINX_CRYPT_VERSAL` | `--enable-xilinx` | port/xilinx/xil-versal-*.c |
+| **ARM CryptoCell** | | | | |
+| CC-300/312/700/712/714 | AES, SHA, RSA, ECC, ChaCha, Poly1305 | `WOLFSSL_CRYPTOCELL` | `--enable-cryptocell` | port/arm/cryptocell*.c |
+| **IoT-Safe (SIM)** | ECC, SHA, RNG | `WOLFSSL_IOTSAFE` | `--enable-iotsafe` | port/iotsafe/ |
+
+## D. 外部アクセラレータ・コプロセッサ
+
+| 製品 | 対応アルゴリズム | user_settings.h マクロ | configure オプション |
+|---|---|---|---|
+| Intel QuickAssist (QAT) | AES, RSA, DH, ECC, SHA | `HAVE_INTEL_QA` | `--with-intelqa=PATH` |
+| Intel QAT（同期） | 同上 | `ENABLED_INTEL_QA_SYNC` | `--with-intelqa-sync=PATH` |
+| Cavium NITROX | AES, RSA, DH, ECC, SHA | `HAVE_CAVIUM` | `--with-cavium=PATH` |
+| Cavium NITROX V | 同上 | `HAVE_CAVIUM_V` | `--with-cavium=PATH` |
+| Cavium Octeon (MIPS) | AES, RSA, ECC, SHA | `HAVE_CAVIUM_OCTEON` | `--with-octeon-sync=PATH` |
+| NXP CAAM | AES, SHA, RSA, ECC, HMAC, DH | `WOLFSSL_CAAM` | `--enable-caam` |
+
+## E. OS カーネル経由ハードウェアオフロード
+
+| インターフェース | 対応アルゴリズム | user_settings.h マクロ | configure オプション |
+|---|---|---|---|
+| Linux `/dev/crypto` | AES, SHA-1/256/512, RSA, ECC, DH, HMAC | `WOLFSSL_DEVCRYPTO` | `--enable-devcrypto` |
+| Linux Kernel Crypto API | AES, SHA, RSA, ECC, X25519, HMAC | `WOLFSSL_KCAPI` | `--enable-kcapi` |
+| Linux AF_ALG | AES, SHA（カーネルバックエンド依存） | `WOLFSSL_AFALG` | `--enable-afalg` |
+| PSA (Platform Security Architecture) | ベンダー実装依存 | `WOLFSSL_HAVE_PSA` | `--enable-psa` |
