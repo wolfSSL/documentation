@@ -11,15 +11,33 @@ endif
 all: pdf html
 
 
-SOURCES = chapter01.md \
-		  chapter02.md \
-		  chapter03.md \
-		  chapter04.md \
-		  chapter05.md \
-		  chapter06.md \
-		  chapter07.md \
-		  chapter08.md
-APPENDIX= appendix01.md
+ifeq ($(DOC_LANG),JA)
+    SOURCES = chapter01.md \
+        chapter02.md \
+        chapter03.md \
+        chapter04.md \
+        chapter05.md \
+        chapter06.md \
+        chapter07.md \
+        chapter08.md
+    APPENDIX = appendix01.md
+    HOMEPAGE = chapter01.md
+    LINK_STRIP = chapter[0-9][0-9].md|appendix[0-9][0-9].md
+else
+    SOURCES = 1-Overview.md \
+        2-FAQs.md \
+        3-Quickstart.md \
+        4-Architecture.md \
+        5-Features.md \
+        6-Utilities.md \
+        7-Examples.md \
+        8-Integration.md \
+        9-Configuration.md
+    APPENDIX = 10-API-docs-client.md \
+        11-API-docs-server.md
+    HOMEPAGE = 0-Index.md
+    LINK_STRIP = [0-9]+-[A-Za-z0-9-]+\.md
+endif
 
 ifeq ($(DOC_LANG),JA)
 	DOXY = Doxyfile-ja
@@ -64,14 +82,14 @@ html-setup: wolfhsm-update
 	$(Q)cp ../common/*.css build/html/
 	$(Q)perl -i -pe 's/    ```/```/g' build/html/*.md
 	$(Q)perl -i -pe "s/\#--/\#-/g" build/html/*.md
-	$(Q)mv build/html/$(word 1,$(SOURCES)) build/html/index.md
+	$(Q)mv build/html/$(HOMEPAGE) build/html/index.md
 
 # Override pdf-setup to ensure wolfhsm repo is cloned first
 .PHONY: pdf-setup
 pdf-setup: wolfhsm-update builddir
 	$(Q)cp -a $(SRC)/* build/pdf/
 	$(Q)cp ../common/*.png build/pdf/
-	$(Q)perl -i -pe "s/chapter[0-9][0-9].md|appendix[0-9][0-9].md//g" build/pdf/*.md
+	$(Q)perl -i -pe "s/$(LINK_STRIP)//g" build/pdf/*.md
 	$(Q)perl -i -pe "s/\#--/\#/g" build/pdf/*.md
 
 # Need an index.md, so let's make it chapter01.
@@ -85,10 +103,16 @@ html-prep: api
 
 	$(Q)perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*
+	$(Q)perl -i -pe "s/\[([^\]]+)\]\(Classes\/[^)]+\.md\)/\1/g" build/html/*8h*
 
 # Set input format to gfm to fix issues with converted API docs
 # Regexes:
-# 1. Indent all headings by one #
+# 1. Demote the auto-generated API h-file headings by one # (only wh__*_8h.md)
+#    so they nest as subsections under their parent appendix chapter. Don't
+#    demote chapter source files — pandoc -N needs their H1 → \section for
+#    proper "1.", "2.", ... numbering (and "A.", "B.", ... after \appendix);
+#    if everything is demoted to ##, every chapter renders as "0.N" and the
+#    appendix as ".N".
 # 2. Fix broken anchors from Doxybook2
 # 3. Remove file references from links
 # 4. Three regexes to remove metadata which outputs in the PDF text
@@ -98,7 +122,7 @@ html-prep: api
 pdf-prep: api
 	$(Q)cp -a api/md/*8h* build/pdf/
 
-	$(Q)perl -i -pe "s/# /## /g" build/pdf/*.md
+	$(Q)perl -i -pe "s/# /## /g" build/pdf/wh__*_8h.md
 	$(Q)perl -i -pe "s/(\/group_.*|Classes\/struct.*|\/.*8h)\.md//g" build/pdf/*.md
 	$(Q)perl -i -pe "s/^-(-)+$$//" build/pdf/*.md
 	$(Q)perl -i -pe "s/^title:.*//" build/pdf/*.md
@@ -111,4 +135,11 @@ pdf-prep: api
 	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/*.md
 	$(Q)perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/*.md
 	$(Q)perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/*.md
-	$(Q)cat build/pdf/wh__client_8h.md build/pdf/wh__client__crypto_8h.md build/pdf/wh__server_8h.md >> build/pdf/appendix01.md
+	$(Q)perl -i -pe "s/\[([^\]]+)\]\((?:\.\.\/)*wolfhsm\/wh_[a-z_]+\.h\)/\1/g" build/pdf/*.md
+	$(Q)perl -i -pe "s/\[([^\]]+)\]\(wh__[a-z_0-9]+\.md\)/\1/g" build/pdf/*.md
+	$(Q)if [ "$(DOC_LANG)" = "JA" ]; then \
+		cat build/pdf/wh__client_8h.md build/pdf/wh__client__crypto_8h.md build/pdf/wh__client__she_8h.md build/pdf/wh__server_8h.md build/pdf/wh__server__keystore_8h.md build/pdf/wh__server__img__mgr_8h.md build/pdf/wh__server__cert_8h.md build/pdf/wh__server__cert__cache_8h.md >> build/pdf/appendix01.md; \
+	else \
+		cat build/pdf/wh__client_8h.md build/pdf/wh__client__crypto_8h.md build/pdf/wh__client__she_8h.md >> build/pdf/10-API-docs-client.md; \
+		cat build/pdf/wh__server_8h.md build/pdf/wh__server__keystore_8h.md build/pdf/wh__server__img__mgr_8h.md build/pdf/wh__server__cert_8h.md build/pdf/wh__server__cert__cache_8h.md >> build/pdf/11-API-docs-server.md; \
+	fi
