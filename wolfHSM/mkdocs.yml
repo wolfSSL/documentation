@@ -4,18 +4,28 @@ docs_dir: build/html/
 site_dir: html/
 copyright: Copyright © 2024 wolfSSL Inc.
 nav:
-    - "1. Introduction": index.md
-    - "2. Overview": chapter02.md
-    - "3. Getting Started": chapter03.md
-    - "4. Functional Components": chapter04.md
-    - "5. Client Library": chapter05.md
-    - "6. Server Library": chapter06.md
-    - "7. Customizing wolfHSM": chapter07.md
-    - "8. Porting wolfHSM": chapter08.md
-    - "9. API Reference":
+    - Home: index.md
+    - "1. Overview": 1-Overview.md
+    - "2. FAQs": 2-FAQs.md
+    - "3. Quickstart": 3-Quickstart.md
+    - "4. Architecture": 4-Architecture.md
+    - "5. Features": 5-Features.md
+    - "6. Utilities": 6-Utilities.md
+    - "7. Examples": 7-Examples.md
+    - "8. Integration": 8-Integration.md
+    - "9. Configuration": 9-Configuration.md
+    - "10. Client API Reference":
+      - Overview: 10-API-docs-client.md
       - Client API: wh__client_8h.md
       - Client Crypto API: wh__client__crypto_8h.md
+      - Client SHE API: wh__client__she_8h.md
+    - "11. Server API Reference":
+      - Overview: 11-API-docs-server.md
       - Server API: wh__server_8h.md
+      - Server Keystore API: wh__server__keystore_8h.md
+      - Server Image Manager API: wh__server__img__mgr_8h.md
+      - Server Cert API: wh__server__cert_8h.md
+      - Server Cert Cache API: wh__server__cert__cache_8h.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
