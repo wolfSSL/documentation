@@ -4064,6 +4064,113 @@ Implements a lean TLS 1.2 client only (no client auth), ECC256, AES128 and SHA25
 
 Enabling produces a small footprint TLS client that supports TLS 1.2 client only (no client auth), ECC256, AES128 and SHA256 w/o Shamir. Meant to be used by itself at the moment and not in conjunction with other build options.
 
+### `--enable-tinytls13`
+
+Enable the tiny TLS 1.3 footprint profile. This is a TLS 1.3 only build that strips wolfSSL to a minimal handshake surface for embedded and resource constrained targets. It is expressed as a translation layer over standard wolfSSL macros (the `WOLFSSL_TINY_TLS13` umbrella in `settings.h`), so it adds no new feature flags to the core library.
+
+The profile is selected with a comma separated list:
+
+```sh
+./configure --enable-tinytls13=LIST
+```
+
+The bare flag `--enable-tinytls13` is equivalent to `--enable-tinytls13=psk`. This profile is non FIPS and cannot be combined with a FIPS build.
+
+#### Base profiles
+
+* `psk` (default): a pre shared key plus ECDHE build with no X.509. The floor is X25519 key exchange, AES-128-GCM, SHA-256 and HKDF. This is the smallest configuration.
+* `cert`: adds a minimal X.509 certificate chain verify on top of the floor, using ECDSA P-256 by default.
+
+The certificate profile is a reduced security verify. It disables X.509 name constraint enforcement, relaxes ASN.1 strictness and removes CRL revocation checking to save code. It is intended for a known or pinned certificate authority, not for general public internet PKI. Configure prints a notice when the certificate profile is selected.
+
+#### Adders
+
+The following may be combined with a base profile in the comma separated list:
+
+* `server`: add the TLS 1.3 server role. The default is client only.
+* `mutualauth`: mutual TLS with X.509 client authentication. Implies `cert`.
+* `staticmem`: serve TLS allocations from a caller provided static memory pool. Add `WOLFSSL_NO_MALLOC` separately for a true zero heap build.
+* `asm`: use assembly crypto instead of the small C backend. Larger but faster.
+* `p256`: use P-256 ECDHE on the PSK floor instead of X25519.
+* `sha384`: add SHA-384, for example for AES-256-GCM-SHA384.
+* `mldsa`: add ML-DSA-65 certificate verification (verify only).
+* `rsaverify`: add RSA-PSS certificate verification. The certificate profile is ECDSA only by default.
+
+For example, a TLS 1.3 server that verifies ECDSA certificates and also supports SHA-384:
+
+```sh
+./configure --enable-tinytls13=cert,server,sha384
+```
+
+#### Footprint
+
+The figures below are flash (text plus data) of the linked client binary, built `-Os` with link time optimization and dead code elimination (`-flto -ffunction-sections -fdata-sections -Wl,--gc-sections`) on the SHA-256 only floor. This is what links into an application, which is much smaller than the size of `libwolfssl.a`. Toolchains: arm-none-eabi-gcc 14.2 with newlib-nano (Cortex-M33), clang `-Os` (Intel x86_64), aarch64-none-elf-gcc 14.2 with newlib (ARM aarch64).
+
+| Configuration | Cortex-M33 | Intel x86_64 | ARM aarch64 |
+| --- | --: | --: | --: |
+| PSK, X25519 (floor) | 30,836 | 56,092 | 50,700 |
+| PSK, P-256 | 37,347 | 66,068 | 59,292 |
+| Cert, ECDSA P-256 | 62,765 | 110,817 | 95,404 |
+| Mutual TLS | 66,554 | 116,789 | 99,836 |
+
+Cost of common adders on Cortex-M33, relative to the PSK floor:
+
+| Build | Flash (bytes) | Delta vs floor |
+| --- | --: | --: |
+| PSK floor (X25519) | 30,836 | 0 |
+| plus static memory (zero heap) | 32,169 | +1,333 |
+| plus P-256 | 37,347 | +6,511 |
+| plus ML-DSA-65 verify | 43,780 | +12,944 |
+
+Where the flash goes for a PSK P-256 client on Cortex-M33 (37,347 bytes):
+
+| Component | Bytes |
+| --- | --: |
+| TLS 1.3 handshake | 7,766 |
+| TLS extensions | 5,678 |
+| ECC P-256 (SP math) | 5,962 |
+| CTX, SSL object and API | 4,050 |
+| Record layer | 3,564 |
+| AES-128-GCM | 2,650 |
+| HMAC, HKDF, DRBG and RNG | 2,110 |
+| SHA-256 | 1,370 |
+| Key schedule | 1,120 |
+| Memory and cleanup | 630 |
+| C library (newlib) | 952 |
+| Other and inlined | 1,486 |
+
+#### Customizing for your application
+
+1. Start from the closest base profile. Use `psk` if your endpoints share a pre shared key and you do not need certificates. Use `cert` if you must validate an X.509 certificate from a known certificate authority.
+2. Add only the adders you need. Each one is a deliberate, measured step up in size, as the tables above show. Begin with `server` if the build is a server, and add a curve or signature adder only when your peer requires it.
+3. Choose the key exchange curve. The PSK floor uses X25519. Add `p256` when you want P-256, for example to reuse the P-256 code already pulled in by an ECDSA certificate.
+4. Choose the memory model. The default uses the system allocator. Add `staticmem` to serve TLS allocations from a fixed pool supplied with `wolfSSL_CTX_load_static_memory()`. For a target with no heap at all, also define `WOLFSSL_NO_MALLOC`.
+5. Provide the platform glue for bare metal. The example template enables `WOLFSSL_USER_IO` (you supply send and receive callbacks), `NO_FILESYSTEM` and `WOLFSSL_NO_SOCK`, and expects a hardware entropy source through `CUSTOM_RAND_GENERATE_SEED`.
+6. Build for size. Link your application with `-Os -flto -ffunction-sections -fdata-sections -Wl,--gc-sections` so unused code is dropped.
+
+The same profile is available without autotools through the `WOLFSSL_TINY_TLS13` umbrella in `settings.h`. The template `examples/configs/user_settings_tinytls13.h` selects the profile and adders with `#if 0` and `#if 1` blocks. The smallest result comes from a dead code eliminated, link time optimized build:
+
+```sh
+cp ./examples/configs/user_settings_tinytls13.h user_settings.h
+./configure --enable-usersettings --enable-static --disable-shared \
+            --disable-examples --disable-crypttests
+make
+# link your application with:
+#   -Os -flto -ffunction-sections -fdata-sections -Wl,--gc-sections
+```
+
+A self contained, single process TLS 1.3 handshake smoke test for the profile is provided in `examples/configs/tinytls13_smoke.c`. It wires an in memory client and server together with no sockets or threads, so it can validate a tiny build that has no example or test harness available.
+
+#### Dos and don'ts
+
+* Do use the `cert` profile only with a known or pinned certificate authority. Its verify is deliberately reduced (no name constraints, relaxed ASN.1, no CRL).
+* Do not use the `cert` profile for general public internet PKI.
+* Do pair `mldsa` and `rsaverify` with the `cert` profile. They are certificate verification algorithms, so on the PSK floor they only confirm the build links.
+* Do supply a real hardware entropy source through `CUSTOM_RAND_GENERATE_SEED` on bare metal. The default seed sources are not present once `NO_FILESYSTEM` and similar are set.
+* Do not combine the profile with a FIPS build. It is a non FIPS footprint profile.
+* Do not define `WOLFSSL_NO_MALLOC` and expect the standard `make check` test suite to run, since that suite needs an allocator. Validate a zero heap build by linking it and running the smoke test instead.
+* Note that AES-256-GCM-SHA384 uses a SHA-384 transcript. With an external pre shared key, provision the key for SHA-384 through the cipher suite specific PSK callback, or use the cipher on the certificate profile, otherwise the PSK binder will not match.
+
 ### `--enable-bigcache`
 
 Enable a big session cache.
