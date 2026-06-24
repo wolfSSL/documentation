@@ -3396,7 +3396,7 @@ Generates a random IV for ECIES encryption instead of deriving it from the KDF o
 
 #### WOLFSSL_SP_521
 
-Enables single-precision (SP) math optimized implementation for the P-521 ECC curve. Off by default; auto-enabled when [`WOLFSSL_SP_MATH`](#wolfssl_sp_math) or [`WOLFSSL_SP_MATH_ALL`](#wolfssl_sp_math_all) is set and `HAVE_ECC521` is defined.
+Enables the single-precision (SP) math optimized implementation for the P-521 ECC curve. Off by default. Enabled by `--enable-sp` and its variants (for example `--enable-sp=521`, `ec521`, `p521`) on 64-bit Intel/ARM targets, by the CMake equivalent, or by defining it manually in `user_settings.h`. It is **not** auto-enabled by the headers from [`WOLFSSL_SP_MATH`](#wolfssl_sp_math) / [`WOLFSSL_SP_MATH_ALL`](#wolfssl_sp_math_all) together with `HAVE_ECC521`; defining `WOLFSSL_SP_521` instead forces `HAVE_ECC521` on. Note that `WOLFSSL_SP_MATH_ALL` alone still provides working (unoptimized, generic) P-521 support — `WOLFSSL_SP_521` adds the curve-specific optimized path.
 
 #### WOLFSSL_SP_SM2
 
@@ -4800,7 +4800,7 @@ There are many possible values for OPT. Below is a list of ways to call enable-s
 2) "--enable-sp-math-all=small"...
 as (1) only has implementations of specific key sizes while (2) has implementations to support all key sizes.
 
-**NOTE**: This is for x86_64 and with no other configuration flags; your results may vary depending on your architectures and other configuration flags that you specify. For example,  WOLFSSL_SP_384 and WOLFSSL_SP_4096 will only be enabled for Intel x86_64.
+**NOTE**: This is for x86_64 and with no other configuration flags; your results may vary depending on your architectures and other configuration flags that you specify. For example,  WOLFSSL_SP_384, WOLFSSL_SP_521 and WOLFSSL_SP_4096 will only be enabled for 64-bit Intel/ARM targets (x86_64, amd64, aarch64).
 
 #### `--enable-sp=no` or `--disable-sp`
 
@@ -4812,8 +4812,11 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 * WOLFSSL_HAVE_SP_ECC
 * WOLFSSL_HAVE_SP_DH
 * WOLFSSL_SP_384
+* WOLFSSL_SP_521
 * WOLFSSL_SP_4096
 * WOLFSSL_SP_LARGE_CODE
+
+(`WOLFSSL_SP_384`, `WOLFSSL_SP_521` and `WOLFSSL_SP_4096` are only added on 64-bit Intel/ARM targets — see the note above.)
 
 #### `--enable-sp=small`
 
