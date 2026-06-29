@@ -4143,7 +4143,7 @@ Where the flash goes for a PSK P-256 client on Cortex-M33 (37,347 bytes):
 
 1. Start from the closest base profile. Use `psk` if your endpoints share a pre shared key and you do not need certificates. Use `cert` if you must validate an X.509 certificate from a known certificate authority.
 2. Add only the adders you need. Each one is a deliberate, measured step up in size, as the tables above show. Begin with `server` if the build is a server, and add a curve or signature adder only when your peer requires it.
-3. Choose the key exchange curve. The PSK floor uses X25519. Add `p256` when you want P-256, for example to reuse the P-256 code already pulled in by an ECDSA certificate.
+3. Choose the key exchange curve. The PSK floor uses X25519 and the certificate profile uses P-256. Add `p256` when you want P-256 on the PSK floor, for example to reuse the P-256 code already pulled in by an ECDSA certificate. To supply your own group instead, for example P-384 or a post quantum hybrid, select that curve yourself and define `WOLFSSL_TINY_TLS13_NO_DEFAULT_CURVE` so the profile does not force a default X25519 or P-256.
 4. Choose the memory model. The default uses the system allocator. Add `staticmem` to serve TLS allocations from a fixed pool supplied with `wolfSSL_CTX_load_static_memory()`. For a target with no heap at all, also define `WOLFSSL_NO_MALLOC`.
 5. Provide the platform glue for bare metal. The example template enables `WOLFSSL_USER_IO` (you supply send and receive callbacks), `NO_FILESYSTEM` and `WOLFSSL_NO_SOCK`, and expects a hardware entropy source through `CUSTOM_RAND_GENERATE_SEED`.
 6. Build for size. Link your application with `-Os -flto -ffunction-sections -fdata-sections -Wl,--gc-sections` so unused code is dropped.
@@ -4158,6 +4158,21 @@ make
 # link your application with:
 #   -Os -flto -ffunction-sections -fdata-sections -Wl,--gc-sections
 ```
+
+The profile is driven entirely by the `WOLFSSL_TINY_TLS13` family of macros. Each one maps to a configure list item, so a `settings.h` build and an `--enable-tinytls13` build select the same features:
+
+| Macro | Configure item | Effect |
+| --- | --- | --- |
+| `WOLFSSL_TINY_TLS13` | `psk` | The base profile. TLS 1.3 only, PSK plus ECDHE, no X.509. X25519, AES-128-GCM, SHA-256 and HKDF. Every other macro implies this one. |
+| `WOLFSSL_TINY_TLS13_CERT` | `cert` | Add minimal X.509 certificate chain verify (ECDSA P-256), and switch the default curve to P-256. Implies the base profile. |
+| `WOLFSSL_TINY_TLS13_MUTUAL_AUTH` | `mutualauth` | Mutual TLS with X.509 client authentication. Implies `WOLFSSL_TINY_TLS13_CERT`. |
+| `WOLFSSL_TINY_TLS13_SERVER` | `server` | Add the TLS 1.3 server role. The default is client only. |
+| `WOLFSSL_TINY_TLS13_STATIC_MEM` | `staticmem` | Serve TLS allocations from a caller provided static memory pool. |
+| `WOLFSSL_TINY_TLS13_ASM` | `asm` | Use assembly crypto instead of the small C backend. Larger but faster. |
+| `WOLFSSL_TINY_TLS13_RSA_VERIFY` | `rsaverify` | Add RSA-PSS certificate verification. Pair with the certificate profile. |
+| `WOLFSSL_TINY_TLS13_NO_DEFAULT_CURVE` | (none) | Suppress the automatic default curve. The profile then enables neither X25519 nor P-256, so you can select your own group (for example P-384 or a post quantum hybrid). |
+
+The `p256`, `sha384` and `mldsa` configure items have no dedicated tiny macro; they are selected with the standard wolfSSL macros (`HAVE_ECC` with `ECC_USER_CURVES`, `WOLFSSL_SHA384`, and `WOLFSSL_HAVE_MLDSA` with `WOLFSSL_MLDSA_VERIFY_ONLY`). See `examples/configs/user_settings_tinytls13.h` for the exact blocks.
 
 A self contained, single process TLS 1.3 handshake smoke test for the profile is provided in `examples/configs/tinytls13_smoke.c`. It wires an in memory client and server together with no sockets or threads, so it can validate a tiny build that has no example or test harness available.
 
