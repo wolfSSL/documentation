@@ -1,0 +1,326 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Build all documentation
+        run: |
+          # Build all manuals using Docker (outputs to build/)
+          make all
+
+      - name: Create site structure
+        run: |
+          mkdir -p _site
+
+          # Move each manual to its own subdirectory
+          for manual in wolfSSL wolfSSH wolfBoot wolfCLU wolfCrypt-JNI wolfMQTT wolfSentry wolfSSL-JNI wolfTPM wolfHSM wolfEngine wolfProvider wolfSSL-FIPS-Ready wolfSSL-Tuning wolfSSL-Porting wolfSSL-FAQ wolfSSL-FIPS-FAQ BouncyCastle-Migration; do
+            if [ -d "build/${manual}" ]; then
+              # Convert to lowercase URL path
+              urlpath=$(echo "$manual" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+              mkdir -p "_site/${urlpath}"
+
+              # Copy HTML site
+              if [ -d "build/${manual}/html" ]; then
+                cp -r build/${manual}/html/* "_site/${urlpath}/"
+              fi
+
+              # Copy PDF if exists
+              if [ -f "build/${manual}/pdf/"*.pdf ]; then
+                cp build/${manual}/pdf/*.pdf "_site/${urlpath}/"
+              fi
+            fi
+          done
+
+          # Copy CNAME file
+          cp CNAME _site/
+
+      - name: Create landing page
+        run: |
+          cat > _site/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>wolfSSL Documentation</title>
+              <style>
+                  * {
+                      margin: 0;
+                      padding: 0;
+                      box-sizing: border-box;
+                  }
+                  body {
+                      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+                      line-height: 1.6;
+                      color: #1a1a1a;
+                      background: #f8f9fa;
+                  }
+                  .header {
+                      background: #1a1a1a;
+                      color: white;
+                      padding: 2rem 0;
+                      text-align: center;
+                  }
+                  .header h1 {
+                      font-size: 2.5rem;
+                      margin-bottom: 0.5rem;
+                  }
+                  .header p {
+                      font-size: 1.1rem;
+                      opacity: 0.9;
+                  }
+                  .container {
+                      max-width: 1200px;
+                      margin: 0 auto;
+                      padding: 3rem 1rem;
+                  }
+                  .section {
+                      background: white;
+                      border-radius: 8px;
+                      padding: 2rem;
+                      margin-bottom: 2rem;
+                      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                  }
+                  .section h2 {
+                      font-size: 1.75rem;
+                      margin-bottom: 1.5rem;
+                      color: #1a1a1a;
+                      border-bottom: 2px solid #1fbeca;
+                      padding-bottom: 0.5rem;
+                  }
+                  .doc-grid {
+                      display: grid;
+                      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                      gap: 1.5rem;
+                  }
+                  .doc-card {
+                      border: 1px solid #e0e0e0;
+                      border-radius: 6px;
+                      padding: 1.5rem;
+                      transition: all 0.2s;
+                  }
+                  .doc-card:hover {
+                      border-color: #1fbeca;
+                      box-shadow: 0 4px 8px rgba(31,190,202,0.1);
+                  }
+                  .doc-card h3 {
+                      font-size: 1.25rem;
+                      margin-bottom: 0.5rem;
+                      color: #1a1a1a;
+                  }
+                  .doc-card p {
+                      color: #666;
+                      font-size: 0.95rem;
+                      margin-bottom: 1rem;
+                  }
+                  .doc-card a {
+                      color: #1fbeca;
+                      text-decoration: none;
+                      font-weight: 500;
+                      margin-right: 1rem;
+                  }
+                  .doc-card a:hover {
+                      text-decoration: underline;
+                  }
+                  .footer {
+                      text-align: center;
+                      padding: 2rem 0;
+                      color: #666;
+                      border-top: 1px solid #e0e0e0;
+                      margin-top: 2rem;
+                  }
+                  .footer a {
+                      color: #1fbeca;
+                      text-decoration: none;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="header">
+                  <h1>wolfSSL Documentation</h1>
+                  <p>Product manuals, guides, and API references</p>
+              </div>
+
+              <div class="container">
+                  <div class="section">
+                      <h2>Core Products</h2>
+                      <div class="doc-grid">
+                          <div class="doc-card">
+                              <h3>wolfSSL</h3>
+                              <p>Embedded SSL/TLS library</p>
+                              <a href="/wolfssl/">HTML</a>
+                              <a href="/wolfssl/wolfSSL-Manual.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>wolfCrypt</h3>
+                              <p>Embedded crypto engine</p>
+                              <a href="/wolfssl/">Included in wolfSSL</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>wolfSSH</h3>
+                              <p>Lightweight SSH library</p>
+                              <a href="/wolfssh/">HTML</a>
+                              <a href="/wolfssh/wolfSSH-Manual.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>wolfTPM</h3>
+                              <p>TPM 2.0 library</p>
+                              <a href="/wolftpm/">HTML</a>
+                              <a href="/wolftpm/wolfTPM-Manual.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>wolfMQTT</h3>
+                              <p>MQTT client library</p>
+                              <a href="/wolfmqtt/">HTML</a>
+                              <a href="/wolfmqtt/wolfMQTT-Manual.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>wolfBoot</h3>
+                              <p>Secure bootloader</p>
+                              <a href="/wolfboot/">HTML</a>
+                              <a href="/wolfboot/wolfBoot-Manual.pdf">PDF</a>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="section">
+                      <h2>Additional Products</h2>
+                      <div class="doc-grid">
+                          <div class="doc-card">
+                              <h3>wolfSentry</h3>
+                              <p>Embedded firewall engine</p>
+                              <a href="/wolfsentry/">HTML</a>
+                              <a href="/wolfsentry/wolfSentry-Manual.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>wolfHSM</h3>
+                              <p>Hardware security module</p>
+                              <a href="/wolfhsm/">HTML</a>
+                              <a href="/wolfhsm/wolfHSM-Manual.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>wolfEngine</h3>
+                              <p>OpenSSL engine</p>
+                              <a href="/wolfengine/">HTML</a>
+                              <a href="/wolfengine/wolfEngine-Manual.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>wolfProvider</h3>
+                              <p>OpenSSL 3.0 provider</p>
+                              <a href="/wolfprovider/">HTML</a>
+                              <a href="/wolfprovider/wolfProvider-Manual.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>wolfCLU</h3>
+                              <p>Command line utility</p>
+                              <a href="/wolfclu/">HTML</a>
+                              <a href="/wolfclu/wolfCLU-Manual.pdf">PDF</a>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="section">
+                      <h2>Language Wrappers</h2>
+                      <div class="doc-grid">
+                          <div class="doc-card">
+                              <h3>wolfSSL JNI/JSSE</h3>
+                              <p>Java wrapper</p>
+                              <a href="/wolfssl-jni/">HTML</a>
+                              <a href="/wolfssl-jni/wolfSSL-JNI-JSSE-Manual.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>wolfCrypt JNI/JCE</h3>
+                              <p>Java crypto wrapper</p>
+                              <a href="/wolfcrypt-jni/">HTML</a>
+                              <a href="/wolfcrypt-jni/wolfCrypt-JNI-JCE-Manual.pdf">PDF</a>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="section">
+                      <h2>Guides</h2>
+                      <div class="doc-grid">
+                          <div class="doc-card">
+                              <h3>Porting Guide</h3>
+                              <p>How to port wolfSSL</p>
+                              <a href="/wolfssl-porting/">HTML</a>
+                              <a href="/wolfssl-porting/wolfSSL-Porting-Guide.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>Tuning Guide</h3>
+                              <p>Performance optimization</p>
+                              <a href="/wolfssl-tuning/">HTML</a>
+                              <a href="/wolfssl-tuning/wolfSSL-Tuning-Guide.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>FAQ</h3>
+                              <p>Frequently asked questions</p>
+                              <a href="/wolfssl-faq/">HTML</a>
+                              <a href="/wolfssl-faq/wolfSSL-FAQ.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>FIPS Ready</h3>
+                              <p>FIPS 140-2/3 information</p>
+                              <a href="/wolfssl-fips-ready/">HTML</a>
+                              <a href="/wolfssl-fips-ready/wolfSSL-FIPS-Ready.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>FIPS FAQ</h3>
+                              <p>FIPS questions</p>
+                              <a href="/wolfssl-fips-faq/">HTML</a>
+                              <a href="/wolfssl-fips-faq/wolfSSL-FIPS-FAQ.pdf">PDF</a>
+                          </div>
+                          <div class="doc-card">
+                              <h3>BouncyCastle Migration</h3>
+                              <p>Migrating from BouncyCastle</p>
+                              <a href="/bouncycastle-migration/">HTML</a>
+                              <a href="/bouncycastle-migration/BouncyCastle-wolfSSL-Migration-Guide.pdf">PDF</a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="footer">
+                  <p>&copy; 2026 wolfSSL Inc. | <a href="https://www.wolfssl.com">wolfssl.com</a> | <a href="https://github.com/wolfSSL/documentation">GitHub</a></p>
+              </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
