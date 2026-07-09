@@ -186,7 +186,7 @@ Following this model, as long as root cert "A" has been loaded as a trusted root
 
 ## Domain Name Check for Server Certificates
 
-wolfSSL has an extension on the client that automatically checks the domain of the server certificate. In OpenSSL mode nearly a dozen function calls are needed to perform this. wolfSSL checks that the date of the certificate is in range, verifies the signature, and additionally verifies the domain if you call [`wolfSSL_check_domain_name(WOLFSSL* ssl, const char* dn)`](group__Setup.md#function-wolfssl_check_domain_name) before calling [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect). wolfSSL will match the X.509 issuer name of peer's server certificate against `dn` (the expected domain name). If the names match [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) will proceed normally, however if there is a name mismatch, [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) will return a fatal error and [`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error) will return `DOMAIN_NAME_MISMATCH`.
+wolfSSL has an extension on the client that automatically checks the domain of the server certificate. In OpenSSL mode nearly a dozen function calls are needed to perform this. wolfSSL checks that the date of the certificate is in range, verifies the signature, and additionally verifies the domain if you call [`wolfSSL_check_domain_name(WOLFSSL* ssl, const char* dn)`](group__Setup.md#function-wolfssl_check_domain_name) before calling [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect). wolfSSL will match the X.509 subject name of peer's server certificate against `dn` (the expected domain name). If the names match [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) will proceed normally, however if there is a name mismatch, [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) will return a fatal error and [`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error) will return `DOMAIN_NAME_MISMATCH`.
 
 Checking the domain name of the certificate is an important step that verifies the server is actually who it claims to be. This extension is intended to ease the burden of performing the check.
 
@@ -222,7 +222,7 @@ int wolfSSL_X509_get_serial_number(WOLFSSL_X509* x509,
 wolfSSL supports RSA key generation of varying lengths up to 4096 bits. Key generation is off by default but can be turned on during the `./configure` process with `--enable-keygen` or by defining `WOLFSSL_KEY_GEN` in Windows or non-standard environments. Creating a key is easy, only requiring one function from `rsa.h`:
 
 ```c
-int MakeRsaKey(RsaKey* key, int size, long e, RNG* rng);
+int wc_MakeRsaKey(RsaKey* key, int size, long e, RNG* rng);
 ```
 
 Where `size` is the length in bits and `e` is the public exponent (using 65537 is usually a good choice for `e`). The following from `wolfcrypt/test/test.c` gives an example creating an RSA key of 1024 bits:
@@ -232,19 +232,19 @@ RsaKey genKey;
 RNG    rng;
 int    ret;
 
-InitRng(&rng);
-InitRsaKey(&genKey, 0);
+wc_InitRng(&rng);
+wc_InitRsaKey(&genKey, 0);
 
-ret = MakeRsaKey(&genKey, 1024, 65537, &rng);
+ret = wc_MakeRsaKey(&genKey, 1024, 65537, &rng);
 if (ret != 0)
     /* ret contains error */;
 ```
 
-The RsaKey `genKey` can now be used like any other RsaKey. If you need to export the key, wolfSSL provides both DER and PEM formatting in asn.h. Always convert the key to DER format first, and then if you need PEM use the generic `DerToPem()` function like this:
+The RsaKey `genKey` can now be used like any other RsaKey. If you need to export the key, wolfSSL provides both DER and PEM formatting in asn.h. Always convert the key to DER format first, and then if you need PEM use the generic `wc_DerToPem()` function like this:
 
 ```c
 byte der[4096];
-int  derSz = RsaKeyToDer(&genKey, der, sizeof(der));
+int  derSz = wc_RsaKeyToDer(&genKey, der, sizeof(der));
 if (derSz < 0)
     /* derSz contains error */;
 ```
@@ -253,7 +253,7 @@ The buffer `der` now holds a DER format of the key. To convert the DER buffer to
 
 ```c
 byte pem[4096];
-int  pemSz = DerToPem(der, derSz, pem, sizeof(pem),
+int  pemSz = wc_DerToPem(der, derSz, pem, sizeof(pem),
                       PRIVATEKEY_TYPE);
 if (pemSz < 0)
     /* pemSz contains error */;
@@ -285,7 +285,7 @@ The last argument of _DerToPem()_ takes a type parameter, usually either `PRIVAT
 
 The RSA private key contains the public key as well.  The private key can be used as both a private and public key by wolfSSL as used in test.c. The private key and the public key (in the form of a certificate) is all that is typically needed for SSL.
 
-A separate public key can be loaded into wolfSSL manually using the RsaPublicKeyDecode() function if need be. Additionally, the [`wc_RsaKeyToPublicDer()`](group__RSA.md#function-wc_rsakeytopublicder) function can be used to export the public RSA key.
+A separate public key can be loaded into wolfSSL manually using the wc_RsaPublicKeyDecode() function if need be. Additionally, the [`wc_RsaKeyToPublicDer()`](group__RSA.md#function-wc_rsakeytopublicder) function can be used to export the public RSA key.
 
 ## Certificate Generation
 
@@ -334,7 +334,7 @@ Before filling in the subject information an initialization function needs to be
 
 ```c
 Cert myCert;
-InitCert(&myCert);
+wc_InitCert(&myCert);
 ```
 
 `InitCert()` sets defaults for some of the variables including setting the version to **3** (0x02), the serial number to **0** (randomly generated), the sigType to `CTC_SHAwRSA`, the daysValid to **500**, and selfSigned to **1** (TRUE). Supported signature types include:
@@ -368,17 +368,17 @@ Then, a self-signed certificate can be generated using the variables genKey and 
 ```c
 byte derCert[4096];
 
-int certSz = MakeSelfCert(&myCert, derCert, sizeof(derCert), &key, &rng);
+int certSz = wc_MakeSelfCert(&myCert, derCert, sizeof(derCert), &key, &rng);
 if (certSz < 0)
   /* certSz contains the error */;
 ```
 
-The buffer `derCert` now contains a DER format of the certificate. If you need a PEM format of the certificate you can use the generic `DerToPem()` function and specify the type to be `CERT_TYPE` like this:
+The buffer `derCert` now contains a DER format of the certificate. If you need a PEM format of the certificate you can use the generic `wc_DerToPem()` function and specify the type to be `CERT_TYPE` like this:
 
 ```c
-byte* pem;
+byte* pemCert[4096];
 
-int pemSz = DerToPem(derCert, certSz, pem, sizeof(pemCert), CERT_TYPE);
+int pemCertSz = wc_DerToPem(derCert, certSz, pemCert, sizeof(pemCert), CERT_TYPE);
 if (pemCertSz < 0)
   /* pemCertSz contains error */;
 ```
@@ -407,24 +407,24 @@ Supported types are:
 
 Now the buffer `pemCert` holds the PEM format of the certificate.
 
-If you wish to create a CA signed certificate then a couple of steps are required. After filling in the subject information as before, you’ll need to set the issuer information from the CA certificate.  This can be done with `SetIssuer()` like this:
+If you wish to create a CA signed certificate then a couple of steps are required. After filling in the subject information as before, you’ll need to set the issuer information from the CA certificate.  This can be done with `wc_SetIssuer()` like this:
 
 ```c
-ret = SetIssuer(&myCert, "ca-cert.pem");
+ret = wc_SetIssuer(&myCert, "ca-cert.pem");
 if (ret < 0)
     /* ret contains error */;
 ```
 
-Then you’ll need to perform the two-step process of creating the certificate and then signing it (`MakeSelfCert()` does these both in one step). You’ll need the private keys from both the issuer (`caKey`) and the subject (`key`). Please see the example in `test.c` for complete usage.
+Then you’ll need to perform the two-step process of creating the certificate and then signing it (`wc_MakeSelfCert()` does these both in one step). You’ll need the private keys from both the issuer (`caKey`) and the subject (`key`). Please see the example in `test.c` for complete usage.
 
 ```c
 byte derCert[4096];
 
-int certSz = MakeCert(&myCert, derCert, sizeof(derCert), &key, NULL, &rng);
+int certSz = wc_MakeCert(&myCert, derCert, sizeof(derCert), &key, NULL, &rng);
 if (certSz < 0);
    /*certSz contains the error*/;
 
-certSz = SignCert(myCert.bodySz, myCert.sigType, derCert,
+certSz = wc_SignCert(myCert.bodySz, myCert.sigType, derCert,
             sizeof(derCert), &caKey, NULL, &rng);
 if (certSz < 0);
    /*certSz contains the error*/;
@@ -444,7 +444,7 @@ Before filling in the subject information an initialization function needs to be
 
 ```c
 Cert request;
-InitCert(&request);
+wc_InitCert(&request);
 ```
 
 `InitCert()` sets defaults for some of the variables including setting the version to **3** (0x02), the serial number to **0** (randomly generated), the sigType to `CTC_SHAwRSA`, the daysValid to **500**, and selfSigned to **1** (TRUE). Supported signature types include:
@@ -511,7 +511,7 @@ There are fields that are mandatory in a certificate that are excluded in a CSR.
 With our recently added support for raw ECC key import comes the ability to convert an ECC key from PEM to DER. Use the following with the specified arguments to accomplish this:
 
 ```c
-EccKeyToDer(ecc_key*, byte* output, word32 inLen);
+wc_EccKeyToDer(ecc_key*, byte* output, word32 inLen);
 ```
 
 ### Example
@@ -521,5 +521,5 @@ EccKeyToDer(ecc_key*, byte* output, word32 inLen);
 byte  der[FOURK_BUF];
 ecc_key userB;
 
-EccKeyToDer(&userB, der, FOURK_BUF);
+wc_EccKeyToDer(&userB, der, FOURK_BUF);
 ```

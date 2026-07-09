@@ -224,7 +224,7 @@ CTR mode is available for both encryption and decryption through the [`wc_AesCtr
 
 #### DES and 3DES
 
-wolfCrypt provides support for DES and 3DES (Des3 since 3 is an invalid leading C identifier). To use these include the header `wolfssl/wolfcrypt/des.h`. The structures you can use are `Des` and `Des3`. Initialization is done through [`wc_Des_SetKey()`](group__DES.md#function-wc_des_setkey) or [`wc_Des3_SetKey()`](group__DES.md#function-wc_des3_setkey). CBC encryption/decryption is provided through [`wc_Des_CbcEnrypt()`](group__DES.md#function-wc_des_cbcencrypt) / [`wc_Des_CbcDecrypt()`](group__DES.md#function-wc_dec_cbcdecrypt) and [`wc_Des3_CbcEncrypt()`](group__DES.md#function-wc_des3_cbcencrypt) / [`wc_Des3_CbcDecrypt()`](group__DES.md#function-wc_des3_cbcdecrypt). Des has a key size of 8 bytes (24 for 3DES) and the block size is 8 bytes, so only pass increments of 8 bytes to encrypt/decrypt functions. If your data isn't in a block size increment you'll need to add padding to make sure it is. Each `SetKey()` also takes an IV (an initialization vector that is the same size as the key size). Usage is usually like the following:
+wolfCrypt provides support for DES and 3DES (Des3 since 3 is an invalid leading C identifier). To use these include the header `wolfssl/wolfcrypt/des.h`. The structures you can use are `Des` and `Des3`. Initialization is done through [`wc_Des_SetKey()`](group__DES.md#function-wc_des_setkey) or [`wc_Des3_SetKey()`](group__DES.md#function-wc_des3_setkey). CBC encryption/decryption is provided through [`wc_Des_CbcEncrypt()`](group__DES.md#function-wc_des_cbcencrypt) / [`wc_Des_CbcDecrypt()`](group__DES.md#function-wc_des_cbcdecrypt) and [`wc_Des3_CbcEncrypt()`](group__DES.md#function-wc_des3_cbcencrypt) / [`wc_Des3_CbcDecrypt()`](group__DES.md#function-wc_des3_cbcdecrypt). Des has a key size of 8 bytes (24 for 3DES) and the block size is 8 bytes, so only pass increments of 8 bytes to encrypt/decrypt functions. If your data isn't in a block size increment you'll need to add padding to make sure it is. Each `SetKey()` also takes an IV (an initialization vector that is the same size as the key size). Usage is usually like the following:
 
 ```c
 Des3 enc;
@@ -253,7 +253,7 @@ wc_Des3_CbcDecrypt(&dec, plain, cipher, sizeof(cipher));
 
 #### Camellia
 
-wolfCrypt provides support for the Camellia block cipher. To use Camellia include the header `wolfssl/wolfcrypt/camellia.h`. The structure you can use is called `Camellia`. Initialization is done through [`wc_CamelliaSetKey()`](group__Camellia.md#function-wc_camelliasetkey). CBC encryption/decryption is provided through [`wc_CamelliaCbcEnrypt()`](group__Camellia.md#function-wc_CamelliacbcEncrypt) and [`wc_CamelliaCbcDecrypt()`](group__Camellia.md#function-wc_camelliacbcdecrypt) while direct encryption/decryption is provided through [`wc_CamelliaEncryptDirect()`](group__Camellia.md#function-wc_camelliaencryptdirect) and [`wc_CamelliaDecryptDirect()`](group__Camellia.md#function-wc_camelliadecryptdirect).
+wolfCrypt provides support for the Camellia block cipher. To use Camellia include the header `wolfssl/wolfcrypt/camellia.h`. The structure you can use is called `Camellia`. Initialization is done through [`wc_CamelliaSetKey()`](group__Camellia.md#function-wc_camelliasetkey). CBC encryption/decryption is provided through [`wc_CamelliaCbcEncrypt()`](group__Camellia.md#function-wc_CamelliacbcEncrypt) and [`wc_CamelliaCbcDecrypt()`](group__Camellia.md#function-wc_camelliacbcdecrypt) while direct encryption/decryption is provided through [`wc_CamelliaEncryptDirect()`](group__Camellia.md#function-wc_camelliaencryptdirect) and [`wc_CamelliaDecryptDirect()`](group__Camellia.md#function-wc_camelliadecryptdirect).
 
 For usage examples please see the camellia_test() function in `<wolfssl_root>/wolfcrypt/test/test.c`.
 
@@ -294,8 +294,8 @@ wc_Arc4Process(&dec, plain, cipher, sizeof(cipher));
 ChaCha with 20 rounds is slightly faster than ARC4 while maintaining a high level of security.  To use it with wolfCrypt, please include the header `wolfssl/wolfcrypt/chacha.h`. ChaCha typically uses 32 byte keys (256 bit) but can also use 16 byte keys (128 bits).
 
 ```c
-CHACHA enc;
-CHACHA dec;
+ChaCha enc;
+ChaCha dec;
 
 const byte key[] = {  /*some key 32 bytes*/};
 const byte iv[]  = {  /*some iv 12 bytes*/ };
@@ -336,7 +336,7 @@ byte publicKeyBuffer[]  = { /*holds the raw data from the key, maybe
                         from a file like RsaPublicKey.der*/ };
 word32 idx = 0;            /*where to start reading into the buffer*/
 
-RsaPublicKeyDecode(publicKeyBuffer, &idx, &rsaPublicKey, sizeof(publicKeyBuffer));
+wc_RsaPublicKeyDecode(publicKeyBuffer, &idx, &rsaPublicKey, sizeof(publicKeyBuffer));
 
 byte in[] = { /*plain text to encrypt*/ };
 byte out[128];
@@ -344,18 +344,18 @@ RNG rng;
 
 wc_InitRng(&rng);
 
-word32 outLen = RsaPublicEncrypt(in, sizeof(in), out, sizeof(out), &rsaPublicKey, &rng);
+word32 outLen = wc_RsaPublicEncrypt(in, sizeof(in), out, sizeof(out), &rsaPublicKey, &rng);
 ```
 
-Now `out` holds the ciphertext from the plain text `in`. [`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt) will return the length in bytes written to out or a negative number in case of an error. [`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt) needs a RNG (Random Number Generator) for the padding used by the encryptor and it must be initialized before it can be used. To make sure that the output buffer is large enough to pass you can first call [`wc_RsaEncryptSize()`](group__RSA.md#function-wc_rsaencryptsize) which will return the number of bytes that a successful call to [`wc_RsaPublicEnrypt()`](group__RSA.md#function-wc_rsapublicencrypt) will write.
+Now `out` holds the ciphertext from the plain text `in`. [`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt) will return the length in bytes written to out or a negative number in case of an error. [`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt) needs a RNG (Random Number Generator) for the padding used by the encryptor and it must be initialized before it can be used. To make sure that the output buffer is large enough to pass you can first call [`wc_RsaEncryptSize()`](group__RSA.md#function-wc_rsaencryptsize) which will return the number of bytes that a successful call to [`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt) will write.
 
-In the event of an error, a negative return from [`wc_RsaPublicEnrypt()`](group__RSA.md#function-wc_rsapublicencrypt), or [`wc_RsaPublicKeyDecode()`](group__RSA.md#function-wc_rsapublickeydecode) for that matter, you can call [`wc_ErrorString()`](group__Error.md#function-wc_errorstring) to get a string describing the error that occurred.
+In the event of an error, a negative return from [`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt), or [`wc_RsaPublicKeyDecode()`](group__RSA.md#function-wc_rsapublickeydecode) for that matter, you can call [`wc_ErrorString()`](group__Error.md#function-wc_errorstring) to get a string describing the error that occurred.
 
 ```c
 void wc_ErrorString(int error, char* buffer);
 ```
 
-Make sure that buffer is at least `MAX_ERROR_SZ` bytes (80).
+Make sure that buffer is at least `WOLFSSL_MAX_ERROR_SZ` bytes (80).
 
 Now to decrypt out:
 
@@ -378,7 +378,7 @@ Now plain will hold plainSz bytes or an error code. For complete examples of eac
 
 ### DH (Diffie-Hellman)
 
-wolfCrypt provides support for Diffie-Hellman through the header `wolfssl/wolfrypt/dh.h`.  The Diffie-Hellman key exchange algorithm allows two parties to establish a shared secret key.  Usage is usually similar to the following example, where **sideA** and **sideB** designate the two parties.
+wolfCrypt provides support for Diffie-Hellman through the header `wolfssl/wolfcrypt/dh.h`.  The Diffie-Hellman key exchange algorithm allows two parties to establish a shared secret key.  Usage is usually similar to the following example, where **sideA** and **sideB** designate the two parties.
 
 In the following example, `dhPublicKey` contains the Diffie-Hellman public parameters signed by a Certificate Authority (or self-signed).  `privA` holds the generated private key for sideA, `pubA` holds the generated public key for sideA, and `agreeA` holds the mutual key that both sides have agreed on.
 
@@ -398,8 +398,8 @@ wc_InitDhKey(&dhPublicKey);
 
 byte publicKeyBuffer[] = { /*holds the raw data from the public key
                              parameters, maybe from a file like
-                             dh1024.der*/ }
-wc_DhKeyDecode(tmp, &idx, &dhPublicKey, publicKeyBuffer);
+                             dh1024.der*/ };
+wc_DhKeyDecode(publicKeyBuffer, &idx, &dhPublicKey, sizeof(publicKeyBuffer));
 wc_InitRng(&rng);  /*Initialize random number generator*/
 ```
 

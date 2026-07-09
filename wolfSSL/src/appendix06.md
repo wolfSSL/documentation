@@ -92,7 +92,7 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `UNKNOWN_MAX_FRAG_LEN_E` | -382 | Unrecognized max frag len Error |
 | `KEYUSE_SIGNATURE_E` | -383 | KeyUse digSignature error |
 | `KEYUSE_ENCIPHER_E` | -385 | KeyUse KeyEncipher error |
-| `EXTKEYUSE_AUTH_E` | -386 | ExtKeyUse server|client_auth |
+| `EXTKEYUSE_AUTH_E` | -386 | ExtKeyUse server\|client_auth |
 | `SEND_OOB_READ_E` | -387 | Send Cb out of bounds read |
 | `SECURE_RENEGOTIATION_E` | -388 | Invalid renegotiation info |
 | `SESSION_TICKET_LEN_E` | -389 | Session Ticket too large |

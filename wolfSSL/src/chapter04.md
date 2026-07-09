@@ -357,11 +357,11 @@ PKCS #5 is a password-based key derivation method which combines a password, a s
 wolfSSL also supports the PBKDF function from PKCS #12 in addition to PBKDF1 and PBKDF2. The function prototypes look like this:
 
 ```c
-int PBKDF2(byte* output, const byte* passwd, int pLen,
+int wc_PBKDF2(byte* output, const byte* passwd, int pLen,
            const byte* salt, int sLen, int iterations,
            int kLen, int hashType);
 
-int PKCS12_PBKDF(byte* output, const byte* passwd, int pLen,
+int wc_PKCS12_PBKDF(byte* output, const byte* passwd, int pLen,
                  const byte* salt, int sLen, int iterations,
                  int kLen, int hashType, int purpose);
 ```
@@ -410,7 +410,7 @@ For streaming when decoding/verifying bundles the following functions are suppor
 1. `wc_PKCS7_DecodeEncryptedData()`
 2. [`wc_PKCS7_VerifySignedData()`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata)
 3. [`wc_PKCS7_VerifySignedData_ex()`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata_ex)
-4. [`wc_PKCS7_DecodeEnvelopedData()`](group__PKCS7.md#function-wc_pkcs7_decodeenvelopeddate)
+4. [`wc_PKCS7_DecodeEnvelopedData()`](group__PKCS7.md#function-wc_pkcs7_decodeenvelopeddata)
 5. `wc_PKCS7_DecodeAuthEnvelopedData()`
 
 **Note**: that when calling [`wc_PKCS7_VerifySignedData_ex`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata_ex) it is expected that the argument pkiMsgFoot is the full buffer. The internal structure only supports streaming of one buffer, which in this case would be `pkiMsgHead`.
@@ -432,7 +432,7 @@ wolfSSL_CTX_set_cipher_list(ctx, "AES128-SHA");
 
 ### OpenQuantumSafe's liboqs Integration
 
-Please see the appendix [Experimenting with Post-Quantum Cryptography](appendix07.md#experimenting-with-post-quantum-cryptography) in this document for more details.
+Please see the appendix [Experimenting with Post-Quantum Cryptography](appendix09.md#experimenting-with-post-quantum-cryptography) in this document for more details.
 
 ## Hardware Accelerated Crypto
 
@@ -897,7 +897,7 @@ For DTLS server:
 
 |API|description|
 |:---|:---|
-|[`wolfSSL_CTX_load_static_memory`](group__Memory.md#function-wolfSSL_CTX_static_memory)| Set buffer for WOLFSSL_CTX as a heap memory. |
+|[`wolfSSL_CTX_load_static_memory`](group__Memory.md#function-wolfssl_ctx_load_static_memory)| Set buffer for WOLFSSL_CTX as a heap memory. |
 |[`wolfSSL_CTX_is_static_memory`](group__Memory.md#function-wolfSSL_CTX_is_static_memory)| Returns whether "Static buffer Allocation" is used. If it is the case, gets usage report. |
 |[`wolfSSL_is_static_memory`](group__Memory.md#function-wolfSSL_is_static_memory)| Returns whether "Static buffer Allocation" is used. If it is the case, gets usage report. |
 |[`wc_LoadStaticMemory`](group__Memory.md#function-wc_LoadStaticMemory)| Used to set aside static memory for wolfCrypt use. |
@@ -1007,7 +1007,7 @@ On the server side one of the same function calls is required. Since the wolfSSL
 
 ### Grouping Handshake Messages
 
-wolfSSL has the ability to group handshake messages if the user desires.  This can be done at the context level with [`wolfSSL_CTX_set_group_messages(ctx);`](group__Setup.md#function-wolfssl_ct_set_group_messages) or at the SSL object level with [`wolfSSL_set_group_messages(ssl);`](group__Setup.md#function-wolfssl_set_group_messages).
+wolfSSL has the ability to group handshake messages if the user desires.  This can be done at the context level with [`wolfSSL_CTX_set_group_messages(ctx);`](group__Setup.md#function-wolfssl_ctx_set_group_messages) or at the SSL object level with [`wolfSSL_set_group_messages(ssl);`](group__Setup.md#function-wolfssl_set_group_messages).
 
 ## Truncated HMAC
 
@@ -1022,7 +1022,7 @@ Using Truncated HMAC on the client side requires an additional function call, wh
 * [`wolfSSL_CTX_UseTruncatedHMAC()`](ssl_8h.md#function-wolfssl_ctx_usetruncatedhmac)
 * [`wolfSSL_UseTruncatedHMAC()`](ssl_8h.md#function-wolfssl_usetruncatedhmac)
 
-[`wolfSSL_CTX_UseTruncatedHMAC()`](ssl_8h.md#function-wolfssl_ctx_usetrunctatedhmac) is most recommended when the client would like to enable Truncated HMAC for all sessions. Setting the Truncated HMAC extension at context level will enable it in all SSL objects created from that same context from the moment of the call forward.
+[`wolfSSL_CTX_UseTruncatedHMAC()`](ssl_8h.md#function-wolfssl_ctx_usetruncatedhmac) is most recommended when the client would like to enable Truncated HMAC for all sessions. Setting the Truncated HMAC extension at context level will enable it in all SSL objects created from that same context from the moment of the call forward.
 
 [`wolfSSL_UseTruncatedHMAC()`](ssl_8h.md#function-wolfssl_usetruncatedhmac) will enable it for one SSL object only, so it's recommended to use this function when there is no need for Truncated HMAC on all sessions.
 
