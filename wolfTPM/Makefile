@@ -66,6 +66,9 @@ html-prep: api
 # 7. For oversized enum table rows (>2000 chars), keep table formatting intact
 #    by splitting enum values across continuation rows to avoid LaTeX
 #    "Dimension too large" errors in longtable
+# NOTE: The final `cat` assembles the API Reference for the PDF from a hardcoded
+# list. It mirrors the "5. API Reference" nav in mkdocs.yml (which drives the
+# HTML build); the PDF build does not read that nav. Keep both lists in sync.
 .PHONY: pdf-prep
 pdf-prep: api
 	$(Q)perl -i -pe "s/# /## /g" api/md/*.md

@@ -14,6 +14,9 @@ nav:
     - "7. Examples": 7-Examples.md
     - "8. Integration": 8-Integration.md
     - "9. Configuration": 9-Configuration.md
+    # NOTE: The PDF build (see Makefile, pdf-prep target) assembles the Client
+    # (10) and Server (11) API References from hardcoded `cat` lists. It does not
+    # read this nav, so keep those `cat` commands in sync with these sections.
     - "10. Client API Reference":
       - Overview: 10-API-docs-client.md
       - Client API: wh__client_8h.md
