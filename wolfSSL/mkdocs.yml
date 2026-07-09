@@ -20,6 +20,10 @@ nav:
     - "14. Licensing": chapter14.md
     - "15. Support and Consulting": chapter15.md
     - "16. wolfSSL Updates": chapter16.md
+    # NOTE: The PDF build (see Makefile, pdf-prep target) assembles the wolfSSL
+    # (A), wolfCrypt (B), and API Header File (C) references from hardcoded `cat`
+    # lists. It does not read this nav, so keep those `cat` commands in sync with
+    # these sections.
     - "A. wolfSSL API Reference":
       - "CertManager API": group__CertManager.md
       - "Memory Handling": group__Memory.md
@@ -47,7 +51,7 @@ nav:
       - "Algorithms - Camellia": group__Camellia.md
       - "Algorithms - ChaCha": group__ChaCha.md
       - "Algorithms - ChaCha20_Poly1305": group__ChaCha20Poly1305.md
-      - "Algorithms - CMAC ": group__CMAC.md
+      - "Algorithms - CMAC": group__CMAC.md
       - "Callbacks - CryptoCb": group__Crypto.md
       - "Algorithms - Curve25519": group__Curve25519.md
       - "Algorithms - Curve448": group__Curve448.md
@@ -66,21 +70,27 @@ nav:
         - "Operations on/with SAKKE RSK": group__SAKKE__RSK.md
         - "Operations using SAKKE Key": group__SAKKE__Operations.md
       - "Algorithms - HMAC": group__HMAC.md
+      - "Algorithms - LMS / HSS (RFC 8554)": group__LMS.md
       - "Algorithms - MD2": group__MD2.md
       - "Algorithms - MD4": group__MD4.md
       - "Algorithms - MD5": group__MD5.md
+      - "Algorithms - ML-DSA (FIPS 204)": group__ML__DSA.md
+      - "Algorithms - ML-KEM (FIPS 203)": group__ML__KEM.md
       - "Algorithms - Password Based": group__Password.md
       - "Algorithms - PKCS7": group__PKCS7.md
       - "Algorithms - PKCS11": group__PKCS11.md
       - "Algorithms - Poly1305": group__Poly1305.md
       - "Algorithms - PSA": group__PSA.md
+      - "Algorithms - PUF": group__PUF.md
       - "Algorithms - RIPEMD": group__RIPEMD.md
       - "Algorithms - RSA": group__RSA.md
       - "Algorithms - SHA 128/224/256/384/512": group__SHA.md
       - "Algorithms - SHE": group__SHE.md
       - "Algorithms - SipHash": group__SipHash.md
+      - "Algorithms - SLH-DSA (FIPS 205)": group__SLH__DSA.md
       - "Algorithms - SrtpKdf": group__SrtpKdf.md
       - "Algorithms - SRP": group__SRP.md
+      - "Algorithms - XMSS / XMSS^MT (RFC 8391)": group__XMSS.md
     - "C. API Header Files":
       - aes_8h.md
       - arc4_8h.md
@@ -124,6 +134,7 @@ nav:
       - pkcs7_8h.md
       - poly1305_8h.md
       - psa_8h.md
+      - puf_8h.md
       - pwdbased_8h.md
       - quic_8h.md
       - random_8h.md
@@ -138,11 +149,16 @@ nav:
       - siphash_8h.md
       - srp_8h.md
       - ssl_8h.md
-      - wc__she_8h.md
       - tfm_8h.md
       - types_8h.md
       - wc__encrypt_8h.md
+      - wc__lms_8h.md
+      - wc__mldsa_8h.md
+      - wc__mlkem_8h.md
       - wc__port_8h.md
+      - wc__she_8h.md
+      - wc__slhdsa_8h.md
+      - wc__xmss_8h.md
       - wolfio_8h.md
     - "D. SSL/TLS Overview": appendix04.md
     - "E. RFCs, Specifications, and Reference": appendix05.md
