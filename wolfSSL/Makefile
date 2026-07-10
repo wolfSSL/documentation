@@ -67,6 +67,7 @@ html-prep: api
 	$(Q)rm -f build/html/appendix01.md build/html/appendix02.md build/html/appendix03.md
 	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
+	$(Q)perl -i -pe 's#\]\(/#](#g' build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/dox_comments\/$(HEADER_FILES)\///" build/html/*8h*
 
 # Set input format to gfm to fix issues with converted API docs

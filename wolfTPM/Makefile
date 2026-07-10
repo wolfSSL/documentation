@@ -48,6 +48,12 @@ html-prep: api
   else
 	$(Q)cp -a api/md/group* build/html/
 	$(Q)cp -a api/md/*8h* build/html/
+	$(Q)cp -a api/md/Classes build/html/
+	$(Q)perl -i -pe 's#\]\(/Classes/#](#g' build/html/Classes/*.md
+	$(Q)perl -i -pe "s/Classes\///g" build/html/Classes/*.md
+	$(Q)perl -i -pe 's#\]\(/#](../#g' build/html/Classes/*.md
+	$(Q)perl -i -pe 's#\]\(/#](#g' build/html/group* build/html/*8h*
+	$(Q)perl -i -pe "s/(\]\([^)#]*#[a-z]+-)([^)]+?)(\))/\$$1.(\$$2=~tr#-#_#r).\$$3/ge" build/html/group* build/html/*8h* build/html/Classes/*.md
   endif
 
 	$(Q)rm -rf build/html/chapter05.md
