@@ -100,6 +100,12 @@ pdf-setup: wolfhsm-update builddir
 .PHONY: html-prep
 html-prep: api
 	$(Q)cp -a api/md/*8h* build/html/
+	$(Q)cp -a api/md/Classes build/html/
+	$(Q)perl -i -pe 's#\]\(/Classes/#](#g' build/html/Classes/*.md
+	$(Q)perl -i -pe "s/Classes\///g" build/html/Classes/*.md
+	$(Q)perl -i -pe 's#\]\(/#](../#g' build/html/Classes/*.md
+	$(Q)perl -i -pe 's#\]\(/#](#g' build/html/*8h*
+	$(Q)perl -i -pe "s/(\]\([^)#]*#[a-z]+-)([^)]+?)(\))/\$$1.(\$$2=~tr#-#_#r).\$$3/ge" build/html/*8h* build/html/Classes/*.md
 
 	$(Q)perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*

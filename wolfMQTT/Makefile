@@ -40,14 +40,15 @@ api: wolfmqtt-update
 .PHONY: html-prep
 html-prep: api
 	$(Q)cp -a api/md/*8h* build/html/
+	$(Q)cp -a api/md/Classes build/html/
 	$(Q)rm -rf build/html/chapter05.md
-	$(Q)perl -i -pe "s/Classes\///g" build/html/*8h*
-	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge"   build/html/*8h*
-	$(Q)perl -i -pe "s/(?<=md\#typedef\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge"   build/html/*8h*
-	$(Q)perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge"   build/html/*8h*
-	$(Q)perl -i -pe "s/\\\\discussion//g" build/html/*8h*
-	$(Q)perl -i -pe "s/\/mqtt_/mqtt_/g" build/html/*8h*
-	$(Q)perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h*
+	$(Q)perl -i -pe "s/\\\\discussion//g" build/html/*8h* build/html/Classes/*.md
+	$(Q)perl -i -pe "s/dox_comments\/header_files\///" build/html/*8h* build/html/Classes/*.md
+	$(Q)perl -i -pe 's#\]\(/#](#g' build/html/*8h*
+	$(Q)perl -i -pe 's#\]\(/Classes/#](#g' build/html/Classes/*.md
+	$(Q)perl -i -pe "s/Classes\///g" build/html/Classes/*.md
+	$(Q)perl -i -pe 's#\]\(/#](../#g' build/html/Classes/*.md
+	$(Q)perl -i -pe "s/(\]\([^)#]*#[a-z]+-)([^)]+?)(\))/\$$1.(\$$2=~tr#-#_#r).\$$3/ge" build/html/*8h* build/html/Classes/*.md
 
 # Set input format to gfm to fix issues with converted API docs
 # Regexes:
