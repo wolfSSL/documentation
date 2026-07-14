@@ -2,7 +2,7 @@
 
 ## HandShake Callback
 
-wolfSSL (formerly CyaSSL) has an extension that allows a HandShake Callback to be set for connect or accept. This can be useful in embedded systems for debugging support when another debugger isn’t available and sniffing is impractical. To use wolfSSL HandShake Callbacks, use the extended functions, [`wolfSSL_connect_ex()`](ssl_8h.md#function_wolfssl_connect_ex) and [`wolfSSL_accept_ex()`](ssl_8h.md#function-wolfssl_accept_ex):
+wolfSSL (formerly CyaSSL) has an extension that allows a HandShake Callback to be set for connect or accept. This can be useful in embedded systems for debugging support when another debugger isn’t available and sniffing is impractical. To use wolfSSL HandShake Callbacks, use the extended functions, [`wolfSSL_connect_ex()`](ssl_8h.md#function-wolfssl_connect_ex) and [`wolfSSL_accept_ex()`](ssl_8h.md#function-wolfssl_accept_ex):
 
 ```c
 int wolfSSL_connect_ex(WOLFSSL*, HandShakeCallBack, TimeoutCallBack,
@@ -147,7 +147,7 @@ The user can set a context per WOLFSSL object (session) with `wolfSSL_SetDhAgree
 
 Example callbacks can be found in `wolfssl/test.h`, under `myDhCallback()`. Usage can be seen in the wolfSSL example client.
 
-To use DH callbacks, wolfSSL needs to be compiled with `HAVE_DH` defined.
+To use DH callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` and `HAVE_DH` defined.
 
 ### Ed25519 Callbacks
 
@@ -397,7 +397,7 @@ typedef int (*CallbackRsaVerify)(WOLFSSL* ssl,
 
 typedef int (*CallbackRsaEnc)(WOLFSSL* ssl,
     const unsigned char* in, unsigned int inSz,
-    Unsigned char* out, unsigned int* outSz,
+    unsigned char* out, unsigned int* outSz,
     const unsigned char* keyDer,
     unsigned int keySz, void* ctx);
 
@@ -584,7 +584,7 @@ when `info->algo_type == WC_ALGO_TYPE_RNG` is a memory error and can result in u
 
 ### Troubleshooting
 
-Some older compilers don't allow "anonymous inline aggregates", which wolfCrypt uses when defining the nested `wcCryptoInfo` anonymous unions in order to save space. To disable the use of anonymous inline aggregates, define the `HAVE_ANONYMOUS_INLINE_AGGREGATES` preprocessor macro as `0`. This will allow crypto callbacks to be used, but will dramatically increase the size of the `wcCryptoInfo` structure.
+Some older compilers don't allow "anonymous inline aggregates", which wolfCrypt uses when defining the nested `wc_CryptoInfo` anonymous unions in order to save space. To disable the use of anonymous inline aggregates, define the `HAVE_ANONYMOUS_INLINE_AGGREGATES` preprocessor macro as `0`. This will allow crypto callbacks to be used, but will dramatically increase the size of the `wc_CryptoInfo` structure.
 
 
 ### Examples

@@ -216,7 +216,7 @@ Returns:
 wolfSSL_connect avg took:  296.417 milliseconds
 ```
 
-If you'd like to change the default host from localhost, or the default port from 11111, you can change these settings in `/wolfssl/test.h`. The variables wolfSSLIP and wolfSSLPort control these settings. Re-build all of the examples including testsuite when changing these settings otherwise the test programs won't be able to connect to each other.
+If you'd like to change the default host from localhost, or the default port from 11111, you can change these settings in `wolfssl/test.h`. The variables wolfSSLIP and wolfSSLPort control these settings. Re-build all of the examples including testsuite when changing these settings otherwise the test programs won't be able to connect to each other.
 
 By default, the wolfSSL example client tries to connect to the specified server using TLS 1.2. The user is able to change the SSL/TLS version which the client uses by passing the `-v` command line option. The following values are available for this option:
 
@@ -454,7 +454,7 @@ There are several build options available to make building the benchmark applica
 
 #### BENCH_EMBEDDED
 
-Enabling this define will switch the benchmark application from using Megabytes to using Kilobytes, therefore reducing the memory usage. By default, when using this define, ciphers and algorithms will be benchmarked with 25kB. Public key algorithms will only be benchmarked over 1 iteration (as public key operations on some embedded processors can be fairly slow). These can be adjusted in `benchmark.c` by altering the variables `numBlocks` and `times` located inside the `BENCH_EMBEDDED` define.
+Enabling this define will switch the benchmark application from using Megabytes to using Kilobytes, therefore reducing the memory usage. By default, when using this define, ciphers and algorithms will be benchmarked with 25kB. Public key algorithms will only be benchmarked over 1 iteration (as public key operations on some embedded processors can be fairly slow). These can be adjusted in `benchmark.c` by altering the variables `numBlocks` and `ntimes` located inside the `BENCH_EMBEDDED` define.
 
 #### USE_CERT_BUFFERS_1024
 
@@ -552,7 +552,7 @@ calling:
     wolfSSL_Cleanup();
     ```
 
-    For an example of a client application using wolfSSL, see the client example located in the `<wolfssl_root>/examples/client.c` file.
+    For an example of a client application using wolfSSL, see the client example located in the `<wolfssl_root>/examples/client/client.c` file.
 
 ## Changing a Server Application to Use wolfSSL
 
@@ -594,4 +594,4 @@ This section will explain the basic steps needed to add wolfSSL to a server appl
 
 It is possible to load certificates and keys from buffers as well if there is no filesystem available. In this case, see the [`wolfSSL_CTX_use_certificate_buffer()`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_buffer) and [`wolfSSL_CTX_use_PrivateKey_buffer()`](group__CertsKeys.md#function-wolfssl_ctx_use_privatekey_buffer) API documentation, linked here, for more information.
 
-For an example of a server application using wolfSSL, see the server example located in the `<wolfssl_root>/examples/server.c` file.
+For an example of a server application using wolfSSL, see the server example located in the `<wolfssl_root>/examples/server/server.c` file.

@@ -8,6 +8,9 @@ nav:
     - "2. Building wolfTPM": chapter02.md
     - "3. Getting Started": chapter03.md
     - "4. wolfTPM Library Design": chapter04.md
+    # NOTE: The PDF build (see Makefile, pdf-prep target) assembles the API
+    # Reference from a hardcoded `cat` list. It does not read this nav, so keep
+    # that `cat` in sync when modifying the header list below.
     - "5. API Reference":
       - "TPM2 API": group__TPM2__Proprietary.md
       - "TPM2 Wrapper API": group__wolfTPM2__Wrappers.md

@@ -58,6 +58,9 @@ html-prep: api
 # 4. Three regexes to remove metadata which outputs in the PDF text
 # 5. Fix titles of the header files Markdown
 # 6. Two regexes to handle bad Doxygen that didn't convert and the LaTeX processor thinks is LaTeX commands
+# NOTE: The final `cat` assembles the API Reference for the PDF from a hardcoded
+# list. It mirrors the "5. API Reference" nav in mkdocs.yml (which drives the
+# HTML build); the PDF build does not read that nav. Keep both lists in sync.
 .PHONY: pdf-prep
 pdf-prep: api
 	$(Q)perl -i -pe "s/# /## /g" api/md/*.md
@@ -76,4 +79,4 @@ pdf-prep: api
 	$(Q)perl -i -pe "s/(?<=md\#enum\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" api/md/*.md
 	$(Q)rm -rf build/pdf/chapter05.md
 	$(Q)echo '# API Reference' >> build/pdf/chapter05.md
-	$(Q)cat api/md/mqtt__client_8h.md api/md/mqtt__socket_8h.md api/md/mqtt__socket_8h.md	api/md/mqtt__types_8h.md >> build/pdf/chapter05.md
+	$(Q)cat api/md/mqtt__client_8h.md api/md/mqtt__packet_8h.md api/md/mqtt__socket_8h.md	api/md/mqtt__types_8h.md >> build/pdf/chapter05.md

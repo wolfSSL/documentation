@@ -37,7 +37,7 @@ After defining `STRING_USER` you could do:
 Or if you prefer to avoid macros:
 
 ```c
-external void* my_memcpy(void* d, const void* s, size_t n);
+extern void* my_memcpy(void* d, const void* s, size_t n);
 ```
 
 to set wolfSSL’s abstraction layer to point to your version `my_memcpy()`.
@@ -59,7 +59,7 @@ The user will need to define two functions:
 1. The network Send function
 2. The network Receive function
 
-These two functions are prototyped by `CallbackIOSend` and `CallbackIORecv` in `ssl.h`:
+These two functions are prototyped by `CallbackIOSend` and `CallbackIORecv` in `wolfssl/wolfio.h`:
 
 ```c
 typedef int (*CallbackIORecv)(WOLFSSL *ssl, char *buf, int sz, void *ctx);

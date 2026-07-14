@@ -124,6 +124,10 @@ html-prep: api
 # 4. Three regexes to remove metadata which outputs in the PDF text
 # 5. Fix titles of the header files Markdown
 # 6. Two regexes to handle bad Doxygen that didn't convert and the LaTeX processor thinks is LaTeX commands
+# NOTE: The `cat` commands below assemble the Client (10) and Server (11) API
+# References for the PDF from hardcoded lists. They mirror the API Reference nav
+# sections in mkdocs.yml (which drive the HTML build); the PDF build does not
+# read that nav. Keep both locations in sync.
 .PHONY: pdf-prep
 pdf-prep: api
 	$(Q)cp -a api/md/*8h* build/pdf/

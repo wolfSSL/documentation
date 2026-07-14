@@ -1185,7 +1185,7 @@ Enables TLS session ticket support (RFC 5077). Allows the server to issue sessio
 
 #### HAVE_TRUSTED_CA
 
-Enables the Trusted CA Indication TLS extension (RFC 4366). Allows the client to indicate which CA certificates it trusts, helping the server select the appropriate certificate chain.
+Enables the Trusted CA Indication TLS extension (RFC 6066). Allows the client to indicate which CA certificates it trusts, helping the server select the appropriate certificate chain.
 
 #### HAVE_RPK
 
@@ -1801,7 +1801,7 @@ Enables debug logging for the OpenSSL compatibility layer functions. Helps trace
 
 #### HAVE_BLAKE2
 
-Enables Blake2s algorithm support
+Enables Blake2b algorithm support
 
 #### HAVE_FALLBACK_SCSV
 
@@ -2506,7 +2506,7 @@ This extension allows debugging callbacks through the use of signals in an envir
 
 #### WOLF_CRYPTO_CB
 
- Enable crypto callback support. This feature is also enabled automatically when [`--enable-cryptocb`](#enable-cryptocb) is used.
+ Enable crypto callback support. This feature is also enabled automatically when [`--enable-cryptocb`](#--enable-cryptocb) is used.
 
 #### WOLF_CRYPTO_CB_FIND
 
@@ -2562,7 +2562,7 @@ Allow allocation of subjectCN and publicKey fields when parsing certificates eve
 
 #### WOLFSSL_USER_IO
 
-Allows the user to remove automatic setting of the default I/O functions [`EmbedSend()`](wolfio_8h.md#function-embedsend) and [`EmbedReceive()`](wolfio_8h.md#function-embedrecieve). Used for custom I/O abstraction layer (see [Abstraction Layers](chapter05.md#abstraction-layers) for more details).
+Allows the user to remove automatic setting of the default I/O functions [`EmbedSend()`](wolfio_8h.md#function-embedsend) and [`EmbedReceive()`](wolfio_8h.md#function-embedreceive). Used for custom I/O abstraction layer (see [Abstraction Layers](chapter05.md#abstraction-layers) for more details).
 
 #### NO_FILESYSTEM
 
@@ -4766,7 +4766,7 @@ Enables RSA verify only support (**note** requires [`--enable-cryptonly`](#--ena
 
 ### `--enable-rsapub`
 
-Default value: Enabled RSA public key only support (**note** requires [`--enable-cryptonly`](#--enable-cryptonly))
+Enables RSA public key only support (**note** requires [`--enable-cryptonly`](#--enable-cryptonly))
 
 ### `--enable-armasm`
 
@@ -4782,7 +4782,7 @@ Disable TLS 1.2 support
 
 Enable TLS 1.3 support
 
-This build option can be combined with [`--disable-tlsv12`](#--disable-tlsv12) and [`--disable-oldtls`](#--disable-oldtlx) to produce a wolfSSL build that is only TLS 1.3.
+This build option can be combined with [`--disable-tlsv12`](#--disable-tlsv12) and [`--disable-oldtls`](#--disable-oldtls) to produce a wolfSSL build that is only TLS 1.3.
 
 ### `--enable-all`
 
@@ -4851,7 +4851,7 @@ The following two defines can be used with `--enable-cryptocb` to complie out RS
 * WOLF_CRYPTO_CB_ONLY_RSA - compiles out RSA software crypto fallback
 * WOLF_CRYPTO_CB_ONLY_ECC - compiles out ECC software crypto fallback
 
-Use of the WOLF_CRYPTO_CB_ONLY_* options requires disabling the examples. See [`--disable-examples`](#disable-examples)
+Use of the WOLF_CRYPTO_CB_ONLY_* options requires disabling the examples. See [`--disable-examples`](#--disable-examples)
 
 ### `--enable-reproducible-build`
 
