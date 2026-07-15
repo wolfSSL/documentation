@@ -16,7 +16,10 @@ SOURCES = chapter01.md \
           chapter11.md \
           chapter12.md \
           chapter13.md \
-          chapter14.md 
+          chapter14.md \
+          chapter15.md \
+          chapter16.md \
+          chapter17.md
 
 ifeq ($(DOC_LANG),JA)
     PDF  = wolfSSH-Manual-jp.pdf

@@ -1,4 +1,4 @@
-#  wolfSSL SFTP API Reference
+# wolfSSH SFTP API Reference
 
 ##  Connection Functions
 
@@ -8,133 +8,108 @@
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function to handle an incoming connection request from a client.
-
-**Return Values:**
-
-Returns WS_SFTP_COMPLETE on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_accept(WOLFSSH* ssh );
-```
-```
-WOLFSSH* ssh;
-```
-```
-//create new WOLFSSH structure
-...
-```
-```
-if (wolfSSH_SFTP_accept(ssh) != WS_SUCCESS) {
-//handle error case
-}
+
+int wolfSSH_SFTP_accept(WOLFSSH* ssh);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_free()
-wolfSSH_new()
-wolfSSH_SFTP_connect()
+Handles an incoming SFTP connection request from a client. Called on the server side after the SSH session is established.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session used for the connection
+
+**Return Values**
+
+- `WS_SFTP_COMPLETE` on success
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_connect()`
+- `wolfSSH_SFTP_negotiate()`
 
 ### wolfSSH_SFTP_connect()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function for initiating a connection to a SFTP server.
-
-**Return Values:**
-
-**WS_SFTP_COMPLETE:** on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure to be used for connection
-
-**Example:**
-
-**See Also:**
-
-wolfSSH_SFTP_accept()
-wolfSSH_new()
-wolfSSH_free()
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_connect(WOLFSSH* ssh );
+
+int wolfSSH_SFTP_connect(WOLFSSH* ssh);
 ```
-```
-WOLFSSH* ssh;
-```
-```
-//after creating a new WOLFSSH structrue
-```
-```
-wolfSSH_SFTP_connect(ssh);
-```
+
+**Description**
+
+Initiates an SFTP connection to a server. Called on the client side after the SSH session is established.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session used for the connection
+
+**Return Values**
+
+- `WS_SFTP_COMPLETE` on success
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_accept()`
+- `wolfSSH_SFTP_negotiate()`
 
 ### wolfSSH_SFTP_negotiate()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function to handle either an incoming connection from client or to send out a
-connection request to a server. It is dependent on which side of the connection the
-created WOLFSSH structure is set to for which action is performed.
-
-**Return Values:**
-
-Returns WS_SUCCESS on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-
-**Example:**
-
-**See Also:**
-
-wolfSSH_SFTP_free()
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_negotiate(WOLFSSH* ssh)
-```
-```
-WOLFSSH* ssh;
-```
-```
-//create new WOLFSSH structure with side of connection
-set
-....
-```
-```
-if (wolfSSH_SFTP_negotiate(ssh) != WS_SUCCESS) {
-//handle error case
-}
+
+int wolfSSH_SFTP_negotiate(WOLFSSH* ssh);
 ```
 
-wolfSSH_new()
-wolfSSH_SFTP_connect()
-wolfSSH_SFTP_accept()
+**Description**
 
+Performs SFTP protocol negotiation. Depending on which side the session was created for, this either handles an incoming connection from a client or sends a connection request to a server.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session used for the connection
+
+**Return Values**
+
+- `WS_SUCCESS` on success
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_accept()`
+- `wolfSSH_SFTP_connect()`
+
+
+### wolfSSH_SFTP_SetDefaultPath()
+
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_SetDefaultPath(WOLFSSH* ssh, const char* path);
+```
+
+**Description**
+
+Sets the default (starting) directory for the SFTP session. On the server side this is the base directory against which relative paths are resolved.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `path` - the default path to set
+
+**Return Values**
+
+- `WS_SUCCESS`
+- `WS_BAD_ARGUMENT`
 
 ##  Protocol Level Functions
 
@@ -144,473 +119,292 @@ wolfSSH_SFTP_accept()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function to send REALPATH packet to peer. It gets the name of the file returned from
-peer.
-
-**Return Values:**
-
-Returns a pointer to a WS_SFTPNAME structure on success and NULL on error.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**dir** - directory / file name to get real path of
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-WS_SFTPNAME* wolfSSH_SFTP_RealPath(WOLFSSH* ssh , char*
-dir );
+
+WS_SFTPNAME* wolfSSH_SFTP_RealPath(WOLFSSH* ssh, char* dir);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_accept()
-wolfSSH_SFTP_connect()
+Sends a REALPATH request to the peer and returns the canonical name of the file or directory. The returned `WS_SFTPNAME` must be freed with wolfSSH_SFTPNAME_free().
 
-```
-WOLFSSH* ssh ;
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-if (wolfSSH_SFTP_read( ssh ) != WS_SUCCESS) {
-//handle error case
-}
-```
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `dir` - the file or directory name to resolve
+
+**Return Values**
+
+- pointer to a `WS_SFTPNAME` structure on success
+- `NULL` on error
+
+**See Also**
+
+- `wolfSSH_SFTPNAME_free()`
 
 ### wolfSSH_SFTP_Close()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function to to send a close packet to the peer.
-
-**Return Values:**
-
-**WS_SUCCESS** on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**handle** - handle to try and close
-**handleSz** - size of handle buffer
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_Close(WOLFSSH* ssh , byte* handle , word32
-handleSz );
+
+int wolfSSH_SFTP_Close(WOLFSSH* ssh, byte* handle, word32 handleSz);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_accept()
-wolfSSH_SFTP_connect()
+Sends a close request to the peer for the given file handle, which was obtained from a previous call to wolfSSH_SFTP_Open().
 
-```
-WOLFSSH* ssh;
-byte handle[HANDLE_SIZE];
-word32 handleSz = HANDLE_SIZE;
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-if (wolfSSH_SFTP_Close(ssh, handle, handleSz) !=
-WS_SUCCESS) {
-//handle error case
-}
-```
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `handle` - the file handle to close
+- `handleSz` - size of the handle buffer
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_Open()`
 
 ### wolfSSH_SFTP_Open()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function to to send an open packet to the peer. This sets handleSz with the size of
-resulting buffer and gets the resulting handle from the peer and places it in the buffer
-handle.
-
-Available reasons for open:
-WOLFSSH_FXF_READ
-WOLFSSH_FXF_WRITE
-WOLFSSH_FXF_APPEND
-WOLFSSH_FXF_CREAT
-WOLFSSH_FXF_TRUNC
-WOLFSSH_FXF_EXCL
-
-**Return Values:**
-
-**WS_SUCCESS** on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**dir** - name of file to open
-**reason** - reason for opening the file
-**atr** - initial attributes for file
-**handle** - resulting handle from open
-**handleSz** - gets set to the size of resulting handle
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_Open(WOLFSSH* ssh , char* dir , word32
-reason ,
-WS_SFTP_FILEATRB* atr , byte* handle , word32* handleSz ) ;
+
+int wolfSSH_SFTP_Open(WOLFSSH* ssh, char* dir, word32 reason,
+        WS_SFTP_FILEATRB* atr, byte* handle, word32* handleSz);
 ```
 
-**Example:**
+**Description**
 
-**See Also:**
+Sends an open request to the peer for the file named by `dir`. On success the resulting file handle is placed in `handle` and its size is written to `handleSz`. The `reason` argument is a bitmask of the open flags: `WOLFSSH_FXF_READ`, `WOLFSSH_FXF_WRITE`, `WOLFSSH_FXF_APPEND`, `WOLFSSH_FXF_CREAT`, `WOLFSSH_FXF_TRUNC`, or `WOLFSSH_FXF_EXCL`.
 
-wolfSSH_SFTP_accept()
-wolfSSH_SFTP_connect()
+**Parameters**
 
-```
-WOLFSSH* ssh ;
-char name[NAME_SIZE];
-byte handle[HANDLE_SIZE];
-word32 handleSz = HANDLE_SIZE;
-WS_SFTP_FILEATRB atr;
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-if (wolfSSH_SFTP_Open( ssh , name , WOLFSSH_FXF_WRITE |
-WOLFSSH_FXF_APPEND | WOLFSSH_FXF_CREAT , & atr , handle ,
-& handleSz )
-!= WS_SUCCESS) {
-//handle error case
-}
-```
+- `ssh` - pointer to the wolfSSH session
+- `dir` - name of the file to open
+- `reason` - bitmask of open flags (see above)
+- `atr` - initial file attributes
+- `handle` - output buffer for the resulting file handle
+- `handleSz` - on input the buffer size, set on output to the handle size
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_Close()`
+- `wolfSSH_SFTP_SendReadPacket()`
+- `wolfSSH_SFTP_SendWritePacket()`
 
 ### wolfSSH_SFTP_SendReadPacket()
 
-**Synopsis:**
-
-**Description:**
-
-Function to to send a read packet to the peer. The buffer handle should contain the
-result of a previous call to wolfSSH_SFTP_Open. The resulting bytes from a read are
-placed into the “out” buffer.
-
-**Return Values:**
-
-Returns the number of bytes read on success.
-A negative value is returned on failure.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**handle** - handle to try and read from
-**handleSz** - size of handle buffer
-**ofst** - offset to start reading from
-**out** - buffer to hold result from read
-**outSz** - size of out buffer
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_SendReadPacket(WOLFSSH* ssh , byte*
-handle , word32
-handleSz , word64 ofst , byte* out , word32 outSz );
+
+int wolfSSH_SFTP_SendReadPacket(WOLFSSH* ssh, byte* handle,
+        word32 handleSz, const word32* ofst, byte* out, word32 outSz);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_SendWritePacket()
-wolfSSH_SFTP_Open()
+Sends a read request to the peer for the file referenced by `handle` (obtained from wolfSSH_SFTP_Open()). The bytes read are placed into the `out` buffer. The `ofst` argument points to the file offset to read from.
 
-```
-WOLFSSH* ssh;
-byte handle[HANDLE_SIZE];
-word32 handleSz = HANDLE_SIZE;
-byte out[OUT_SIZE];
-word32 outSz = OUT_SIZE;
-word32 ofst = 0;
-int ret;
-```
-```
-//set up ssh and do sftp connections
-...
-//get handle with wolfSSH_SFTP_Open()
-```
-```
-if ((ret = wolfSSH_SFTP_SendReadPacket(ssh, handle,
-handleSz, ofst,
-out, outSz)) < 0) {
-//handle error case
-}
-//ret holds the number of bytes placed into out buffer
-```
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `handle` - the file handle to read from
+- `handleSz` - size of the handle buffer
+- `ofst` - pointer to the file offset to start reading from
+- `out` - buffer to hold the data read
+- `outSz` - size of the output buffer
+
+**Return Values**
+
+- greater than or equal to 0 - number of bytes read on success
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_SendWritePacket()`
+- `wolfSSH_SFTP_Open()`
 
 ### wolfSSH_SFTP_SendWritePacket()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function to send a write packet to the peer.
-The buffer handle should contain the result of a previous call to
-wolfSSH_SFTP_Open().
-
-**Return Values:**
-
-Returns the number of bytes written on success.
-A negative value is returned on failure.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**handle** - handle to try and read from
-**handleSz** - size of handle buffer
-**ofst** - offset to start reading from
-**out** - buffer to send to peer for writing
-**outSz** - size of out buffer
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_SendWritePacket(WOLFSSH* ssh , byte*
-handle , word32
-handleSz , word64 ofst , byte* out , word32 outSz );
+
+int wolfSSH_SFTP_SendWritePacket(WOLFSSH* ssh, byte* handle,
+        word32 handleSz, const word32* ofst, byte* out, word32 outSz);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_SendReadPacket()
-wolfSSH_SFTP_Open()
+Sends a write request to the peer for the file referenced by `handle` (obtained from wolfSSH_SFTP_Open()), writing the contents of the `out` buffer. The `ofst` argument points to the file offset to write at.
 
-```
-WOLFSSH* ssh;
-byte handle[HANDLE_SIZE];
-word32 handleSz = HANDLE_SIZE;
-byte out[OUT_SIZE];
-word32 outSz = OUT_SIZE;
-word32 ofst = 0;
-int ret;
-```
-```
-//set up ssh and do sftp connections
-...
-//get handle with wolfSSH_SFTP_Open()
-```
-```
-if ((ret = wolfSSH_SFTP_SendWritePacket(ssh, handle,
-handleSz, ofst,
-out,outSz)) < 0) {
-//handle error case
-}
-//ret holds the number of bytes written
-```
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `handle` - the file handle to write to
+- `handleSz` - size of the handle buffer
+- `ofst` - pointer to the file offset to start writing at
+- `out` - buffer of data to send to the peer
+- `outSz` - size of the buffer
+
+**Return Values**
+
+- greater than or equal to 0 - number of bytes written on success
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_SendReadPacket()`
+- `wolfSSH_SFTP_Open()`
 
 ### wolfSSH_SFTP_STAT()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function to send a STAT packet to the peer. This will get the attributes of file or
-directory. If the file or attribute does not exist the peer will return resulting in this function
-returning an error value.
-
-**Return Values:**
-
-**WS_SUCCESS** on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**dir** - NULL terminated name of file or directory to get attributes of
-**atr** - resulting attributes are set into this structure
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_STAT(WOLFSSH* ssh , char* dir ,
-WS_SFTP_FILEATRB* atr);
+
+int wolfSSH_SFTP_STAT(WOLFSSH* ssh, char* dir, WS_SFTP_FILEATRB* atr);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_LSTAT()
-wolfSSH_SFTP_connect()
+Sends a STAT request to the peer to retrieve the attributes of a file or directory, following symbolic links. If the target does not exist, the peer returns an error and this function returns an error value.
 
-```
-WOLFSSH* ssh;
-byte name[NAME_SIZE];
-int ret;
-WS_SFTP_FILEATRB atr;
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-if ((ret = wolfSSH_SFTP_STAT(ssh, name, &atr)) < 0) {
-//handle error case
-}
-```
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `dir` - null-terminated name of the file or directory
+- `atr` - structure that receives the resulting attributes
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_LSTAT()`
+- `wolfSSH_SFTP_SetSTAT()`
 
 ### wolfSSH_SFTP_LSTAT()
 
-**Synopsis:**
-
-**Description:**
-
-Function to send a LSTAT packet to the peer. This will get the attributes of file or
-directory. It follows symbolic links where a STAT packet will not follow symbolic links. If
-the file or attribute does not exist the peer will return resulting in this function returning
-an error value.
-
-**Return Values:**
-
-WS_SUCCESS on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**dir** - NULL terminated name of file or directory to get attributes of
-**atr** - resulting attributes are set into this structure
-
-Example:
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_LSTAT(WOLFSSH* ssh , char* dir ,
-WS_SFTP_FILEATRB* atr );
+
+int wolfSSH_SFTP_LSTAT(WOLFSSH* ssh, char* dir, WS_SFTP_FILEATRB* atr);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_STAT()
-wolfSSH_SFTP_connect()
+Sends an LSTAT request to the peer to retrieve the attributes of a file or directory. Unlike wolfSSH_SFTP_STAT(), LSTAT does not follow symbolic links: it returns the attributes of the link itself. If the target does not exist, the peer returns an error and this function returns an error value.
 
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `dir` - null-terminated name of the file or directory
+- `atr` - structure that receives the resulting attributes
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_STAT()`
+- `wolfSSH_SFTP_SetSTAT()`
+
+### wolfSSH_SFTP_SetSTAT()
+
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_SetSTAT(WOLFSSH* ssh, char* dir, WS_SFTP_FILEATRB* atr);
 ```
-WOLFSSH* ssh;
-byte name[NAME_SIZE];
-int ret;
-WS_SFTP_FILEATRB atr;
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-if ((ret = wolfSSH_SFTP_LSTAT(ssh, name, &atr)) < 0) {
-//handle error case
-}
-```
+
+**Description**
+
+Sends a SETSTAT request to the peer to apply the attributes in `atr` (for example permissions, size, or timestamps) to the named file or directory.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `dir` - null-terminated name of the file or directory
+- `atr` - the attributes to apply
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_STAT()`
 
 ### wolfSSH_SFTPNAME_free()
 
-**Synopsis:**
+```c
+#include <wolfssh/wolfsftp.h>
 
-**Description:**
+void wolfSSH_SFTPNAME_free(WS_SFTPNAME* n);
+```
 
-Function to free a single WS_SFTPNAME node. Note that if this node is in the middle of a
-list of nodes then the list will be broken.
+**Description**
 
-**Return Values:**
+Frees a single `WS_SFTPNAME` node. If the node is in the middle of a list, freeing it breaks the list; use wolfSSH_SFTPNAME_list_free() to free an entire list.
+
+**Parameters**
+
+- `n` - the `WS_SFTPNAME` node to free
+
+**Return Values**
 
 None
 
-**Parameters:**
+**See Also**
 
-**name** - structure to be free’d
+- `wolfSSH_SFTPNAME_list_free()`
 
-**Example:**
+### wolfSSH_SFTPNAME_list_free()
 
-**See Also:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-```
-### void wolfSSH_SFTPNAME_free(WS_SFTPNMAE* name );
 
-```
-WOLFSSH* ssh;
-WS_SFTPNAME* name;
-```
-```
-//set up ssh and do sftp connections
-...
-name = wolfSSH_SFTP_RealPath(ssh, path);
-if (name != NULL) {
-wolfSSH_SFTPNAME_free(name);
-}
+void wolfSSH_SFTPNAME_list_free(WS_SFTPNAME* n);
 ```
 
-wolfSSH_SFTPNAME_list_free
+**Description**
 
-wolfSSH_SFTPNAME_list_free()
+Frees an entire list of `WS_SFTPNAME` nodes, such as the list returned by wolfSSH_SFTP_LS().
 
+**Parameters**
 
+- `n` - head of the `WS_SFTPNAME` list to free
 
-**Synopsis:**
-
-**Description:**
-
-Function to free a all WS_SFTPNAME nodes in a list.
-
-**Return Values:**
+**Return Values**
 
 None
 
-**Parameters:**
+**See Also**
 
-**name** - head of list to be free’d
-
-**Example:**
-
-```
-#include <wolfssh/wolfsftp.h>
-void wolfSSH_SFTPNAME_list_free(WS_SFTPNMAE* name );
-```
-
-**See Also:**
-
-wolfSSH_SFTPNAME_free()
-
-```
-WOLFSSH* ssh;
-WS_SFTPNAME* name;
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-name = wolfSSH_SFTP_LS(ssh, path);
-if (name != NULL) {
-wolfSSH_SFTPNAME_list_free(name);
-}
-```
+- `wolfSSH_SFTPNAME_free()`
 
 ##  Reget / Reput Functions
 
@@ -618,188 +412,120 @@ wolfSSH_SFTPNAME_list_free(name);
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function to save an offset for an interrupted get or put command. The offset can be
-recovered by calling wolfSSH_SFTP_GetOfst
-
-**Return Values:**
-
-Returns WS_SUCCESS on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure for connection
-**from** - NULL terminated string of source path
-**to** - NULL terminated string with destination path
-**ofst** - offset into file to be saved
-
-Example:
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_SaveOfst(WOLFSSH* ssh , char* from , char*
-to ,
-word64 ofst );
+
+int wolfSSH_SFTP_SaveOfst(WOLFSSH* ssh, char* frm, char* to,
+        const word32* ofst);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_GetOfst()
-wolfSSH_SFTP_Interrupt()
+Saves the transfer offset for an interrupted get or put, keyed by the source (`frm`) and destination (`to`) paths. The saved offset can later be recovered with wolfSSH_SFTP_GetOfst().
 
-```
-WOLFSSH* ssh;
-char from[NAME_SZ];
-char to[NAME_SZ];
-word64 ofst;
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-if (wolfSSH_SFTP_SaveOfst(ssh, from, to, ofst) !=
-WS_SUCCESS) {
-//handle error case
-}
-```
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `frm` - null-terminated source path
+- `to` - null-terminated destination path
+- `ofst` - pointer to the offset to save
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_GetOfst()`
+- `wolfSSH_SFTP_Interrupt()`
 
 ### wolfSSH_SFTP_GetOfst()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function to retrieve an offset for an interrupted get or put command.
-
-**Return Values:**
-
-Returns offset value on success. If not stored offset is found then 0 is returned.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure for connection
-**from** - NULL terminated string of source path
-**to** - NULL terminated string with destination path
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-word64 wolfSSH_SFTP_GetOfst(WOLFSSH* ssh, char* from,
-char* to);
-```
-```
-WOLFSSH* ssh;
-char from[NAME_SZ];
-char to[NAME_SZ];
-word64 ofst;
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-ofst = wolfSSH_SFTP_GetOfst(ssh, from, to);
-//start reading/writing from ofst
+
+int wolfSSH_SFTP_GetOfst(WOLFSSH* ssh, char* frm, char* to,
+        word32* ofst);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_SaveOfst()
-wolfSSH_SFTP_Interrup()
+Retrieves the saved transfer offset for an interrupted get or put, keyed by the source (`frm`) and destination (`to`) paths, writing it to `ofst`. If no saved offset is found, `ofst` is set to 0.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `frm` - null-terminated source path
+- `to` - null-terminated destination path
+- `ofst` - output for the saved offset
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_SaveOfst()`
+- `wolfSSH_SFTP_Interrupt()`
 
 ### wolfSSH_SFTP_ClearOfst()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function to clear all stored offset values.
-
-**Return Values:**
-
-**WS_SUCCESS** on success
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
+
 int wolfSSH_SFTP_ClearOfst(WOLFSSH* ssh);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_SaveOfst()
-wolfSSH_SFTP_GetOfst()
+Clears all stored transfer offsets for the session.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_SaveOfst()`
+- `wolfSSH_SFTP_GetOfst()`
 
 ### wolfSSH_SFTP_Interrupt()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function to set interrupt flag and stop a get/put command.
-
-**Return Values:**
-
-None
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure
-
-**Example:**
-
-```
-WOLFSSH* ssh;
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-if (wolfSSH_SFTP_ClearOfst(ssh) != WS_SUCCESS) {
-//handle error
-}
-```
-```
+```c
 #include <wolfssh/wolfsftp.h>
+
 void wolfSSH_SFTP_Interrupt(WOLFSSH* ssh);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_SaveOfst()
-wolfSSH_SFTP_GetOfst()
+Sets the interrupt flag on the session to stop an in-progress get or put transfer. The current offset can be saved with wolfSSH_SFTP_SaveOfst() so the transfer can be resumed later.
 
-```
-WOLFSSH* ssh;
-char from[NAME_SZ];
-char to[NAME_SZ];
-word64 ofst;
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-wolfSSH_SFTP_Interrupt(ssh);
-wolfSSH_SFTP_SaveOfst(ssh, from, to, ofst);
-```
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+
+**Return Values**
+
+None
+
+**See Also**
+
+- `wolfSSH_SFTP_SaveOfst()`
+- `wolfSSH_SFTP_GetOfst()`
 
 ##  Command Functions
 
@@ -809,380 +535,237 @@ wolfSSH_SFTP_SaveOfst(ssh, from, to, ofst);
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function for sending a “remove” packet across the channel.
-The file name passed in as “f” is sent to the peer for removal.
-
-**Return Values:**
-
-**WS_SUCCESS** : returns WS_SUCCESS on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**f** - file name to be removed
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_Remove(WOLFSSH* ssh , char* f );
-```
-```
-WOLFSSH* ssh;
-int ret;
-char* name[NAME_SZ];
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-ret = wolfSSH_SFTP_Remove(ssh, name);
+
+int wolfSSH_SFTP_Remove(WOLFSSH* ssh, char* f);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_accept()
-wolfSSH_SFTP_connect()
+Sends a remove request to the peer to delete the file named by `f`.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `f` - null-terminated name of the file to remove
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_RMDIR()`
 
 ### wolfSSH_SFTP_MKDIR()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function for sending a “mkdir” packet across the channel. The directory name passed in
-as “dir” is sent to the peer for creation. Currently the attributes passed in are not used
-and default attributes is set instead.
-
-**Return Values:**
-
-**WS_SUCCESS** : returns WS_SUCCESS on success.
-
-**Parameters:**
-
-ssh - pointer to WOLFSSH structure used for connection
-dir - NULL terminated directory to be created
-atr - attributes to be used with directory creation
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_MKDIR(WOLFSSH* ssh , char* dir ,
-WS_SFTP_FILEATRB*
-atr );
+
+int wolfSSH_SFTP_MKDIR(WOLFSSH* ssh, char* dir, WS_SFTP_FILEATRB* atr);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_accept()
-wolfSSH_SFTP_connect()
+Sends a mkdir request to the peer to create the directory named by `dir`. The `atr` attributes are currently not used; default attributes are applied instead.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `dir` - null-terminated name of the directory to create
+- `atr` - attributes for the new directory (currently unused)
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_RMDIR()`
 
 ### wolfSSH_SFTP_RMDIR()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function for sending a “rmdir” packet across the channel. The directory name passed in
-as “dir” is sent to the peer for deletion.
-
-**Return Values:**
-
-**WS_SUCCESS** : returns WS_SUCCESS on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**dir** - NULL terminated directory to be remove
-
-```
-WOLFSSH* ssh;
-int ret;
-char* dir[DIR_SZ];
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-ret = wolfSSH_SFTP_MKDIR(ssh, dir, DIR_SZ);
-```
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_RMDIR(WOLFSSH* ssh , char* dir );
+
+int wolfSSH_SFTP_RMDIR(WOLFSSH* ssh, char* dir);
 ```
 
-**Example:**
+**Description**
 
-**See Also:**
+Sends an rmdir request to the peer to delete the directory named by `dir`.
 
-wolfSSH_SFTP_accept()
-wolfSSH_SFTP_connect()
+**Parameters**
 
-```
-WOLFSSH* ssh;
-int ret;
-char* dir[DIR_SZ];
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-ret = wolfSSH_SFTP_RMDIR(ssh, dir);
-```
+- `ssh` - pointer to the wolfSSH session
+- `dir` - null-terminated name of the directory to remove
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_MKDIR()`
 
 ### wolfSSH_SFTP_Rename()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function for sending a “rename” packet across the channel. This tries to have a peer file
-renamed from “old” to “nw”.
-
-**Return Values:**
-
-**WS_SUCCESS** : returns WS_SUCCESS on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**old** - Old file name
-**nw** - New file name
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_Rename(WOLFSSH* ssh , const char* old ,
-const char*
-nw );
-```
-```
-WOLFSSH* ssh;
-int ret;
-char* old[NAME_SZ];
-char* nw[NAME_SZ]; //new file name
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-ret = wolfSSH_SFTP_Rename(ssh, old, nw);
+
+int wolfSSH_SFTP_Rename(WOLFSSH* ssh, const char* old, const char* nw);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_accept()
-wolfSSH_SFTP_connect()
+Sends a rename request to the peer, renaming the file `old` to `nw`.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `old` - the current file name
+- `nw` - the new file name
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_Remove()`
 
 ### wolfSSH_SFTP_LS()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function for performing LS operation which gets a list of all files and directories in the
-current working directory. This is a high level function that performs REALPATH,
-OPENDIR, READDIR, and CLOSE operations.
-
-**Return Values:**
-
-On Success, returns a pointer to a list of WS_SFTPNAME structures.
-NULL on failure.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**dir** - directory to list
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-WS_SFTPNAME* wolfSSH_SFTP_LS(WOLFSSH* ssh , char* dir );
+
+WS_SFTPNAME* wolfSSH_SFTP_LS(WOLFSSH* ssh, char* dir);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_accept()
-wolfSSH_SFTP_connect()
-wolfSSH_SFTPNAME_list_free()
+Lists the files and directories in `dir`. This is a high-level helper that performs the REALPATH, OPENDIR, READDIR, and CLOSE operations. The returned list must be freed with wolfSSH_SFTPNAME_list_free().
 
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `dir` - the directory to list
+
+**Return Values**
+
+- pointer to a list of `WS_SFTPNAME` structures on success
+- `NULL` on failure
+
+**See Also**
+
+- `wolfSSH_SFTPNAME_list_free()`
+- `wolfSSH_SFTP_RealPath()`
+
+### wolfSSH_SFTP_CHMOD()
+
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_CHMOD(WOLFSSH* ssh, char* n, char* oct);
 ```
-WOLFSSH* ssh;
-int ret;
-char* dir[DIR_SZ];
-WS_SFTPNAME* name;
-WS_SFTPNAME* tmp;
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-name = wolfSSH_SFTP_LS(ssh, dir);
-tmp = name;
-while (tmp != NULL) {
-printf("%s\n", tmp->fName);
-tmp = tmp->next;
-}
-wolfSSH_SFTPNAME_list_free(name);
-```
+
+**Description**
+
+Changes the permission bits of the file or directory `n` to the mode given by the octal string `oct` (for example, "644"). Implemented by sending a SETSTAT request with the new permissions.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `n` - null-terminated name of the file or directory
+- `oct` - octal permission string (for example, "755")
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_SetSTAT()`
 
 ### wolfSSH_SFTP_Get()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function for performing get operation which gets a file from the peer and places it in a
-local directory. This is a high level function that performs LSTAT, OPEN, READ, and
-CLOSE operations. To interrupt the operation call the function
-wolfSSH_SFTP_Interrupt. (See the API documentation of this function for more
-information on what it does)
-
-**Return Values:**
-
-**WS_SUCCESS** : on success.
-All other return values should be considered error cases.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**from** - file name to get
-**to** - file name to place result at
-**resume** - flag to try resume of operation. 1 for yes 0 for no
-**statusCb** - callback function to get status
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-```
-```
-int wolfSSH_SFTP_Get(WOLFSSH* ssh , char* from , char* to ,
-byte resume ,
-WS_STATUS_CB* statusCb );
+
+int wolfSSH_SFTP_Get(WOLFSSH* ssh, char* from, char* to,
+        byte resume, WS_STATUS_CB* statusCb);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_accept()
-wolfSSH_SFTP_connect()
+Downloads a file from the peer to a local path. This is a high-level helper that performs the LSTAT, OPEN, READ, and CLOSE operations. A transfer in progress can be interrupted with wolfSSH_SFTP_Interrupt().
 
-```
-static void myStatusCb(WOLFSSH* sshIn, long bytes, char*
-name)
-{
-char buf[80];
-WSNPRINTF(buf, sizeof(buf), "Processed %8ld\t bytes
-\r", bytes);
-WFPUTS(buf, fout);
-(void)name;
-(void)sshIn;
-}
-...
-WOLFSSH* ssh;
-char* from[NAME_SZ];
-char* to[NAME_SZ];
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-if (wolfSSH_SFTP_Get( ssh , from , to , 0 , & myStatusCb ) !=
-WS_SUCCESS) {
-//handle error case
-}
-```
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `from` - the remote file name to get
+- `to` - the local path to write the file to
+- `resume` - non-zero to resume a previously interrupted transfer, 0 otherwise
+- `statusCb` - callback invoked with transfer progress, or `NULL`
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_Put()`
+- `wolfSSH_SFTP_Interrupt()`
 
 ### wolfSSH_SFTP_Put()
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Function for performing put operation which pushes a file local file to a peers directory.
-This is a high level function that performs OPEN, WRITE, and CLOSE operations.
-To interrupt the operation call the function wolfSSH_SFTP_Interrupt.
-(See the API documentation of this function for more information on what it does)
-
-**Return Values:**
-
-**WS_SUCCESS** on success.
-All other return values should be considered error cases.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-**from** - file name to push
-**to** - file name to place result at
-**resume** - flag to try resume of operation. 1 for yes 0 for no
-**statusCb** - callback function to get status
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_Put(WOLFSSH* ssh , char* from , char* to ,
-byte resume , WS_STATUS_CB* statusCb );
+
+int wolfSSH_SFTP_Put(WOLFSSH* ssh, char* from, char* to,
+        byte resume, WS_STATUS_CB* statusCb);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_accept()
-wolfSSH_SFTP_connect()
+Uploads a local file to the peer. This is a high-level helper that performs the OPEN, WRITE, and CLOSE operations. A transfer in progress can be interrupted with wolfSSH_SFTP_Interrupt().
 
-```
-static void myStatusCb(WOLFSSH* sshIn, long bytes, char*
-name)
-{
-char buf[80];
-WSNPRINTF(buf, sizeof(buf), "Processed %8ld\t bytes
-\r", bytes);
-WFPUTS(buf, fout);
-(void)name;
-(void)sshIn;
-}
-...
-```
-```
-WOLFSSH* ssh;
-char* from[NAME_SZ];
-char* to[NAME_SZ];
-```
-```
-//set up ssh and do sftp connections
-...
-```
-```
-if (wolfSSH_SFTP_Put(ssh, from, to, 0, &myStatusCb) !=
-WS_SUCCESS) {
-//handle error case
-}
-```
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `from` - the local file name to push
+- `to` - the remote path to write the file to
+- `resume` - non-zero to resume a previously interrupted transfer, 0 otherwise
+- `statusCb` - callback invoked with transfer progress, or `NULL`
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_Get()`
+- `wolfSSH_SFTP_Interrupt()`
 
 ##  SFTP Server Functions
 
@@ -1192,42 +775,52 @@ WS_SUCCESS) {
 
 
 
-**Synopsis:**
-
-**Description:**
-
-Main SFTP server function that handles incoming packets. This function tries to read
-from the I/O buffer and calls internal functions to depending on the SFTP packet type
-received.
-
-**Return Values:**
-
-**WS_SUCCESS:** on success.
-
-**Parameters:**
-
-**ssh** - pointer to WOLFSSH structure used for connection
-
-**Example:**
-
-```
+```c
 #include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_read(WOLFSSH* ssh );
+
+int wolfSSH_SFTP_read(WOLFSSH* ssh);
 ```
 
-**See Also:**
+**Description**
 
-wolfSSH_SFTP_accept()
-wolfSSH_SFTP_connect()
+The main server-side SFTP entry point. Reads from the I/O buffer and dispatches to the appropriate internal handler based on the SFTP packet type received. Call this from the server loop to service SFTP requests.
 
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+
+**Return Values**
+
+- `WS_SUCCESS`
+- a negative error code on failure
+
+**See Also**
+
+- `wolfSSH_SFTP_accept()`
+- `wolfSSH_SFTP_PendingSend()`
+
+### wolfSSH_SFTP_PendingSend()
+
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_PendingSend(WOLFSSH* ssh);
 ```
-WOLFSSH* ssh;
-```
-```
-//set up ssh and do sftp connections
-...
-if (wolfSSH_SFTP_read(ssh) != WS_SUCCESS) {
-//handle error case
-}
-```
+
+**Description**
+
+Reports whether the SFTP layer has buffered outbound data still waiting to be sent. This is useful when driving non-blocking I/O to know that another send attempt is needed.
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+
+**Return Values**
+
+- non-zero if there is pending data to send
+- 0 if there is no pending data
+
+**See Also**
+
+- `wolfSSH_SFTP_read()`
 
