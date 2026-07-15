@@ -1,4 +1,4 @@
-#  wolfSSL SFTP API リファレンス
+# wolfSSH SFTP API リファレンス
 
 ##  接続機能
 
