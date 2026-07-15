@@ -17,5 +17,11 @@ header-includes:
     - \let\verbatim\undefined
     - \let\verbatimend\undefined
     - \lstnewenvironment{verbatim}{\lstset{breaklines,basicstyle=\ttfamily}}{}
+    # Widen TOC number columns so deep chapter.section.subsection numbers
+    # (e.g. 13.15.6 in the API Reference chapter) don't overlap the title text
+    - \usepackage{tocloft}
+    - \setlength{\cftsecnumwidth}{5.0em}
+    - \setlength{\cftsubsecnumwidth}{5.0em}
+    - \setlength{\cftsubsubsecnumwidth}{5.0em}
 subparagraph: yes
 ---
