@@ -207,15 +207,6 @@ builds. After building, it can also be run directly from the wolfProvider root:
 ./examples/pqc_openssl_example
 ```
 
-The companion
-[`examples/openssl_example.c`](https://github.com/wolfSSL/wolfProvider/blob/master/examples/openssl_example.c)
-shows basic provider loading, build information, and self-test handling.
-
-ML-DSA supports pure ML-DSA and HashML-DSA through OpenSSL's digest-sign
-interface. SLH-DSA is a pure signature algorithm and does not accept a
-separate digest name. Its streaming interface buffers the complete message
-and limits it to 64 MiB.
-
 ### Build Macros
 
 The configure options add the corresponding request macros:
@@ -289,6 +280,24 @@ eligible stable release. OSP tests run in replace-default and non-replace
 modes, with normal and forced-failure cases. PQC KAT and version coverage runs
 for pull requests, while the longer OSP integration workflows are
 label-selected and run nightly.
+
+## Further Reading
+
+For the current deployment model and complete build guidance, see the
+[wolfProvider README](https://github.com/wolfSSL/wolfProvider/blob/master/README.md)
+and the [wolfProvider Integration Guide](https://github.com/wolfSSL/wolfProvider/blob/master/docs/INTEGRATION_GUIDE.md).
+The integration guide covers replace-default builds, provider configuration,
+testing, and troubleshooting. For validated deployments, use the
+[FIPS Integration Guide](https://github.com/wolfSSL/wolfProvider/blob/master/docs/FIPS_INTEGRATION_GUIDE.md),
+which explains the replace-default requirements and security-policy considerations.
+
+The repository's
+[replace-default build workflow](https://github.com/wolfSSL/wolfProvider/blob/master/scripts/build-wolfprovider.sh),
+[provider configuration](https://github.com/wolfSSL/wolfProvider/blob/master/provider.conf),
+[PQC EVP example](https://github.com/wolfSSL/wolfProvider/blob/master/examples/pqc_openssl_example.c),
+and [PQC KAT runner](https://github.com/wolfSSL/wolfProvider/blob/master/scripts/test-pqc-kat.sh)
+are maintained alongside the implementation and provide the most current
+examples of supported options and validation.
 
 ## Build Defines
 
