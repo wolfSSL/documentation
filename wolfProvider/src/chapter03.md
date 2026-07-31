@@ -212,10 +212,11 @@ By default, wolfProvider only builds a shared library, with building of a static
 | --enable-usersettings | **Disabled** | Use your own user_settings.h and do not add Makefile CFLAGS |
 | --enable-dynamic | **Enabled** | Enable loading wolfProvider as a dynamic provider |
 | --enable-singlethreaded | **Disabled** | Enable wolfProvider single threaded |
-| --enable-pqc | **Disabled** | Enable all post-quantum algorithms: ML-KEM, ML-DSA and SLH-DSA |
+| --enable-pqc | **Disabled** | Enable ML-KEM and ML-DSA (FIPS 203/204) |
 | --enable-mlkem | **Disabled** | Enable ML-KEM (FIPS 203) only |
 | --enable-mldsa | **Disabled** | Enable ML-DSA (FIPS 204) only |
 | --enable-slhdsa | **Disabled** | Enable SLH-DSA (FIPS 205) only |
+| --enable-lms | **Disabled** | Enable LMS verification only (requires OpenSSL 3.6+) |
 | | | |
 | --with-openssl=DIR |   | OpenSSL installation location to link against. If not set, use the system default library and include paths. |
 | --with-wolfssl=DIR |   | wolfSSL installation location to link against. If not set, use the system default library and include paths. |
@@ -243,12 +244,15 @@ system OpenSSL is older than OpenSSL 3.6.
 | ML-DSA | FIPS 204 | ML-DSA-44, ML-DSA-65, ML-DSA-87 |
 | SLH-DSA with SHA-2 | FIPS 205 | SLH-DSA-SHA2-128s, SLH-DSA-SHA2-128f, SLH-DSA-SHA2-192s, SLH-DSA-SHA2-192f, SLH-DSA-SHA2-256s, SLH-DSA-SHA2-256f |
 | SLH-DSA with SHAKE | FIPS 205 | SLH-DSA-SHAKE-128s, SLH-DSA-SHAKE-128f, SLH-DSA-SHAKE-192s, SLH-DSA-SHAKE-192f, SLH-DSA-SHAKE-256s, SLH-DSA-SHAKE-256f |
+| LMS | RFC 8554 / NIST SP 800-208 | LMS and LMOTS public-key verification |
 
 ML-KEM supports key generation, encapsulation, decapsulation, raw key
 import/export, and public/private key encoding. ML-DSA supports key generation,
 pure and pre-hash signing, verification, context strings, and key encoding.
 SLH-DSA supports key generation, pure signing, verification, context strings,
-and key encoding.
+and key encoding. LMS supports public-key import and one-shot signature
+verification; private-key import, signing, and key generation are not exposed
+because OpenSSL 3.6 provides LMS as a verification-only interface.
 
 ### Provider Architecture
 
@@ -264,6 +268,7 @@ wolfCrypt APIs and keeps the wolfCrypt key object inside the OpenSSL
 | ML-KEM | `EVP_PKEY`, `EVP_PKEY_CTX`, KEM | Key generation, encapsulation, decapsulation, key import/export |
 | ML-DSA | `EVP_PKEY`, `EVP_MD_CTX`, signature | Key generation, pure and pre-hash sign/verify, key import/export |
 | SLH-DSA | `EVP_PKEY`, `EVP_MD_CTX`, signature | Key generation, pure sign/verify, key import/export |
+| LMS | `EVP_PKEY`, `EVP_MD_CTX`, signature | Public-key import/export and one-shot verification |
 
 Keys support raw public and private key parameters as well as DER and PEM
 encoding. Public keys use SubjectPublicKeyInfo and private keys use PKCS#8.
@@ -427,11 +432,12 @@ The configure options add the corresponding request macros:
 | `--enable-mlkem` | `WOLFPROV_HAVE_MLKEM` | `WOLFSSL_HAVE_MLKEM` |
 | `--enable-mldsa` | `WOLFPROV_HAVE_MLDSA` | `WOLFSSL_HAVE_MLDSA` |
 | `--enable-slhdsa` | `WOLFPROV_HAVE_SLHDSA` | `WOLFSSL_HAVE_SLHDSA` |
+| `--enable-lms` | `WOLFPROV_HAVE_LMS` | `WOLFSSL_HAVE_LMS` |
 
-`--enable-pqc` enables all three request macros. After configuration validates
-the wolfSSL capabilities, wolfProvider uses `WP_HAVE_MLKEM`,
-`WP_HAVE_MLDSA`, and `WP_HAVE_SLHDSA` internally to compile and register the
-available implementations.
+`--enable-pqc` enables ML-KEM and ML-DSA. SLH-DSA and LMS are enabled separately
+with `--enable-slhdsa` and `--enable-lms`. After configuration validates the wolfSSL capabilities,
+wolfProvider uses `WP_HAVE_MLKEM`, `WP_HAVE_MLDSA`, `WP_HAVE_SLHDSA`, and
+`WP_HAVE_LMS` internally to compile and register the available implementations.
 
 ### TLS 1.3
 
@@ -453,7 +459,8 @@ signature scheme.
 The wolfCrypt Post Quantum v7.0.0 implementation has NIST CAVP algorithm
 validation under
 [certificate A8437](https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/details?validation=41047).
-The certificate covers ML-KEM key generation, encapsulation, and
+The certificate covers LMS signature verification; ML-KEM key generation,
+encapsulation, and
 decapsulation; ML-DSA key generation, signature generation, and signature
 verification; and SLH-DSA key generation, signature generation, and signature
 verification. It also covers the prerequisite SHA, SHAKE, HMAC, and DRBG
@@ -474,8 +481,8 @@ PQC has several independent test layers:
 - Unit and example tests cover key generation, import/export, encoding,
   encapsulation, decapsulation, signing, verification, malformed inputs, and
   X.509 operations where applicable.
-- OpenSSL EVP known-answer tests run the ML-KEM, ML-DSA, and SLH-DSA vector
-  files against wolfProvider.
+- OpenSSL EVP known-answer tests run the ML-KEM, ML-DSA, SLH-DSA, and LMS vector
+  files against wolfProvider. The LMS vector contains 320 verification cases.
 - The PQC interoperability test compares wolfProvider with OpenSSL's default
   provider and the direct wolfSSL APIs. It also tests ML-KEM and hybrid TLS
   groups plus ML-DSA certificate authentication.
