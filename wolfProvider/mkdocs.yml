@@ -14,6 +14,7 @@ nav:
     - "8. wolfProvider Design": chapter08.md
     - "9. Notes on Open Source Integration": chapter09.md
     - "10. Support and OpenSSL Version Adding": chapter10.md
+    - "11. Post-Quantum Cryptography": chapter11.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
