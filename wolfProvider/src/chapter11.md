@@ -174,18 +174,30 @@ every operation is handled by wolfProvider: OpenSSL can select its default
 provider when wolfProvider does not implement an operation or when the
 configuration is not applied.
 
-Set the provider module and configuration paths for this optional mode:
+Use the repository's provider configuration to load wolfProvider. The
+configuration activates `libwolfprov`; point `OPENSSL_CONF` at that file:
 
 ```sh
-export OPENSSL_MODULES=/path/to/wolfprovider/lib
 export OPENSSL_CONF=/path/to/wolfProvider/provider.conf
 ```
 
-Confirm that the expected algorithms are provided by `libwolfprov`:
+If wolfProvider was installed outside OpenSSL's module search path, also set
+`OPENSSL_MODULES` to the directory containing `libwolfprov.so`:
 
 ```sh
-openssl list -kem-algorithms -provider libwolfprov
-openssl list -signature-algorithms -provider libwolfprov
+export OPENSSL_MODULES=/path/to/wolfprovider/lib
+```
+
+Run commands with the configuration active. This verifies the algorithms
+advertised by the configured provider; it does not guarantee that unrelated
+operations cannot be selected from OpenSSL's default provider in standard
+provider mode:
+
+```sh
+OPENSSL_CONF=/path/to/wolfProvider/provider.conf \
+    openssl list -kem-algorithms
+OPENSSL_CONF=/path/to/wolfProvider/provider.conf \
+    openssl list -signature-algorithms
 ```
 
 ### OpenSSL EVP Example
