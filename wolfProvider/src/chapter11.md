@@ -1,6 +1,5 @@
 # Post-Quantum Cryptography
 
-
 ## Post-Quantum Cryptography
 
 wolfProvider supports the NIST post-quantum standards through the OpenSSL 3
@@ -143,12 +142,12 @@ then configure wolfProvider:
 
 ```sh
 # Add the required options to the normal wolfSSL configuration.
-./configure --enable-mlkem --enable-mldsa --enable-slhdsa
+./configure --enable-mlkem --enable-mldsa --enable-slhdsa --enable-lms
 make
 sudo make install
 
 # Configure wolfProvider against OpenSSL 3.6 or later.
-./configure --enable-pqc \
+./configure --enable-pqc --enable-slhdsa --enable-lms \
     --with-openssl=/path/to/openssl \
     --with-wolfssl=/path/to/wolfssl
 make
@@ -158,10 +157,24 @@ sudo make install
 PQC code is not compiled unless `--enable-pqc` or an individual PQC option is
 passed to wolfProvider, even when wolfSSL has the algorithms enabled.
 
-### Loading the Provider
+### Using wolfProvider
 
-Set the provider module and configuration paths to the wolfProvider
-installation:
+For production deployments, the recommended configuration is replace-default
+mode. It makes wolfProvider the OpenSSL default and prevents operations from
+silently falling back to OpenSSL's built-in provider:
+
+```sh
+./scripts/build-wolfprovider.sh --replace-default \
+    --enable-pqc --enable-slhdsa --enable-lms
+```
+
+Applications may also load wolfProvider as a normal provider. This mode is
+useful for interoperability and migration, but it does not guarantee that
+every operation is handled by wolfProvider: OpenSSL can select its default
+provider when wolfProvider does not implement an operation or when the
+configuration is not applied.
+
+Set the provider module and configuration paths for this optional mode:
 
 ```sh
 export OPENSSL_MODULES=/path/to/wolfprovider/lib
