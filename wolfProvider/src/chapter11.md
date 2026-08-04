@@ -1,12 +1,10 @@
 # Post-Quantum Cryptography
 
-## Post-Quantum Cryptography
-
 wolfProvider supports the NIST post-quantum standards through the OpenSSL 3
 EVP interface. PQC support is opt-in so applications that do not need these
 algorithms are unaffected.
 
-### Requirements
+## Requirements
 
 - wolfSSL v5.9.2-stable or later
 - OpenSSL 3.6 or later
@@ -15,7 +13,7 @@ algorithms are unaffected.
 The packaged Debian build is not currently available with PQC because its
 system OpenSSL is older than OpenSSL 3.6.
 
-### Supported Algorithms
+## Supported Algorithms
 
 | Algorithm | Standard | Supported Parameter Sets |
 | :-------- | :------- | :----------------------- |
@@ -31,9 +29,11 @@ pure and pre-hash signing, verification, context strings, and key encoding.
 SLH-DSA supports key generation, pure signing, verification, context strings,
 and key encoding. LMS supports public-key import and one-shot signature
 verification; private-key import, signing, and key generation are not exposed
-because OpenSSL 3.6 provides LMS as a verification-only interface.
+because OpenSSL 3.6 provides LMS as a verification-only interface. This also
+avoids exposing stateful private-key operations through an interface that
+cannot enforce LMS leaf-use state.
 
-### Provider Architecture
+## Provider Architecture
 
 Applications use the standard OpenSSL 3 EVP interfaces. wolfProvider registers
 OpenSSL key management implementations for each parameter set, a KEM
@@ -49,13 +49,20 @@ wolfCrypt APIs and keeps the wolfCrypt key object inside the OpenSSL
 | SLH-DSA | `EVP_PKEY`, `EVP_MD_CTX`, signature | Key generation, pure sign/verify, key import/export |
 | LMS | `EVP_PKEY`, `EVP_MD_CTX`, signature | Public-key import/export and one-shot verification |
 
-Keys support raw public and private key parameters as well as DER and PEM
-encoding. Public keys use SubjectPublicKeyInfo and private keys use PKCS#8.
-Encrypted PKCS#8 private key output is also supported. The signature
-implementations expose the algorithm identifiers needed for X.509 certificate
-and request operations.
+ML-KEM, ML-DSA, and SLH-DSA keys support raw public and private key parameters
+as well as DER and PEM encoding. Public keys use SubjectPublicKeyInfo and
+private keys use PKCS#8. Encrypted PKCS#8 private key output is also supported.
+The signature implementations expose the algorithm identifiers needed for
+X.509 certificate and request operations. LMS instead uses OpenSSL's raw XDR
+public-key representation and exposes no private key.
 
-### Sizes and Security Categories
+OpenSSL's LMS provider contract represents one LMS tree rather than a general
+multi-level HSS hierarchy. Its raw public keys and signatures omit the
+four-byte HSS level-count field. wolfProvider adds the required single-level
+HSS wrapper only when calling wolfCrypt and removes it again at the OpenSSL
+boundary, preserving OpenSSL-compatible bytes for applications.
+
+## Sizes and Security Categories
 
 ML-KEM always produces a 32-byte shared secret:
 
@@ -86,7 +93,7 @@ faster signing:
 | 256s | 5 | 64 bytes | 128 bytes | 29,792 bytes |
 | 256f | 5 | 64 bytes | 128 bytes | 49,856 bytes |
 
-### Signing and Generation Parameters
+## Signing and Generation Parameters
 
 ML-DSA and SLH-DSA accept the OpenSSL signature context-string parameter, with
 the FIPS 204 and FIPS 205 maximum of 255 bytes. Both support deterministic and
@@ -103,14 +110,15 @@ applications. wolfProvider incrementally hashes HashML-DSA input. Pure ML-DSA
 and SLH-DSA require the complete message; SLH-DSA therefore buffers streaming
 input and enforces a 64 MiB message limit.
 
-### Platform Optimizations
+## Platform Optimizations
 
 wolfProvider calls the native wolfCrypt implementations, so it benefits from
 the optimized code selected by the wolfSSL build without requiring a separate
 provider-specific acceleration layer. Available wolfCrypt PQC speedups include
 x86-64 vectorized implementations and assembly paths for ARM32, AArch64,
-ARMv7-M, and ARMv7E-M. Optimized SHA-3 and SHAKE operations also accelerate
-the Keccak work used by ML-KEM and ML-DSA.
+ARMv7-M, and ARMv7E-M. Optimized SHA-2, SHA-3, and SHAKE operations also
+accelerate the hash work used by ML-KEM, ML-DSA, SLH-DSA, and the configured
+LMS parameter families.
 
 The exact path is compiler, processor, and wolfSSL configuration dependent.
 Applications should use the wolfCrypt benchmark on the target system to
@@ -120,7 +128,7 @@ sets. See the wolfSSL
 and [ML-KEM acceleration overview](https://www.wolfssl.com/accelerated-kyber-ml-kem/)
 for configuration and benchmark details.
 
-### Building
+## Building
 
 The build script can configure OpenSSL, wolfSSL, and wolfProvider together:
 
@@ -128,13 +136,14 @@ The build script can configure OpenSSL, wolfSSL, and wolfProvider together:
 ./scripts/build-wolfprovider.sh --enable-pqc
 ```
 
-`--enable-pqc` enables all three algorithm families. Each family can also be
-selected independently:
+`--enable-pqc` enables ML-KEM and ML-DSA. SLH-DSA and LMS remain independent
+options, and each family can be selected separately:
 
 ```sh
 ./scripts/build-wolfprovider.sh --enable-mlkem
 ./scripts/build-wolfprovider.sh --enable-mldsa
 ./scripts/build-wolfprovider.sh --enable-slhdsa
+./scripts/build-wolfprovider.sh --enable-lms
 ```
 
 For a manual build, configure wolfSSL with the matching algorithm options,
@@ -157,7 +166,7 @@ sudo make install
 PQC code is not compiled unless `--enable-pqc` or an individual PQC option is
 passed to wolfProvider, even when wolfSSL has the algorithms enabled.
 
-### Using wolfProvider
+## Using wolfProvider
 
 For production deployments, the recommended configuration is replace-default
 mode. It makes wolfProvider the OpenSSL default and prevents operations from
@@ -200,11 +209,12 @@ OPENSSL_CONF=/path/to/wolfProvider/provider.conf \
     openssl list -signature-algorithms
 ```
 
-### OpenSSL EVP Example
+## OpenSSL EVP Example
 
 The maintained
 [`examples/pqc_openssl_example.c`](https://github.com/wolfSSL/wolfProvider/blob/master/examples/pqc_openssl_example.c)
-program demonstrates all three algorithm families through the OpenSSL EVP API:
+program demonstrates the three NIST FIPS 203 through FIPS 205 algorithm
+families through the OpenSSL EVP API:
 
 - ML-KEM-768 key generation, encapsulation, and decapsulation
 - ML-DSA-65 key generation, signing, and verification
@@ -219,7 +229,12 @@ builds. After building, it can also be run directly from the wolfProvider root:
 ./examples/pqc_openssl_example
 ```
 
-### Build Macros
+LMS is not part of this example because OpenSSL exposes only verification and
+a useful example would require a fixed public key and signature. The
+repository instead validates LMS with OpenSSL's 320 fixed verification vectors
+and focused provider unit tests.
+
+## Build Macros
 
 The configure options add the corresponding request macros:
 
@@ -235,7 +250,7 @@ with `--enable-slhdsa` and `--enable-lms`. After configuration validates the wol
 wolfProvider uses `WP_HAVE_MLKEM`, `WP_HAVE_MLDSA`, `WP_HAVE_SLHDSA`, and
 `WP_HAVE_LMS` internally to compile and register the available implementations.
 
-### TLS 1.3
+## TLS 1.3
 
 wolfProvider advertises these ML-KEM TLS groups:
 
@@ -250,7 +265,7 @@ It also advertises the `mldsa44`, `mldsa65`, and `mldsa87` TLS 1.3 signature
 schemes. SLH-DSA is supported through EVP but is not advertised as a TLS
 signature scheme.
 
-### Validation
+## Validation
 
 The wolfCrypt Post Quantum v7.0.0 implementation has NIST CAVP algorithm
 validation under
@@ -276,7 +291,9 @@ PQC has several independent test layers:
 
 - Unit and example tests cover key generation, import/export, encoding,
   encapsulation, decapsulation, signing, verification, malformed inputs, and
-  X.509 operations where applicable.
+  X.509 operations where applicable. LMS unit tests specifically cover raw
+  public-key import/export, XDR decoding, selection handling, malformed input,
+  and rejection of unsupported stateful operations.
 - OpenSSL EVP known-answer tests run the ML-KEM, ML-DSA, SLH-DSA, and LMS vector
   files against wolfProvider. The LMS vector contains 320 verification cases.
 - The PQC interoperability test compares wolfProvider with OpenSSL's default
@@ -291,7 +308,8 @@ The version, nginx, and libacvp matrices cover wolfSSL master and the latest
 eligible stable release. OSP tests run in replace-default and non-replace
 modes, with normal and forced-failure cases. PQC KAT and version coverage runs
 for pull requests, while the longer OSP integration workflows are
-label-selected and run nightly.
+label-selected and run nightly. The KAT matrix also includes an LMS-only row
+in addition to the combined PQC configurations.
 
 ## Further Reading
 
@@ -351,6 +369,7 @@ wolfProvider exposes several preprocessor defines that allow users to configure 
 | WP_HAVE_MD5_SHA1 | MD5+SHA1 combination support |
 | WP_HAVE_MLDSA | ML-DSA (FIPS 204) post-quantum signature support |
 | WP_HAVE_MLKEM | ML-KEM (FIPS 203) post-quantum key encapsulation support |
+| WP_HAVE_LMS | LMS (RFC 8554 / SP 800-208) verification support |
 | WP_HAVE_PBE | Password-Based Encryption support |
 | WP_HAVE_RANDOM | Random number generation support |
 | WP_HAVE_RSA | RSA encryption and signature support |
