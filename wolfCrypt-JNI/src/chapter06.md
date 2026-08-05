@@ -79,6 +79,39 @@ wolfJCE currently supports the following algorithms and classes:
         SHA3-256withECDSAinP1363Format
         SHA3-384withECDSAinP1363Format
         SHA3-512withECDSAinP1363Format
+        ML-DSA (any ML-DSA-44/65/87 key)
+        ML-DSA-44
+        ML-DSA-65
+        ML-DSA-87
+        XMSS (verify-only)
+        XMSSMT (verify-only)
+        LMS (aliased also as: HSS/LMS, verify-only)
+        SLH-DSA (any SLH-DSA parameter set key)
+        SLH-DSA-SHA2-128s
+        SLH-DSA-SHA2-128f
+        SLH-DSA-SHA2-192s
+        SLH-DSA-SHA2-192f
+        SLH-DSA-SHA2-256s
+        SLH-DSA-SHA2-256f
+        SLH-DSA-SHAKE-128s
+        SLH-DSA-SHAKE-128f
+        SLH-DSA-SHAKE-192s
+        SLH-DSA-SHAKE-192f
+        SLH-DSA-SHAKE-256s
+        SLH-DSA-SHAKE-256f
+        HASH-SLH-DSA (pre-hash, any SLH-DSA parameter set key)
+        SLH-DSA-SHA2-128s-WITH-SHA256
+        SLH-DSA-SHA2-128f-WITH-SHA256
+        SLH-DSA-SHA2-192s-WITH-SHA512
+        SLH-DSA-SHA2-192f-WITH-SHA512
+        SLH-DSA-SHA2-256s-WITH-SHA512
+        SLH-DSA-SHA2-256f-WITH-SHA512
+        SLH-DSA-SHAKE-128s-WITH-SHAKE128
+        SLH-DSA-SHAKE-128f-WITH-SHAKE128
+        SLH-DSA-SHAKE-192s-WITH-SHAKE256
+        SLH-DSA-SHAKE-192f-WITH-SHAKE256
+        SLH-DSA-SHAKE-256s-WITH-SHAKE256
+        SLH-DSA-SHAKE-256f-WITH-SHAKE256
 
     KeyAgreement Class
         DiffieHellman
@@ -102,14 +135,65 @@ wolfJCE currently supports the following algorithms and classes:
         RSASSA-PSS
         EC
         DH (aliased also as: DiffieHellman)
+        ML-DSA (defaults to ML-DSA-65, level overridable via init())
+        ML-DSA-44
+        ML-DSA-65
+        ML-DSA-87
+        SLH-DSA (defaults to SLH-DSA-SHA2-128f, set overridable via init())
+        SLH-DSA-SHA2-128s
+        SLH-DSA-SHA2-128f
+        SLH-DSA-SHA2-192s
+        SLH-DSA-SHA2-192f
+        SLH-DSA-SHA2-256s
+        SLH-DSA-SHA2-256f
+        SLH-DSA-SHAKE-128s
+        SLH-DSA-SHAKE-128f
+        SLH-DSA-SHAKE-192s
+        SLH-DSA-SHAKE-192f
+        SLH-DSA-SHAKE-256s
+        SLH-DSA-SHAKE-256f
+        ML-KEM (defaults to ML-KEM-768, level overridable via init())
+        ML-KEM-512
+        ML-KEM-768
+        ML-KEM-1024
 
     KeyFactory Class
         RSA
         EC
         DH (aliased also as: DiffieHellman)
+        ML-DSA
+        ML-DSA-44
+        ML-DSA-65
+        ML-DSA-87
+        SLH-DSA
+        SLH-DSA-SHA2-128s
+        SLH-DSA-SHA2-128f
+        SLH-DSA-SHA2-192s
+        SLH-DSA-SHA2-192f
+        SLH-DSA-SHA2-256s
+        SLH-DSA-SHA2-256f
+        SLH-DSA-SHAKE-128s
+        SLH-DSA-SHAKE-128f
+        SLH-DSA-SHAKE-192s
+        SLH-DSA-SHAKE-192f
+        SLH-DSA-SHAKE-256s
+        SLH-DSA-SHAKE-256f
+        ML-KEM
+        ML-KEM-512
+        ML-KEM-768
+        ML-KEM-1024
+        XMSS (verify-only)
+        XMSSMT (verify-only)
+        LMS (aliased also as: HSS/LMS)
+
+    KEM Class (javax.crypto.KEM, requires JDK 21 or later)
+        ML-KEM
+        ML-KEM-512
+        ML-KEM-768
+        ML-KEM-1024
 
     CertPathValidator Class
-        PKIX
+        PKIX (with PKIXRevocationChecker via getRevocationChecker())
 
     CertPathBuilder Class
         PKIX
@@ -124,6 +208,8 @@ wolfJCE currently supports the following algorithms and classes:
         PBKDF2WithHmacSHA3-256
         PBKDF2WithHmacSHA3-384
         PBKDF2WithHmacSHA3-512
+        AES
+        DESede
 
     KeyStore Class
         WKS
@@ -136,4 +222,55 @@ wolfJCE currently supports the following algorithms and classes:
 
     AlgorithmParameterGenerator Class
         DH (aliased also as: DiffieHellman)
+
+In addition to the algorithm names above, many services are also registered
+under their standard OID aliases (for example, `Cipher` AES OIDs,
+`MessageDigest` SHA-2 OIDs, `Mac` HMAC OIDs, and the ML-DSA, SLH-DSA, ML-KEM,
+XMSS, and LMS object identifiers), allowing lookup by OID string. A complete
+list of aliases can be found in the wolfcrypt-jni `README_JCE.md` file.
+
+The RSA `Cipher` implementations also support `Cipher.WRAP_MODE` and
+`Cipher.UNWRAP_MODE` for RSA-based key wrapping and unwrapping.
+
+## Native wolfSSL Feature Requirements
+
+The ML-KEM, ML-DSA, SLH-DSA, XMSS/XMSS^MT, and LMS/HSS services require the
+matching algorithm support to be compiled into the native wolfSSL library.
+If native support is missing, wolfJCE will still compile and run normally,
+but the corresponding services will not be registered. See
+[Chapter 2](chapter02.md#native-feature-requirements-for-post-quantum-and-hash-based-algorithms)
+for the native wolfSSL configure options required for each algorithm.
+
+## ML-KEM (FIPS 203) Notes
+
+wolfJCE supports ML-KEM, the Module-Lattice-Based Key Encapsulation Mechanism
+from FIPS 203 (formerly Kyber). The `KeyPairGenerator`, `KeyFactory`, and key
+classes work on Java 8 and later. The `KEM` service (`javax.crypto.KEM`)
+requires JDK 21 or later - on earlier JDKs the KEM service is not registered,
+but key generation and key encoding are still available.
+
+To select a parameter set, either use the parameter-set-specific names
+directly (ex: `KeyPairGenerator.getInstance("ML-KEM-768", "wolfJCE")`), or use
+the family name `ML-KEM` (defaults to ML-KEM-768) and initialize with a
+parameter spec. On JDK 11+ use `java.security.spec.NamedParameterSpec.ML_KEM_768`,
+and on Java 8 use `com.wolfssl.provider.jce.WolfPQCParameterSpec.ML_KEM_768`.
+As with the JDK reference implementation, ML-KEM does not accept an integer
+key size via `initialize(int)`.
+
+Generated keys report `getAlgorithm()` of `ML-KEM` (matching the JDK
+reference implementation) regardless of parameter set. Public keys use X.509
+SubjectPublicKeyInfo encoding and private keys use PKCS#8, per RFC 9935. On
+input, wolfJCE accepts all three RFC 9935 private key CHOICE forms (`seed`,
+`expandedKey`, and `both`). On output, the form is controlled by the
+`jdk.mlkem.pkcs8.encoding` property (the same property the JDK reference
+implementation uses), defaulting to `expandedKey`, which is importable by the
+widest range of providers.
+
+## Example Applications
+
+The `examples/provider` directory in the wolfcrypt-jni package contains
+example applications demonstrating several of the algorithm classes above,
+including `MlKemExample.java` (ML-KEM encapsulation/decapsulation and key
+encoding), `MlDsaExample.java`, `SlhDsaExample.java`, `XmssExample.java`,
+and `CertPathBuilderExample.java`.
 

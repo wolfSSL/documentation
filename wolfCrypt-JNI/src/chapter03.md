@@ -2,7 +2,7 @@
 
 Before following steps in this section, please ensure that the dependencies in [Chapter 2](chapter02.md#requirements) above are installed.
 
-Before running `make`, copy the correct “makefile” for your system, depending if you are on Linux/Unix or MacOS. For example, if you were on Linux:
+Before running `make`, copy the correct “makefile” for your system, depending if you are on Linux/Unix or macOS. For example, if you were on Linux:
 
 ```
 $ cd wolfcrypt-jni
@@ -87,15 +87,51 @@ To install the JAR into the local Maven repository:
 $ mvn install
 ```
 
-After installation, the package can be included as a dependency in other Maven projects:
+After installation, the package can be included as a dependency in other Maven
+projects, where the version number will change depending on the current release:
 
 ```
 <dependency>
     <groupId>com.wolfssl</groupId>
     <artifactId>wolfcrypt-jni</artifactId>
-    <version>1.9.0-SNAPSHOT</version>
+    <version>1.10.0-SNAPSHOT</version>
 </dependency>
 ```
+
+## Java 9+ Module Support (JPMS)
+
+wolfCrypt JNI/JCE supports the Java Platform Module System (JPMS) introduced
+in Java 9. This enables use with `jlink` for creating custom, minimal Java
+runtimes.
+
+**Module Information:**
+
+- Module name: `com.wolfssl.wolfcrypt`
+- Exported packages: `com.wolfssl.wolfcrypt`, `com.wolfssl.provider.jce`
+- Service provider: `java.security.Provider` (WolfCryptProvider)
+
+The `module-info.java` (located under `src/java9`) is conditionally compiled
+based on the JDK version used to build. When building with Java 9 or later,
+a modular JAR is produced that includes `module-info.class`. When building
+with Java 8, `module-info.java` is automatically excluded from compilation
+and the resulting JAR works as a standard classpath JAR.
+
+When built with Java 9+, the wolfCrypt JNI/JCE JAR can be used with `jlink`
+to create a custom Java runtime that includes the wolfCrypt module:
+
+```
+$ jlink \
+    --module-path lib/wolfcrypt-jni.jar:$JAVA_HOME/jmods \
+    --add-modules com.wolfssl.wolfcrypt \
+    --output custom-runtime \
+    --no-header-files \
+    --no-man-pages
+
+$ ./custom-runtime/bin/java --list-modules
+```
+
+Note that the native wolfCrypt JNI shared library (`libwolfcryptjni.so/dylib`)
+must still be available on the native library search path at runtime.
 
 ## API Javadocs
 
