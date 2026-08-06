@@ -1,102 +1,81 @@
-#  wolfSSHのビルド
+#  wolfSSH のビルド
 
-wolfSSHはポータビリティを念頭において開発されているので多くのシステム上に移植するのは容易にできるはずです。ですが、もし移植上で問題がありましたら https://www.wolfssl.com/forums を参照されるか support@wolfssl.com へ質問をお寄せください。
+wolfSSH はポータビリティを念頭において開発されているので、多くのシステム上で概ね容易にビルドできるはずです。もしビルドで問題がありましたら、遠慮なくサポートフォーラム https://www.wolfssl.com/forums を通じてサポートをお求めいただくか、support@wolfssl.com へ直接ご連絡ください。
 
+この章では、Linux、un\*x 系（BSD、macOS）、および Windows 環境で wolfSSH をビルドする方法を説明し、非標準環境でのビルドに関するガイダンスも提供します。入門ガイドとサンプルは第 3 章に用意しています。
 
-この章ではwolfSSHを*nix システム（あるいはその派生システム）やWindows上でビルドする方法を説明します。また、上記以外のシステムにおいてのビルド方法のガイダンスも提供します。次章では「サンプルプログラムを使って始めてみよう」を用意しています。
-
-autoconf/automakeシステムを使ってビルドする際にはwolfSSHは単一のMakefileによってすべてのコンポーネントとサンプルプログラムをビルドできます。Makefileを繰り返し使用する場合に比べてシンプルで早いです。
+autotools システムを使ってビルドする際には、wolfSSH は単一の Makefile によってライブラリのすべての部分とサンプルをビルドします。これは Makefile を再帰的に使用する場合に比べてシンプルかつ高速です。
 
 ##  ソースコードの入手
 
-最新バージョンのコードを入手する場合には次のGitHubサイトからダウンロードできます：<br>
- [https://github.com/wolfSSL/wolfSSH](https://github.com/wolfSSL/wolfSSH)
+最新の最新版は、次の GitHub サイトからダウンロードできます: [https://github.com/wolfSSL/wolfssh](https://github.com/wolfSSL/wolfssh)。
 
- “Download ZIP” ボタンをクリックするかターミナルを開いて次のコマンドを実行してください:<br>
- 
+“Download ZIP” ボタンをクリックするか、ターミナルで次のコマンドを実行してください:
 ```
 $ git clone https://github.com/wolfSSL/wolfssh.git
 ```
-
 ##  wolfSSH が依存するモジュール
 
-wolfSSHはwolfCryptに依存しているので、wolfSSLのコンフィギュレーションが必要となっています。wolfSSLはここからダウンロードできます:<br>
-https://github.com/wolfSSL/wolfssl
-
-最も簡潔なwolfSSHの構成のためのwolfSSLのコンフィギュレーションを行うにはwolfSSLのルートフォルダから以下のコマンドを実行します:<br>
-
+wolfSSH は wolfCrypt に依存しているため、wolfSSL のコンフィギュレーションが必要です。wolfSSL はここからダウンロードできます: [https://github.com/wolfSSL/wolfssl](https://github.com/wolfSSL/wolfssl)。wolfSSH に必要な最も簡潔な wolfSSL の構成は、既定のビルドです。これは wolfSSL のルートフォルダから次のコマンドでビルドできます:
 
 ```
-$ ./autogen.sh (GitHubからクローンした場合にのみ実行が必要)
-$ ./configure --enable-ssh
+$ ./autogen.sh (GitHub からクローンした場合にのみ実行が必要)
+$ ./configure --enable-wolfssh
 $ make check
 $ sudo make install
 ```
-
-wolfSSHの鍵生成機能を利用する場合には `--enable-keygen` を追加してください。
-また、もしwolfSSLのコードが必要ない場合には `--enable-cryptonly` を追加してください。
-
-上記により、wolfSSHの実行に必要なwolfSSLライブラリがインストールされます。
-
-##   ＊nixシステム上でのwolfSSHのビルド
-
-Linux, ＊BSD, OS X, Solaris ＊nix類似のシステム上でビルドを行う場合には、autoconfシステムを利用します。wolfSSHのビルドには以下のコマンドを実行します:<br>
-
+wolfSSH の鍵生成機能を利用するには、wolfSSL を keygen 付きでコンフィギュレーションする必要があります:
 ```
-$ ./autogen.sh (GitHubからクローンした場合にのみ実行が必要)
+--enable-keygen
+```
+wolfSSL コードの大部分が不要な場合は、crypto only オプションで wolfSSL をコンフィギュレーションできます:
+```
+--enable-cryptonly
+```
+
+##   autotools でのビルド
+
+Linux、BSD、macOS、Solaris、その他の un\*x 系環境でビルドする場合は、autotools システムを使用します。wolfSSH をビルドするには次のコマンドを実行します:
+```
+$ ./autogen.sh (GitHub からクローンした場合にのみ実行が必要)
 $ ./configure
 $ make
 $ make install
 ```
-
-configureコマンドにはオプションを追加することができます。追加可能なオプションとその用途は以下のコマンドで参照することができます:<br>
-
+configure コマンドにはビルドオプションを追加できます。利用可能な configure オプションとその用途の一覧は、次のコマンドで参照できます:
 ```
 $ ./configure --help
 ```
-
-wolfSSHのビルドには以下を実行してください:
-
+wolfSSH をビルドするには次を実行します:
 ```
 $ make
 ```
-
-wolfSSHのビルドが正常に終了したことを確認する為に、以下のコマンドを実行して、全てのテストがパスすることを確認してください:
-
+wolfSSH が正しくビルドされたことを確認するために、次のコマンドで全てのテストがパスしたかどうかを確認してください:
 
 ```
 $ make check
 ```
 
-以下を実行してwolfSSHをインストールします:
-
+wolfSSH をインストールするには次を実行します:
 ```
 $ make install
 ```
 
-インストールにはスーパーユーザー権限が必要なので、場合によっては以下の様に'sudo'コマンドを前置して実行する必要があるかもしれません:
-
+インストールにはスーパーユーザー権限が必要な場合があり、その場合は sudo を付けてインストールを実行してください:
 ```
 $ sudo make install
 ```
-
-場合によっては、wolfssh/src以下のwolfSSHライブラリだけをビルドし、その他のアイテム（サンプルプログラムやテスト）を除外したいかもしれません。その場合にはwolfSSHのルートフォルダから以下のコマンドを実行してください:
-
+wolfssh/src/ にある wolfSSH ライブラリのみをビルドし、追加のアイテム（サンプルとテスト）はビルドしたくない場合は、wolfSSH のルートフォルダから次のコマンドを実行できます:
 ```
 $ make src/libwolfssh.la
 ```
+##  Windows 上でのビルド
 
-##  Windows上でのwolfSSHのビルド
+Visual Studio のプロジェクトファイルは *ide\\winvs* ディレクトリにあります。
 
-Visual Studioプロジェクトファイルは以下で取得できます:
-https://github.com/wolfSSL/wolfssh/blob/master/ide/winvs/wolfssh.sln
+ソリューションファイル 'wolfssh.sln' により、wolfSSH とそのサンプルおよびテストプログラムをビルドできます。このソリューションは、スタティックおよびダイナミックの 32 ビットまたは 64 ビットライブラリの Debug ビルドと Release ビルドの両方を提供します。wolfSSL のビルドをコンフィギュレーションするには user_settings.h を使用してください。
 
-
-ソリューションファイル'wolfssh.sln'はwolfSSH,そのサンプルプログラムとテストプログラムをビルドするように構成されています。DebugビルドとReleaseビルドの構成をスタティックリンクライブラリとダイナミック（32/64ビット）ライブラリの両形式で提供しています。user_settings.hはwolfSSLのコンフィギュレーションで必要となります。
-
-
-このプロジェクトファイルではwolfSSHとwolfSSLのソースフォルダ階層が隣同士に配置されていることを前提にしています。また、それらのルートフォルダにはバージョン番号が含まれていないフォルダ名となっていることを前提としています。つまり、次のようなフォルダ構成です:
-
+このプロジェクトは、wolfSSH と wolfSSL のソースディレクトリが隣り合わせにインストールされ、そのフォルダ名にバージョン番号が含まれていないことを前提としています:
 
 ```
 Projects\
@@ -104,96 +83,70 @@ wolfssh\
 wolfssl\
 ```
 
-`wolfssh\ide\winvs\user_settings.h`ファイルはwolfSSLに対する設定も既に含んだ適切な内容となっています。このファイルを忘れずに`wolfssh\ide\winvs`フォルダから`wolfssl\IDE\WIN`フォルダにコピーしてください。もし、一方の内容を変更した場合には、
-その内容を他方にもコピーして下さい。
+`wolfssh\ide\winvs\user_settings.h` ファイルには、wolfSSL を適切な設定でコンフィギュレーションするための設定が含まれています。このファイルは `wolfssh\ide\winvs` ディレクトリから `wolfssl\IDE\WIN` へコピーする必要があります。一方のコピーを変更した場合は、両方のコピーを変更しなければなりません。`WOLFCRYPT_ONLY` オプションは wolfSSL ファイルのビルドを無効にし、wolfCrypt アルゴリズムのみをビルドします。wolfSSL も残すには、このオプションを削除してください。
 
-`WOLFCRYPT_ONLY`マクロ定義はwolfSSLコードをビルド対象から除外し、wolfCryptのアルゴリズム部分のみをビルドするの為に指定してあります。もし、wolfSSLコードもビルドする場合にはこの定義を削除してください。
+### Windows 上でのビルドに使用するユーザーマクロ
 
+このソリューションでは、wolfSSL ライブラリとヘッダーの場所を示すためにユーザーマクロを使用します。すべてのパスは wolfssl64 ソリューションの既定のビルド出力先に設定されています。ユーザーマクロ wolfCryptDir は、ライブラリを検索するためのベースパスとして使用されます。初期値は `..\..\..\..\wolfssl` に設定されています。そして、例えば API テストプロジェクトの追加インクルードディレクトリの値は `$(wolfCryptDir)` に設定されています。
 
-### Windows上でのビルドに使用するユーザーマクロ定義
-
-
-
-ソリューションではwolfSSLライブラリとヘッダーファイルのロケーションを指定するためにユーザーマクロを利用します。wolfssl64ソリューションでは全てのパスは既定のビルド出力先に設定されます。ユーザーマクロ'wolfCryptDir'はライブラリを検索するためのベースパスとして使用します。初期値として、`..\..\..\..\wolfssl`に設定されています。その後、例えば追加のインクルードファイル検索パスが追加される場合には、`$(wolfCryptDir)`に対して追加を行います。
-
-wolfCryptDirパスはプロジェクトファイルからの相対位置で表せなければなりません。
-
-
+wolfCryptDir パスは、プロジェクトファイルからの相対パスでなければなりません。プロジェクトファイルはすべて 1 つ下のディレクトリにあります。
 
 ```
 wolfssh/wolfssh.vcxproj
 unit-test/unit-test.vcxproj
 ```
-
-そのほかのユーザーマクロは異なるビルドターゲットのためのディレクトリを表すために使用されます。例えば、   `wolfCryptDllRelease64` は次のフォルダを表します:
-
-
+その他のユーザーマクロは、異なるビルド向けの wolfSSL ライブラリが見つかるディレクトリです。したがって、ユーザーマクロ 'wolfCryptDllRelease64' は初期値として次のように設定されています:
 ```
 $(wolfCryptDir)\x64\DLL Release
 ```
-
-このパスはechoserverサンプルプログラムのデバッグ環境設定で64-bit DLLリリースビルド版の出力先を表現するのに次の様に使われます:
-
+この値は、echoserver の 64 ビット DLL Release ビルドのデバッグ環境で次のように設定して使用されます:
 ```
 PATH=$(wolfCryptDllRelease64);%PATH%
 ```
+デバッガーから echoserver を実行すると、そのディレクトリで wolfSSL DLL が見つかります。
 
-echoserverプログラムをデバッガーを使って実行する際にはこの設定によってwolfSSL DLLがこのディレクトリから見つかります。
+##  非標準環境でのビルド
 
+公式にはサポートしていませんが、非標準環境、特に組み込みおよびクロスコンパイル環境で wolfSSH をビルドしたいユーザーをできるだけお手伝いしようとしています。以下は、その際に理解しておいていただきたい点です:
 
-##  その他の環境上でのビルド
-
-公式にはサポートしていませんが、wolfSSHを非標準の環境でビルドしたいお客様、特に組み込み機器向け環境でのビルドをご希望の方々をできるだけお手伝いしようとしています。以下はその際に理解しておいていただきたい点です:
-
-1. ソースとヘッダーファイルはwolfSSHダウンロードパッケージの階層構造に存在する必要があります。
-2. いくつかのビルドシステムではwolfSSHヘッダーファイルの格納場所を明示的に指定することを求める場合があります。その格納場所は<wolfssh_root>/wolfsshディレクトリなので通常は<wolfssh_root>ディレクトリをインクルードファイルパスに追加することで解決します。
-3. wolfSSHはコンフィギュレーションで指定されない限りリトルエンディアンをデフォルトにしています。ユーザーが使用している非標準環境ではconfigureコマンドを使用していない場合で、ビッグエンディアンシステムに指定する場合にはBIG_ENDIAN_ORDERマクロ定義が必要となります。
-4. ライブラリをビルドしてみて何か問題が生じた場合にはwolfSSLにお知らせください。サポートが必要な場合には、support@wolfssl.com 宛てにご連絡ください。
-
-
+1. ソースファイルとヘッダーファイルは、wolfSSH ダウンロードパッケージにある階層構造のまま維持する必要があります。
+2. 一部のビルドシステムでは、wolfSSH ヘッダーファイルの場所を明示的に知る必要があるため、それを指定しなければならない場合があります。それらは <wolfssh_root>/wolfssh ディレクトリにあります。通常、<wolfssh_root> ディレクトリをインクルードパスに追加することでヘッダーの問題を解決できます。
+3. wolfSSH は、configure プロセスがビッグエンディアンを検出しない限り、リトルエンディアンシステムを既定とします。非標準環境でビルドするユーザーは configure プロセスを使用していないため、ビッグエンディアンシステムを使用する場合は BIG_ENDIAN_ORDER を定義する必要があります。
+4. ライブラリをビルドしてみて、何か問題が生じた場合はお知らせください。サポートが必要な場合は、support@wolfssl.com までご連絡ください。
 
 ##  クロスコンパイル
+組み込みプラットフォームの多くのユーザーは、自身の環境向けにクロスコンパイルを行います。ライブラリをクロスコンパイルする最も簡単な方法は、configure システムを使用することです。configure システムは Makefile を生成し、それを使って wolfSSH をビルドできます。
 
-組み込み機器開発環境ではクロスコンパイルを行います。そのための簡単な方法はライブラリをコンフィギュアシステムを使ってクロスコンパイルを行うことです。コンフィギュアシステムはMakefileを一つ生成し、それを使ってwolfSSHをビルドします。
-
-クロスコンパイルを行う際には、次の様にコンフィギュアを行うホストを指定する必要があります:
-
+クロスコンパイルを行う際には、次のようにコンフィギュレーションするホストを指定する必要があります:
 ```
 $ ./configure --host=arm-linux
 ```
-
-さらにコンパイラ、リンカー等も指定する必要があるでしょう：
-
+また、使用したいコンパイラやリンカーなどを指定する必要がある場合もあります:
 ```
-$ ./configure --host=arm-linux CC=arm-linux-gcc AR=arm-linux-ar RANLIB=arm-linux
+$ ./configure --host=arm-linux CC=arm-linux-gcc AR=arm-
+linux-ar
+RANLIB=arm-linux
 ```
-
-クロスコンパイル用にwolfSSHを正しくコンフィギュレーションできた後は、標準のautoconf作法にしたがってビルドとライブラリのインストールを行います:
+クロスコンパイル用に wolfSSH を正しくコンフィギュレーションできた後は、標準の autoconf の作法にしたがってライブラリのビルドとインストールを行えるはずです:
 
 ```
 $ make
 $ sudo make install
 ```
-
-ここでご紹介した以外のTipsをお持ちでしたらぜひ facts@wolfssl.comまで お知らせください。
+wolfSSH のクロスコンパイルに関する追加の Tips やフィードバックがありましたら、facts@wolfssl.com までお知らせください。
 
 ##  カスタムディレクトリへのインストール
 
-wolfSSLをカスタムディレクトリへインストールする場合には次のようにしてください:
-
+wolfSSL のカスタムインストールディレクトリを設定するには、次のようにします:
 ```
-$ ./configure --prefix=`~`/wolfSSL
+$ ./configure --prefix=~/wolfSSL
 $ make
 $ make install
 ```
-
-上記コマンドによってライブラリを ”~/wolfSSL/lib” に、インクルードファイルを ”~/wolfssl/include” に配置するように指定します。wolfSSHをカスタムディレクトリに配置する場合には次の様にしてください:
-
-
+これにより、ライブラリは ~/wolfSSL/lib に、インクルードは ~/wolfssl/include に配置されます。wolfSSH のカスタムインストールディレクトリを設定し、カスタムの wolfSSL ライブラリおよびインクルードディレクトリを指定するには、次のようにします:
 ```
-$ ./configure  --prefix=`~`/wolfssh  --libdir=`~`/wolfssl/lib  --includedir=`~`/wolfssl/include
+$ ./configure  --prefix=~/wolfssh  --libdir=~/wolfssl/lib  --includedir=~/wolfssl/include
 $ make
 $ make install
 ```
-
-上記パスがご自分の実際のディレクトリとマッチすることを確認して下さい。
+上記のパスが実際の場所と一致していることを確認してください。

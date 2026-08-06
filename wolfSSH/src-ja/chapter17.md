@@ -1,100 +1,101 @@
-# wolfSSH Preprocessor Guard Macros
+# wolfSSH プリプロセッサガードマクロ
 
-Many wolfSSH features, algorithms, and functions are controlled by build-time
-preprocessor macros. This chapter is a reference for the macros that are
-intended to be set by applications. They are defined at build time through the
-compiler command line (for example `CPPFLAGS`/`CFLAGS`), or by the `./configure`
-options described in the "Building wolfSSH" chapter.
+wolfSSH の多くの機能、アルゴリズム、関数は、ビルド時のプリプロセッサマクロによって
+制御されます。この章は、アプリケーションが設定することを意図したマクロのリファレンス
+です。これらはビルド時にコンパイラのコマンドライン（例えば `CPPFLAGS`/`CFLAGS`）を
+通じて、または「wolfSSH のビルド」の章で説明した `./configure` オプションによって
+定義されます。
 
-##  Algorithm-Disable Macros
+##  アルゴリズム無効化マクロ
 
-Each of the following `WOLFSSH_NO_*` macros disables one algorithm (or a family
-of algorithms). In an autotools build these are normally set automatically based
-on which algorithms are enabled in wolfCrypt; they may also be defined manually
-to remove an algorithm from wolfSSH.
+以下の各 `WOLFSSH_NO_*` マクロは、1 つのアルゴリズム（またはアルゴリズムファミリー）
+を無効にします。autotools ビルドでは、これらは通常、wolfCrypt でどのアルゴリズムが
+有効になっているかに基づいて自動的に設定されます。wolfSSH からアルゴリズムを削除する
+ために手動で定義することもできます。
 
-Two algorithm families are "soft-disabled" by default: they are compiled in and
-still work, but are not advertised during key exchange unless re-enabled.
+2 つのアルゴリズムファミリーはデフォルトで「ソフト無効化」されています。これらは
+コンパイルされており動作もしますが、再度有効化しない限り鍵交換時にアドバタイズ
+されません。
 
-| Macro | Effect |
+| マクロ | 効果 |
 |--------------------------------------|------------------------------------|
-| `WOLFSSH_NO_SHA1_SOFT_DISABLE` | SHA-1 algorithms are compiled in but not advertised during KEX by default. Define this to advertise SHA-1 algorithms by default. |
-| `WOLFSSH_NO_AES_CBC_SOFT_DISABLE` | AES-CBC algorithms are compiled in but not advertised during KEX by default. Define this to advertise AES-CBC algorithms by default. |
-| `WOLFSSH_NO_SHA1` | Disables SHA-1 in HMAC and digital signatures. |
-| `WOLFSSH_NO_HMAC_SHA1` | Disables HMAC-SHA1. |
-| `WOLFSSH_NO_HMAC_SHA1_96` | Disables HMAC-SHA1-96. |
-| `WOLFSSH_NO_HMAC_SHA2_256` | Disables HMAC-SHA2-256. |
-| `WOLFSSH_NO_HMAC_SHA2_512` | Disables HMAC-SHA2-512. |
-| `WOLFSSH_NO_DH_GROUP1_SHA1` | Disables DH group 1 (Oakley 1) with SHA-1. |
-| `WOLFSSH_NO_DH_GROUP14_SHA1` | Disables DH group 14 (Oakley 14) with SHA-1. |
-| `WOLFSSH_NO_DH_GROUP14_SHA256` | Disables DH group 14 with SHA-256. |
-| `WOLFSSH_NO_DH_GROUP16_SHA512` | Disables DH group 16 with SHA-512. |
-| `WOLFSSH_NO_DH_GEX_SHA256` | Disables DH group exchange with SHA-256. |
-| `WOLFSSH_NO_DH` | Disables all DH key agreement. |
-| `WOLFSSH_NO_ECDH_SHA2_NISTP256` | Disables ECDH key exchange with NIST P-256. |
-| `WOLFSSH_NO_ECDH_SHA2_NISTP384` | Disables ECDH key exchange with NIST P-384. |
-| `WOLFSSH_NO_ECDH_SHA2_NISTP521` | Disables ECDH key exchange with NIST P-521. |
-| `WOLFSSH_NO_ECDH` | Disables all ECDH key agreement. |
-| `WOLFSSH_NO_CURVE25519_SHA256` | Disables Curve25519 key exchange. |
-| `WOLFSSH_NO_NISTP256_MLKEM768_SHA256` | Disables the NIST P-256 with ML-KEM-768 post-quantum hybrid key exchange. |
-| `WOLFSSH_NO_NISTP384_MLKEM1024_SHA384` | Disables the NIST P-384 with ML-KEM-1024 post-quantum hybrid key exchange. |
-| `WOLFSSH_NO_CURVE25519_MLKEM768_SHA256` | Disables the Curve25519 with ML-KEM-768 post-quantum hybrid key exchange. |
-| `WOLFSSH_NO_RSA` | Disables RSA server and user authentication. |
-| `WOLFSSH_NO_SSH_RSA_SHA1` | Disables RSA server authentication using SHA-1. |
-| `WOLFSSH_NO_ECDSA` | Disables ECDSA server and user authentication. |
-| `WOLFSSH_NO_ECDSA_SHA2_NISTP256` | Disables ECDSA authentication with NIST P-256. |
-| `WOLFSSH_NO_ECDSA_SHA2_NISTP384` | Disables ECDSA authentication with NIST P-384. |
-| `WOLFSSH_NO_ECDSA_SHA2_NISTP521` | Disables ECDSA authentication with NIST P-521. |
-| `WOLFSSH_NO_AES_CBC` | Disables AES-CBC encryption. |
-| `WOLFSSH_NO_AES_CTR` | Disables AES-CTR encryption. |
-| `WOLFSSH_NO_AES_GCM` | Disables AES-GCM encryption. |
-| `WOLFSSH_NO_AEAD` | Disables all AEAD ciphers. |
+| `WOLFSSH_NO_SHA1_SOFT_DISABLE` | SHA-1 アルゴリズムはコンパイルされますが、デフォルトでは KEX 時にアドバタイズされません。デフォルトで SHA-1 アルゴリズムをアドバタイズするには、これを定義します。 |
+| `WOLFSSH_NO_AES_CBC_SOFT_DISABLE` | AES-CBC アルゴリズムはコンパイルされますが、デフォルトでは KEX 時にアドバタイズされません。デフォルトで AES-CBC アルゴリズムをアドバタイズするには、これを定義します。 |
+| `WOLFSSH_NO_SHA1` | HMAC およびデジタル署名における SHA-1 を無効にします。 |
+| `WOLFSSH_NO_HMAC_SHA1` | HMAC-SHA1 を無効にします。 |
+| `WOLFSSH_NO_HMAC_SHA1_96` | HMAC-SHA1-96 を無効にします。 |
+| `WOLFSSH_NO_HMAC_SHA2_256` | HMAC-SHA2-256 を無効にします。 |
+| `WOLFSSH_NO_HMAC_SHA2_512` | HMAC-SHA2-512 を無効にします。 |
+| `WOLFSSH_NO_DH_GROUP1_SHA1` | SHA-1 を用いた DH グループ 1（Oakley 1）を無効にします。 |
+| `WOLFSSH_NO_DH_GROUP14_SHA1` | SHA-1 を用いた DH グループ 14（Oakley 14）を無効にします。 |
+| `WOLFSSH_NO_DH_GROUP14_SHA256` | SHA-256 を用いた DH グループ 14 を無効にします。 |
+| `WOLFSSH_NO_DH_GROUP16_SHA512` | SHA-512 を用いた DH グループ 16 を無効にします。 |
+| `WOLFSSH_NO_DH_GEX_SHA256` | SHA-256 を用いた DH グループ交換を無効にします。 |
+| `WOLFSSH_NO_DH` | すべての DH 鍵合意を無効にします。 |
+| `WOLFSSH_NO_ECDH_SHA2_NISTP256` | NIST P-256 を用いた ECDH 鍵交換を無効にします。 |
+| `WOLFSSH_NO_ECDH_SHA2_NISTP384` | NIST P-384 を用いた ECDH 鍵交換を無効にします。 |
+| `WOLFSSH_NO_ECDH_SHA2_NISTP521` | NIST P-521 を用いた ECDH 鍵交換を無効にします。 |
+| `WOLFSSH_NO_ECDH` | すべての ECDH 鍵合意を無効にします。 |
+| `WOLFSSH_NO_CURVE25519_SHA256` | Curve25519 鍵交換を無効にします。 |
+| `WOLFSSH_NO_NISTP256_MLKEM768_SHA256` | NIST P-256 と ML-KEM-768 を組み合わせたポスト量子ハイブリッド鍵交換を無効にします。 |
+| `WOLFSSH_NO_NISTP384_MLKEM1024_SHA384` | NIST P-384 と ML-KEM-1024 を組み合わせたポスト量子ハイブリッド鍵交換を無効にします。 |
+| `WOLFSSH_NO_CURVE25519_MLKEM768_SHA256` | Curve25519 と ML-KEM-768 を組み合わせたポスト量子ハイブリッド鍵交換を無効にします。 |
+| `WOLFSSH_NO_RSA` | RSA サーバー認証およびユーザー認証を無効にします。 |
+| `WOLFSSH_NO_SSH_RSA_SHA1` | SHA-1 を用いた RSA サーバー認証を無効にします。 |
+| `WOLFSSH_NO_ECDSA` | ECDSA サーバー認証およびユーザー認証を無効にします。 |
+| `WOLFSSH_NO_ECDSA_SHA2_NISTP256` | NIST P-256 を用いた ECDSA 認証を無効にします。 |
+| `WOLFSSH_NO_ECDSA_SHA2_NISTP384` | NIST P-384 を用いた ECDSA 認証を無効にします。 |
+| `WOLFSSH_NO_ECDSA_SHA2_NISTP521` | NIST P-521 を用いた ECDSA 認証を無効にします。 |
+| `WOLFSSH_NO_AES_CBC` | AES-CBC 暗号化を無効にします。 |
+| `WOLFSSH_NO_AES_CTR` | AES-CTR 暗号化を無効にします。 |
+| `WOLFSSH_NO_AES_GCM` | AES-GCM 暗号化を無効にします。 |
+| `WOLFSSH_NO_AEAD` | すべての AEAD 暗号を無効にします。 |
 
-##  Feature-Enable Macros
+##  機能有効化マクロ
 
-These macros turn whole subsystems on. In an autotools build each is defined by
-the corresponding `./configure` option shown below. The relevant API for most of
-these features is documented in the API reference chapters.
+これらのマクロはサブシステム全体を有効にします。autotools ビルドでは、各マクロは
+以下に示す対応する `./configure` オプションによって定義されます。これらの機能の
+ほとんどに関連する API は、API リファレンスの各章で説明されています。
 
-| Macro | Enables | Configure option |
+| マクロ | 有効化する機能 | Configure オプション |
 |--------------------------------|---------------------|------------------------------|
-| `WOLFSSH_SFTP` | SFTP support | `--enable-sftp` |
-| `WOLFSSH_SCP` | SCP support | `--enable-scp` |
-| `WOLFSSH_FWD` | TCP/IP port forwarding | `--enable-fwd` |
-| `WOLFSSH_AGENT` | ssh-agent forwarding | `--enable-agent` |
-| `WOLFSSH_CERTS` | X.509 certificate support | `--enable-certs` |
-| `WOLFSSH_TPM` | TPM 2.0 host-key support | `--enable-tpm` |
-| `WOLFSSH_SSHD` | wolfsshd daemon | `--enable-sshd` |
-| `WOLFSSH_SHELL` | echoserver shell support | `--enable-shell` |
-| `WOLFSSH_KEYGEN` | key generation API | `--enable-keygen` |
-| `WOLFSSH_KEYBOARD_INTERACTIVE` | keyboard-interactive authentication | `--enable-keyboard-interactive` |
-| `WOLFSSH_SSHCLIENT` | wolfSSH client application | `--enable-sshclient` |
-| `WOLFSSH_TERM` | PTY / terminal handling | on by default (`--disable-term` to remove) |
-| `WOLFSSH_SMALL_STACK` | reduced stack usage for constrained targets | `--enable-smallstack` |
+| `WOLFSSH_SFTP` | SFTP サポート | `--enable-sftp` |
+| `WOLFSSH_SCP` | SCP サポート | `--enable-scp` |
+| `WOLFSSH_FWD` | TCP/IP ポートフォワーディング | `--enable-fwd` |
+| `WOLFSSH_AGENT` | ssh-agent フォワーディング | `--enable-agent` |
+| `WOLFSSH_CERTS` | X.509 証明書サポート | `--enable-certs` |
+| `WOLFSSH_TPM` | TPM 2.0 ホスト鍵サポート | `--enable-tpm` |
+| `WOLFSSH_SSHD` | wolfsshd デーモン | `--enable-sshd` |
+| `WOLFSSH_SHELL` | echoserver のシェルサポート | `--enable-shell` |
+| `WOLFSSH_KEYGEN` | 鍵生成 API | `--enable-keygen` |
+| `WOLFSSH_KEYBOARD_INTERACTIVE` | キーボードインタラクティブ認証 | `--enable-keyboard-interactive` |
+| `WOLFSSH_SSHCLIENT` | wolfSSH クライアントアプリケーション | `--enable-sshclient` |
+| `WOLFSSH_TERM` | PTY / 端末処理 | デフォルトで有効（削除するには `--disable-term`） |
+| `WOLFSSH_SMALL_STACK` | リソース制約のあるターゲット向けのスタック使用量削減 | `--enable-smallstack` |
 
-The following macros adjust behavior rather than enabling a subsystem:
+次のマクロは、サブシステムを有効にするのではなく、動作を調整します。
 
-| Macro | Effect |
+| マクロ | 効果 |
 |--------------------------------------|--------------------------------------------------|
-| `WOLFSSH_NO_DEFAULT_LOGGING_CB` | Omits the built-in default logging callback. |
-| `WOLFSSH_NO_TIMESTAMP` | Omits timestamps from log output. |
-| `WOLFSSH_NO_SYMLINK_CHECK` | Disables the SFTP symbolic-link safety check. |
-| `WOLFSSH_NO_SFTP_BUFFER_ZERO` | Skips zeroing SFTP transfer buffers between operations. |
+| `WOLFSSH_NO_DEFAULT_LOGGING_CB` | 組み込みのデフォルトロギングコールバックを省略します。 |
+| `WOLFSSH_NO_TIMESTAMP` | ログ出力からタイムスタンプを省略します。 |
+| `WOLFSSH_NO_SYMLINK_CHECK` | SFTP のシンボリックリンク安全性チェックを無効にします。 |
+| `WOLFSSH_NO_SFTP_BUFFER_ZERO` | 操作の間で SFTP 転送バッファをゼロクリアする処理をスキップします。 |
 
-##  Tuning and Value Macros
+##  チューニングおよび値マクロ
 
-These macros take a numeric value rather than acting as an on/off switch. Define
-them at build time to override the default.
+これらのマクロは、オン/オフのスイッチとして機能するのではなく、数値を取ります。
+デフォルトを上書きするには、ビルド時に定義します。
 
-| Macro | Meaning | Default |
+| マクロ | 意味 | デフォルト |
 |-------------------------------------|-----------------------------------|--------------|
-| `DEFAULT_WINDOW_SZ` | Initial channel window size, in bytes. | 131072 (128 KB) |
-| `DEFAULT_MAX_PACKET_SZ` | Maximum channel packet size, in bytes. | 32768 |
-| `DEFAULT_HIGHWATER_MARK` | Default data highwater mark, in bytes, before a rekey is triggered. | about 1 GB |
-| `WOLFSSH_DEFAULT_MSG_HIGHWATER_MARK` | Default packet-count highwater mark before a rekey is triggered. | 0x80000000 |
-| `WOLFSSH_MR_ROUNDS` | Miller-Rabin rounds used when the client checks the server's DH group-exchange prime. | 8 |
-| `WOLFSSH_KEY_QUANTITY_REQ` | Number of keys required in an OpenSSH-style key wrapper. | 1 |
-| `WOLFSSH_MAX_FILENAME` | Maximum filename length, in bytes. | 256 |
-| `WOLFSSH_MAX_SFTP_RW` | Maximum SFTP read/write chunk size, in bytes. | 32768 |
-| `WOLFSSH_MAX_SFTP_RECV` | Maximum SFTP receive size, in bytes. | 32768 |
-| `WOLFSSH_MAX_SFTP_NAME` | Maximum size of an SFTP name list, in bytes. | 1048576 (1 MB) |
+| `DEFAULT_WINDOW_SZ` | 初期のチャネルウィンドウサイズ（バイト単位）。 | 131072（128 KB） |
+| `DEFAULT_MAX_PACKET_SZ` | チャネルの最大パケットサイズ（バイト単位）。 | 32768 |
+| `DEFAULT_HIGHWATER_MARK` | 再鍵交換がトリガーされるまでのデフォルトのデータ最高水位（バイト単位）。 | 約 1 GB |
+| `WOLFSSH_DEFAULT_MSG_HIGHWATER_MARK` | 再鍵交換がトリガーされるまでのデフォルトのパケット数最高水位。 | 0x80000000 |
+| `WOLFSSH_MR_ROUNDS` | クライアントがサーバーの DH グループ交換素数を検査する際に使用する Miller-Rabin のラウンド数。 | 8 |
+| `WOLFSSH_KEY_QUANTITY_REQ` | OpenSSH 形式の鍵ラッパーで必要な鍵の数。 | 1 |
+| `WOLFSSH_MAX_FILENAME` | 最大ファイル名長（バイト単位）。 | 256 |
+| `WOLFSSH_MAX_SFTP_RW` | SFTP の読み書きチャンクの最大サイズ（バイト単位）。 | 32768 |
+| `WOLFSSH_MAX_SFTP_RECV` | SFTP の最大受信サイズ（バイト単位）。 | 32768 |
+| `WOLFSSH_MAX_SFTP_NAME` | SFTP 名前リストの最大サイズ（バイト単位）。 | 1048576（1 MB） |

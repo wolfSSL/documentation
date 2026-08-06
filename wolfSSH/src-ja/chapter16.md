@@ -1,13 +1,14 @@
-# wolfSSH Additional API Reference
+# wolfSSH 追加 API リファレンス
 
-This chapter documents the remaining public wolfSSH interfaces: ssh-agent
-forwarding, key generation, logging, the certificate manager, and the
-platform portability layer.
+この章では、wolfSSH の残りのパブリックインターフェイス、すなわち ssh-agent
+フォワーディング、鍵生成、ロギング、証明書マネージャー、およびプラットフォーム
+移植レイヤーについて説明します。
 
-##  SSH Agent Functions
+##  SSH エージェント関数
 
-These functions support ssh-agent forwarding. They require wolfSSH to be built
-with agent support (`WOLFSSH_AGENT`, from `./configure --enable-agent`).
+これらの関数は ssh-agent フォワーディングをサポートします。使用するには、wolfSSH
+をエージェントサポート付き（`WOLFSSH_AGENT`、`./configure --enable-agent` により
+有効化）でビルドする必要があります。
 
 ### wolfSSH_AGENT_new()
 
@@ -17,19 +18,19 @@ with agent support (`WOLFSSH_AGENT`, from `./configure --enable-agent`).
 WOLFSSH_AGENT_CTX* wolfSSH_AGENT_new(void* heap);
 ```
 
-**Description**
+**説明**
 
-Allocates and initializes a new ssh-agent context.
+新しい ssh-agent コンテキストを割り当てて初期化します。
 
-**Parameters**
+**引数**
 
-- `heap` - pointer to a heap to use for memory allocations, or `NULL`
+- `heap` - メモリ割り当てに使用するヒープへのポインター。または `NULL`
 
-**Return Values**
+**戻り値**
 
-- pointer to the new agent context, or `NULL` on failure
+- 新しいエージェントコンテキストへのポインター。失敗時は `NULL`
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_AGENT_free()`
 
@@ -41,19 +42,19 @@ Allocates and initializes a new ssh-agent context.
 void wolfSSH_AGENT_free(WOLFSSH_AGENT_CTX* agent);
 ```
 
-**Description**
+**説明**
 
-Frees an ssh-agent context previously allocated with wolfSSH_AGENT_new().
+wolfSSH_AGENT_new() で以前に割り当てられた ssh-agent コンテキストを解放します。
 
-**Parameters**
+**引数**
 
-- `agent` - the agent context to free
+- `agent` - 解放するエージェントコンテキスト
 
-**Return Values**
+**戻り値**
 
-None
+なし
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_AGENT_new()`
 
@@ -66,23 +67,24 @@ int wolfSSH_CTX_set_agent_cb(WOLFSSH_CTX* ctx,
         WS_CallbackAgent agentCb, WS_CallbackAgentIO agentIoCb);
 ```
 
-**Description**
+**説明**
 
-Registers the agent callback and the agent I/O callback on the context. These
-callbacks let the application service agent requests and perform agent I/O.
+コンテキストにエージェントコールバックとエージェント I/O コールバックを登録し
+ます。これらのコールバックにより、アプリケーションはエージェント要求を処理し、
+エージェント I/O を実行できます。
 
-**Parameters**
+**引数**
 
-- `ctx` - pointer to the wolfSSH context
-- `agentCb` - the agent callback
-- `agentIoCb` - the agent I/O callback
+- `ctx` - wolfSSH コンテキストへのポインター
+- `agentCb` - エージェントコールバック
+- `agentIoCb` - エージェント I/O コールバック
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
 - `WS_BAD_ARGUMENT`
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_set_agent_cb_ctx()`
 
@@ -94,16 +96,16 @@ callbacks let the application service agent requests and perform agent I/O.
 int wolfSSH_set_agent_cb_ctx(WOLFSSH* ssh, void* ctx);
 ```
 
-**Description**
+**説明**
 
-Sets the user context pointer passed to the agent callbacks.
+エージェントコールバックに渡されるユーザーコンテキストポインターを設定します。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
-- `ctx` - user context pointer to pass to the agent callbacks
+- `ssh` - wolfSSH セッションへのポインター
+- `ctx` - エージェントコールバックに渡すユーザーコンテキストポインター
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
 - `WS_BAD_ARGUMENT`
@@ -116,21 +118,23 @@ Sets the user context pointer passed to the agent callbacks.
 int wolfSSH_CTX_AGENT_enable(WOLFSSH_CTX* ctx, byte isEnabled);
 ```
 
-**Description**
+**説明**
 
-Enables or disables ssh-agent forwarding for sessions created from the context.
+コンテキストから作成されるセッションについて、ssh-agent フォワーディングを有効
+または無効にします。
 
-**Parameters**
+**引数**
 
-- `ctx` - pointer to the wolfSSH context
-- `isEnabled` - non-zero to enable agent forwarding, 0 to disable
+- `ctx` - wolfSSH コンテキストへのポインター
+- `isEnabled` - エージェントフォワーディングを有効にするには非ゼロ、無効にする
+  には 0
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
 - `WS_BAD_ARGUMENT`
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_AGENT_enable()`
 
@@ -142,21 +146,22 @@ Enables or disables ssh-agent forwarding for sessions created from the context.
 int wolfSSH_AGENT_enable(WOLFSSH* ssh, byte isEnabled);
 ```
 
-**Description**
+**説明**
 
-Enables or disables ssh-agent forwarding for a single session.
+単一のセッションについて、ssh-agent フォワーディングを有効または無効にします。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
-- `isEnabled` - non-zero to enable agent forwarding, 0 to disable
+- `ssh` - wolfSSH セッションへのポインター
+- `isEnabled` - エージェントフォワーディングを有効にするには非ゼロ、無効にする
+  には 0
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
 - `WS_BAD_ARGUMENT`
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_CTX_AGENT_enable()`
 
@@ -169,24 +174,24 @@ int wolfSSH_AGENT_Relay(WOLFSSH* ssh,
         const byte* msg, word32* msgSz, byte* rsp, word32* rspSz);
 ```
 
-**Description**
+**説明**
 
-Relays an agent protocol message to the agent and returns the agent's response.
-On input `rspSz` holds the size of the `rsp` buffer; on output it holds the size
-of the response written.
+エージェントプロトコルメッセージをエージェントへ中継し、エージェントの応答を返し
+ます。入力時 `rspSz` は `rsp` バッファのサイズを保持し、出力時には書き込まれた
+応答のサイズを保持します。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
-- `msg` - the agent message to relay
-- `msgSz` - pointer to the size of the message
-- `rsp` - buffer that receives the agent's response
-- `rspSz` - on input the response buffer size, set on output to the response size
+- `ssh` - wolfSSH セッションへのポインター
+- `msg` - 中継するエージェントメッセージ
+- `msgSz` - メッセージのサイズへのポインター
+- `rsp` - エージェントの応答を受け取るバッファ
+- `rspSz` - 入力時は応答バッファのサイズ、出力時は応答のサイズが設定される
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
-- a negative error code on failure
+- 失敗時は負のエラーコード
 
 ### wolfSSH_AGENT_SignRequest()
 
@@ -199,32 +204,32 @@ int wolfSSH_AGENT_SignRequest(WOLFSSH* ssh,
         const byte* keyBlob, word32 keyBlobSz, word32 flags);
 ```
 
-**Description**
+**説明**
 
-Requests that the agent sign the given `digest` using the key identified by
-`keyBlob`. The resulting signature is written to `sig`.
+`keyBlob` で識別される鍵を使用して、指定された `digest` に署名するようエージェント
+に要求します。生成された署名は `sig` に書き込まれます。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
-- `digest` - the digest to sign
-- `digestSz` - size of the digest
-- `sig` - buffer that receives the signature
-- `sigSz` - on input the signature buffer size, set on output to the signature size
-- `keyBlob` - the public key blob identifying which key to sign with
-- `keyBlobSz` - size of the key blob
-- `flags` - signature request flags
+- `ssh` - wolfSSH セッションへのポインター
+- `digest` - 署名するダイジェスト
+- `digestSz` - ダイジェストのサイズ
+- `sig` - 署名を受け取るバッファ
+- `sigSz` - 入力時は署名バッファのサイズ、出力時は署名のサイズが設定される
+- `keyBlob` - どの鍵で署名するかを識別する公開鍵ブロブ
+- `keyBlobSz` - 鍵ブロブのサイズ
+- `flags` - 署名要求のフラグ
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
-- a negative error code on failure
+- 失敗時は負のエラーコード
 
-##  Key Generation Functions
+##  鍵生成関数
 
-These functions generate SSH key pairs. They require wolfSSH to be built with
-key generation support (`WOLFSSH_KEYGEN`, from `./configure --enable-keygen`),
-and the corresponding algorithm must be enabled in wolfCrypt.
+これらの関数は SSH 鍵ペアを生成します。使用するには、wolfSSH を鍵生成サポート付き
+（`WOLFSSH_KEYGEN`、`./configure --enable-keygen` により有効化）でビルドし、対応
+するアルゴリズムが wolfCrypt で有効になっている必要があります。
 
 ### wolfSSH_MakeRsaKey()
 
@@ -234,24 +239,24 @@ and the corresponding algorithm must be enabled in wolfCrypt.
 int wolfSSH_MakeRsaKey(byte* out, word32 outSz, word32 size, word32 e);
 ```
 
-**Description**
+**説明**
 
-Generates an RSA key pair of `size` bits using public exponent `e`, writing the
-encoded key to `out`.
+公開指数 `e` を使用して `size` ビットの RSA 鍵ペアを生成し、エンコードされた鍵を
+`out` に書き込みます。
 
-**Parameters**
+**引数**
 
-- `out` - buffer that receives the generated key
-- `outSz` - size of the output buffer
-- `size` - RSA key size in bits (for example, 2048)
-- `e` - RSA public exponent (for example, 65537)
+- `out` - 生成された鍵を受け取るバッファ
+- `outSz` - 出力バッファのサイズ
+- `size` - RSA 鍵のサイズ（ビット単位、例えば 2048）
+- `e` - RSA 公開指数（例えば 65537）
 
-**Return Values**
+**戻り値**
 
-- the number of bytes written on success
-- a negative error code on failure
+- 成功時は書き込まれたバイト数
+- 失敗時は負のエラーコード
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_MakeEcdsaKey()`
 
@@ -263,23 +268,23 @@ encoded key to `out`.
 int wolfSSH_MakeEcdsaKey(byte* out, word32 outSz, word32 size);
 ```
 
-**Description**
+**説明**
 
-Generates an ECDSA key pair for the curve of the given `size` in bits (for
-example, 256 for NIST P-256), writing the encoded key to `out`.
+指定された `size`（ビット単位、例えば NIST P-256 の場合 256）の曲線に対する ECDSA
+鍵ペアを生成し、エンコードされた鍵を `out` に書き込みます。
 
-**Parameters**
+**引数**
 
-- `out` - buffer that receives the generated key
-- `outSz` - size of the output buffer
-- `size` - ECC curve size in bits (for example, 256, 384, or 521)
+- `out` - 生成された鍵を受け取るバッファ
+- `outSz` - 出力バッファのサイズ
+- `size` - ECC 曲線のサイズ（ビット単位、例えば 256、384、または 521）
 
-**Return Values**
+**戻り値**
 
-- the number of bytes written on success
-- a negative error code on failure
+- 成功時は書き込まれたバイト数
+- 失敗時は負のエラーコード
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_MakeRsaKey()`
 - `wolfSSH_MakeEd25519Key()`
@@ -292,30 +297,30 @@ example, 256 for NIST P-256), writing the encoded key to `out`.
 int wolfSSH_MakeEd25519Key(byte* out, word32 outSz, word32 size);
 ```
 
-**Description**
+**説明**
 
-Generates an Ed25519 key pair, writing the encoded key to `out`.
+Ed25519 鍵ペアを生成し、エンコードされた鍵を `out` に書き込みます。
 
-**Parameters**
+**引数**
 
-- `out` - buffer that receives the generated key
-- `outSz` - size of the output buffer
-- `size` - key size in bits (256 for Ed25519)
+- `out` - 生成された鍵を受け取るバッファ
+- `outSz` - 出力バッファのサイズ
+- `size` - 鍵のサイズ（ビット単位、Ed25519 の場合 256）
 
-**Return Values**
+**戻り値**
 
-- the number of bytes written on success
-- a negative error code on failure
+- 成功時は書き込まれたバイト数
+- 失敗時は負のエラーコード
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_MakeEcdsaKey()`
 
-##  Logging Functions
+##  ロギング関数
 
-These functions control wolfSSH debug logging. The logging code is compiled in
-when wolfSSH is built with `DEBUG_WOLFSSH` (from `./configure --enable-debug`)
-or with `WOLFSSH_SSHD`.
+これらの関数は wolfSSH のデバッグロギングを制御します。ロギングのコードは、wolfSSH
+を `DEBUG_WOLFSSH`（`./configure --enable-debug` により有効化）または `WOLFSSH_SSHD`
+付きでビルドした場合にコンパイルされます。
 
 ### wolfSSH_SetLoggingCb()
 
@@ -325,20 +330,20 @@ or with `WOLFSSH_SSHD`.
 void wolfSSH_SetLoggingCb(wolfSSH_LoggingCb logF);
 ```
 
-**Description**
+**説明**
 
-Registers a callback that receives log messages, each with its log level and
-message text, instead of the default logging output.
+デフォルトのロギング出力の代わりに、ログメッセージをそのログレベルおよびメッセージ
+テキストとともに受け取るコールバックを登録します。
 
-**Parameters**
+**引数**
 
-- `logF` - the logging callback
+- `logF` - ロギングコールバック
 
-**Return Values**
+**戻り値**
 
-None
+なし
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_LogEnabled()`
 
@@ -350,18 +355,18 @@ None
 int wolfSSH_LogEnabled(void);
 ```
 
-**Description**
+**説明**
 
-Reports whether logging is currently enabled.
+現在ロギングが有効かどうかを報告します。
 
-**Parameters**
+**引数**
 
-None
+なし
 
-**Return Values**
+**戻り値**
 
-- non-zero if logging is enabled
-- 0 if logging is disabled
+- ロギングが有効な場合は非ゼロ
+- ロギングが無効な場合は 0
 
 ### wolfSSH_Log()
 
@@ -371,32 +376,32 @@ None
 void wolfSSH_Log(enum wolfSSH_LogLevel level, const char* const fmt, ...);
 ```
 
-**Description**
+**説明**
 
-Writes a printf-style formatted log message at the given level. The log levels,
-from lowest to highest, are `WS_LOG_DEBUG`, `WS_LOG_INFO`, `WS_LOG_WARN`,
-`WS_LOG_ERROR`, and `WS_LOG_USER`, plus the per-subsystem levels `WS_LOG_SFTP`,
-`WS_LOG_SCP`, `WS_LOG_AGENT`, and `WS_LOG_CERTMAN`.
+指定されたレベルで printf 形式のフォーマット済みログメッセージを書き込みます。
+ログレベルは、低いものから高いものへ順に `WS_LOG_DEBUG`、`WS_LOG_INFO`、
+`WS_LOG_WARN`、`WS_LOG_ERROR`、`WS_LOG_USER`、およびサブシステムごとのレベル
+`WS_LOG_SFTP`、`WS_LOG_SCP`、`WS_LOG_AGENT`、`WS_LOG_CERTMAN` です。
 
-**Parameters**
+**引数**
 
-- `level` - the `wolfSSH_LogLevel` for the message
-- `fmt` - printf-style format string
-- `...` - arguments for the format string
+- `level` - メッセージの `wolfSSH_LogLevel`
+- `fmt` - printf 形式のフォーマット文字列
+- `...` - フォーマット文字列に対する引数
 
-**Return Values**
+**戻り値**
 
-None
+なし
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_SetLoggingCb()`
 
-##  Certificate Manager Functions
+##  証明書マネージャー関数
 
-The certificate manager verifies X.509 certificates for certificate-based
-authentication. These functions require wolfSSH to be built with certificate
-support (`WOLFSSH_CERTS`, from `./configure --enable-certs`).
+証明書マネージャーは、証明書ベースの認証のために X.509 証明書を検証します。これ
+らの関数を使用するには、wolfSSH を証明書サポート付き（`WOLFSSH_CERTS`、
+`./configure --enable-certs` により有効化）でビルドする必要があります。
 
 ### wolfSSH_CERTMAN_new()
 
@@ -406,19 +411,19 @@ support (`WOLFSSH_CERTS`, from `./configure --enable-certs`).
 WOLFSSH_CERTMAN* wolfSSH_CERTMAN_new(void* heap);
 ```
 
-**Description**
+**説明**
 
-Allocates and initializes a new certificate manager.
+新しい証明書マネージャーを割り当てて初期化します。
 
-**Parameters**
+**引数**
 
-- `heap` - pointer to a heap to use for memory allocations, or `NULL`
+- `heap` - メモリ割り当てに使用するヒープへのポインター。または `NULL`
 
-**Return Values**
+**戻り値**
 
-- pointer to the new certificate manager, or `NULL` on failure
+- 新しい証明書マネージャーへのポインター。失敗時は `NULL`
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_CERTMAN_free()`
 
@@ -430,19 +435,19 @@ Allocates and initializes a new certificate manager.
 void wolfSSH_CERTMAN_free(WOLFSSH_CERTMAN* cm);
 ```
 
-**Description**
+**説明**
 
-Frees a certificate manager previously allocated with wolfSSH_CERTMAN_new().
+wolfSSH_CERTMAN_new() で以前に割り当てられた証明書マネージャーを解放します。
 
-**Parameters**
+**引数**
 
-- `cm` - the certificate manager to free
+- `cm` - 解放する証明書マネージャー
 
-**Return Values**
+**戻り値**
 
-None
+なし
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_CERTMAN_new()`
 
@@ -455,23 +460,23 @@ int wolfSSH_CERTMAN_LoadRootCA_buffer(WOLFSSH_CERTMAN* cm,
         const unsigned char* rootCa, word32 rootCaSz);
 ```
 
-**Description**
+**説明**
 
-Loads a trusted root CA certificate from a buffer into the certificate manager.
-Loaded roots are used to verify certificates presented by a peer.
+信頼されたルート CA 証明書をバッファから証明書マネージャーに読み込みます。読み込ま
+れたルートは、ピアから提示された証明書を検証するために使用されます。
 
-**Parameters**
+**引数**
 
-- `cm` - the certificate manager
-- `rootCa` - buffer containing the root CA certificate
-- `rootCaSz` - size of the root CA buffer
+- `cm` - 証明書マネージャー
+- `rootCa` - ルート CA 証明書を含むバッファ
+- `rootCaSz` - ルート CA バッファのサイズ
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
-- a negative error code on failure
+- 失敗時は負のエラーコード
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_CERTMAN_VerifyCerts_buffer()`
 
@@ -484,33 +489,33 @@ int wolfSSH_CERTMAN_VerifyCerts_buffer(WOLFSSH_CERTMAN* cm,
         const unsigned char* cert, word32 certSz, word32 certCount);
 ```
 
-**Description**
+**説明**
 
-Verifies a chain of `certCount` certificates contained in the buffer against the
-root CAs loaded into the certificate manager.
+バッファに含まれる `certCount` 個の証明書のチェーンを、証明書マネージャーに読み
+込まれたルート CA に対して検証します。
 
-**Parameters**
+**引数**
 
-- `cm` - the certificate manager
-- `cert` - buffer containing the certificate chain
-- `certSz` - size of the certificate buffer
-- `certCount` - number of certificates in the chain
+- `cm` - 証明書マネージャー
+- `cert` - 証明書チェーンを含むバッファ
+- `certSz` - 証明書バッファのサイズ
+- `certCount` - チェーン内の証明書の数
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
-- a negative error code on failure
+- 失敗時は負のエラーコード
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_CERTMAN_LoadRootCA_buffer()`
 
-##  Portability Functions
+##  移植性関数
 
-These functions form part of the wolfSSH platform portability layer, which
-abstracts filesystem and string operations across supported targets. They are
-primarily used internally and when porting wolfSSH to a new platform; the exact
-set available depends on the target build configuration.
+これらの関数は wolfSSH のプラットフォーム移植レイヤーの一部を構成し、サポートされる
+ターゲット間でファイルシステム操作および文字列操作を抽象化します。主に内部的に、
+また wolfSSH を新しいプラットフォームに移植する際に使用されます。利用可能な関数の
+正確なセットは、ターゲットのビルド構成によって異なります。
 
 ### wfopen()
 
@@ -520,21 +525,21 @@ set available depends on the target build configuration.
 int wfopen(WFILE** f, const char* filename, const char* mode);
 ```
 
-**Description**
+**説明**
 
-Portable file-open wrapper. Opens `filename` using the access `mode` and stores
-the resulting file handle in `f`.
+移植可能なファイルオープンラッパーです。アクセスモード `mode` を使用して
+`filename` を開き、得られたファイルハンドルを `f` に格納します。
 
-**Parameters**
+**引数**
 
-- `f` - receives the opened file handle
-- `filename` - path of the file to open
-- `mode` - access mode string (as for the C library `fopen`)
+- `f` - 開かれたファイルハンドルを受け取る
+- `filename` - 開くファイルのパス
+- `mode` - アクセスモード文字列（C ライブラリの `fopen` と同様）
 
-**Return Values**
+**戻り値**
 
-- 0 on success
-- non-zero on failure
+- 成功時は 0
+- 失敗時は非ゼロ
 
 ### wstrnstr()
 
@@ -544,20 +549,19 @@ the resulting file handle in `f`.
 char* wstrnstr(const char* s1, const char* s2, unsigned int n);
 ```
 
-**Description**
+**説明**
 
-Finds the first occurrence of the substring `s2` within the first `n` bytes of
-`s1`.
+`s1` の先頭 `n` バイト以内で、部分文字列 `s2` が最初に出現する位置を見つけます。
 
-**Parameters**
+**引数**
 
-- `s1` - the string to search
-- `s2` - the substring to find
-- `n` - maximum number of bytes of `s1` to search
+- `s1` - 検索対象の文字列
+- `s2` - 見つける部分文字列
+- `n` - `s1` を検索する最大バイト数
 
-**Return Values**
+**戻り値**
 
-- pointer to the first occurrence of `s2` in `s1`, or `NULL` if not found
+- `s1` 内で `s2` が最初に出現する位置へのポインター。見つからない場合は `NULL`
 
 ### wstrncat()
 
@@ -567,19 +571,19 @@ Finds the first occurrence of the substring `s2` within the first `n` bytes of
 char* wstrncat(char* s1, const char* s2, size_t n);
 ```
 
-**Description**
+**説明**
 
-Appends up to `n` bytes of the string `s2` to the end of `s1`.
+文字列 `s2` の最大 `n` バイトを `s1` の末尾に追加します。
 
-**Parameters**
+**引数**
 
-- `s1` - destination string, appended to in place
-- `s2` - source string to append
-- `n` - maximum number of bytes to append
+- `s1` - 追加先の文字列。その場で追加される
+- `s2` - 追加するソース文字列
+- `n` - 追加する最大バイト数
 
-**Return Values**
+**戻り値**
 
-- pointer to the destination string `s1`
+- 追加先の文字列 `s1` へのポインター
 
 ### wstrdup()
 
@@ -589,25 +593,25 @@ Appends up to `n` bytes of the string `s2` to the end of `s1`.
 char* wstrdup(const char* s1, void* heap, int type);
 ```
 
-**Description**
+**説明**
 
-Duplicates the string `s1`, allocating the copy from the given `heap`.
+文字列 `s1` を複製します。複製は指定された `heap` から割り当てられます。
 
-**Parameters**
+**引数**
 
-- `s1` - the string to duplicate
-- `heap` - heap used for the allocation
-- `type` - allocation type hint
+- `s1` - 複製する文字列
+- `heap` - 割り当てに使用するヒープ
+- `type` - 割り当てタイプのヒント
 
-**Return Values**
+**戻り値**
 
-- pointer to the duplicated string, or `NULL` on failure
+- 複製された文字列へのポインター。失敗時は `NULL`
 
 ### WS_FindFirstFileA()
 
-**Availability**
+**利用可能性**
 
-Available on Windows builds (`USE_WINDOWS_API`).
+Windows ビルド（`USE_WINDOWS_API`）で利用可能です。
 
 ```c
 #include <wolfssh/port.h>
@@ -616,33 +620,33 @@ void* WS_FindFirstFileA(const char* fileName,
         char* realFileName, size_t realFileNameSz, int* isDir, void* heap);
 ```
 
-**Description**
+**説明**
 
-Begins a directory enumeration for `fileName`, returning a find handle and the
-first matching entry. `isDir` is set to indicate whether the entry is a
-directory.
+`fileName` に対するディレクトリ列挙を開始し、検索ハンドルと最初に一致したエントリ
+を返します。`isDir` には、そのエントリがディレクトリかどうかを示す値が設定され
+ます。
 
-**Parameters**
+**引数**
 
-- `fileName` - the directory or search pattern to enumerate
-- `realFileName` - buffer that receives the matched file name
-- `realFileNameSz` - size of the `realFileName` buffer
-- `isDir` - output set non-zero if the entry is a directory
-- `heap` - heap used for allocations
+- `fileName` - 列挙するディレクトリまたは検索パターン
+- `realFileName` - 一致したファイル名を受け取るバッファ
+- `realFileNameSz` - `realFileName` バッファのサイズ
+- `isDir` - エントリがディレクトリの場合に非ゼロが設定される出力
+- `heap` - 割り当てに使用するヒープ
 
-**Return Values**
+**戻り値**
 
-- an opaque find handle on success, or `NULL` on failure
+- 成功時は不透明な検索ハンドル、失敗時は `NULL`
 
-**See Also**
+**関連項目**
 
 - `WS_FindNextFileA()`
 
 ### WS_FindNextFileA()
 
-**Availability**
+**利用可能性**
 
-Available on Windows builds (`USE_WINDOWS_API`).
+Windows ビルド（`USE_WINDOWS_API`）で利用可能です。
 
 ```c
 #include <wolfssh/port.h>
@@ -651,22 +655,22 @@ int WS_FindNextFileA(void* findHandle,
         char* realFileName, size_t realFileNameSz);
 ```
 
-**Description**
+**説明**
 
-Continues a directory enumeration started with WS_FindFirstFileA(), returning the
-next matching entry.
+WS_FindFirstFileA() で開始したディレクトリ列挙を継続し、次に一致したエントリを
+返します。
 
-**Parameters**
+**引数**
 
-- `findHandle` - the find handle returned by WS_FindFirstFileA()
-- `realFileName` - buffer that receives the matched file name
-- `realFileNameSz` - size of the `realFileName` buffer
+- `findHandle` - WS_FindFirstFileA() が返した検索ハンドル
+- `realFileName` - 一致したファイル名を受け取るバッファ
+- `realFileNameSz` - `realFileName` バッファのサイズ
 
-**Return Values**
+**戻り値**
 
-- non-zero if another entry was returned
-- 0 when there are no more entries
+- 別のエントリが返された場合は非ゼロ
+- これ以上エントリがない場合は 0
 
-**See Also**
+**関連項目**
 
 - `WS_FindFirstFileA()`
