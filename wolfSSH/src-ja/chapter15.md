@@ -1,12 +1,13 @@
-# wolfSSH SCP API Reference
+# wolfSSH SCP API リファレンス
 
-This section describes the public application programming interface for SCP
-(Secure Copy) file transfer in wolfSSH.
+この章では、wolfSSH における SCP（Secure Copy）ファイル転送のパブリック
+アプリケーションプログラミングインターフェイスについて説明します。
 
-All functions in this chapter require wolfSSH to be built with SCP support
-(`WOLFSSH_SCP`, from `./configure --enable-scp`).
+この章のすべての関数を使用するには、wolfSSH を SCP サポート付き
+（`WOLFSSH_SCP`、`./configure --enable-scp` により有効化）でビルドする必要が
+あります。
 
-##  SCP Transfer Functions
+##  SCP 転送関数
 
 ### wolfSSH_SCP_connect()
 
@@ -16,23 +17,22 @@ All functions in this chapter require wolfSSH to be built with SCP support
 int wolfSSH_SCP_connect(WOLFSSH* ssh, byte* cmd);
 ```
 
-**Description**
+**説明**
 
-Initiates an SCP session over an established SSH connection by sending the SCP
-command `cmd` to the server. Called on the client side before transferring
-files.
+確立済みの SSH 接続上で、SCP コマンド `cmd` をサーバーに送信して SCP セッション
+を開始します。ファイルを転送する前に、クライアント側で呼び出します。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
-- `cmd` - the SCP command to send to the server
+- `ssh` - wolfSSH セッションへのポインター
+- `cmd` - サーバーに送信する SCP コマンド
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
-- a negative error code on failure
+- 失敗時は負のエラーコード
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_SCP_to()`
 - `wolfSSH_SCP_from()`
@@ -45,23 +45,23 @@ files.
 int wolfSSH_SCP_to(WOLFSSH* ssh, const char* src, const char* dst);
 ```
 
-**Description**
+**説明**
 
-Sends (uploads) the local file or directory `src` to the remote destination
-`dst` over the SSH connection. Called on the client side.
+ローカルのファイルまたはディレクトリ `src` を、SSH 接続を通じてリモートの宛先
+`dst` に送信（アップロード）します。クライアント側で呼び出します。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
-- `src` - path to the local source file or directory
-- `dst` - destination path on the remote peer
+- `ssh` - wolfSSH セッションへのポインター
+- `src` - ローカルのソースファイルまたはディレクトリのパス
+- `dst` - リモートピア上の宛先パス
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
-- a negative error code on failure
+- 失敗時は負のエラーコード
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_SCP_from()`
 - `wolfSSH_SCP_connect()`
@@ -74,24 +74,24 @@ Sends (uploads) the local file or directory `src` to the remote destination
 int wolfSSH_SCP_from(WOLFSSH* ssh, const char* src, const char* dst);
 ```
 
-**Description**
+**説明**
 
-Retrieves (downloads) the remote file or directory `src` from the peer and
-writes it to the local destination `dst` over the SSH connection. Called on the
-client side.
+リモートのファイルまたはディレクトリ `src` をピアから取得（ダウンロード）し、
+SSH 接続を通じてローカルの宛先 `dst` に書き込みます。クライアント側で呼び出し
+ます。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
-- `src` - path to the source file or directory on the remote peer
-- `dst` - destination path on the local system
+- `ssh` - wolfSSH セッションへのポインター
+- `src` - リモートピア上のソースファイルまたはディレクトリのパス
+- `dst` - ローカルシステム上の宛先パス
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
-- a negative error code on failure
+- 失敗時は負のエラーコード
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_SCP_to()`
 - `wolfSSH_SCP_connect()`
@@ -104,26 +104,27 @@ client side.
 int wolfSSH_SetScpErrorMsg(WOLFSSH* ssh, const char* message);
 ```
 
-**Description**
+**説明**
 
-Sets a custom error message string on the session, which is reported to the peer
-when an SCP transfer fails.
+セッションにカスタムのエラーメッセージ文字列を設定します。この文字列は、SCP 転送
+が失敗したときにピアへ報告されます。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
-- `message` - null-terminated error message to report
+- `ssh` - wolfSSH セッションへのポインター
+- `message` - 報告する NULL 終端のエラーメッセージ
 
-**Return Values**
+**戻り値**
 
 - `WS_SUCCESS`
 - `WS_BAD_ARGUMENT`
 
-##  SCP Callbacks
+##  SCP コールバック
 
-When using SCP with application-managed storage (for example, on systems without
-a filesystem, or to filter transfers), the application registers send and receive
-callbacks. Each callback may be given a user context pointer.
+アプリケーションが管理するストレージで SCP を使用する場合（例えばファイルシステム
+のないシステム上や、転送をフィルタリングする場合）、アプリケーションは送信および
+受信のコールバックを登録します。各コールバックにはユーザーコンテキストポインター
+を渡すことができます。
 
 ### wolfSSH_SetScpRecv()
 
@@ -133,21 +134,22 @@ callbacks. Each callback may be given a user context pointer.
 void wolfSSH_SetScpRecv(WOLFSSH_CTX* ctx, WS_CallbackScpRecv cb);
 ```
 
-**Description**
+**説明**
 
-Registers the SCP receive callback on the context. The callback is invoked as
-incoming files are received, allowing the application to store the data itself.
+コンテキストに SCP 受信コールバックを登録します。このコールバックは受信ファイル
+が受け取られる際に呼び出され、アプリケーション自身がデータを保存できるようにし
+ます。
 
-**Parameters**
+**引数**
 
-- `ctx` - pointer to the wolfSSH context
-- `cb` - the SCP receive callback
+- `ctx` - wolfSSH コンテキストへのポインター
+- `cb` - SCP 受信コールバック
 
-**Return Values**
+**戻り値**
 
-None
+なし
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_SetScpRecvCtx()`
 - `wolfSSH_SetScpSend()`
@@ -160,21 +162,21 @@ None
 void wolfSSH_SetScpSend(WOLFSSH_CTX* ctx, WS_CallbackScpSend cb);
 ```
 
-**Description**
+**説明**
 
-Registers the SCP send callback on the context. The callback is invoked when the
-peer requests files, allowing the application to supply the data itself.
+コンテキストに SCP 送信コールバックを登録します。このコールバックはピアがファイル
+を要求した際に呼び出され、アプリケーション自身がデータを供給できるようにします。
 
-**Parameters**
+**引数**
 
-- `ctx` - pointer to the wolfSSH context
-- `cb` - the SCP send callback
+- `ctx` - wolfSSH コンテキストへのポインター
+- `cb` - SCP 送信コールバック
 
-**Return Values**
+**戻り値**
 
-None
+なし
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_SetScpSendCtx()`
 - `wolfSSH_SetScpRecv()`
@@ -187,20 +189,20 @@ None
 void wolfSSH_SetScpRecvCtx(WOLFSSH* ssh, void* ctx);
 ```
 
-**Description**
+**説明**
 
-Sets the user context pointer passed to the SCP receive callback.
+SCP 受信コールバックに渡されるユーザーコンテキストポインターを設定します。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
-- `ctx` - user context pointer to pass to the receive callback
+- `ssh` - wolfSSH セッションへのポインター
+- `ctx` - 受信コールバックに渡すユーザーコンテキストポインター
 
-**Return Values**
+**戻り値**
 
-None
+なし
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_GetScpRecvCtx()`
 
@@ -212,20 +214,20 @@ None
 void wolfSSH_SetScpSendCtx(WOLFSSH* ssh, void* ctx);
 ```
 
-**Description**
+**説明**
 
-Sets the user context pointer passed to the SCP send callback.
+SCP 送信コールバックに渡されるユーザーコンテキストポインターを設定します。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
-- `ctx` - user context pointer to pass to the send callback
+- `ssh` - wolfSSH セッションへのポインター
+- `ctx` - 送信コールバックに渡すユーザーコンテキストポインター
 
-**Return Values**
+**戻り値**
 
-None
+なし
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_GetScpSendCtx()`
 
@@ -237,19 +239,20 @@ None
 void* wolfSSH_GetScpRecvCtx(WOLFSSH* ssh);
 ```
 
-**Description**
+**説明**
 
-Returns the user context pointer previously set with wolfSSH_SetScpRecvCtx().
+wolfSSH_SetScpRecvCtx() で以前に設定されたユーザーコンテキストポインターを返し
+ます。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
+- `ssh` - wolfSSH セッションへのポインター
 
-**Return Values**
+**戻り値**
 
-- the SCP receive context pointer, or `NULL` if none
+- SCP 受信コンテキストポインター。設定されていない場合は `NULL`
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_SetScpRecvCtx()`
 
@@ -261,18 +264,19 @@ Returns the user context pointer previously set with wolfSSH_SetScpRecvCtx().
 void* wolfSSH_GetScpSendCtx(WOLFSSH* ssh);
 ```
 
-**Description**
+**説明**
 
-Returns the user context pointer previously set with wolfSSH_SetScpSendCtx().
+wolfSSH_SetScpSendCtx() で以前に設定されたユーザーコンテキストポインターを返し
+ます。
 
-**Parameters**
+**引数**
 
-- `ssh` - pointer to the wolfSSH session
+- `ssh` - wolfSSH セッションへのポインター
 
-**Return Values**
+**戻り値**
 
-- the SCP send context pointer, or `NULL` if none
+- SCP 送信コンテキストポインター。設定されていない場合は `NULL`
 
-**See Also**
+**関連項目**
 
 - `wolfSSH_SetScpSendCtx()`
