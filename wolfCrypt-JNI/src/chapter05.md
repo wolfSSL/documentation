@@ -10,20 +10,24 @@ version of “wolfcrypt-jni.jar” that does not include the JCE provider classe
 **wolfJCE / wolfCrypt JNI package structure:**
 
 ```
-wolfcrypt-jni /
+wolfcrypt-jni/
     .github                        GitHub Actions workflows
     AUTHORS
     COPYING
     ChangeLog.md                   Version ChangeLog
     IDE/                           IDE Project Files
+        Android/                   Example Android Studio project
         WIN/                       Visual Studio Project Files
     LICENSING
     README.md                      Main README
     README_JCE.md                  wolfJCE README
     build.xml                      ant build script
-    docs /                         Javadocs
+    docs/                          Javadocs and design documents
+        design/                    Design documents (WKS KeyStore, etc)
+        javadoc/                   Generated Javadocs
     examples/                      Example applications and certs/keys
         certs/                     Example cert/keys/KeyStores
+        filtered-providers/        Filtered Sun provider examples (FIPS)
         provider/                  JCE example apps
     jni/                           Native C JNI binding source files
     lib/                           Compiled library artifacts
@@ -33,14 +37,16 @@ wolfcrypt-jni /
     rpm/                           Linux rpm files
     scripts/                       Test scripts (Facebook Infer, etc)
     src/                           Source code
+        java9/                     module-info.java (Java 9+ JPMS support)
         main/java                  Java source files
+        test/java                  JUnit test source files
 
 ```
 
 The wolfJCE provider source code is located in the
 `src/main/java/com/wolfssl/provider/jce` directory, and is part of the
 “**com.wolfssl.provider.jce**” Java package.
- 
+
 The wolfCrypt JNI wrapper is located in the
 `src/main/java/com/wolfssl/wolfcrypt` directory and is part of the
 “**com.wolfssl.wolfcrypt**” Java package. Users of JCE will not need to use
