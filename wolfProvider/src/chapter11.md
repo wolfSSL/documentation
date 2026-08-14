@@ -28,10 +28,12 @@ import/export, and public/private key encoding. ML-DSA supports key generation,
 pure and pre-hash signing, verification, context strings, and key encoding.
 SLH-DSA supports key generation, pure signing, verification, context strings,
 and key encoding. LMS supports public-key import and one-shot signature
-verification; private-key import, signing, and key generation are not exposed
-because OpenSSL 3.6 provides LMS as a verification-only interface. This also
-avoids exposing stateful private-key operations through an interface that
-cannot enforce LMS leaf-use state.
+verification only. Private-key import, signing, and key generation are not
+exposed because OpenSSL 3.6's provider ABI defines LMS as verification-only: it
+advertises no signing, key-generation, or private-key import entry points for
+wolfProvider to implement, even though wolfCrypt itself supports them. This
+also avoids exposing stateful private-key operations through an interface that
+cannot enforce LMS leaf-use (one-time signature) state.
 
 ## Provider Architecture
 
@@ -151,7 +153,8 @@ then configure wolfProvider:
 
 ```sh
 # Add the required options to the normal wolfSSL configuration.
-./configure --enable-mlkem --enable-mldsa --enable-slhdsa --enable-lms
+./configure --enable-mlkem --enable-mldsa --enable-slhdsa \
+    --enable-lms=verify-only
 make
 sudo make install
 
@@ -165,6 +168,11 @@ sudo make install
 
 PQC code is not compiled unless `--enable-pqc` or an individual PQC option is
 passed to wolfProvider, even when wolfSSL has the algorithms enabled.
+
+Because wolfProvider only verifies LMS, build wolfSSL with
+`--enable-lms=verify-only` so LMS signing and key generation are left out of
+the build entirely rather than compiled and unused. The
+`build-wolfprovider.sh --enable-lms` flow already configures wolfSSL this way.
 
 ## Using wolfProvider
 
@@ -301,8 +309,10 @@ PQC has several independent test layers:
   groups plus ML-DSA certificate authentication.
 - The nginx OSP workflow tests ML-KEM and hybrid TLS 1.3 key exchange with
   ML-DSA authentication.
-- The pinned libacvp OSP workflow runs its complete unit suite and exercises
-  its OpenSSL ACVP handlers for ML-KEM, ML-DSA, and SLH-DSA.
+- The pinned libacvp (Cisco v2.3.1) OSP workflow builds wolfProvider with
+  `--enable-pqc`, runs its `APP_PQC_HANDLER` group, and then its complete unit
+  suite, exercising the OpenSSL ACVP handlers for ML-KEM and ML-DSA in both
+  replace-default and non-replace modes.
 
 The version, nginx, and libacvp matrices cover wolfSSL master and the latest
 eligible stable release. OSP tests run in replace-default and non-replace
