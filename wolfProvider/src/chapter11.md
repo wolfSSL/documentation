@@ -375,11 +375,11 @@ wolfProvider exposes several preprocessor defines that allow users to configure 
 | WP_HAVE_HKDF | HKDF (HMAC-based Key Derivation Function) support |
 | WP_HAVE_HMAC | HMAC (Hash-based Message Authentication Code) support |
 | WP_HAVE_KRB5KDF | Kerberos 5 Key Derivation Function support |
+| WP_HAVE_LMS | LMS (RFC 8554 / SP 800-208) verification support |
 | WP_HAVE_MD5 | MD5 hash algorithm support |
 | WP_HAVE_MD5_SHA1 | MD5+SHA1 combination support |
 | WP_HAVE_MLDSA | ML-DSA (FIPS 204) post-quantum signature support |
 | WP_HAVE_MLKEM | ML-KEM (FIPS 203) post-quantum key encapsulation support |
-| WP_HAVE_LMS | LMS (RFC 8554 / SP 800-208) verification support |
 | WP_HAVE_PBE | Password-Based Encryption support |
 | WP_HAVE_RANDOM | Random number generation support |
 | WP_HAVE_RSA | RSA encryption and signature support |

@@ -265,6 +265,7 @@ wolfProviderを静的エンジンとして使用するには`--static`を付け�
 | --enable-mlkem | **無効** | ML-KEM (FIPS 203) のみを有効にする |
 | --enable-mldsa | **無効** | ML-DSA (FIPS 204) のみを有効にする |
 | --enable-slhdsa | **無効** | SLH-DSA (FIPS 205) のみを有効にする |
+| --enable-lms | **無効** | LMS検証のみを有効にする |
 | | | | |
 | --with-openssl=DIR | | リンクするOpenSSLのインストール場所。設定されていない場合は、システムのデフォルトのライブラリとインクルードパスが使用されます。 |
 | --with-wolfssl=DIR | | リンクするwolfSSLのインストール場所。設定されていない場合は、システムのデフォルトのライブラリとインクルードパスが使用されます。 |
@@ -306,6 +307,7 @@ wolfProviderは、お客様がwolfProviderのビルド方法を設定できる�
 | WP_HAVE_HKDF | HKDF (HMACベースの鍵導出関数) を有効化 |
 | WP_HAVE_HMAC | HMAC (ハッシュベースのメッセージ認証コード) を有効化 |
 | WP_HAVE_KRB5KDF | Kerberos 5 鍵導出関数を有効化 |
+| WP_HAVE_LMS | LMS (RFC 8554 / SP 800-208) 検証を有効化 |
 | WP_HAVE_MD5 | MD5 ハッシュアルゴリズムを有効化 |
 | WP_HAVE_MD5_SHA1 | MD5+SHA1 の組み合わせを有効化 |
 | WP_HAVE_MLDSA | ML-DSA (FIPS 204) ポスト量子署名を有効化 |
