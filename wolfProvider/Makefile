@@ -18,6 +18,8 @@ ifeq ($(DOC_LANG),JA)
 	PDF = wolfProvider-Manual-jp.pdf
 else
 	PDF = wolfProvider-Manual.pdf
+	# chapter11 (Post-Quantum) is English-only until it is translated.
+	SOURCES += chapter11.md
 endif
 
 .PHONY: html-prep

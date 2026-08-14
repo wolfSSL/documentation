@@ -261,6 +261,11 @@ wolfProviderを静的エンジンとして使用するには`--static`を付け�
 | --enable-usersettings | **無効** | user_settings.h を使用し、MakefileのCFLAGSを使用しない |
 | --enable-dynamic | 有効 | wolfProviderをダイナミックプロバイダーとしてロードできるようにする |
 | --enable-singlethreaded | **無効** | wolfProviderをシングルスレッド環境で使用する |
+| --enable-pqc | **無効** | ポスト量子アルゴリズム (ML-KEM、ML-DSA、SLH-DSA) をすべて有効にする |
+| --enable-mlkem | **無効** | ML-KEM (FIPS 203) のみを有効にする |
+| --enable-mldsa | **無効** | ML-DSA (FIPS 204) のみを有効にする |
+| --enable-slhdsa | **無効** | SLH-DSA (FIPS 205) のみを有効にする |
+| --enable-lms | **無効** | LMS検証のみを有効にする |
 | | | | |
 | --with-openssl=DIR | | リンクするOpenSSLのインストール場所。設定されていない場合は、システムのデフォルトのライブラリとインクルードパスが使用されます。 |
 | --with-wolfssl=DIR | | リンクするwolfSSLのインストール場所。設定されていない場合は、システムのデフォルトのライブラリとインクルードパスが使用されます。 |
@@ -302,8 +307,11 @@ wolfProviderは、お客様がwolfProviderのビルド方法を設定できる�
 | WP_HAVE_HKDF | HKDF (HMACベースの鍵導出関数) を有効化 |
 | WP_HAVE_HMAC | HMAC (ハッシュベースのメッセージ認証コード) を有効化 |
 | WP_HAVE_KRB5KDF | Kerberos 5 鍵導出関数を有効化 |
+| WP_HAVE_LMS | LMS (RFC 8554 / SP 800-208) 検証を有効化 |
 | WP_HAVE_MD5 | MD5 ハッシュアルゴリズムを有効化 |
 | WP_HAVE_MD5_SHA1 | MD5+SHA1 の組み合わせを有効化 |
+| WP_HAVE_MLDSA | ML-DSA (FIPS 204) ポスト量子署名を有効化 |
+| WP_HAVE_MLKEM | ML-KEM (FIPS 203) ポスト量子鍵カプセル化を有効化 |
 | WP_HAVE_PBE | パスワードベースの暗号化を有効化 |
 | WP_HAVE_RANDOM | 乱数生成を有効化 |
 | WP_HAVE_RSA | RSA 暗号化と署名を有効化 |
@@ -320,6 +328,7 @@ wolfProviderは、お客様がwolfProviderのビルド方法を設定できる�
 | WP_HAVE_SHA512_224 | SHA512/224 ハッシュアルゴリズムを有効化 |
 | WP_HAVE_SHA512_256 | SHA512/256 ハッシュアルゴリズムを有効化 |
 | WP_HAVE_SHAKE_256 | SHAKE256 拡張出力関数を有効化 |
+| WP_HAVE_SLHDSA | SLH-DSA (FIPS 205) ポスト量子署名を有効化 |
 | WP_HAVE_TLS1_PRF | TLS1 擬似乱数関数を有効化 |
 | WP_HAVE_X25519 | X25519 楕円曲線を有効化 |
 | WP_HAVE_X448 | X448 楕円曲線を有効化 |
