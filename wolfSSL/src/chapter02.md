@@ -1049,7 +1049,11 @@ Removes support for ASN formatted certificate processing.
 
 #### NO_OLD_TLS
 
-Removes support for SSLv3, TLSv1.0 and TLSv1.1
+Removes support for SSLv3, TLSv1.0 and TLSv1.1. This macro is defined by
+default; it is only left undefined when old TLS support is explicitly requested
+(for example with `--enable-oldtls`, `--enable-tlsv10` or `--enable-sslv3`).
+
+**Warning:** Leaving `NO_OLD_TLS` undefined produces a build that is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. RFC 8996 deprecates TLS 1.0 and TLS 1.1, and RFC 9846 states that SSL 2.0, SSL 3.0, TLS 1.0 and TLS 1.1 "MUST NOT be negotiated for any reason". Only build without `NO_OLD_TLS` when legacy interoperability requires it, and do not claim conformance with those RFCs for such a build.
 
 #### WOLFSSL_AEAD_ONLY
 
@@ -1133,7 +1137,15 @@ Rejects DTLS records that have a future epoch number. Provides stricter epoch va
 
 #### WOLFSSL_ALLOW_TLSV10
 
-Allows TLS 1.0 connections. TLS 1.0 is disabled by default for security reasons. Only enable when legacy compatibility is required.
+Allows TLS 1.0 connections. TLS 1.0 is disabled by default for security reasons. Only enable when legacy compatibility is required. Implies that `NO_OLD_TLS` is not defined.
+
+**Warning:** Defining `WOLFSSL_ALLOW_TLSV10` produces a build that is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. TLS 1.0 is deprecated by RFC 8996, and RFC 9846 states it "MUST NOT be negotiated for any reason".
+
+#### WOLFSSL_ALLOW_SSLV3
+
+Allows SSL 3.0 connections. SSL 3.0 is disabled by default for security reasons. Only enable when legacy compatibility is required. Implies that `NO_OLD_TLS` is not defined.
+
+**Warning:** Defining `WOLFSSL_ALLOW_SSLV3` produces a build that is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. SSL 3.0 is deprecated by RFC 7568 and RFC 8996, and RFC 9846 states it "MUST NOT be negotiated for any reason".
 
 
 #### WOLFSSL_ALLOW_TLS_SHA1
@@ -4308,11 +4320,22 @@ Disable the error strings table
 
 ### `--disable-oldtls`
 
-Disable old TLS version < 1.2
+Disable old TLS version < 1.2. This is the default; the corresponding
+`--enable-oldtls` leaves `NO_OLD_TLS` undefined.
+
+**Warning:** Building with `--enable-oldtls` is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. RFC 8996 deprecates TLS 1.0 and TLS 1.1, and RFC 9846 states that SSL 2.0, SSL 3.0, TLS 1.0 and TLS 1.1 "MUST NOT be negotiated for any reason".
+
+### `--enable-tlsv10`
+
+Enable TLS version 1.0 (defines `WOLFSSL_ALLOW_TLSV10`, and enables old TLS).
+
+**Warning:** Building with `--enable-tlsv10` is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. See `--disable-oldtls` above.
 
 ### `--enable-sslv3`
 
-Enable SSL version 3.0
+Enable SSL version 3.0 (defines `WOLFSSL_ALLOW_SSLV3`, and enables old TLS).
+
+**Warning:** Building with `--enable-sslv3` is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. SSL 3.0 is deprecated by RFC 7568 and RFC 8996, and RFC 9846 states it "MUST NOT be negotiated for any reason".
 
 ### `--enable-stacksize`
 
