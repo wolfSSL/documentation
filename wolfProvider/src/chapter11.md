@@ -138,8 +138,8 @@ The build script can configure OpenSSL, wolfSSL, and wolfProvider together:
 ./scripts/build-wolfprovider.sh --enable-pqc
 ```
 
-`--enable-pqc` enables ML-KEM and ML-DSA. SLH-DSA and LMS remain independent
-options, and each family can be selected separately:
+`--enable-pqc` enables ML-KEM, ML-DSA and SLH-DSA. LMS remains an independent
+option, and each family can also be selected separately:
 
 ```sh
 ./scripts/build-wolfprovider.sh --enable-mlkem
@@ -153,13 +153,13 @@ then configure wolfProvider:
 
 ```sh
 # Add the required options to the normal wolfSSL configuration.
-./configure --enable-mlkem --enable-mldsa --enable-slhdsa \
-    --enable-lms=verify-only
+./configure --enable-mlkem --enable-mldsa --enable-slhdsa=yes,sha2 \
+    --enable-lms=verify-only,sha256-192,shake256
 make
 sudo make install
 
 # Configure wolfProvider against OpenSSL 3.6 or later.
-./configure --enable-pqc --enable-slhdsa --enable-lms \
+./configure --enable-pqc --enable-lms \
     --with-openssl=/path/to/openssl \
     --with-wolfssl=/path/to/wolfssl
 make
@@ -182,7 +182,7 @@ silently falling back to OpenSSL's built-in provider:
 
 ```sh
 ./scripts/build-wolfprovider.sh --replace-default \
-    --enable-pqc --enable-slhdsa --enable-lms
+    --enable-pqc --enable-lms
 ```
 
 Applications may also load wolfProvider as a normal provider. This mode is
@@ -253,8 +253,8 @@ The configure options add the corresponding request macros:
 | `--enable-slhdsa` | `WOLFPROV_HAVE_SLHDSA` | `WOLFSSL_HAVE_SLHDSA` |
 | `--enable-lms` | `WOLFPROV_HAVE_LMS` | `WOLFSSL_HAVE_LMS` |
 
-`--enable-pqc` enables ML-KEM and ML-DSA. SLH-DSA and LMS are enabled separately
-with `--enable-slhdsa` and `--enable-lms`. After configuration validates the wolfSSL capabilities,
+`--enable-pqc` enables ML-KEM, ML-DSA and SLH-DSA. LMS is enabled separately
+with `--enable-lms`. After configuration validates the wolfSSL capabilities,
 wolfProvider uses `WP_HAVE_MLKEM`, `WP_HAVE_MLDSA`, `WP_HAVE_SLHDSA`, and
 `WP_HAVE_LMS` internally to compile and register the available implementations.
 
@@ -338,66 +338,3 @@ The repository's
 and [PQC KAT runner](https://github.com/wolfSSL/wolfProvider/blob/master/scripts/test-pqc-kat.sh)
 are maintained alongside the implementation and provide the most current
 examples of supported options and validation.
-
-## Build Defines
-
-wolfProvider exposes several preprocessor defines that allow users to configure how wolfProvider is built. These are described in the table below.
-
-| Define                           | Description |
-| :------------------------------- | :----------------------------- |
-| WOLFPROVIDER_USER_SETTINGS | Read user-specified defines from user_settings.h. |
-| WOLFPROV_DEBUG | Output debug information |
-| WP_CHECK_FORCE_FAIL | Force failure checking for testing purposes |
-| WP_ALLOW_NON_FIPS | Allow certain non-FIPS algorithms in FIPS mode |
-| WP_HAVE_AESCCM | AES encryption in CCM (Counter with CBC-MAC) mode |
-| WP_HAVE_AESCFB | AES encryption in CFB (Cipher Feedback) mode |
-| WP_HAVE_AESCBC | AES encryption in CBC (Cipher Block Chaining) mode |
-| WP_HAVE_AESCTR | AES encryption in CTR (Counter) mode |
-| WP_HAVE_AESCTS | AES encryption in CTS (Ciphertext Stealing) mode |
-| WP_HAVE_AESECB | AES encryption in ECB (Electronic Codebook) mode |
-| WP_HAVE_AESGCM | AES encryption in GCM (Galois/Counter Mode) mode |
-| WP_HAVE_CMAC | CMAC (Cipher-based Message Authentication Code) support |
-| WP_HAVE_DES3CBC | Triple DES encryption in CBC mode |
-| WP_HAVE_DH | Diffie-Hellman key exchange support |
-| WP_HAVE_DIGEST | General digest/hash algorithm support |
-| WP_HAVE_ECC | General Elliptic Curve Cryptography support |
-| WP_HAVE_EC_P192 | P-192 elliptic curve support |
-| WP_HAVE_EC_P224 | P-224 elliptic curve support |
-| WP_HAVE_EC_P256 | P-256 elliptic curve support |
-| WP_HAVE_EC_P384 | P-384 elliptic curve support |
-| WP_HAVE_EC_P521 | P-521 elliptic curve support |
-| WP_HAVE_ECDH | ECDH (Elliptic Curve Diffie-Hellman) key exchange support |
-| WP_HAVE_ECDSA | ECDSA (Elliptic Curve Digital Signature Algorithm) support |
-| WP_HAVE_ECKEYGEN | Elliptic curve key generation support |
-| WP_HAVE_ED25519 | Ed25519 elliptic curve signature support |
-| WP_HAVE_ED448 | Ed448 elliptic curve signature support |
-| WP_HAVE_GMAC | GMAC (Galois/Counter Mode Authentication) support |
-| WP_HAVE_HKDF | HKDF (HMAC-based Key Derivation Function) support |
-| WP_HAVE_HMAC | HMAC (Hash-based Message Authentication Code) support |
-| WP_HAVE_KRB5KDF | Kerberos 5 Key Derivation Function support |
-| WP_HAVE_LMS | LMS (RFC 8554 / SP 800-208) verification support |
-| WP_HAVE_MD5 | MD5 hash algorithm support |
-| WP_HAVE_MD5_SHA1 | MD5+SHA1 combination support |
-| WP_HAVE_MLDSA | ML-DSA (FIPS 204) post-quantum signature support |
-| WP_HAVE_MLKEM | ML-KEM (FIPS 203) post-quantum key encapsulation support |
-| WP_HAVE_PBE | Password-Based Encryption support |
-| WP_HAVE_RANDOM | Random number generation support |
-| WP_HAVE_RSA | RSA encryption and signature support |
-| WP_HAVE_SHA1 | SHA1 hash algorithm support |
-| WP_HAVE_SHA224 | SHA224 hash algorithm support |
-| WP_HAVE_SHA256 | SHA256 hash algorithm support |
-| WP_HAVE_SHA384 | SHA384 hash algorithm support |
-| WP_HAVE_SHA3 | SHA3 family hash algorithm support |
-| WP_HAVE_SHA3_224 | SHA3-224 hash algorithm support |
-| WP_HAVE_SHA3_256 | SHA3-256 hash algorithm support |
-| WP_HAVE_SHA3_384 | SHA3-384 hash algorithm support |
-| WP_HAVE_SHA3_512 | SHA3-512 hash algorithm support |
-| WP_HAVE_SHA512 | SHA512 hash algorithm support |
-| WP_HAVE_SHA512_224 | SHA512/224 hash algorithm support |
-| WP_HAVE_SHA512_256 | SHA512/256 hash algorithm support |
-| WP_HAVE_SHAKE_256 | SHAKE256 extendable output function support |
-| WP_HAVE_SLHDSA | SLH-DSA (FIPS 205) post-quantum signature support |
-| WP_HAVE_TLS1_PRF | TLS1 Pseudo-Random Function support |
-| WP_HAVE_X25519 | X25519 elliptic curve support |
-| WP_HAVE_X448 | X448 elliptic curve support |
-| WP_RSA_PSS_ENCODING | RSA-PSS (Probabilistic Signature Scheme) encoding support |
