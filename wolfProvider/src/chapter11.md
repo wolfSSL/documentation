@@ -170,8 +170,8 @@ PQC code is not compiled unless `--enable-pqc` or an individual PQC option is
 passed to wolfProvider, even when wolfSSL has the algorithms enabled.
 
 Because wolfProvider only verifies LMS, build wolfSSL with
-`--enable-lms=verify-only` so LMS signing and key generation are left out of
-the build entirely rather than compiled and unused. The
+`--enable-lms=verify-only,sha256-192,shake256` so LMS signing and key generation
+are left out of the build entirely rather than compiled and unused. The
 `build-wolfprovider.sh --enable-lms` flow already configures wolfSSL this way.
 
 ## Using wolfProvider
