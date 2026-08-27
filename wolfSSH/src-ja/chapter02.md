@@ -10,7 +10,7 @@ autotools システムを使ってビルドする際には、wolfSSH は単一�
 
 最新の最新版は、次の GitHub サイトからダウンロードできます: [https://github.com/wolfSSL/wolfssh](https://github.com/wolfSSL/wolfssh)。
 
-“Download ZIP” ボタンをクリックするか、ターミナルで次のコマンドを実行してください:
+"Download ZIP" ボタンをクリックするか、ターミナルで次のコマンドを実行してください:
 ```
 $ git clone https://github.com/wolfSSL/wolfssh.git
 ```

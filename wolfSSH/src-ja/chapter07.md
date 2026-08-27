@@ -28,7 +28,7 @@ SFTPサーバーとクライアントアプリケーションはwolfSSHにバン
 ```
 $ ./wolfsftp/client/wolfsftp -u <username>
 ```
-テストを実行するためのデフォルトの“username:password”は“jack:fetchapail” または “jill:upthehill”です。デフォルトのポートは22222です。
+テストを実行するためのデフォルトの"username:password"は"jack:fetchapail" または "jill:upthehill"です。デフォルトのポートは22222です。
 
 サポートしているコマンドの全リストは、接続後に"help"と入力すると得られます。
 ```
