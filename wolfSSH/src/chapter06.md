@@ -7,7 +7,7 @@ The following functions are used to set up the user authentication callback func
 void wolfSSH_SetUserAuth(WOLFSSH_CTX* ctx , WS_CallbackUserAuth
 cb );
 ```
-The callback function is set on the wolfSSL CTX object that is used to create the wolfSSH session objects. All sessions using this CTX will use the same callback
+The callback function is set on the wolfSSH CTX object that is used to create the wolfSSH session objects. All sessions using this CTX will use the same callback
 function. This context is not to be confused with the callback function’s context.
 
 ##  Setting the User Authentication Callback Context Data

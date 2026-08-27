@@ -21,7 +21,7 @@ $ make check (when using autoconf)
 
 ### Testing Notes
 
-After cloning the repository, be sure to make the testing private keys read- only for the user, otherwise ssh_client will tell you to do it.
+After cloning the repository, be sure to make the testing private keys read- only for the user, otherwise ssh will tell you to do it.
 ```
 $ chmod 0600 ./keys/gretel-key-rsa.pem ./keys/hansel-key-rsa.pem \
              ./keys/gretel-key-ecc.pem ./keys/hansel-key-ecc.pem

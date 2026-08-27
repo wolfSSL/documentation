@@ -150,9 +150,9 @@ $ ./configure --prefix=~/wolfSSL
 $ make
 $ make install
 ```
-This will place the library in ~/wolfSSL/lib and the includes in ~/wolfssl/include. To set up a custom install directory for wolfSSH and specify the custom wolfSSL library and include directories use the following:
+This will place the library in ~/wolfSSL/lib and the includes in ~/wolfSSL/include. To set up a custom install directory for wolfSSH and specify the custom wolfSSL library and include directories use the following:
 ```
-$ ./configure  --prefix=~/wolfssh  --libdir=~/wolfssl/lib  --includedir=~/wolfssl/include
+$ ./configure  --prefix=~/wolfssh  --libdir=~/wolfSSL/lib  --includedir=~/wolfSSL/include
 $ make
 $ make install
 ```
