@@ -11,8 +11,7 @@ SFTPサポート機能を有効にしてwolfSSHをビルドする場合には、
 リード・ライトをハンドリングするためのバッファサイズはデフォルトで1024バイトです。この値はアプリケーションがより少ないリソース消費に抑えたい場合やより大きなバッファが必要な場合には変更することができます。デフォルトサイズの変更は、コンパイル時に`WOLFSSH_MAX_SFTP_RW`マクロを定義して行います。設定例は次のとおりです:
 
 ```
-./configure --enable-sftp
-C_EXTRA_FLAGS=’WOLFSSH_MAX_SFTP_RW=2048
+./configure --enable-sftp C_EXTRA_FLAGS="-DWOLFSSH_MAX_SFTP_RW=2048"
 ```
 
 ##  wolfSSH SFTP アプリケーションの使用

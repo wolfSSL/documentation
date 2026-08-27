@@ -143,9 +143,9 @@ $ ./configure --prefix=~/wolfSSL
 $ make
 $ make install
 ```
-これにより、ライブラリは ~/wolfSSL/lib に、インクルードは ~/wolfssl/include に配置されます。wolfSSH のカスタムインストールディレクトリを設定し、カスタムの wolfSSL ライブラリおよびインクルードディレクトリを指定するには、次のようにします:
+これにより、ライブラリは ~/wolfSSL/lib に、インクルードは ~/wolfSSL/include に配置されます。wolfSSH のカスタムインストールディレクトリを設定し、カスタムの wolfSSL ライブラリおよびインクルードディレクトリを指定するには、次のようにします:
 ```
-$ ./configure  --prefix=~/wolfssh  --libdir=~/wolfssl/lib  --includedir=~/wolfssl/include
+$ ./configure  --prefix=~/wolfssh  --libdir=~/wolfSSL/lib  --includedir=~/wolfSSL/include
 $ make
 $ make install
 ```

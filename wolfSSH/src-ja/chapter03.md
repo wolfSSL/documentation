@@ -21,7 +21,7 @@ $ make check (autoconfが使われている場合)
 
 ### テストに関する注記事項
 
-レポジトリをクローンした後、テスト用の秘密鍵はユーザーにとってリードオンリーになっていることを確認してください。そうなっていない場合はssh_clientがそうするように警告します。
+レポジトリをクローンした後、テスト用の秘密鍵はユーザーにとってリードオンリーになっていることを確認してください。そうなっていない場合はsshクライアントがそうするように警告します。
 ```
 $ chmod 0600 ./keys/gretel-key-rsa.pem ./keys/hansel-key-rsa.pem \
              ./keys/gretel-key-ecc.pem ./keys/hansel-key-ecc.pem
