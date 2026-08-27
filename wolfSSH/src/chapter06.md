@@ -8,7 +8,7 @@ void wolfSSH_SetUserAuth(WOLFSSH_CTX* ctx , WS_CallbackUserAuth
 cb );
 ```
 The callback function is set on the wolfSSH CTX object that is used to create the wolfSSH session objects. All sessions using this CTX will use the same callback
-function. This context is not to be confused with the callback function’s context.
+function. This context is not to be confused with the callback function's context.
 
 ##  Setting the User Authentication Callback Context Data
 ```
@@ -20,7 +20,7 @@ Each wolfSSH session may have its own user authentication context data or share 
 ```
 void* wolfSSH_GetUserAuthCtx(WOLFSSH* ssh );
 ```
-This returns the pointer to the user authentication context data stored in the provided wolfSSH session. This is not to be confused with the wolfSSH’s context data used to create the session.
+This returns the pointer to the user authentication context data stored in the provided wolfSSH session. This is not to be confused with the wolfSSH's context data used to create the session.
 
 ## Setting the Keyboard Authentication Prompts Callback Function
 ```

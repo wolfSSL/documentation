@@ -28,7 +28,7 @@ Starting the client with specific username:
 ```
 $ ./wolfsftp/client/wolfsftp -u <username>
 ```
-The default “username:password” to run the test is either: “jack:fetchapail” or “jill:upthehill”. The default port is 22222.
+The default "username:password" to run the test is either: "jack:fetchapail" or "jill:upthehill". The default port is 22222.
 
 A full list of supported commands can be seen with typeing "help" after a connection.
 ```
