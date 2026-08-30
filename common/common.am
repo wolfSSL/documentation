@@ -27,6 +27,10 @@ builddir:
 .PHONY: html-setup
 html-setup:
 	$(Q)git submodule update --init
+# Revert any theme patch from a previous build. The EN and JA patches touch the
+# same lines of header.html, so without this an EN build in a tree last used for
+# a JA build (or vice versa) keeps the wrong language's nav links.
+	$(Q)cd ../mkdocs-material; git checkout -- material/base.html material/partials/header.html
 	-cd ../mkdocs-material; patch -p1 < $(PATCH) --ignore-whitespace -N
 	$(Q)cp -a $(SRC)/* build/html/
 	$(Q)cp ../common/*.png build/html/
