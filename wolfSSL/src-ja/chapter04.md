@@ -531,6 +531,128 @@ autoconfで行う場合は、 `./configure --enable-pkcs7 CFLAGS=-DNO_PKCS7_STRE
 **注意**：[`wc_PKCS7_VerifySignedData_ex`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata_ex) を呼び出す場合、引数`pkiMsgFoot`は完全なバッファであることが想定されています。
 内部構造は1つのバッファのストリーミングのみをサポートしており、この場合は`pkiMsgHead`になります。
 
+#### PKCS #12
+
+PKCS #12はPFXバンドル形式を定義しています。
+これは、秘密鍵とその証明書、および任意でCAチェーンをまとめて格納する、パスワードで保護された単一のファイルです。
+OpenSSL、Javaのkeytool、WindowsのCertificate Exportなどが出力する`.p12`ファイルや`.pfx`ファイルはこの形式です。
+wolfSSLは[RFC 7292](https://www.rfc-editor.org/rfc/rfc7292)に記述された形式を実装しています。
+
+PKCS #12のサポートは、configureオプション`--enable-pkcs12`を使用するか、マクロ`HAVE_PKCS12`を定義することで有効になります。
+パスワードベースの鍵導出に依存しているため、[`--enable-pwdbased`](chapter02.md#--enable-pwdbased)も必要です。
+どちらも通常のビルドではデフォルトで有効であり、[`--disable-pkcs12`](chapter02.md#--disable-pkcs12)で無効にできます。
+古いバンドルはRC2やシングルDESで暗号化されていることが多いため、旧来のツールが生成したファイルを読み込むには`--enable-rc2`や`--enable-des3`が追加で必要になる場合があります。
+
+wolfCryptのAPIは`<wolfssl/wolfcrypt/pkcs12.h>`で宣言されており、不透明な`WC_PKCS12`構造体を操作します。
+各関数の詳細は[PKCS12 APIリファレンス](group__PKCS12.md)をご参照ください。
+
+##### PKCS #12 バンドルの読み込み
+
+バンドルの読み込みは3つの手順で行います。
+`WC_PKCS12`構造体を割り当て、DERをその構造体にデコードし、MACを検証して内容を復号します。
+
+```c
+WC_PKCS12* pkcs12 = NULL;
+byte* key  = NULL;
+byte* cert = NULL;
+WC_DerCertList* ca = NULL;
+word32 keySz  = 0;
+word32 certSz = 0;
+
+/* *pkcs12がNULLの場合、wc_d2i_PKCS12_fpがWC_PKCS12を割り当てます */
+if (wc_d2i_PKCS12_fp("./certs/test-servercert.p12", &pkcs12) != 0) {
+    /* ファイルの読み込みまたはデコードのエラー */
+}
+
+if (wc_PKCS12_parse(pkcs12, "password", &key, &keySz, &cert, &certSz,
+                    &ca) != 0) {
+    /* バンドルの解析エラー。パスワード誤りが最も多い原因です */
+}
+
+/* ここでDER形式の鍵、証明書、CAチェーンを使用します。
+ * 例えばwolfSSL_CTX_use_certificate_buffer()や
+ * wolfSSL_CTX_use_PrivateKey_buffer()に渡します */
+
+XFREE(key, NULL, DYNAMIC_TYPE_PUBLIC_KEY);
+XFREE(cert, NULL, DYNAMIC_TYPE_PKCS);
+wc_FreeCertList(ca, NULL);
+wc_PKCS12_free(pkcs12);
+```
+
+バンドルがファイルではなくメモリ上にある場合は、[`wc_PKCS12_new()`](group__PKCS12.md#function-wc_pkcs12_new)または[`wc_PKCS12_new_ex()`](group__PKCS12.md#function-wc_pkcs12_new_ex)で取得した`WC_PKCS12`と共に[`wc_d2i_PKCS12()`](group__PKCS12.md#function-wc_d2i_pkcs12)を使用します。
+`_ex`版はヒープヒントを受け取り、そのヒントは構造体に保存されて、その構造体のために行われるすべての割り当てに使用されます。
+
+[`wc_PKCS12_parse()`](group__PKCS12.md#function-wc_pkcs12_parse)は秘密鍵と証明書を新たに割り当てたDERバッファで返し、呼び出し元が3つの結果すべての所有権を持ちます。
+鍵と証明書で解放時の動的タイプが異なること、およびCAリストには専用の解放関数があることにご注意ください。
+
+| 出力 | 解放方法 |
+| ---- | -------- |
+| `pkey` | `XFREE(pkey, heap, DYNAMIC_TYPE_PUBLIC_KEY)` |
+| `cert` | `XFREE(cert, heap, DYNAMIC_TYPE_PKCS)` |
+| `ca`   | [`wc_FreeCertList(ca, heap)`](group__PKCS12.md#function-wc_freecertlist) |
+
+上記の`heap`は`wc_PKCS12_new_ex()`に渡したヒープヒントと同じものです。
+`wc_PKCS12_new()`を使用した場合は`NULL`になります。
+`ca`引数は任意であり、追加の証明書が不要な場合は`NULL`を渡してください。
+
+デフォルトでは、返される秘密鍵からPKCS #8ヘッダーが取り除かれます。
+ヘッダーを残したい場合は、[`wc_PKCS12_parse_ex()`](group__PKCS12.md#function-wc_pkcs12_parse_ex)を`keepKeyHeader`に0以外の値を指定して呼び出してください。
+それ以外の動作は`wc_PKCS12_parse()`と同じです。
+
+##### PKCS #12 バンドルの作成
+
+[`wc_PKCS12_create()`](group__PKCS12.md#function-wc_pkcs12_create)は、DER形式の秘密鍵、DER形式の証明書、および任意の追加証明書の`WC_DerCertList`からバンドルを構築します。
+作成された構造体は[`wc_i2d_PKCS12()`](group__PKCS12.md#function-wc_i2d_pkcs12)でシリアライズします。
+
+```c
+WC_PKCS12* pkcs12 = NULL;
+byte* der = NULL;
+int derSz = 0;
+char pass[] = "password";
+
+pkcs12 = wc_PKCS12_create(pass, sizeof(pass) - 1, NULL,
+                          key, keySz, cert, certSz, ca,
+                          PBE_AES256_CBC,          /* 鍵の暗号化     */
+                          PBE_AES256_CBC,          /* 証明書の暗号化 */
+                          WC_PKCS12_ITT_DEFAULT,   /* 暗号化の反復回数 */
+                          WC_PKCS12_ITT_DEFAULT,   /* MACの反復回数  */
+                          0, NULL);
+if (pkcs12 == NULL) {
+    /* バンドルの作成エラー */
+}
+
+/* *derにNULLを渡すと、wc_i2d_PKCS12がバッファを割り当てます */
+if ((derSz = wc_i2d_PKCS12(pkcs12, &der, NULL)) <= 0) {
+    /* バンドルのエンコードエラー */
+}
+
+/* ここでder/derSzを.p12ファイルに書き出します */
+
+XFREE(der, NULL, DYNAMIC_TYPE_PKCS);
+wc_PKCS12_free(pkcs12);
+```
+
+`nidKey`引数と`nidCert`引数は、秘密鍵と証明書に適用するパスワードベース暗号化を選択します。
+指定できる値は`PBE_SHA1_RC4_128`、`PBE_SHA1_DES`、`PBE_SHA1_DES3`、`PBE_AES128_CBC`、`PBE_AES256_CBC`です。
+`-1`を渡すと、そのパートは暗号化されずに格納されます。
+新規に作成するバンドルには`PBE_AES256_CBC`を推奨します。
+SHA-1ベースのオプションは、古いソフトウェアとの相互運用が必要な場合にのみ使用してください。
+`iter`が0以下の場合は`WC_PKCS12_ITT_DEFAULT`（2048）回の反復が使用されます。
+
+`name`（friendlyName）引数と`keyType`引数はAPIの互換性のために受け付けられますが、現在は使用されていません。
+
+`wc_i2d_PKCS12()`には、`der`引数と`derSz`引数によって選択される3つのモードがあります。
+
+* `der`に`NULL`を渡すと、必要なサイズの計算のみを行います。必要な長さが`*derSz`に格納され、`LENGTH_ONLY_E`が返されます。
+* `*der`が`NULL`である`der`を渡すと、必要なサイズのバッファを割り当て、そのアドレスを`*der`に格納します。呼び出し元は`XFREE(*der, NULL, DYNAMIC_TYPE_PKCS)`で解放します。
+* `*der`が呼び出し元の用意したバッファを指している`der`を渡すと、そのバッファに書き込みます。`derSz`がバッファ不足を示している場合は`BUFFER_E`を返します。通常の`i2d`の慣例に従い、成功時には`*der`がエンコードされたDERの末尾の次のバイトへ進められるため、元のポインタは別途保持しておいてください。
+
+##### OpenSSL互換レイヤー
+
+互換レイヤーが有効な場合、`<wolfssl/openssl/pkcs12.h>`から使い慣れたOpenSSL形式の名前も使用できます。
+`d2i_PKCS12_bio()`、`PKCS12_parse()`、`PKCS12_verify_mac()`、`PKCS12_create()`が該当します。
+これらは[`wolfSSL_d2i_PKCS12_bio()`](group__openSSL.md)や`wolfSSL_PKCS12_parse()`などに対応しており、上記のwolfCrypt関数をラップして、DERバッファの代わりに`WOLFSSL_X509`オブジェクトや`WOLFSSL_EVP_PKEY`オブジェクトを返します。
+
 ### 特定の暗号スイートの使用を強制する
 
 デフォルトでは、wolfSSLは接続の両側がサポートしている最良の暗号スイートを選択します。
