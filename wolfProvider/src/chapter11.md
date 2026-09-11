@@ -29,11 +29,11 @@ pure and pre-hash signing, verification, context strings, and key encoding.
 SLH-DSA supports key generation, pure signing, verification, context strings,
 and key encoding. LMS supports public-key import and one-shot signature
 verification only. Private-key import, signing, and key generation are not
-exposed because OpenSSL 3.6's provider ABI defines LMS as verification-only: it
-advertises no signing, key-generation, or private-key import entry points for
-wolfProvider to implement, even though wolfCrypt itself supports them. This
-also avoids exposing stateful private-key operations through an interface that
-cannot enforce LMS leaf-use (one-time signature) state.
+exposed. This follows OpenSSL's LMS key-type contract, which is
+verification-only, and is also a deliberate wolfProvider design choice: it
+avoids exposing stateful LMS private-key operations through an interface that
+cannot enforce LMS leaf-use (one-time signature) state, even though wolfCrypt
+itself supports LMS signing and key generation.
 
 ## Provider Architecture
 
@@ -132,10 +132,12 @@ for configuration and benchmark details.
 
 ## Building
 
+Post-quantum algorithms require OpenSSL 3.6 or later. Set `OPENSSL_TAG` to the latest patched OpenSSL 3.6.x release (not 3.6.0, which has known vulnerabilities) so the build does not use an outdated default:
+
 The build script can configure OpenSSL, wolfSSL, and wolfProvider together:
 
 ```sh
-./scripts/build-wolfprovider.sh --enable-pqc
+OPENSSL_TAG=openssl-3.6.2 ./scripts/build-wolfprovider.sh --enable-pqc
 ```
 
 `--enable-pqc` enables ML-KEM, ML-DSA and SLH-DSA. LMS remains an independent
@@ -152,13 +154,16 @@ For a manual build, configure wolfSSL with the matching algorithm options,
 then configure wolfProvider:
 
 ```sh
-# Add the required options to the normal wolfSSL configuration.
+# In the wolfSSL source directory, add the required options to the
+# normal wolfSSL configuration.
+cd /path/to/wolfssl
 ./configure --enable-mlkem --enable-mldsa --enable-slhdsa=yes,sha2 \
     --enable-lms=verify-only,sha256-192,shake256
 make
 sudo make install
 
-# Configure wolfProvider against OpenSSL 3.6 or later.
+# In the wolfProvider source directory, configure against OpenSSL 3.6 or later.
+cd /path/to/wolfProvider
 ./configure --enable-pqc --enable-lms \
     --with-openssl=/path/to/openssl \
     --with-wolfssl=/path/to/wolfssl
@@ -181,7 +186,7 @@ mode. It makes wolfProvider the OpenSSL default and prevents operations from
 silently falling back to OpenSSL's built-in provider:
 
 ```sh
-./scripts/build-wolfprovider.sh --replace-default \
+OPENSSL_TAG=openssl-3.6.2 ./scripts/build-wolfprovider.sh --replace-default \
     --enable-pqc --enable-lms
 ```
 
@@ -205,10 +210,11 @@ If wolfProvider was installed outside OpenSSL's module search path, also set
 export OPENSSL_MODULES=/path/to/wolfprovider/lib
 ```
 
-Run commands with the configuration active. This verifies the algorithms
-advertised by the configured provider; it does not guarantee that unrelated
-operations cannot be selected from OpenSSL's default provider in standard
-provider mode:
+Run commands with the configuration active. Because this configuration
+activates only `libwolfprov`, OpenSSL does not implicitly activate its own
+default provider, so operations that wolfProvider does not support will fail
+rather than silently falling back, unless an application also activates the
+default provider (or unless replace-default mode is used):
 
 ```sh
 OPENSSL_CONF=/path/to/wolfProvider/provider.conf \
@@ -228,10 +234,12 @@ families through the OpenSSL EVP API:
 - ML-DSA-65 key generation, signing, and verification
 - SLH-DSA-SHA2-128f key generation, signing, and verification
 
-The example is built and run by `make check` when wolfProvider is configured
-with any PQC family. Compile-time guards run only the enabled families, so the
-same source also demonstrates ML-KEM-only, ML-DSA-only, and SLH-DSA-only
-builds. After building, it can also be run directly from the wolfProvider root:
+The example is built (as a `noinst_PROGRAMS` target, not an Automake test)
+when wolfProvider is configured with any PQC family; wolfProvider's CI runs it
+as a separate step rather than as part of `make check`. Compile-time guards run
+only the enabled families, so the same source also demonstrates ML-KEM-only,
+ML-DSA-only, and SLH-DSA-only builds. After building, it can be run directly
+from the wolfProvider root:
 
 ```sh
 ./examples/pqc_openssl_example
@@ -294,6 +302,14 @@ CAVP validates the algorithm implementations. It is distinct from validation
 of a complete cryptographic module under FIPS 140-3, so using an open source or
 FIPS-ready wolfSSL build does not by itself create a FIPS-validated
 application.
+
+Validated FIPS and FIPS-Ready builds currently reject PQC (ML-KEM, ML-DSA,
+SLH-DSA) and LMS: combining a FIPS or FIPS-Ready wolfSSL build with these
+algorithms is not yet supported, pending the module-specific CAST integration.
+Use PQC and LMS with non-FIPS wolfSSL builds only until that integration is
+available. This restriction is enforced by `scripts/build-wolfprovider.sh`; a
+hand-run `./configure` does not currently reject the combination, so use the
+build script (or avoid the combination) for FIPS builds.
 
 PQC has several independent test layers:
 

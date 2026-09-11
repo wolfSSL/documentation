@@ -1,18 +1,17 @@
-# FIPS 140-2のサポート
+# FIPS 140-3のサポート
 
-wolfProviderは、FIPSで検証されたバージョンのwolfCryptに対して適切にコンパイルされた場合にのみ、FIPS140-2に対応した動作を行うよう設計しています。
-この使用シナリオには、wolfSSL Inc. から入手した、適切にライセンスされ、検証されたバージョンのwolfCryptが必要です。
+wolfProviderは、FIPS検証済みのwolfCryptに対してコンパイルした場合に、FIPS 140-3検証済みのwolfCryptと連携するよう設計されています。
+この使用形態では、wolfSSL Inc.から入手した、適切にライセンスされ検証済みのwolfCryptが必要です。
 
-wolfCrypt FIPSライブラリは、非FIPSモードに「切り替える」ことができません。
-通常の非FIPS版wolfCryptとFIPS版wolfCryptは、それぞれ別々のソースコードパッケージで提供しています。
+wolfCrypt FIPSライブラリを非FIPSモードへ「切り替える」ことはできません。
+wolfCrypt FIPSと通常版wolfCryptは、別々のソースコードパッケージです。
 
-wolfProviderをFIPS版wolfCryptを使用するようにコンパイルすると、
-FIPSで検証されたアルゴリズム、モード、および鍵サイズのサポートおよび登録エンジンコールバックのみが含まれます。
-OpenSSLベースのアプリケーションがFIPS検証が行われていないアルゴリズムを呼び出す場合、実行はwolfProviderに入らず、
-OpenSSL構成に基づいて、デフォルトのOpenSSLエンジンまたは他の登録済みエンジンプロバイダーによって処理される可能性があります。
+wolfProviderをwolfCrypt FIPSと組み合わせてコンパイルすると、wolfCrypt FIPSモジュールが提供するアルゴリズムのプロバイダーコールバックが登録されます。
+FIPS適合を目的とするアプリケーションは、モジュールのセキュリティポリシーに記載された承認済みのアルゴリズム、モード、鍵サイズだけを使用する必要があります。登録されたモードの一部は検証範囲外である可能性があり、FIPS適合環境では依拠できません。
+OpenSSLベースのアプリケーションがFIPS検証されていないアルゴリズムを呼び出すと、OpenSSLの構成によっては、処理がwolfProviderに入らず、OpenSSLのデフォルトプロバイダーまたは他の登録済みプロバイダーで実行される可能性があります。
 
-**注**:wolfCrypt以外に実装されたFIPSアルゴリズムを別のプロバイダーから呼び出す場合、
-それらのアルゴリズムはwolfProviderおよびFIPS版wolfCryptのスコープに含みません。
-FIPS認証取得に際し、問題となる可能性があります。
+**注**: FIPS適合を目的とする場合に、wolfCrypt FIPS以外のアルゴリズムを別のプロバイダーから呼び出すと、そのアルゴリズムはwolfProviderとwolfCrypt FIPSの両方の範囲外となり、FIPS検証済みではない可能性があります。
+
+FIPS適合の範囲を広げるため、wolfProviderは通常、置き換え用デフォルトモードでビルドします。これによりwolfProviderがOpenSSLのデフォルトプロバイダーとなり、アプリケーションがデフォルトプロバイダー内の非FIPSアルゴリズムへ暗黙にフォールバックするリスクを低減します。有効化には、`--enable-replace-default`ビルドオプションと、wolfProviderのプロバイダー置換を組み込んだOpenSSLのビルドの両方が必要です。`scripts/build-wolfprovider.sh --replace-default`は両方の手順を実行します。明示的にロードされたプロバイダーや低レベルAPIの直接呼び出しは制御外であるため、これ自体がシステム全体のFIPS適合を保証するものではありません。置き換え用デフォルトモードについては[wolfProviderのロード](chapter07.md)の章を、FIPSベースライン検証や本番FIPSビルドのワークフロー(wolfCrypt FIPSモジュールの世代(例: v5、v6、v7)やFIPS Readyバンドルを含む)についてはwolfProvider FIPSインテグレーションガイド(wolfProviderパッケージ内の`docs/FIPS_INTEGRATION_GUIDE.md`)をご参照ください。
 
 FIPS版wolfCrypt(140-2/140-3)の使用に関する詳細については、wolfSSL(info@wolfssl.jp)までお問い合わせください。

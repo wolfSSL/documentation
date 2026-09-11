@@ -4,8 +4,8 @@ wolfProvider is composed of the following source files, all located under the "s
 
 | Source File | Description |
 | --------------- | ---------------- |
-| wp_wolfprov.c | Contains library entry points. Calls OpenSSL IMPLEMENT_DYNAMIC_BIND_FN for dynamic loading of the library using the OpenSSL provider framework. Also includes static entry points when compiled and used as a static library. |
-| wp_internal.c | Includes wolfprovider_bind() function, which handles registration of provider algorithm callbacks. Also includes other wolfprovider internal functionality. |
+| wp_wolfprov.c | Contains the library entry points `OSSL_provider_init()` and `wolfssl_provider_init()`, the provider dispatch table, provider parameter handling, and the `OSSL_ALGORITHM` arrays that register wolfProvider's algorithm implementations with OpenSSL. Also serves as the static entry point when compiled and used as a static library. |
+| wp_internal.c | wolfProvider internal helpers, including entropy/RNG and CAST self-test mutex setup, provider-context RNG access and locking utilities, and decoder-skip logic. |
 | wp_logging.c | wolfProvider logging framework and function implementations. |
 | wp_aes_aead.c | wolfProvider AES-AEAD (Authenticated Encryption with Associated Data) implementation. |
 | wp_aes_block.c | wolfProvider AES-ECB and AES-CBC implementation. |
@@ -19,6 +19,7 @@ wolfProvider is composed of the following source files, all located under the "s
 | wp_dh_kmgmt.c | wolfProvider DH key management implementation. |
 | wp_digests.c | wolfProvider message digest implementations (SHA-1, SHA-2, SHA-3, ...). |
 | wp_drbg.c | wolfProvider DRBG (Deterministic Random Bit Generator) implementation. |
+| wp_seed_src.c | wolfProvider SEED-SRC entropy source with /dev/urandom caching for fork-safe entropy. |
 | wp_ecc_kmgmt.c | wolfProvider ECC key management implementation. |
 | wp_ecdh_exch.c | wolfProvider ECDH key exchange implementation. |
 | wp_ecdsa_sig.c | wolfProvider ECDSA signature implementation. |
@@ -38,10 +39,20 @@ wolfProvider is composed of the following source files, all located under the "s
 | wp_mac_sig.c | wolfProvider MAC signature implementation. |
 | wp_params.c | wolfProvider parameter handling implementation. |
 | wp_pbkdf2.c | wolfProvider PBKDF2 (Password-Based Key Derivation Function 2) implementation. |
+| wp_sshkdf.c | wolfProvider SSHKDF (SSH Key Derivation Function) implementation. |
 | wp_rsa_asym.c | wolfProvider RSA asymmetric encryption implementation. |
 | wp_rsa_kem.c | wolfProvider RSA KEM (Key Encapsulation Mechanism) implementation. |
 | wp_rsa_kmgmt.c | wolfProvider RSA key management implementation. |
 | wp_rsa_sig.c | wolfProvider RSA signature implementation. |
+| wp_mlkem_kmgmt.c | wolfProvider ML-KEM (FIPS 203) key management implementation. |
+| wp_mlkem_kem.c | wolfProvider ML-KEM (FIPS 203) key encapsulation implementation. |
+| wp_mlx_kmgmt.c | wolfProvider hybrid ML-KEM plus ECDH key management implementation. |
+| wp_mlx_kem.c | wolfProvider hybrid ML-KEM plus ECDH key encapsulation implementation. |
+| wp_mldsa_kmgmt.c | wolfProvider ML-DSA (FIPS 204) key management implementation. |
+| wp_mldsa_sig.c | wolfProvider ML-DSA (FIPS 204) signature implementation. |
+| wp_slhdsa_kmgmt.c | wolfProvider SLH-DSA (FIPS 205) key management implementation. |
+| wp_slhdsa_sig.c | wolfProvider SLH-DSA (FIPS 205) signature implementation. |
+| wp_lms.c | wolfProvider LMS (RFC 8554) verification implementation. |
 | wp_tls1_prf.c | wolfProvider TLS 1.0 PRF implementation. |
 | wp_tls_capa.c | wolfProvider TLS capabilities implementation. |
 
@@ -76,15 +87,7 @@ The wolfProvider dispatch table contains several key functions that handle diffe
 
 ### wolfprov_teardown
 
-The `wolfprov_teardown()` function is responsible for cleaning up wolfProvider when it is unloaded by OpenSSL. It performs the following cleanup tasks:
-
-- Frees allocated provider context and resources
-- Cleans up any remaining algorithm implementations
-- Removes registered callbacks and handlers
-- Ensures proper memory deallocation to prevent memory leaks
-- Resets any global state maintained by the provider
-
-This function is called automatically by OpenSSL when the provider is being unloaded, ensuring that all resources are properly released.
+The `wolfprov_teardown()` function is called automatically by OpenSSL when the provider is unloaded. It frees the provider context (`wolfssl_prov_ctx_free()`) and calls `wolfCrypt_Cleanup()` to release wolfCrypt's resources.
 
 ### wolfprov_gettable_params
 
@@ -108,19 +111,16 @@ The `wolfprov_get_params()` function retrieves specific parameter values from th
 - Provides access to provider configuration and state information
 - Supports both simple parameters and complex parameter structures
 
-Common parameters that can be retrieved include provider version, supported algorithms, FIPS mode status, and other configuration details.
+wolfProvider implements four provider parameters: the provider name (`OSSL_PROV_PARAM_NAME`), version (`OSSL_PROV_PARAM_VERSION`), build information (`OSSL_PROV_PARAM_BUILDINFO`), and running status (`OSSL_PROV_PARAM_STATUS`).
 
 ### wolfssl_prov_get_capabilities
 
-The `wolfssl_prov_get_capabilities()` function reports the cryptographic capabilities of wolfProvider to OpenSSL. It provides capability information which:
+The `wolfssl_prov_get_capabilities()` function reports wolfProvider's TLS-related capabilities to OpenSSL. It provides:
 
-- Returns information about supported algorithms and operations
-- Provides details about algorithm parameters and constraints
-- Indicates FIPS compliance and validation status
-- Reports performance characteristics and limitations
-- Enables OpenSSL to make informed decisions about algorithm selection
+- The supported TLS key-exchange groups (the `TLS-GROUP` capability), including classical and, when enabled, post-quantum and hybrid groups
+- When ML-DSA is enabled, the supported TLS signature algorithms (the `TLS-SIGALG` capability)
 
-The capabilities information helps OpenSSL determine when to use wolfProvider algorithms and how to configure them appropriately for different use cases.
+The capabilities information helps OpenSSL negotiate the key-exchange groups and signature algorithms that wolfProvider supports during a TLS handshake.
 
 ### wolfprov_query
 

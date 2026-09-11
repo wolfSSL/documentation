@@ -9,57 +9,56 @@ wolfSSL has tested wolfProvider with numerous open source projects through autom
 The following Open Source Projects (OSPs) have been tested and verified to work with wolfProvider:
 
 ### Network and Web Technologies
-* cURL - Command line tool for transferring data with URLs
+* cURL - Command line tool and library for transferring data with URLs
 * gRPC - High-performance RPC framework
-* libwebsockets - Lightweight C library for websockets
+* libwebsockets - Lightweight C library for WebSockets
 * Nginx - High-performance HTTP server and reverse proxy
+* Nginx (PQC) - Nginx built with post-quantum TLS key exchange groups
 * Qt5 Network - Qt networking module
+* libnice - GLib ICE implementation for peer-to-peer and WebRTC
+* iPerf - Network performance measurement tool
 
 ### Security and Authentication
 * OpenSSH - Secure shell implementation
-* libssh2 - SSH2 library
+* libssh2 - SSH2 client library
 * libfido2 - FIDO2 library for WebAuthn
 * OpenSC - Smart card tools and middleware
 * pam-pkcs11 - PAM module for PKCS#11
 * OpenVPN - VPN solution
-* Stunnel - SSL wrapper for network services
+* Stunnel - SSL/TLS wrapper for network services
+* hostap (wpa_supplicant / hostapd) - Wi-Fi authentication (EAP, WPA)
+* Kerberos 5 (krb5) - Network authentication protocol
+* libcryptsetup - LUKS disk encryption
+* Git over SSH - Git transport over SSH
 
 ### System and Network Tools
 * systemd - System and service manager
 * tcpdump - Network packet analyzer
 * rsync - File synchronization utility
 * tnftp - Enhanced FTP client
-* iperf - Network performance measurement tool
-* IPMItool - IPMI management tool
 * PPP - Point-to-Point Protocol implementation
+* Socat - Multipurpose relay for bidirectional data transfer
+* librelp - Reliable Event Logging Protocol library
+* Net-SNMP - Simple Network Management Protocol implementation
 
 ### Directory and Identity Services
 * OpenLDAP - Lightweight Directory Access Protocol
 * SSSD - System Security Services Daemon
-* Net-SNMP - Network management protocol implementation
+* BIND 9 - DNS server and resolver
 
 ### Cryptography and PKI
-* cjose - C library for JWT
-* libeac3 - Electronic Authentication Components
-* libhashkit2 - Consistent hashing library
-* liboauth2 - OAuth2 library
+* cjose - C library for JOSE/JWT
+* libeac3 - Extended Access Control library
+* libhashkit2 - Consistent hashing library (libmemcached)
+* liboauth2 - OAuth 2.0 library
 * libtss2 - TPM2 Software Stack
 * tpm2-tools - TPM2 tools
 * xmlsec - XML Security library
 * sscep - SCEP client implementation
 
-### Development and Testing
-* Asan - Address Sanitizer testing
-* Codespell - Spell checker for source code
-* Multi-Compiler - Multi-compiler testing
-
 ### Remote Access and Display
 * x11vnc - VNC server for X11
-* python3-ntp - Python NTP library
-
-### Other Utilities
-* Socat - Multipurpose relay for bidirectional data transfer
-* Simple - Simple test applications
+* python3-ntp - Python NTP implementation
 
 ## General Setup
 Most of these projects require similar setup steps:
@@ -87,11 +86,15 @@ Further, wolfProvider gives some ability to determine if the library is actually
 If the project being used is included in the list of tested open source project's then the testing scripts can be referenced. These can be found in the [wolfssl/wolfProvider](https://github.com/wolfSSL/wolfProvider) repository on GitHub under .github/workflows/.
 
 ## Testing and Validation
-All of the above referenced open source project's are continuously tested in the wolfProvider CI/CD pipeline with:
+All of the above referenced open source projects are continuously tested in the wolfProvider CI/CD pipeline. Testing spans:
 
-* OpenSSL version 3.5.0
-* wolfSSL with both master and stable releases
-* Force failure testing to ensure proper error handling
-* FIPS testing is also done through a Jenkins pipeline
+* A range of OpenSSL 3.x releases (from 3.0.6 through the latest 3.x release)
+* wolfSSL master plus multiple stable releases (for example v5.9.1 and v5.8.4)
+* Both standard and replace-default provider modes
+* FIPS and non-FIPS builds (FIPS additionally exercised by dedicated FIPS and FIPS-Ready GitHub Actions workflows)
+* Force-failure testing (`WOLFPROV_FORCE_FAIL=1`) to confirm wolfProvider crypto is actually exercised
+* Address and undefined-behavior sanitizers, static analysis, and post-quantum known-answer tests (KATs)
+
+wolfProvider currently maintains over 40 open source project integrations across more than 60 GitHub Actions workflows, split between a fast per-pull-request tier and a broader nightly tier.
 
 This comprehensive testing ensures that wolfProvider maintains compatibility with a wide range of open source projects and their various use cases.

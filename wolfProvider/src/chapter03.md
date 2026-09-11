@@ -10,16 +10,16 @@ The general wolfProvider package is structured as follows:
 
 ```
 certs/                      (Test certificates and keys, used with unit tests)
+docs/                       (Integration and FIPS integration guides)
 examples/                   (Code examples)
 include/
     wolfprovider/           (wolfProvider header files)
-IDE/                        (Integration examples)
+IDE/                        (Integration examples, including the Windows Visual Studio solution)
 scripts/                    (wolfProvider scripts for testing and building)
 src/                        (wolfProvider source files)
 test/                       (wolfProvider test files)
 provider.conf               (Example OpenSSL config file using wolfProvider)
 provider-fips.conf          (Example OpenSSL config file using wolfProvider FIPS)
-user_settings.h             (EXAMPLE user_settings.h)
 ```
 ## Building on *nix
 The quickest method is to use the `scripts/build-wolfprovider.sh` script as follows:
@@ -33,13 +33,13 @@ It will clone, configure, compile, and install OpenSSL and wolfSSL with a defaul
 Setting the various environment variables prior to calling the script:
 
 ```
-OPENSSL_TAG=openssl-3.2.0 WOLFSSL_TAG=v5.7.2-stable WOLFPROV_DEBUG=1 ./scripts/build-wolfprovider.sh
+OPENSSL_TAG=openssl-3.5.4 WOLFSSL_TAG=v5.9.2-stable WOLFPROV_DEBUG=1 ./scripts/build-wolfprovider.sh
 ```
 
 Specifying arguments for the script to parse:
 
 ```
-./scripts/build-wolfprovider.sh --openssl-ver=openssl-3.2.0 --wolfssl-ver=v5.7.2-stable --debug
+./scripts/build-wolfprovider.sh --openssl-ver=openssl-3.5.4 --wolfssl-ver=v5.9.2-stable --debug
 ```
 
 Of course, these methods can be combined to achieve the desired build combination as well.
@@ -53,25 +53,29 @@ If desired, each component can be manually compiled using the following guide.
 
 A pre-installed version of OpenSSL may be used with wolfProvider, or OpenSSL can be recompiled for use with wolfProvider. General instructions for compiling OpenSSL on *nix-like platforms will be similar to the following. For complete and comprehensive OpenSSL build instructions, reference the OpenSSL INSTALL file and documentation.
 ```
+# Check out the latest patch release of a supported OpenSSL 3.x series.
 git clone https://github.com/openssl/openssl.git
 cd openssl
-./config no-fips -shared
+git checkout "$(git tag -l 'openssl-3.*' | grep -Ev 'alpha|beta' | sort -V | tail -1)"
+./config no-fips shared
 make
 sudo make install
 ```
 
+Always build against the latest patch release of your chosen OpenSSL 3.x series (see the OpenSSL Version Compatibility chapter); older point releases may be missing security fixes.
+
 ### Building wolfSSL
 
-If using a FIPS-validated version of wolfSSL with wolfProvider, follow the build instructions provided with your specific FIPS validated source bundle and Security Policy. In addition to the correct “--enable-fips” configure option, wolfProvider will need wolfSSL to be compiled with “**WOLFSSL_PUBLIC_MP**” defined. For example, building the “wolfCrypt Linux FIPSv5” bundle on Linux:
+If using a FIPS-validated version of wolfSSL with wolfProvider, follow the build instructions provided with your specific FIPS validated source bundle and Security Policy. In addition to the correct "--enable-fips" configure option, wolfProvider will need wolfSSL to be compiled with "**WOLFSSL_PUBLIC_MP**" defined. For example, building the "wolfCrypt Linux FIPSv5" bundle on Linux:
 ```
 cd wolfssl-X.X.X-commercial-fips-linuxv5
-./configure --enable-fips=v5 CFLAGS=”-DWOLFSSL_PUBLIC_MP”
+./configure --enable-fips=v5 CFLAGS="-DWOLFSSL_PUBLIC_MP"
 make
 ./wolfcrypt/test/testwolfcrypt
-< modify fips_test.c using verifyCore hash output from testwolfcrypt >
+# modify fips_test.c using the verifyCore hash output from testwolfcrypt
 make
 ./wolfcrypt/test/testwolfcrypt
-< all algorithms should PASS >
+# all algorithms should PASS
 sudo make install
 ```
 
@@ -91,6 +95,7 @@ Add `--enable-curve25519` to include support for X25519 Key Exchange.
 Add `--enable-curve448` to include support for X448 Key Exchange.
 Add `--enable-ed25519` to include support for Ed25519 signatures and certificates..
 Add `--enable-ed448` to include support for Ed448 signature and certificates.
+Add `--enable-sha3` and `--enable-shake256` to include SHA-3 and SHAKE-256 support.
 
 Add `--enable-pwdbased` to the configure command above if PKCS#12 is used in OpenSSL.
 
@@ -98,13 +103,11 @@ Add to CPPFLAGS `-DHAVE_FFDHE_6144 -DHAVE_FFDHE_8192 -DFP_MAX_BITS=16384` to ena
 
 Add to `--enable-hmac-copy` if performing HMAC repeatedly with the same key to improve performance. (Available with wolfSSL 5.7.8+.)
 
-Add `--enable-sp=yes,asm' '--enable-sp-math-all'` to use SP Integer maths. Replace `-DFP_MAX_BITS=16384` with -DSP_INT_BITS=8192` when used.
+Add `--enable-sp=yes,asm --enable-sp-math-all` to use SP integer math. Replace `-DFP_MAX_BITS=16384` with `-DSP_INT_BITS=8192` when used.
 
 Remove `-DWOLFSSL_PSS_LONG_SALT -DWOLFSSL_PSS_SALT_LEN_DISCOVER` and add `--enable-fips=v2` to the configure command above if building from a FIPS v2 bundle and not the git repository. Change `--enable-fips=v2` to `--enable-fips=ready` if using a FIPS Ready bundle.
 
 If '--with-eccminsz=192' is not supported by wolfSSL, add '-DECC_MIN_KEY_SZ=192' to the CPPFLAGS.
-
-``
 
 If cloning wolfSSL from GitHub, you will need to run the `autogen.sh` script before running `./configure`. This will generate the configure script:
 ```
@@ -135,7 +138,7 @@ wolfProvider will use the system default OpenSSL library installation unless cha
 
 The custom OpenSSL installation location may also need to be added to your library search path. On Linux, `LD_LIBRARY_PATH` is used:
 ```
-export LD_LIBRARY_PATH=/usr/local/ssl:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/ssl/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 ```
 
 To build then install wolfProvider, run:
@@ -161,32 +164,16 @@ make check
 
 If you get an error like `error while loading shared libraries: libssl.so.3` then the library cannot be found. Use the `LD_LIBRARY_PATH` environment variable as described in the section above.
 
-## Building on WinCE
+## Building on Windows (Visual Studio)
 
-For full wolfProvider compatibility, ensure you have the following flags in your `user_settings.h` file for wolfCrypt:
-```
-#define WOLFSSL_CMAC
-#define WOLFSSL_KEY_GEN
-#undef NO_SHA
-#undef NO_DES
-#define WOLFSSL_AES_COUNTER
-#define HAVE_AESCCM
-#define HAVE_AES_ECB
-#define WOLFSSL_AES_DIRECT
-#define WC_RSA_NO_PADDING
-#define WOLFSSL_PUBLIC_MP
-#define ECC_MIN_KEY_SZ=192
-```
+wolfProvider includes a Visual Studio 2022 solution at `IDE/WINVS/wolfprovider.sln` that builds **`libwolfprov.dll`**, an OpenSSL 3.x provider backed by wolfSSL. The DLL name matters: `-provider libwolfprov` resolves to `libwolfprov.dll`. There is no `configure` step on Windows; wolfSSL is configured through a `user_settings.h`.
 
-Add wolfProvider flags to your `user_settings.h` file depending on which algorithms and features you want to use. You can find a list of wolfProvider user settings flags in the `user_settings.h` file in wolfProvider’s directory.
+Prerequisites:
 
-Build wcecompat, wolfCrypt and OpenSSL for Windows CE, and keep track of their paths.
+* Visual Studio 2022 with the C++ toolset (v143) and MASM (`ml64.exe`).
+* Perl (for example Strawberry Perl), NASM, and git, to build OpenSSL. NASM is a separate install from Perl.
 
-In the wolfProvider directory, open the sources file and change the OpenSSL, wolfCrypt, and `user_settings.h` paths to the directories you are using. You will need to update the paths in the INCLUDES and TARGETLIBS sections.
-
-Load the wolfProvider project in Visual Studio. Include either `bench.c`, or `unit.h` and `unit.c` depending on if you want to run the benchmark or unit tests.
-
-Build the project, and you will end up with a wolfProvider.exe executable. You can run this executable with ` --help` to see a full list of options. You may need to run it with the  `--static` flag to use wolfProvider as a static provider.
+The solution provides four x64 configurations. `DLL Release` and `DLL Debug` build the shipped provider (`libwolfprov.dll`); `Static Release` and `Static Debug` build `unit-test.exe`, which links wolfProvider statically to run the unit tests. The shipped provider is the DLL; a statically linked wolfProvider is instead registered as an OpenSSL built-in provider via `OSSL_PROVIDER_add_builtin()` (see the Loading wolfProvider chapter). wolfProvider, wolfSSL, and OpenSSL are expected to sit side by side; the paths are set in `wolfprovider.props` and can be overridden on the command line (for example `/p:wolfCryptDir=D:\wolfssl`). Both non-FIPS and FIPS wolfSSL builds are supported.
 
 ## Build Options (./configure Options)
 
@@ -212,7 +199,10 @@ By default, wolfProvider only builds a shared library, with building of a static
 | --enable-usersettings | **Disabled** | Use your own user_settings.h and do not add Makefile CFLAGS |
 | --enable-dynamic | **Enabled** | Enable loading wolfProvider as a dynamic provider |
 | --enable-singlethreaded | **Disabled** | Enable wolfProvider single threaded |
-| --enable-pqc | **Disabled** | Enable ML-KEM, ML-DSA and SLH-DSA (FIPS 203/204/205) |
+| --enable-debug-silent | **Disabled** | With `--enable-debug`, compile debug logging in but keep it silent until enabled at runtime via WOLFPROV_LOG_LEVEL / WOLFPROV_LOG_COMPONENTS (has no effect without `--enable-debug`) |
+| --enable-replace-default | **Disabled** | Compile wolfProvider with `-DWOLFPROV_REPLACE_DEFAULT` for replace-default mode. Making wolfProvider the default provider also requires building OpenSSL with wolfProvider's `provider_predefined.c` replacement; use `scripts/build-wolfprovider.sh --replace-default` for the complete setup |
+| --enable-seed-src | **Disabled** | Enable the SEED-SRC entropy source with /dev/urandom caching for fork-safe entropy |
+| --enable-pqc | **Disabled** | Enable ML-KEM, ML-DSA and SLH-DSA (FIPS 203/204/205). Requires wolfSSL master/v5.9.2+ and OpenSSL 3.6+ |
 | --enable-mlkem | **Disabled** | Enable ML-KEM (FIPS 203) only |
 | --enable-mldsa | **Disabled** | Enable ML-DSA (FIPS 204) only |
 | --enable-slhdsa | **Disabled** | Enable SLH-DSA (FIPS 205) only |
@@ -227,7 +217,7 @@ wolfProvider exposes several preprocessor defines that allow users to configure 
 
 | Define                           | Description |
 | :------------------------------- | :----------------------------- |
-| WOLFPROVIDER_USER_SETTINGS | Read user-specified defines from user_settings.h. |
+| WOLFPROVIDER_USER_SETTINGS | Define this (in your build flags or user_settings.h) to have wolfProvider read user-specified defines from user_settings.h. Some source files currently also check the shorter name `WOLFPROV_USER_SETTINGS`. The separate `--enable-usersettings` configure option tells the build not to add its own Makefile CFLAGS; it does not define this macro. |
 | WOLFPROV_DEBUG | Output debug information |
 | WP_CHECK_FORCE_FAIL | Force failure checking for testing purposes |
 | WP_ALLOW_NON_FIPS | Allow certain non-FIPS algorithms in FIPS mode |
@@ -256,6 +246,7 @@ wolfProvider exposes several preprocessor defines that allow users to configure 
 | WP_HAVE_GMAC | GMAC (Galois/Counter Mode Authentication) support |
 | WP_HAVE_HKDF | HKDF (HMAC-based Key Derivation Function) support |
 | WP_HAVE_HMAC | HMAC (Hash-based Message Authentication Code) support |
+| WP_HAVE_KBKDF | KBKDF (Key-Based Key Derivation Function) support |
 | WP_HAVE_KRB5KDF | Kerberos 5 Key Derivation Function support |
 | WP_HAVE_LMS | LMS (RFC 8554 / SP 800-208) verification support |
 | WP_HAVE_MD5 | MD5 hash algorithm support |
@@ -265,6 +256,7 @@ wolfProvider exposes several preprocessor defines that allow users to configure 
 | WP_HAVE_PBE | Password-Based Encryption support |
 | WP_HAVE_RANDOM | Random number generation support |
 | WP_HAVE_RSA | RSA encryption and signature support |
+| WP_HAVE_SEED_SRC | SEED-SRC entropy source support |
 | WP_HAVE_SHA1 | SHA1 hash algorithm support |
 | WP_HAVE_SHA224 | SHA224 hash algorithm support |
 | WP_HAVE_SHA256 | SHA256 hash algorithm support |
@@ -278,6 +270,7 @@ wolfProvider exposes several preprocessor defines that allow users to configure 
 | WP_HAVE_SHA512_224 | SHA512/224 hash algorithm support |
 | WP_HAVE_SHA512_256 | SHA512/256 hash algorithm support |
 | WP_HAVE_SHAKE_256 | SHAKE256 extendable output function support |
+| WP_HAVE_SSHKDF | SSHKDF (SSH Key Derivation Function) support |
 | WP_HAVE_SLHDSA | SLH-DSA (FIPS 205) post-quantum signature support |
 | WP_HAVE_TLS1_PRF | TLS1 Pseudo-Random Function support |
 | WP_HAVE_X25519 | X25519 elliptic curve support |

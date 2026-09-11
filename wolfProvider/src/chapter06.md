@@ -2,9 +2,23 @@
 
 wolfProvider has been designed to leverage the portability of the associated wolfCrypt and OpenSSL libraries.
 
+## Supported Platforms
+
+wolfProvider is cross-platform and builds on the major platforms supported by wolfSSL and OpenSSL, including:
+
+* Linux and other *nix-like systems, built with the autoconf system (see [Building wolfProvider](chapter03.md))
+* macOS
+* Windows, using the Visual Studio 2022 solution that builds `libwolfprov.dll` (see [Building wolfProvider](chapter03.md))
+* Android, using the build scripts under `IDE/Android`
+* Apple platforms, using the framework build scripts under `IDE/XCODE`
+
+Both FIPS and non-FIPS builds are supported on Linux, macOS, Windows, and Android (the Android build supports FIPS Ready via its `USE_FIPS` option).
+
 ## Threading
 
-wolfProvider is thread safe and uses mutex locking mechanisms from wolfCrypt (`wc_LockMutex()`, `wc_UnLockMutex()`) where necessary. wolfCrypt has mutex operations abstracted for supported platforms.
+wolfProvider's cryptographic operations are thread safe and use mutex locking mechanisms from wolfCrypt (`wc_LockMutex()`, `wc_UnLockMutex()`) where necessary. wolfCrypt has mutex operations abstracted for supported platforms.
+
+The global configuration setters are an exception: the logging setters (`wolfProv_SetLogLevel()`, `wolfProv_SetLogComponents()`, `wolfProv_SetLoggingCb()`) and the FIPS-check state update process-global state without internal synchronization. Configure these once during initialization, before other threads use the provider.
 
 ## Dynamic Memory Usage
 

@@ -12,16 +12,16 @@ wolfProviderパッケージは、以下のように構成しています。
 
 ```
 certs/                      (ユニットテストで使用されるテスト用証明書、鍵)
+docs/                       (インテグレーションガイドおよびFIPSインテグレーションガイド)
 examples/                   (実装例)
 include/
     wolfprovider/           (wolfProviderヘッダーファイル)
-IDE/                        (IDE向けプロファイル)
+IDE/                        (Windows Visual Studioソリューションを含むインテグレーション例)
 scripts/                    (wolfProvider テスト/ビルドスクリプト)
 src/                        (wolfProvider ソースファイル)
 test/                       (wolfProvider テストファイル)
 provider.conf               (wolfProviderを使用する場合のOpenSSLコンフィギュレーションファイルサンプル)
 provider-fips.conf          (wolfProvider FIPS版を使用する場合のOpenSSLコンフィギュレーションファイルサンプル)
-user_settings.h             (user_settings.hサンプル)
 ```
 
 ## *nix上でのビルド
@@ -39,13 +39,13 @@ user_settings.h             (user_settings.hサンプル)
 スクリプトを呼び出す前に、各種環境変数を設定する方法:
 
 ```
-OPENSSL_TAG=openssl-3.2.0 WOLFSSL_TAG=v5.7.2-stable WOLFPROV_DEBUG=1 ./scripts/build-wolfprovider.sh
+OPENSSL_TAG=openssl-3.5.4 WOLFSSL_TAG=v5.9.2-stable WOLFPROV_DEBUG=1 ./scripts/build-wolfprovider.sh
 ```
 
 スクリプトの引数として指定する方法：
 
 ```
-./scripts/build-wolfprovider.sh --openssl-ver=openssl-3.2.0 --wolfssl-ver=v5.7.2-stable --debug
+./scripts/build-wolfprovider.sh --openssl-ver=openssl-3.5.4 --wolfssl-ver=v5.9.2-stable --debug
 ```
 
 これらの方法を組み合わせて、目的のビルドの組み合わせを実現することもできます。
@@ -61,12 +61,16 @@ OPENSSL_TAG=openssl-3.2.0 WOLFSSL_TAG=v5.7.2-stable WOLFPROV_DEBUG=1 ./scripts/b
 より詳しいビルド手順をお求めでしたら、OpenSSLの[INSTALLファイル](https://github.com/openssl/openssl/blob/master/INSTALL.md)や[ドキュメント](https://docs.openssl.org/master/)をご参照ください。
 
 ```
+# サポート対象のOpenSSL 3.x系列から最新のパッチリリースをチェックアウトします。
 git clone https://github.com/openssl/openssl.git
 cd openssl
-./config no-fips -shared
+git checkout "$(git tag -l 'openssl-3.*' | grep -Ev 'alpha|beta' | sort -V | tail -1)"
+./config no-fips shared
 make
 sudo make install
 ```
+
+選択したOpenSSL 3.x系列の最新パッチリリースを必ず使用してください([OpenSSLバージョン互換性](chapter10.md)の章を参照)。古いポイントリリースには、セキュリティ修正が含まれていない可能性があります。
 
 ### wolfSSLをビルド
 
@@ -79,12 +83,12 @@ cd wolfssl-X.X.X-commercial-fips-linuxv5
 ./configure --enable-fips=v5 CFLAGS="-DWOLFSSL_PUBLIC_MP"
 make
 ./wolfcrypt/test/testwolfcrypt
-#--< ここで、fips_test.c内のverifyCoreを開き、testwolfcryptスクリプトが出力するハッシュ値に更新してください >--
+# testwolfcryptが出力したverifyCoreハッシュ値を使用してfips_test.cを更新します
 
 make
 ./wolfcrypt/test/testwolfcrypt
 
-#--< すべてのテストでPASSできるはずです >--
+# すべてのアルゴリズムがPASSすることを確認します
 
 sudo make install
 ```
@@ -112,6 +116,8 @@ Ed25519署名と証明書のサポートを含めるために `--enable-ed25519`
 
 Ed448署名と証明書のサポートを含めるために `--enable-ed448` を追加してください。
 
+SHA-3およびSHAKE-256のサポートを含めるために `--enable-sha3` と `--enable-shake256` を追加してください。
+
 OpenSSLでPKCS#12を使用する場合は、 `--enable-pwdbased` を追加してください。
 
 事前定義された6144ビットおよび8192ビットDHパラメータを有効にするために、CPPFLAGSに `-DHAVE_FFDHE_6144 -DHAVE_FFDHE_8192 -DFP_MAX_BITS=16384` を追加してください。
@@ -119,7 +125,7 @@ OpenSSLでPKCS#12を使用する場合は、 `--enable-pwdbased` を追加して
 同じ鍵でHMACを繰り返し実行してパフォーマンスを向上させる場合は `--enable-hmac-copy` を追加してください。
 （wolfSSL 5.7.8以降で利用可能です。）
 
-SP整数演算を使用するために `--enable-sp=yes,asm' '--enable-sp-math-all'` を追加してください。
+SP整数演算を使用するために `--enable-sp=yes,asm --enable-sp-math-all` を追加してください。
 使用する際は `-DFP_MAX_BITS=16384` を `-DSP_INT_BITS=8192` に置き換えてください。
 
 FIPS v2バンドルからビルドしており、gitリポジトリからではない場合は、`-DWOLFSSL_PSS_LONG_SALT -DWOLFSSL_PSS_SALT_LEN_DISCOVER` を削除し、上記のconfigureコマンドに `--enable-fips=v2` を追加してください。
@@ -169,7 +175,7 @@ wolfProviderは通常、システムにインストールされたデフォル�
 Linuxシステムでは、次のように`LD_LIBRARY_PATH`を編集します。
 
 ```
-export LD_LIBRARY_PATH=/usr/local/ssl:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/ssl/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 ```
 
 wolfProviderをビルドしインストールするには、以下のコマンドを実行します。
@@ -203,38 +209,24 @@ make check
 のようなエラーが発生します。
 環境変数`LD_LIBRARY_PATH`を編集することで解決しないかお試しください。
 
-## WinCE上でのビルド
+## Windows上でのビルド (Visual Studio)
 
-wolfProviderとの互換性を保つために、wolfCryptの`user_settings.h`ファイルに以下の定義があることをご確認ください。
+wolfProviderには、`IDE/WINVS/wolfprovider.sln` にVisual Studio 2022ソリューションが含まれており、wolfSSLをバックエンドとするOpenSSL 3.xプロバイダーである **`libwolfprov.dll`** をビルドします。
+DLL名は重要です。`-provider libwolfprov` は `libwolfprov.dll` に解決されます。
+Windows上では`configure`ステップはなく、wolfSSLは`user_settings.h`を介して構成します。
 
-```
-#define WOLFSSL_CMAC
-#define WOLFSSL_KEY_GEN
-#undef NO_SHA
-#undef NO_DES
-#define WOLFSSL_AES_COUNTER
-#define HAVE_AESCCM
-#define HAVE_AES_ECB
-#define WOLFSSL_AES_DIRECT
-#define WC_RSA_NO_PADDING
-#define WOLFSSL_PUBLIC_MP
-#define ECC_MIN_KEY_SZ=192
-```
+前提条件:
 
-使用するアルゴリズムと機能に応じて、`user_settings.h`ファイルにwolfProviderフラグを追加します。
-wolfProviderディレクトリにある`user_settings.h`ファイルで、wolfProviderユーザー設定フラグを参照できます。
+* C++ツールセット (v143) およびMASM (`ml64.exe`) を含むVisual Studio 2022
+* OpenSSLをビルドするためのPerl(例えばStrawberry Perl)、NASM、git。NASMはPerlとは別にインストールする必要があります
 
-Windows CE用のwcecompat、wolfCrypt、およびOpenSSLをビルドし、それらのパスを参照できるようにします。
-
-wolfProviderディレクトリでソースファイルを開き、OpenSSL、wolfCrypt、および `user_settings.h` パスを使用しているディレクトリに変更します。 
-INCLUDESセクションとTARGETLIBSセクションのパスを更新する必要があります。
-
-Visual StudioでwolfProviderプロジェクトをロードします。
-ベンチマークまたは単体テストを実行する場合は、「bench.c」、または「unit.h」と「unit.c」のいずれかを含めます。
-
-プロジェクトをビルドすると、実行可能ファイルwolfProvider.exeが作成されます。
-この実行可能ファイルに`--help`の引数をつけて実行すると、オプションの一覧を表示できます。 
-wolfProviderを静的エンジンとして使用するには`--static`を付けて実行する必要があります。
+このソリューションは4つのx64構成を提供します。
+`DLL Release` と `DLL Debug` は、実際に配布されるプロバイダー (`libwolfprov.dll`) をビルドします。
+`Static Release` と `Static Debug` は、wolfProviderを静的リンクして単体テストを実行する`unit-test.exe`をビルドします。
+配布されるプロバイダーはDLLです。静的リンクしたwolfProviderは、代わりに`OSSL_PROVIDER_add_builtin()`を使用してOpenSSLの組み込みプロバイダーとして登録します([wolfProviderのロード](chapter07.md)の章を参照)。
+wolfProvider、wolfSSL、OpenSSLは同じ階層に並べて配置されていることを前提としています。
+パスは`wolfprovider.props`で設定されており、コマンドラインから上書きできます（例: `/p:wolfCryptDir=D:\wolfssl`）。
+非FIPS版・FIPS版いずれのwolfSSLビルドもサポートしています。
 
 ## ビルドオプション (./configure に指定するオプション)
 
@@ -261,7 +253,10 @@ wolfProviderを静的エンジンとして使用するには`--static`を付け�
 | --enable-usersettings | **無効** | user_settings.h を使用し、MakefileのCFLAGSを使用しない |
 | --enable-dynamic | 有効 | wolfProviderをダイナミックプロバイダーとしてロードできるようにする |
 | --enable-singlethreaded | **無効** | wolfProviderをシングルスレッド環境で使用する |
-| --enable-pqc | **無効** | ポスト量子アルゴリズム (ML-KEM、ML-DSA、SLH-DSA) をすべて有効にする |
+| --enable-debug-silent | **無効** | `--enable-debug`とともに使用し、デバッグログをコンパイルには含めるが、実行時にWOLFPROV_LOG_LEVEL / WOLFPROV_LOG_COMPONENTSで有効化するまで出力を抑制する(`--enable-debug`なしでは効果なし) |
+| --enable-replace-default | **無効** | 置き換え用デフォルトモード向けに`-DWOLFPROV_REPLACE_DEFAULT`を指定してwolfProviderをコンパイルする。wolfProviderをデフォルトプロバイダーにするには、wolfProviderの`provider_predefined.c`置換を組み込んだOpenSSLのビルドも必要。完全な構成には`scripts/build-wolfprovider.sh --replace-default`を使用する |
+| --enable-seed-src | **無効** | フォークセーフなエントロピーのために、/dev/urandom キャッシュを使用する SEED-SRC エントロピーソースを有効にする |
+| --enable-pqc | **無効** | ML-KEM、ML-DSA、SLH-DSA (FIPS 203/204/205) を有効にする。wolfSSL master/v5.9.2以降およびOpenSSL 3.6以降が必要 |
 | --enable-mlkem | **無効** | ML-KEM (FIPS 203) のみを有効にする |
 | --enable-mldsa | **無効** | ML-DSA (FIPS 204) のみを有効にする |
 | --enable-slhdsa | **無効** | SLH-DSA (FIPS 205) のみを有効にする |
@@ -277,7 +272,7 @@ wolfProviderは、お客様がwolfProviderのビルド方法を設定できる�
 
 | 定義 | 説明 |
 | :---------------- | :----------------------------- |
-| WOLFPROVIDER_USER_SETTINGS | user_settings.hを使用する |
+| WOLFPROVIDER_USER_SETTINGS | ビルドフラグまたはuser_settings.hで定義すると、wolfProviderがuser_settings.h内のユーザー指定定義を読み込む。一部のソースファイルは短い名前`WOLFPROV_USER_SETTINGS`も確認する。別の`--enable-usersettings` configureオプションは、ビルドシステムが独自のMakefile CFLAGSを追加しないようにするもので、このマクロ自体は定義しない |
 | WOLFPROV_DEBUG | デバッグ情報を出力する |
 | WP_CHECK_FORCE_FAIL | テスト目的で障害チェックを強制する |
 | WP_ALLOW_NON_FIPS | FIPSモードで特定の非FIPSアルゴリズムを許可する |
@@ -306,6 +301,7 @@ wolfProviderは、お客様がwolfProviderのビルド方法を設定できる�
 | WP_HAVE_GMAC | GMAC (ガロア/カウンターモード認証) を有効化 |
 | WP_HAVE_HKDF | HKDF (HMACベースの鍵導出関数) を有効化 |
 | WP_HAVE_HMAC | HMAC (ハッシュベースのメッセージ認証コード) を有効化 |
+| WP_HAVE_KBKDF | KBKDF (鍵ベースの鍵導出関数) を有効化 |
 | WP_HAVE_KRB5KDF | Kerberos 5 鍵導出関数を有効化 |
 | WP_HAVE_LMS | LMS (RFC 8554 / SP 800-208) 検証を有効化 |
 | WP_HAVE_MD5 | MD5 ハッシュアルゴリズムを有効化 |
@@ -315,6 +311,7 @@ wolfProviderは、お客様がwolfProviderのビルド方法を設定できる�
 | WP_HAVE_PBE | パスワードベースの暗号化を有効化 |
 | WP_HAVE_RANDOM | 乱数生成を有効化 |
 | WP_HAVE_RSA | RSA 暗号化と署名を有効化 |
+| WP_HAVE_SEED_SRC | SEED-SRC エントロピーソースを有効化 |
 | WP_HAVE_SHA1 | SHA1 ハッシュアルゴリズムを有効化 |
 | WP_HAVE_SHA224 | SHA224 ハッシュアルゴリズムを有効化 |
 | WP_HAVE_SHA256 | SHA256 ハッシュアルゴリズムを有効化 |
@@ -328,6 +325,7 @@ wolfProviderは、お客様がwolfProviderのビルド方法を設定できる�
 | WP_HAVE_SHA512_224 | SHA512/224 ハッシュアルゴリズムを有効化 |
 | WP_HAVE_SHA512_256 | SHA512/256 ハッシュアルゴリズムを有効化 |
 | WP_HAVE_SHAKE_256 | SHAKE256 拡張出力関数を有効化 |
+| WP_HAVE_SSHKDF | SSHKDF (SSH 鍵導出関数) を有効化 |
 | WP_HAVE_SLHDSA | SLH-DSA (FIPS 205) ポスト量子署名を有効化 |
 | WP_HAVE_TLS1_PRF | TLS1 擬似乱数関数を有効化 |
 | WP_HAVE_X25519 | X25519 楕円曲線を有効化 |

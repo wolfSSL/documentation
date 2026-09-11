@@ -8,11 +8,15 @@ wolfProviderは、wolfSSL(libwolfssl)とOpenSSLにリンクする個別のスタ
 wolfProviderは、wolfCryptネイティブAPIを内部的にラップするOpenSSLエンジンです。 
 wolfProviderの概要図、そしてアプリケーションやOpenSSLとどのように関連しているかを下の図1に示します。
 
-wolfProviderの設計とアーキテクチャの詳細については、[wolfProviderの設計](chapter09.md) の章をご覧ください。
+wolfProviderの設計とアーキテクチャの詳細については、[wolfProviderの設計](chapter08.md) の章をご覧ください。
 
 ![wolfProvider Overview](wolfProvider_overview.png)
 
 wolfProviderは、**libwolfprov** という名前の共有ライブラリとしてコンパイルされます。
 これは、アプリケーションまたはコンフィギュレーションファイルを介してOpenSSLによって実行時に動的に登録できます。
 wolfProviderは、アプリケーションが静的ビルドでコンパイルされたときにエンジンをロードするためのエントリポイントも提供します。
+
+wolfProviderはクロスプラットフォームであり、Linuxおよびその他の*nix系システム、macOS、Windows(Visual Studio 2022による`libwolfprov.dll`のビルドを含む)で動作します。
+OpenSSL 3.xのすべてのリリースバージョンに対応しており、FIPSおよび非FIPSの両方の構成で使用できます。
+サポートされているプラットフォームの一覧については、[移植性](chapter06.md)の章をご覧ください。
 
