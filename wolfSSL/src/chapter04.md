@@ -415,6 +415,106 @@ For streaming when decoding/verifying bundles the following functions are suppor
 
 **Note**: that when calling [`wc_PKCS7_VerifySignedData_ex`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata_ex) it is expected that the argument pkiMsgFoot is the full buffer. The internal structure only supports streaming of one buffer, which in this case would be `pkiMsgHead`.
 
+#### PKCS #12
+
+PKCS #12 defines the PFX bundle format: a single, password-protected file that carries a private key together with its certificate and, optionally, the rest of the CA chain. It is the format behind the `.p12` and `.pfx` files commonly produced by OpenSSL, Java keytool, and Windows certificate export. wolfSSL implements the format as described in [RFC 7292](https://www.rfc-editor.org/rfc/rfc7292).
+
+PKCS #12 support is enabled by using the configure option `--enable-pkcs12` or by defining the macro [`HAVE_PKCS12`](chapter02.md#have_pkcs12). It relies on password-based key derivation, so [`--enable-pwdbased`](chapter02.md#--enable-pwdbased) is required as well; both are on by default in a normal build and can be turned off with [`--disable-pkcs12`](chapter02.md#--disable-pkcs12). Older bundles are frequently encrypted with RC2 or single DES, so reading files produced by legacy tools may additionally require `--enable-rc2` or `--enable-des3`.
+
+The wolfCrypt API is declared in `<wolfssl/wolfcrypt/pkcs12.h>` and operates on an opaque `WC_PKCS12` structure. All of the functions are documented in the [PKCS12 API Reference](group__PKCS12.md).
+
+##### Reading a PKCS #12 Bundle
+
+Reading a bundle is a three step process: allocate a `WC_PKCS12` structure, decode the DER into it, then verify the MAC and decrypt the contents.
+
+```c
+WC_PKCS12* pkcs12 = NULL;
+byte* key  = NULL;
+byte* cert = NULL;
+WC_DerCertList* ca = NULL;
+word32 keySz  = 0;
+word32 certSz = 0;
+
+/* wc_d2i_PKCS12_fp allocates the WC_PKCS12 when *pkcs12 is NULL */
+if (wc_d2i_PKCS12_fp("./certs/test-servercert.p12", &pkcs12) != 0) {
+    /* error reading or decoding the file */
+}
+
+if (wc_PKCS12_parse(pkcs12, "password", &key, &keySz, &cert, &certSz,
+                    &ca) != 0) {
+    /* error parsing the bundle, most commonly a wrong password */
+}
+
+/* use the DER key, cert, and ca chain here, for example with
+ * wolfSSL_CTX_use_certificate_buffer() and
+ * wolfSSL_CTX_use_PrivateKey_buffer() */
+
+XFREE(key, NULL, DYNAMIC_TYPE_PUBLIC_KEY);
+XFREE(cert, NULL, DYNAMIC_TYPE_PKCS);
+wc_FreeCertList(ca, NULL);
+wc_PKCS12_free(pkcs12);
+```
+
+If the bundle is already in memory rather than on disk, use [`wc_d2i_PKCS12()`](group__PKCS12.md#function-wc_d2i_pkcs12) with a `WC_PKCS12` obtained from [`wc_PKCS12_new()`](group__PKCS12.md#function-wc_pkcs12_new) or [`wc_PKCS12_new_ex()`](group__PKCS12.md#function-wc_pkcs12_new_ex). The `_ex` variant takes a heap hint, which is stored in the structure and used for every allocation made on its behalf.
+
+[`wc_PKCS12_parse()`](group__PKCS12.md#function-wc_pkcs12_parse) returns the private key and the certificate in newly allocated DER buffers, and the caller owns all three results. Note that the key and the certificate are freed with different dynamic types, and that the CA list has its own free function:
+
+| Output | How to free |
+| ------ | ----------- |
+| `pkey` | `XFREE(pkey, heap, DYNAMIC_TYPE_PUBLIC_KEY)` |
+| `cert` | `XFREE(cert, heap, DYNAMIC_TYPE_PKCS)` |
+| `ca`   | [`wc_FreeCertList(ca, heap)`](group__PKCS12.md#function-wc_freecertlist) |
+
+The `heap` above is the same heap hint that was passed to `wc_PKCS12_new_ex()`, or `NULL` when `wc_PKCS12_new()` was used. The `ca` argument is optional; pass `NULL` if the extra certificates are not needed.
+
+By default the PKCS #8 header is stripped from the returned private key. To keep it, call [`wc_PKCS12_parse_ex()`](group__PKCS12.md#function-wc_pkcs12_parse_ex) with a non-zero `keepKeyHeader` argument; it is otherwise identical to `wc_PKCS12_parse()`.
+
+##### Creating a PKCS #12 Bundle
+
+[`wc_PKCS12_create()`](group__PKCS12.md#function-wc_pkcs12_create) builds a bundle from a DER private key, a DER certificate, and an optional `WC_DerCertList` of additional certificates. The resulting structure is then serialized with [`wc_i2d_PKCS12()`](group__PKCS12.md#function-wc_i2d_pkcs12).
+
+```c
+WC_PKCS12* pkcs12 = NULL;
+byte* der = NULL;
+int derSz = 0;
+char pass[] = "password";
+
+pkcs12 = wc_PKCS12_create(pass, sizeof(pass) - 1, NULL,
+                          key, keySz, cert, certSz, ca,
+                          PBE_AES256_CBC,          /* key encryption  */
+                          PBE_AES256_CBC,          /* cert encryption */
+                          WC_PKCS12_ITT_DEFAULT,   /* encryption iterations */
+                          WC_PKCS12_ITT_DEFAULT,   /* MAC iterations */
+                          0, NULL);
+if (pkcs12 == NULL) {
+    /* error creating the bundle */
+}
+
+/* passing a NULL *der asks wc_i2d_PKCS12 to allocate the buffer */
+if ((derSz = wc_i2d_PKCS12(pkcs12, &der, NULL)) <= 0) {
+    /* error encoding the bundle */
+}
+
+/* write der/derSz out to a .p12 file here */
+
+XFREE(der, NULL, DYNAMIC_TYPE_PKCS);
+wc_PKCS12_free(pkcs12);
+```
+
+The `nidKey` and `nidCert` arguments choose the password-based encryption applied to the private key and to the certificate. The supported values are `PBE_SHA1_RC4_128`, `PBE_SHA1_DES`, `PBE_SHA1_DES3`, `PBE_AES128_CBC`, and `PBE_AES256_CBC`; passing `-1` stores that part of the bundle unencrypted. `PBE_AES256_CBC` is recommended for new bundles, with the SHA-1 based options reserved for interoperability with older software. When `iter` is zero or negative, `WC_PKCS12_ITT_DEFAULT` (2048) iterations are used.
+
+The `name` (friendlyName) and `keyType` arguments are accepted for API compatibility but are not currently used.
+
+`wc_i2d_PKCS12()` has three modes, selected by its `der` and `derSz` arguments:
+
+* Passing `NULL` for `der` only computes the size. The required length is stored in `*derSz` and `LENGTH_ONLY_E` is returned.
+* Passing a `der` whose `*der` is `NULL` allocates a buffer of the right size and stores its address in `*der`. The caller frees it with `XFREE(*der, NULL, DYNAMIC_TYPE_PKCS)`.
+* Passing a `der` whose `*der` points to a caller-supplied buffer writes into that buffer, returning `BUFFER_E` if `derSz` indicates it is too small. Following the usual `i2d` convention, `*der` is advanced to one byte past the encoded DER on success, so keep a separate copy of the original pointer.
+
+##### OpenSSL Compatibility Layer
+
+When the compatibility layer is enabled, the familiar OpenSSL spellings are also available from `<wolfssl/openssl/pkcs12.h>`: `d2i_PKCS12_bio()`, `PKCS12_parse()`, `PKCS12_verify_mac()`, and `PKCS12_create()`. These map onto [`wolfSSL_d2i_PKCS12_bio()`](group__openSSL.md), `wolfSSL_PKCS12_parse()`, and friends, which wrap the wolfCrypt functions described above and return `WOLFSSL_X509` and `WOLFSSL_EVP_PKEY` objects instead of DER buffers.
+
 ### Forcing the Use of a Specific Cipher
 
 By default, wolfSSL will pick the “best” (highest security) cipher suite that both sides of the connection can support.  To force a specific cipher, such as 128 bit AES, add something similar to:
