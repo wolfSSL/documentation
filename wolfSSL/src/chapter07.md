@@ -12,6 +12,8 @@ wolfSSL (formerly CyaSSL) has support for **PEM**, and **DER** formats for certi
 
 An X.509 certificate is encoded using ASN.1 format. The DER format is the ASN.1 encoding. The PEM format is Base64 encoded and wrapped with a human readable header and footer. TLS sends certificates in DER format.
 
+**PKCS #12**, also called PFX, is a password-protected bundle that carries a private key together with its certificate and CA chain in a single file, usually with a `.p12` or `.pfx` extension. wolfSSL can read and write these bundles through the wolfCrypt PKCS #12 API; see [PKCS #12](chapter04.md#pkcs-12) for details.
+
 ## Supported Certificate Extensions
 
     
