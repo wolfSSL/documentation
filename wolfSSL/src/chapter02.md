@@ -1145,7 +1145,7 @@ Allows TLS 1.0 connections. TLS 1.0 is disabled by default for security reasons.
 
 Allows SSL 3.0 connections. SSL 3.0 is disabled by default for security reasons. Only enable when legacy compatibility is required. Implies that `NO_OLD_TLS` is not defined.
 
-**Warning:** Defining `WOLFSSL_ALLOW_SSLV3` produces a build that is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. SSL 3.0 is deprecated by RFC 7568 and RFC 8996, and RFC 9846 states it "MUST NOT be negotiated for any reason".
+**Warning:** Building with `--enable-sslv3` violates RFC 7568. SSL 3.0 is deprecated by RFC 7568 and states "SSLv3 MUST NOT be used."
 
 
 #### WOLFSSL_ALLOW_TLS_SHA1
@@ -4335,7 +4335,7 @@ Enable TLS version 1.0 (defines `WOLFSSL_ALLOW_TLSV10`, and enables old TLS).
 
 Enable SSL version 3.0 (defines `WOLFSSL_ALLOW_SSLV3`, and enables old TLS).
 
-**Warning:** Building with `--enable-sslv3` is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. SSL 3.0 is deprecated by RFC 7568 and RFC 8996, and RFC 9846 states it "MUST NOT be negotiated for any reason".
+**Warning:** Building with `--enable-sslv3` violates RFC 7568. SSL 3.0 is deprecated by RFC 7568 and states "SSLv3 MUST NOT be used."
 
 ### `--enable-stacksize`
 
