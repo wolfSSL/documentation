@@ -11,8 +11,7 @@ To build wolfSSH with support for SFTP use --enable-sftp, in the case of buildin
 By default the internal buffer size for handling reads and writes for get and put commands is set to 1024 bytes. This value can be overwritten in the case that the application needs to consume less resources or in the case that a larger buffer is desired. To override the default size define the macro `WOLFSSH_MAX_SFTP_RW` at compile time. An example of setting it would be as follows:
 
 ```
-./configure --enable-sftp
-C_EXTRA_FLAGS=’WOLFSSH_MAX_SFTP_RW=2048
+./configure --enable-sftp C_EXTRA_FLAGS="-DWOLFSSH_MAX_SFTP_RW=2048"
 ```
 
 ##  Using wolfSSH SFTP Apps
@@ -29,7 +28,7 @@ Starting the client with specific username:
 ```
 $ ./wolfsftp/client/wolfsftp -u <username>
 ```
-The default “username:password” to run the test is either: “jack:fetchapail” or “jill:upthehill”. The default port is 22222.
+The default "username:password" to run the test is either: "jack:fetchapail" or "jill:upthehill". The default port is 22222.
 
 A full list of supported commands can be seen with typeing "help" after a connection.
 ```

@@ -1,49 +1,41 @@
 #  イントロダクション
 
+このマニュアルは組み込み用 wolfSSH ライブラリの技術ガイドとして書かれています。wolfSSH のビルド方法と使い始め方を説明し、ビルドオプション、機能、サポートなどの概要を提供します。
 
-このマニュアルは組み込み用wolfSSHライブラリの技術解説書としてお読みいただけるように書かれています。wolfSSHをビルドして起動することから始まり、ビルドオプション、機能、サポートなどの概要を提供します。
-
-wolfSSHはC言語で書かれたSSH（セキュアシェル）サーバー実装で、wolfSSLから利用可能なwolfCryptを使用します。さらに、マルチプラットフォームで使用できるようにゼロから構築されています。また、SSHv2仕様に準拠しています。
+wolfSSH は C 言語で書かれた SSH（セキュアシェル）サーバーの実装で、wolfSSL からも利用可能な wolfCrypt ライブラリを使用します。さらに、wolfSSH はマルチプラットフォームで利用できるようにゼロから構築されています。この実装は SSH v2 仕様に基づいています。
 
 ##  プロトコル概要
 
-SSHは２つの通信端点に多重化されたデータストリームを提供する一連の階層化されたプロトコルです。一般的には、サーバー上のシェルへの接続を保護するために利用されます。ですが、ファイルを安全にコピーしたり、Xディスプレイプロトコルをトンネリングするのにも利用されています。
+SSH は、2 つのピア間で多重化されたデータストリームを提供する階層化されたプロトコル群です。一般的には、サーバー上のシェルへの接続を保護するために利用されます。ただし、2 台のマシン間でファイルを安全にコピーしたり、X ディスプレイプロトコルをトンネリングしたりするためにもよく利用されます。
 
-##  wolfSSHをお勧めする理由
+##  wolfSSH をお勧めする理由
 
-wolfSSHはANSI Cで記述された軽量のSSHv2サーバーライブラリで、サイズが軽量でありスピード、機能セットに富んでいる点から、組み込み機器、リアルタイムOSおよびリソース制約のある環境をターゲットにしています。wolfSSHは業界標準のSSH v2をサポートし、さらに先進的なアルゴリズム（ChaCha20, Poly1305, NTRU とSHA-3)も提供しています。wolfSSHを支えているのはwolfCrypt暗号化ライブラリで、このライブラリはFIPS140-2認証（認証#2425）を受けています。より詳細はwolfCrypt FIPS FAQを参照されるかあるいはfacts@wolfssl.comまでお知らせください。
+wolfSSH ライブラリは ANSI C で記述された軽量な SSHv2 サーバーライブラリで、そのサイズの小ささ、速度、機能セットから、主に組み込み機器、RTOS、リソース制約のある環境をターゲットにしています。ロイヤリティフリーの価格設定と優れたクロスプラットフォームサポートにより、標準的な動作環境でも広く利用されています。wolfSSH は業界標準の SSH v2 をサポートしています。wolfSSH は wolfCrypt ライブラリによって支えられています。wolfCrypt 暗号ライブラリのあるバージョンは FIPS 140-3 認証（認証番号 #4718）および FIPS 140-2 認証（認証番号 #3389）を取得しています。追加情報については、wolfCrypt FIPS FAQ を参照するか、fips@wolfssl.com までお問い合わせください。
 
+### 機能
 
-### 機能（特徴）
+- SSH v2.0（サーバーおよびクライアント）
 
+- 最小フットプリントサイズ 33kB
 
-- SSH v2.0 (サーバー機能)
+- 実行時メモリ使用量 1.4KB〜2KB（設定可能な受信バッファは含まず）
 
-- 最小フットプリント：33kB
+- 複数のハッシュ関数: SHA-1、SHA-2（SHA-256、SHA-384、SHA-512）
 
-- 実行時メモリ消費量：1.4KB ~ 2KB (受信バッファは含まず)
+- ブロック暗号および認証付き暗号: AES-CBC、AES-CTR、AES-GCM
 
-- ハッシュ関数: SHA-1, SHA-2 (SHA-256, SHA-384, SHA-512), BLAKE2b, Poly
+- 鍵交換オプション: DHE および ECDHE（曲線 NISTP256、NISTP384、NISTP521）
 
-- 暗号アルゴリズム：Block, Stream, and Authenticated Ciphers: AES (CBC, CTR, GCM, CCM), Camellia, ChaCha
+- 公開鍵認証オプション: RSA および ECDSA（曲線 NISTP256、NISTP384、NISTP521）
 
-- 公開鍵オプション: RSA, DH, EDH, NTRU
+- ユーザー認証のサポート（パスワード、keyboard-interactive、公開鍵認証）
 
-- ECDH と ECDSA で次の楕円曲線をサポート: NISTP256, NISTP384, NISTP, Curve25519, Ed
+- シンプルな API
 
-- クライアント認証をサポート(RSA key, password)
+- PEM および DER 形式の X.509 証明書サポート
 
-- シンプルなAPI
+- ハードウェア暗号サポート: Intel AES-NI サポート、Intel AVX1/2、RDRAND、RDSEED、Cavium NITROX サポート、STM32F2/F4 ハードウェア暗号サポート、Freescale CAU / mmCAU / SEC、Microchip PIC32MZ
 
-- PEM and DER certificate support
+- Hybrid ECDH-P256 Kyber-Level1 によるポスト量子ハイブリッド鍵交換
 
-- ハードウエア暗号サポート: 
-    - Intel AES-NI support
-    - Intel AVX1/2
-    - RDRAND
-    - RDSEED
-    - Cavium NITROX
-    - STM32F2/F4 ハードウエア暗号
-    - Freescale CAU / mmCAU / SEC
-    - Microchip PIC32MZ
-
+- SFTP、SCP、SSH-AGENT、ローカルおよびリモートポートフォワーディングのサポート
