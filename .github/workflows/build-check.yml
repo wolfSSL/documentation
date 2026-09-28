@@ -72,6 +72,10 @@ jobs:
       run: cd wolfBoot && export PATH=$PATH:"/home/runner/work/documentation" && make html
     - name: wolfBoot pdf
       run: cd wolfBoot && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: wolfTrust html
+      run: cd wolfTrust && export PATH=$PATH:"/home/runner/work/documentation" && make html
+    - name: wolfTrust pdf
+      run: cd wolfTrust && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
     - name: wolfSentry html
       run: cd wolfSentry && export PATH=$PATH:"/home/runner/work/documentation" && make html
     - name: wolfSentry pdf
