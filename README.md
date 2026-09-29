@@ -25,9 +25,12 @@ To build the documentation you will need Docker running on your system. In this 
 * `make fips-ready`
 * `make bc-migration`
 
-The wolfTrust target reads manual pages from `wolfSSL/wolfTrust` `main` at
-build time. Edit those pages in wolfTrust; this repository holds only its
-build entry point and the shared rendering tools.
+The wolfTrust target reads manual pages from `wolfSSL/wolfTrust` `main` by
+default and prints the source commit used. Edit those pages in wolfTrust; this
+repository holds only its build entry point and the shared rendering tools.
+To rebuild from a specific commit, run `make wolftrust WOLFTRUST_REF=<commit>`.
+For unmerged local changes, run `make WOLFTRUST_SOURCE=/path/to/wolfTrust` from
+the `wolfTrust/` directory with the non-Docker build dependencies installed.
 
 ## Contributing
 
