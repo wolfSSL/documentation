@@ -20,9 +20,17 @@ To build the documentation you will need Docker running on your system. In this 
 * `make wolfsentry`
 * `make wolfssl-jni`
 * `make wolftpm`
+* `make wolfcose`
 * `make porting`
 * `make fips-ready`
 * `make bc-migration`
+
+The wolfCOSE target reads manual pages from `wolfSSL/wolfCOSE` `main` by
+default and prints the source commit used. Edit those pages in wolfCOSE; this
+repository holds only its build entry point and the shared rendering tools.
+To rebuild from a specific commit, run `make wolfcose WOLFCOSE_REF=<commit>`.
+For unmerged local changes, run `make WOLFCOSE_SOURCE=/path/to/wolfCOSE` from
+the `wolfCOSE/` directory with the non-Docker build dependencies installed.
 
 ## Contributing
 
