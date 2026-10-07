@@ -13,7 +13,7 @@ For information regarding wolfSSL products, questions regarding licensing, or ge
 
 If you are submitting a bug report or asking about a problem, please include the following information with your submission:
 
-1. wolfSSL version number
+1. wolfSSH and wolfSSL version numbers
 2. Operating System version
 3. Compiler version
 4. The exact error you are seeing
