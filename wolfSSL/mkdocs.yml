@@ -79,6 +79,7 @@ nav:
       - "Algorithms - Password Based": group__Password.md
       - "Algorithms - PKCS7": group__PKCS7.md
       - "Algorithms - PKCS11": group__PKCS11.md
+      - "Algorithms - PKCS12": group__PKCS12.md
       - "Algorithms - Poly1305": group__Poly1305.md
       - "Algorithms - PSA": group__PSA.md
       - "Algorithms - PUF": group__PUF.md
@@ -131,6 +132,7 @@ nav:
       - ocsp_8h.md
       - pem_8h.md
       - pkcs11_8h.md
+      - pkcs12_8h.md
       - pkcs7_8h.md
       - poly1305_8h.md
       - psa_8h.md
