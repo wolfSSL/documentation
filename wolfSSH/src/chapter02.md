@@ -1,6 +1,6 @@
 #  Building wolfSSH
 
-wolfSSH is written with portability in mind and should generally be easy to build on most systems. If you have difficulty building, please don’t hesitate to seek support through our support forums, https://www.wolfssl.com/forums, or contact us directly at support@wolfssl.com.
+wolfSSH is written with portability in mind and should generally be easy to build on most systems. If you have difficulty building, please don't hesitate to seek support through our support forums, https://www.wolfssl.com/forums, or contact us directly at support@wolfssl.com.
 
 This section explains how to build wolfSSH on Linux, un\*x-like (BSD, macOS) and Windows environments, and provides guidance for building in a non-standard environment. You will find a getting started guide and example in section 3.
 
@@ -10,7 +10,7 @@ When using the autotools system to build, wolfSSH uses a single Makefile to buil
 
 The most recent, up to date version can be downloaded from the GitHub website here: [https://github.com/wolfSSL/wolfssh](https://github.com/wolfSSL/wolfssh).
 
-Either click the “Download ZIP” button or use the following command in your terminal:
+Either click the "Download ZIP" button or use the following command in your terminal:
 ```
 $ git clone https://github.com/wolfSSL/wolfssh.git
 ```
@@ -118,13 +118,13 @@ While not officially supported, we try to help users wishing to build wolfSSH in
 
 1. The source and header files need to remain in the same directory structure as they are in the wolfSSH download package.
 2. Some build systems will want to explicitly know where the wolfSSH header files are located, so you may need to specify that. They are located in the <wolfssh_root>/wolfssh directory. Typically, you can add the <wolfssh_root> directory to your include path to resolve header problems.
-3. wolfSSH defaults to a little endian system unless the configure process detects big endian. Since users building in a non-standard environment aren’t using the configure process, BIG_ENDIAN_ORDER will need to be defined if using a big endian system.
+3. wolfSSH defaults to a little endian system unless the configure process detects big endian. Since users building in a non-standard environment aren't using the configure process, BIG_ENDIAN_ORDER will need to be defined if using a big endian system.
 4. Try to build the library and let us know if you run into any problems. If you need help, contact us at support@wolfssl.com.
 
 ##  Cross Compiling
 Many users on embedded platforms cross compile for their environment. The easiest way to cross compile the library is to use the configure system. It will generate a Makefile which can then be used to build wolfSSH.
 
-When cross compiling, you’ll need to specify the host to configure, such as:
+When cross compiling, you'll need to specify the host to configure, such as:
 ```
 $ ./configure --host=arm-linux
 ```
@@ -150,11 +150,13 @@ $ ./configure --prefix=~/wolfSSL
 $ make
 $ make install
 ```
-This will place the library in ~/wolfSSL/lib and the includes in ~/wolfssl/include. To set up a custom install directory for wolfSSH and specify the custom wolfSSL library and include directories use the following:
+This will place the library in ~/wolfSSL/lib and the includes in ~/wolfSSL/include. To set up a custom install directory for wolfSSH and point it at that wolfSSL install use the following:
 ```
-$ ./configure  --prefix=~/wolfssh  --libdir=~/wolfssl/lib  --includedir=~/wolfssl/include
+$ ./configure  --prefix=~/wolfssh  --with-wolfssl=~/wolfSSL
 $ make
 $ make install
 ```
+The --with-wolfssl option takes the wolfSSL install prefix and expects to find lib/ and include/ under it. It is what tells wolfSSH where to find wolfSSL. The --libdir and --includedir options set where wolfSSH's own library and headers are installed, they do not affect where wolfSSL is found.
+
 Make sure the paths above match your actual locations.
 
