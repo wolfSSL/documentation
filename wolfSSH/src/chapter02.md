@@ -33,6 +33,15 @@ If the bulk of wolfSSL code isn't desired, wolfSSL can be configured with the cr
 --enable-cryptonly
 ```
 
+wolfSSH requires wolfSSL built with `--enable-wolfssh` (which defines `WOLFSSL_WOLFSSH`); building wolfSSH against a wolfSSL without it stops with an `#error`. Some wolfSSH features need further wolfSSL options:
+
+- X.509 certificates (`--enable-certs`) use wolfSSL's certificate manager, so wolfSSL must be built with TLS, not `--enable-cryptonly`. Add `--enable-ocsp` to allow OCSP lookups.
+- Curve25519 key exchange needs `--enable-curve25519`.
+- The ML-KEM hybrid key exchanges need `--enable-mlkem`.
+- ML-DSA host keys and user authentication need `--enable-mldsa` and wolfSSL 5.9.2 or later.
+- TPM support (`--enable-tpm`) needs wolfSSL built with `--enable-wolftpm`, and wolfTPM.
+- The wolfssh client application (`--enable-sshclient`) needs a threaded wolfSSL, and wolfSSL's Base64 encoder (`--enable-base64encode`, on by default only on x86_64).
+
 ##   Building with autotools
 
 When building on Linux, BSD, macOS, Solaris, or other un\*x-like environments, use the autotools system. To build wolfSSH run the following commands:
@@ -71,6 +80,53 @@ wolfSSH root directory:
 ```
 $ make src/libwolfssh.la
 ```
+##  Build Options
+
+The following options may be given to `./configure`. Each feature option also
+defines the preprocessor macro listed for it in the "wolfSSH Preprocessor Guard
+Macros" chapter.
+
+| Option | Default | Description |
+|-------------------------------|-----------|--------------------------------------------|
+| `--with-wolfssl=PATH` | /usr/local | Install prefix of wolfSSL; `PATH/lib` and `PATH/include` must exist. |
+| `--enable-debug` | disabled | Add debug code and logging, and turn off optimizations. |
+| `--disable-inline` | enabled | Disable inline functions. |
+| `--disable-examples` | enabled | Do not build the example programs. |
+| `--disable-server` | enabled | Leave out the server code. Cannot be combined with `--disable-client`. |
+| `--disable-client` | enabled | Leave out the client code. Cannot be combined with `--disable-server`. |
+| `--enable-keygen` | disabled | Key generation API. wolfSSL needs `--enable-keygen`. |
+| `--enable-keyboard-interactive` | disabled | Keyboard-interactive user authentication. |
+| `--enable-scp` | disabled | SCP support. |
+| `--enable-sftp` | disabled | SFTP support. |
+| `--disable-sftp-zeroize` | enabled | Do not zero SFTP file data buffers before they are freed. |
+| `--enable-fwd` | disabled | TCP/IP port forwarding. |
+| `--disable-term` | enabled | Leave out pseudo-terminal support. |
+| `--enable-shell` | disabled | Shell support in the echoserver. |
+| `--enable-agent` | disabled | ssh-agent support. |
+| `--enable-certs` | disabled | X.509 certificate support. |
+| `--enable-ossh-certs` | disabled | OpenSSH certificate user authentication. |
+| `--enable-windows-cert-store` | disabled | Load keys and certificates from the Windows certificate store. Requires `--enable-certs` and a mingw Windows host; links `crypt32` and `ncrypt`. |
+| `--enable-tpm` | disabled | TPM 2.0 support through wolfTPM. |
+| `--enable-smallstack` | disabled | Reduce stack usage, allocating large buffers from the heap. |
+| `--enable-none-cipher` | disabled | Allow negotiating the insecure "none" cipher and MAC, which turn off encryption and integrity protection. |
+| `--enable-sshd` | disabled | Build the wolfSSHd server daemon. Also turns on `--enable-shell`. |
+| `--with-pam=PATH` | none | Directory of the PAM library for wolfSSHd. |
+| `--enable-sshclient` | disabled | Build the wolfssh client application. |
+| `--enable-all` | disabled | Turn on keygen, keyboard-interactive, scp, sftp, fwd, shell, agent, sshd, sshclient and certs. |
+| `--enable-distro` | disabled | `--enable-all` plus both shared and static libraries. |
+
+The wolfssh client application runs every session's I/O on threads, so it needs
+a threaded wolfSSL. Giving `--enable-sshclient` against a single-threaded
+wolfSSL is a configure error, while `--enable-all` leaves the client out instead
+of failing.
+
+`--enable-all` does not turn on `--enable-ossh-certs`,
+`--enable-windows-cert-store`, `--enable-tpm`, `--enable-smallstack` or
+`--enable-none-cipher`; add those explicitly.
+
+In the build tree, `./apps/wolfssh-options` prints the name of each enabled
+build option, one per line, for use by test scripts. It is not installed.
+
 ##  Building on Windows
 
 The Visual Studio project file can be found in the directory *ide\\winvs*.
@@ -90,7 +146,15 @@ configure wolfSSL with the appropriate settings. This file must be copied
 from the directory `wolfssh\ide\winvs` to `wolfssl\IDE\WIN`. If you change
 one copy you must change both copies. The option `WOLFCRYPT_ONLY` disables
 the build of the wolfSSL files and only builds the wolfCrypt algorithms. To
-also keep wolfSSL, delete that option.
+also keep wolfSSL, delete that option. X.509 certificate support needs the
+TLS layer, so the X.509 block in that file removes `WOLFCRYPT_ONLY` along with
+defining `WOLFSSH_CERTS`.
+
+The projects link against the Windows `crypt32.lib` and `ncrypt.lib` import
+libraries for the Windows certificate store support
+(`WOLFSSH_WINDOWS_CERT_STORE`). To use it, define `WOLFSSH_WINDOWS_CERT_STORE`
+as described in the comment block in `user_settings.h`, along with
+`WOLFSSH_CERTS`.
 
 ### User Macros for Building on Windows
 
@@ -104,7 +168,7 @@ unit-test/unit-test.vcxproj
 ```
 The other user macros are the directories where the wolfSSL libraries for the different builds may be found. So the user macro 'wolfCryptDllRelease64' is initially set to:
 ```
-$(wolfCryptDir)\x64\DLL Release
+$(wolfCryptDir)\DLL Release\x64
 ```
 This value is used in the debugging environment for the echoserver's 64-bit DLL Release build is set to:
 ```

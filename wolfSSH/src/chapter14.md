@@ -18,6 +18,8 @@ int wolfSSH_SFTP_accept(WOLFSSH* ssh);
 
 Handles an incoming SFTP connection request from a client. Called on the server side after the SSH session is established.
 
+When application-driven channels are enabled (wolfSSH_CTX_SetAppChannels() or wolfSSH_SetAppChannels()), this function serves only a session channel on which the application's subsystem callback granted the "sftp" subsystem. The subsystem name must match "sftp" exactly. Called before that grant, it returns `WS_INVALID_STATE_E` without recording an error on the session.
+
 **Parameters**
 
 - `ssh` - pointer to the wolfSSH session used for the connection
@@ -25,6 +27,8 @@ Handles an incoming SFTP connection request from a client. Called on the server 
 **Return Values**
 
 - `WS_SFTP_COMPLETE` on success
+- `WS_BAD_ARGUMENT` if `ssh` is `NULL`
+- `WS_INVALID_STATE_E` in application-driven channel mode when no sftp subsystem has been granted
 - a negative error code on failure
 
 **See Also**
@@ -99,17 +103,67 @@ int wolfSSH_SFTP_SetDefaultPath(WOLFSSH* ssh, const char* path);
 
 **Description**
 
-Sets the default (starting) directory for the SFTP session. On the server side this is the base directory against which relative paths are resolved.
+Sets the start path for the SFTP session: the directory the session begins in and the base against which the server resolves relative request paths. The start path only sets where the session opens; it grants and denies nothing. To restrict which paths a session may reach, use wolfSSH_SFTP_SetConfinePath(), which is independent of this setting.
+
+The path is canonicalized before it is stored. A relative `path` is resolved against the process's current working directory. Calling the function again replaces the previous start path; if the replacement cannot be allocated, the existing start path is left intact. A `NULL` path leaves the current setting unchanged and returns `WS_SUCCESS`.
+
+If no start path is set when the server receives the client's first REALPATH request, the server sets the start path to its current working directory. This does not confine the session.
+
+**Note:** As of wolfSSH v1.6.0 the start path no longer confines the session. In earlier releases, requests that resolved outside the default path were rejected. Applications that relied on that behavior must now also call wolfSSH_SFTP_SetConfinePath().
 
 **Parameters**
 
 - `ssh` - pointer to the wolfSSH session
-- `path` - the default path to set
+- `path` - NULL-terminated start path, or `NULL` to leave the current setting unchanged
 
 **Return Values**
 
 - `WS_SUCCESS`
-- `WS_BAD_ARGUMENT`
+- `WS_BAD_ARGUMENT` - `ssh` is `NULL`
+- `WS_BUFFER_E` - the path, or the working directory it resolves against, does not fit in `WOLFSSH_MAX_FILENAME`
+- `WS_INVALID_PATH_E` - the current working directory could not be read, or the path could not be canonicalized
+- `WS_FATAL_ERROR` - memory allocation failed (`ssh->error` is set to `WS_MEMORY_E`)
+
+**See Also**
+
+- `wolfSSH_SFTP_SetConfinePath()`
+
+### wolfSSH_SFTP_SetConfinePath()
+
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_SetConfinePath(WOLFSSH* ssh, const char* path);
+```
+
+**Description**
+
+Confines the server side of an SFTP session to the directory tree rooted at `path`. Each request path is resolved against the start path (see wolfSSH_SFTP_SetDefaultPath()) and canonicalized. If the result is not the root itself or a path below it, the request is rejected with `WS_PERMISSIONS`. If no confinement root is set, or the root is "/", the session is unconfined; with a root of "/", only absolute resolved paths are accepted. On Windows the prefix comparison is case-insensitive.
+
+Confinement and the start path are independent. A server can start a session deep inside a jail (for example, start in /srv/data/user7 and confine to /srv/data), confine a session without changing where it opens, or do neither and rely on operating system permissions. wolfSSHd does the last: it sets no confinement root and drops privileges to the authenticated user. Set the start path inside the confinement root; a start path outside the root makes relative requests resolve outside it, and those requests are rejected.
+
+The path is canonicalized before it is stored. A relative `path` is resolved against the process's current working directory. Calling the function again replaces the previous root. A `NULL` path leaves the current setting unchanged and returns `WS_SUCCESS`.
+
+Paths are resolved lexically, so a symbolic link inside the jail cannot be proven to stay inside it. On builds with symbolic link support (`WOLFSSH_HAVE_SYMLINK`), a confined session therefore rejects every request whose path has an existing symbolic link component below the root, including links whose targets stay inside the jail. A leaf that does not exist yet is allowed, so create operations still work. Define `WOLFSSH_NO_SYMLINK_CHECK` to remove this check, which also removes its escape protection. The root itself is trusted and is never checked, so a root reached through a symbolic link is as wide as the link's target. Use a root that the server controls and that has no symbolic link components.
+
+The symbolic link check is defense in depth, not a security boundary. It is a time-of-check to time-of-use check: a concurrent writer inside the jail could replace a checked component with a link before the operation runs. For hostile multi-tenant deployments, use an OS-level jail (chroot and dropped privileges).
+
+**Parameters**
+
+- `ssh` - pointer to the wolfSSH session
+- `path` - NULL-terminated confinement root, or `NULL` to leave the current setting unchanged
+
+**Return Values**
+
+- `WS_SUCCESS`
+- `WS_BAD_ARGUMENT` - `ssh` is `NULL`
+- `WS_BUFFER_E` - the path, or the working directory it resolves against, does not fit in `WOLFSSH_MAX_FILENAME`
+- `WS_INVALID_PATH_E` - the current working directory could not be read, or the path could not be canonicalized
+- `WS_FATAL_ERROR` - memory allocation failed (`ssh->error` is set to `WS_MEMORY_E`)
+
+**See Also**
+
+- `wolfSSH_SFTP_SetDefaultPath()`
 
 ##  Protocol Level Functions
 
@@ -341,7 +395,7 @@ int wolfSSH_SFTP_SetSTAT(WOLFSSH* ssh, char* dir, WS_SFTP_FILEATRB* atr);
 
 **Description**
 
-Sends a SETSTAT request to the peer to apply the attributes in `atr` (for example permissions, size, or timestamps) to the named file or directory.
+Sends a SETSTAT request to the peer to apply the attributes in `atr` (for example permissions, size, or timestamps) to the named file or directory. Only the attributes whose flags are set in `atr->flags` are sent. A wolfSSH v1.6.0 or later server applies the attributes or answers `SSH_FX_OP_UNSUPPORTED`; earlier servers always answered `SSH_FX_OK`.
 
 **Parameters**
 
@@ -421,7 +475,7 @@ int wolfSSH_SFTP_SaveOfst(WOLFSSH* ssh, char* frm, char* to,
 
 **Description**
 
-Saves the transfer offset for an interrupted get or put, keyed by the source (`frm`) and destination (`to`) paths. The saved offset can later be recovered with wolfSSH_SFTP_GetOfst().
+Saves the transfer offset for an interrupted get or put, keyed by the source (`frm`) and destination (`to`) paths. The saved offset can later be recovered with wolfSSH_SFTP_GetOfst(). Each path must be shorter than `WOLFSSH_MAX_FILENAME` bytes; otherwise `WS_BUFFER_E` is returned.
 
 **Parameters**
 
@@ -684,7 +738,7 @@ int wolfSSH_SFTP_CHMOD(WOLFSSH* ssh, char* n, char* oct);
 
 **Description**
 
-Changes the permission bits of the file or directory `n` to the mode given by the octal string `oct` (for example, "644"). Implemented by sending a SETSTAT request with the new permissions.
+Changes the permission bits of the file or directory `n` to the mode given by the octal string `oct` (for example, "644"). Implemented by a STAT request followed by a SETSTAT request that carries only the new permissions (`WOLFSSH_FILEATRB_PERM`); other attributes of the file are not resent.
 
 **Parameters**
 
@@ -714,7 +768,9 @@ int wolfSSH_SFTP_Get(WOLFSSH* ssh, char* from, char* to,
 
 **Description**
 
-Downloads a file from the peer to a local path. This is a high-level helper that performs the LSTAT, OPEN, READ, and CLOSE operations. A transfer in progress can be interrupted with wolfSSH_SFTP_Interrupt().
+Downloads a file from the peer to a local path. This is a high-level helper that performs the STAT, OPEN, READ, and CLOSE operations. A transfer in progress can be interrupted with wolfSSH_SFTP_Interrupt().
+
+When `resume` is non-zero, the offset saved for the `from` and `to` pair (see wolfSSH_SFTP_SaveOfst()) is used only if the remote file still holds bytes past it and the local file is exactly that many bytes long. Otherwise the transfer starts over from the beginning.
 
 **Parameters**
 
@@ -748,6 +804,8 @@ int wolfSSH_SFTP_Put(WOLFSSH* ssh, char* from, char* to,
 **Description**
 
 Uploads a local file to the peer. This is a high-level helper that performs the OPEN, WRITE, and CLOSE operations. A transfer in progress can be interrupted with wolfSSH_SFTP_Interrupt().
+
+When `resume` is non-zero and an offset was saved for the `from` and `to` pair, the function first sends a STAT request for the remote file. The saved offset is used only if the local file still holds bytes past it and the remote file is exactly that many bytes long; otherwise the transfer starts over. The remote file is opened with `WOLFSSH_FXF_TRUNC` only when the transfer starts from offset 0, so a resumed put does not truncate the destination. A rejected write ends the transfer with an error rather than reporting success.
 
 **Parameters**
 
