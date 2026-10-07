@@ -33,6 +33,15 @@ wolfSSL コードの大部分が不要な場合は、crypto only オプション
 --enable-cryptonly
 ```
 
+wolfSSH には `--enable-wolfssh`（`WOLFSSL_WOLFSSH` を定義します）付きでビルドした wolfSSL が必要です。このオプションなしでビルドされた wolfSSL に対して wolfSSH をビルドすると、`#error` で停止します。wolfSSH の一部の機能には、さらに次の wolfSSL オプションが必要です:
+
+- X.509 証明書（`--enable-certs`）は wolfSSL の証明書マネージャーを使用するため、wolfSSL は `--enable-cryptonly` ではなく TLS 付きでビルドする必要があります。OCSP による問い合わせを可能にするには `--enable-ocsp` を追加してください。
+- Curve25519 鍵交換には `--enable-curve25519` が必要です。
+- ML-KEM ハイブリッド鍵交換には `--enable-mlkem` が必要です。
+- ML-DSA のホスト鍵とユーザー認証には `--enable-mldsa` と wolfSSL 5.9.2 以降が必要です。
+- TPM サポート（`--enable-tpm`）には `--enable-wolftpm` 付きでビルドした wolfSSL と wolfTPM が必要です。
+- wolfssh クライアントアプリケーション（`--enable-sshclient`）には、スレッド対応の wolfSSL と wolfSSL の Base64 エンコーダー（`--enable-base64encode`、x86_64 でのみデフォルトで有効）が必要です。
+
 ##   autotools でのビルド
 
 Linux、BSD、macOS、Solaris、その他の un\*x 系環境でビルドする場合は、autotools システムを使用します。wolfSSH をビルドするには次のコマンドを実行します:
@@ -69,6 +78,45 @@ wolfssh/src/ にある wolfSSH ライブラリのみをビルドし、追加の�
 ```
 $ make src/libwolfssh.la
 ```
+##  ビルドオプション
+
+`./configure` には次のオプションを指定できます。各機能オプションは、「wolfSSH プリプロセッサガードマクロ」の章でそのオプションに対応して記載されているプリプロセッサマクロも定義します。
+
+| オプション | デフォルト | 説明 |
+|-------------------------------|-----------|--------------------------------------------|
+| `--with-wolfssl=PATH` | /usr/local | wolfSSL のインストールプレフィックス。`PATH/lib` と `PATH/include` が存在している必要があります。 |
+| `--enable-debug` | 無効 | デバッグコードとログ出力を追加し、最適化を無効にします。 |
+| `--disable-inline` | 有効 | インライン関数を無効にします。 |
+| `--disable-examples` | 有効 | サンプルプログラムをビルドしません。 |
+| `--disable-server` | 有効 | サーバーのコードを除外します。`--disable-client` と同時には指定できません。 |
+| `--disable-client` | 有効 | クライアントのコードを除外します。`--disable-server` と同時には指定できません。 |
+| `--enable-keygen` | 無効 | 鍵生成 API。wolfSSL には `--enable-keygen` が必要です。 |
+| `--enable-keyboard-interactive` | 無効 | keyboard-interactive ユーザー認証。 |
+| `--enable-scp` | 無効 | SCP サポート。 |
+| `--enable-sftp` | 無効 | SFTP サポート。 |
+| `--disable-sftp-zeroize` | 有効 | SFTP のファイルデータバッファを解放前にゼロクリアしません。 |
+| `--enable-fwd` | 無効 | TCP/IP ポートフォワーディング。 |
+| `--disable-term` | 有効 | 疑似端末サポートを除外します。 |
+| `--enable-shell` | 無効 | echoserver でのシェルサポート。 |
+| `--enable-agent` | 無効 | ssh-agent サポート。 |
+| `--enable-certs` | 無効 | X.509 証明書サポート。 |
+| `--enable-ossh-certs` | 無効 | OpenSSH 証明書によるユーザー認証。 |
+| `--enable-windows-cert-store` | 無効 | Windows 証明書ストアから鍵と証明書を読み込みます。`--enable-certs` と mingw の Windows ホストが必要です。`crypt32` と `ncrypt` をリンクします。 |
+| `--enable-tpm` | 無効 | wolfTPM による TPM 2.0 サポート。 |
+| `--enable-smallstack` | 無効 | 大きなバッファをヒープから確保し、スタック使用量を削減します。 |
+| `--enable-none-cipher` | 無効 | 暗号化と完全性保護を無効にする安全でない "none" 暗号および MAC のネゴシエーションを許可します。 |
+| `--enable-sshd` | 無効 | wolfSSHd サーバーデーモンをビルドします。`--enable-shell` も有効にします。 |
+| `--with-pam=PATH` | なし | wolfSSHd 用の PAM ライブラリのディレクトリ。 |
+| `--enable-sshclient` | 無効 | wolfssh クライアントアプリケーションをビルドします。 |
+| `--enable-all` | 無効 | keygen、keyboard-interactive、scp、sftp、fwd、shell、agent、sshd、sshclient、certs を有効にします。 |
+| `--enable-distro` | 無効 | `--enable-all` に加えて、共有ライブラリとスタティックライブラリの両方をビルドします。 |
+
+wolfssh クライアントアプリケーションはすべてのセッションの I/O をスレッド上で実行するため、スレッド対応の wolfSSL が必要です。シングルスレッドの wolfSSL に対して `--enable-sshclient` を指定すると configure エラーになりますが、`--enable-all` の場合は失敗せずにクライアントを除外します。
+
+`--enable-all` は `--enable-ossh-certs`、`--enable-windows-cert-store`、`--enable-tpm`、`--enable-smallstack`、`--enable-none-cipher` を有効にしません。これらは明示的に追加してください。
+
+ビルドツリー内の `./apps/wolfssh-options` は、有効になっている各ビルドオプションの名前を 1 行に 1 つずつ出力します。テストスクリプトでの使用を想定したもので、インストールはされません。
+
 ##  Windows 上でのビルド
 
 Visual Studio のプロジェクトファイルは *ide\\winvs* ディレクトリにあります。
@@ -83,7 +131,9 @@ wolfssh\
 wolfssl\
 ```
 
-`wolfssh\ide\winvs\user_settings.h` ファイルには、wolfSSL を適切な設定でコンフィギュレーションするための設定が含まれています。このファイルは `wolfssh\ide\winvs` ディレクトリから `wolfssl\IDE\WIN` へコピーする必要があります。一方のコピーを変更した場合は、両方のコピーを変更しなければなりません。`WOLFCRYPT_ONLY` オプションは wolfSSL ファイルのビルドを無効にし、wolfCrypt アルゴリズムのみをビルドします。wolfSSL も残すには、このオプションを削除してください。
+`wolfssh\ide\winvs\user_settings.h` ファイルには、wolfSSL を適切な設定でコンフィギュレーションするための設定が含まれています。このファイルは `wolfssh\ide\winvs` ディレクトリから `wolfssl\IDE\WIN` へコピーする必要があります。一方のコピーを変更した場合は、両方のコピーを変更しなければなりません。`WOLFCRYPT_ONLY` オプションは wolfSSL ファイルのビルドを無効にし、wolfCrypt アルゴリズムのみをビルドします。wolfSSL も残すには、このオプションを削除してください。X.509 証明書サポートには TLS 層が必要なため、このファイルの X.509 ブロックでは `WOLFSSH_CERTS` を定義するとともに `WOLFCRYPT_ONLY` を削除しています。
+
+各プロジェクトは、Windows 証明書ストアのサポート（`WOLFSSH_WINDOWS_CERT_STORE`）のために Windows の `crypt32.lib` および `ncrypt.lib` インポートライブラリとリンクします。これを使用するには、`user_settings.h` のコメントブロックの説明にしたがって、`WOLFSSH_CERTS` とともに `WOLFSSH_WINDOWS_CERT_STORE` を定義してください。
 
 ### Windows 上でのビルドに使用するユーザーマクロ
 
@@ -97,7 +147,7 @@ unit-test/unit-test.vcxproj
 ```
 その他のユーザーマクロは、異なるビルド向けの wolfSSL ライブラリが見つかるディレクトリです。したがって、ユーザーマクロ 'wolfCryptDllRelease64' は初期値として次のように設定されています:
 ```
-$(wolfCryptDir)\x64\DLL Release
+$(wolfCryptDir)\DLL Release\x64
 ```
 この値は、echoserver の 64 ビット DLL Release ビルドのデバッグ環境で次のように設定して使用されます:
 ```

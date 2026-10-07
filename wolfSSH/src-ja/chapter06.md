@@ -21,14 +21,32 @@ void* wolfSSH_GetUserAuthCtx(WOLFSSH* ssh );
 ```
 提供された wolfSSH セッションに保存されたユーザ認証コンテキストデータへのポインターを返します。これはセッションを作成するために使用される wolfSSH のコンテキストデータと混同しないよう注意してください。
 
-## キーボード認証プロンプトコールバック関数の設定
+## Keyboard-Interactive プロンプトの設定
+
+Keyboard-Interactive のプロンプト専用のコールバックはありません。前章で説明したとおり、サーバーは `authType` に `WOLFSSH_USERAUTH_KEYBOARD_SETUP` を指定してユーザ認証コールバックを呼び出し、クライアントに送信するプロンプトを取得します。Keyboard-Interactive 認証には `--enable-keyboard-interactive`（`WOLFSSH_KEYBOARD_INTERACTIVE`）を指定したビルドが必要です。
+
+## 許可する認証タイプのコールバック関数の設定
 ```
-void wolfSSH_SetKeyboardAuthPrompts(WOLFSSH_CTX* ctx, WS_CallbackKeyboardAuthPrompts cb);
+void wolfSSH_SetUserAuthTypes(WOLFSSH_CTX* ctx, WS_CallbackUserAuthTypes cb);
 ```
 
-サーバーは、クライアントが Keyboard-Interactive モードで認証できるように、クライアントに提示するプロンプトを指定する必要があります。このコールバックにより、サーバーはクライアントに送信するプロンプトを設定できます。
+このオプションのコールバックは、サーバーが継続可能な認証タイプとしてクライアントに提示する認証タイプのセットを、`WOLFSSH_USERAUTH_*` タイプ定数のビットマスクとして返します。このコールバックがない場合、サーバーはパスワード、公開鍵、および組み込まれている場合は keyboard-interactive を提示します。
 
-これが設定されていない場合、明示的に有効化しようとしても、サーバー上で Keyboard-Interactive モードは無効になります。
+## ユーザ認証結果コールバック関数の設定
+```
+void wolfSSH_SetUserAuthResult(WOLFSSH_CTX* ctx, WS_CallbackUserAuthResult cb);
+void wolfSSH_SetUserAuthResultCtx(WOLFSSH* ssh, void* userAuthResultCtx);
+```
+
+このオプションのコールバックには、ライブラリによる公開鍵ユーザ認証署名のチェック結果が通知されます。成功が通知された際に `WS_SUCCESS` 以外の値を返すと、その認証試行は失敗になります。
+
+## 最大認証試行回数の設定
+```
+int wolfSSH_CTX_SetMaxAuthAttempts(WOLFSSH_CTX* ctx, int value);
+int wolfSSH_SetMaxAuthAttempts(WOLFSSH* ssh, int value);
+```
+
+サーバーは、ユーザ認証にこの回数失敗したクライアントを切断します。デフォルトは `DEFAULT_MAX_AUTH_ATTEMPTS`（6）です。0 以下の値を指定するとデフォルトに戻ります。
 
 ##  Echoserver サンプルプログラムのユーザ認証
 
