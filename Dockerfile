@@ -27,8 +27,9 @@ FROM builder AS wolfssl-stage1
 ARG MANPATH
 ARG PDFFILE
 ARG V
+ARG WOLFTRUST_REF=main
 WORKDIR /src/wolfssl/${MANPATH}
-RUN make pdf V=${V}
+RUN make pdf V=${V} WOLFTRUST_REF=${WOLFTRUST_REF}
 
 # Build wolfSSL HTML
 FROM wolfssl-stage1 AS wolfssl-stage2
@@ -36,7 +37,11 @@ ARG MANPATH
 ARG PDFFILE
 ARG V
 WORKDIR /src/wolfssl/${MANPATH}
-RUN make html V=${V}
+RUN if [ "${MANPATH}" = wolfTrust ]; then \
+        WOLFTRUST_REF="$(git -C wolftrust rev-parse HEAD)" make html V=${V}; \
+    else \
+        make html V=${V}; \
+    fi
 
 # Build both wolfSSL HTML and PDF
 FROM scratch AS manual

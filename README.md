@@ -14,6 +14,7 @@ To build the documentation you will need Docker running on your system. In this 
 * `make wolfssl`
 * `make wolfssh`
 * `make wolfboot`
+* `make wolftrust`
 * `make wolfclu`
 * `make wolfcrypt-jni`
 * `make wolfmqtt`
@@ -23,6 +24,13 @@ To build the documentation you will need Docker running on your system. In this 
 * `make porting`
 * `make fips-ready`
 * `make bc-migration`
+
+The wolfTrust target reads manual pages from `wolfSSL/wolfTrust` `main` by
+default and prints the source commit used. Edit those pages in wolfTrust; this
+repository holds only its build entry point and the shared rendering tools.
+To rebuild from a specific commit, run `make wolftrust WOLFTRUST_REF=<commit>`.
+For unmerged local changes, run `make WOLFTRUST_SOURCE=/path/to/wolfTrust` from
+the `wolfTrust/` directory with the non-Docker build dependencies installed.
 
 ## Contributing
 
@@ -95,4 +103,3 @@ Then you can confirm the font cache includes the installed font files by 'fc-lis
 fc-list | grep NotoSansCJKjp
 ```
 You will get the list of installed font files.
-

@@ -72,6 +72,13 @@ jobs:
       run: cd wolfBoot && export PATH=$PATH:"/home/runner/work/documentation" && make html
     - name: wolfBoot pdf
       run: cd wolfBoot && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: Pin wolfTrust source for this build
+      run: |
+        ref=$(git ls-remote https://github.com/wolfSSL/wolfTrust.git refs/heads/main | cut -f1)
+        test -n "$ref"
+        echo "WOLFTRUST_REF=$ref" >> "$GITHUB_ENV"
+    - name: wolfTrust html and pdf
+      run: cd wolfTrust && export PATH=$PATH:"/home/runner/work/documentation" && make
     - name: wolfSentry html
       run: cd wolfSentry && export PATH=$PATH:"/home/runner/work/documentation" && make html
     - name: wolfSentry pdf
