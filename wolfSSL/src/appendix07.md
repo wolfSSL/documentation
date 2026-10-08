@@ -329,6 +329,34 @@
 | `mldsa65` (ML-DSA-65) | `0x09,0x05` | Disabled | `--enable-mldsa` |
 | `mldsa87` (ML-DSA-87) | `0x09,0x06` | Disabled | `--enable-mldsa` |
 
+### C-9. SLH-DSA (FIPS 205)
+
+The wire values come from draft-reddy-tls-slhdsa and are the same ones oqs-provider uses. SLH-DSA can sign TLS 1.3 and DTLS 1.3 handshakes, new in wolfSSL 5.9.4.
+
+| Name | Wire Value | Default | configure Option |
+|------|-----------|:-------:|-----------------|
+| `slhdsa_sha2_128s` | `0x09,0x11` | Disabled | `--enable-slhdsa` |
+| `slhdsa_sha2_128f` | `0x09,0x12` | Disabled | `--enable-slhdsa` |
+| `slhdsa_sha2_192s` | `0x09,0x13` | Disabled | `--enable-slhdsa` |
+| `slhdsa_sha2_192f` | `0x09,0x14` | Disabled | `--enable-slhdsa` |
+| `slhdsa_sha2_256s` | `0x09,0x15` | Disabled | `--enable-slhdsa` |
+| `slhdsa_sha2_256f` | `0x09,0x16` | Disabled | `--enable-slhdsa` |
+| `slhdsa_shake_128s` | `0x09,0x17` | Disabled | `--enable-slhdsa` |
+| `slhdsa_shake_128f` | `0x09,0x18` | Disabled | `--enable-slhdsa` |
+| `slhdsa_shake_192s` | `0x09,0x19` | Disabled | `--enable-slhdsa` |
+| `slhdsa_shake_192f` | `0x09,0x1A` | Disabled | `--enable-slhdsa` |
+| `slhdsa_shake_256s` | `0x09,0x1B` | Disabled | `--enable-slhdsa` |
+| `slhdsa_shake_256f` | `0x09,0x1C` | Disabled | `--enable-slhdsa` |
+
+### C-10. Falcon (Experimental)
+
+Falcon uses the private-use code points it shared with the old liboqs integration. The algorithm itself is now implemented natively in wolfCrypt.
+
+| Name | Wire Value | Default | configure Option |
+|------|-----------|:-------:|-----------------|
+| `falcon_level1` (Falcon-512) | `0xFE,0xD7` | Disabled | `--enable-falcon` + `--enable-experimental` |
+| `falcon_level5` (Falcon-1024) | `0xFE,0xDA` | Disabled | `--enable-falcon` + `--enable-experimental` |
+
 ---
 
 ## D. configure Option ↔ #define Reference
@@ -365,4 +393,8 @@
 | `--enable-mlkem` | `WOLFSSL_HAVE_MLKEM` + `HAVE_PQC` | |
 | `--enable-pqc-hybrids` | `WOLFSSL_PQC_HYBRIDS` | Enabled by default when mlkem is enabled |
 | `--enable-mldsa` | `HAVE_DILITHIUM` | |
+| `--enable-slhdsa` | `WOLFSSL_HAVE_SLHDSA` | TLS 1.3 / DTLS 1.3 authentication, new in 5.9.4 |
+| `--enable-falcon` | `HAVE_FALCON` | Native implementation, needs --enable-experimental |
+| `--enable-tls13-sha512` | `WOLFSSL_TLS13_SHA512` | Keeps the SHA-512 transcript in TLS 1.3 only builds |
+| `--disable-tlsv12` | `WOLFSSL_NO_TLS12` | Compiles TLS 1.2 out (5.9.4 and later) |
 | `--enable-staticecdh` | `WOLFSSL_STATIC_ECDH` | No PFS, deprecated |
