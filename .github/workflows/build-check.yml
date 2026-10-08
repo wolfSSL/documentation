@@ -92,3 +92,10 @@ jobs:
       run: cd wolfHSM && export PATH=$PATH:"/home/runner/work/documentation" && make html
     - name: wolfHSM pdf
       run: cd wolfHSM && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: Pin wolfCOSE source for this build
+      run: |
+        ref=$(git ls-remote https://github.com/wolfSSL/wolfCOSE.git refs/heads/main | cut -f1)
+        test -n "$ref"
+        echo "WOLFCOSE_REF=$ref" >> "$GITHUB_ENV"
+    - name: wolfCOSE html and pdf
+      run: cd wolfCOSE && export PATH=$PATH:"/home/runner/work/documentation" && make
