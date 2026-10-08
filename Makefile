@@ -64,7 +64,8 @@ wolfssl-jni: build
 .PHONY: wolftpm
 # Resolve a mutable ref (e.g. master) to an immutable commit so the Docker
 # build-arg cache key advances with upstream; a 40-char SHA passes through.
-wolftpm: WOLFTPM_REF := $(shell r='$(WOLFTPM_REF)'; if printf '%s' "$$r" | grep -Eq '^[0-9a-f]{40}$$'; then printf '%s' "$$r"; else s=$$(git ls-remote https://github.com/wolfSSL/wolfTPM.git "$$r" 2>/dev/null | cut -f1); [ -n "$$s" ] && printf '%s' "$$s" || printf '%s' "$$r"; fi)
+# override so a command-line WOLFTPM_REF=<branch> is still resolved to a commit.
+wolftpm: override WOLFTPM_REF := $(shell r='$(WOLFTPM_REF)'; if printf '%s' "$$r" | grep -Eq '^[0-9a-f]{40}$$'; then printf '%s' "$$r"; else s=$$(git ls-remote https://github.com/wolfSSL/wolfTPM.git "$$r" 2>/dev/null | cut -f1); [ -n "$$s" ] && printf '%s' "$$s" || printf '%s' "$$r"; fi)
 wolftpm: MANPATH=wolfTPM
 wolftpm: PDFFILE=wolfTPM-Manual.pdf
 wolftpm: build
