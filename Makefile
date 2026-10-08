@@ -5,7 +5,8 @@ endif
 
 # Handy debugging trick: `DOCKER_CMD_EXTRA_ARGS="--progress=plain" make` to see all the output
 WOLFCOSE_REF ?= main
-DOCKER_CMD=DOCKER_BUILDKIT=1 docker build $(DOCKER_CMD_EXTRA_ARGS) -t doc_build --build-arg MANPATH=$(MANPATH) --build-arg PDFFILE=$(PDFFILE) --build-arg V=$(V) --build-arg WOLFCOSE_REF=$(WOLFCOSE_REF) --target=manual --output=build -f Dockerfile .
+WOLFTPM_REF ?= master
+DOCKER_CMD=DOCKER_BUILDKIT=1 docker build $(DOCKER_CMD_EXTRA_ARGS) -t doc_build --build-arg MANPATH=$(MANPATH) --build-arg PDFFILE=$(PDFFILE) --build-arg V=$(V) --build-arg WOLFCOSE_REF=$(WOLFCOSE_REF) --build-arg WOLFTPM_REF=$(WOLFTPM_REF) --target=manual --output=build -f Dockerfile .
 
 all: wolfssl wolfssh wolfboot wolfclu wolfcrypt-jni wolfmqtt wolfsentry wolfssl-jni wolftpm wolfhsm wolfcose wolfengine wolfprovider fips-ready tuning porting faq fips-faq bc-migration
 
@@ -61,6 +62,10 @@ wolfssl-jni: build
 	$(Q)$(DOCKER_CMD)
 
 .PHONY: wolftpm
+# Resolve a mutable ref (e.g. master) to an immutable commit so the Docker
+# build-arg cache key advances with upstream; a 40-char SHA passes through.
+# override so a command-line WOLFTPM_REF=<branch> is still resolved to a commit.
+wolftpm: override WOLFTPM_REF := $(shell r='$(WOLFTPM_REF)'; if printf '%s' "$$r" | grep -Eq '^[0-9a-f]{40}$$'; then printf '%s' "$$r"; else s=$$(git ls-remote https://github.com/wolfSSL/wolfTPM.git "$$r" 2>/dev/null | cut -f1); [ -n "$$s" ] && printf '%s' "$$s" || printf '%s' "$$r"; fi)
 wolftpm: MANPATH=wolfTPM
 wolftpm: PDFFILE=wolfTPM-Manual.pdf
 wolftpm: build
