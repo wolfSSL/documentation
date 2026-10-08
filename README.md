@@ -32,6 +32,13 @@ To rebuild from a specific commit, run `make wolfcose WOLFCOSE_REF=<commit>`.
 For unmerged local changes, run `make WOLFCOSE_SOURCE=/path/to/wolfCOSE` from
 the `wolfCOSE/` directory with the non-Docker build dependencies installed.
 
+The wolfTPM target works the same way. It reads manual pages from
+`wolfSSL/wolfTPM` `master` by default, from that repository's `docs/`
+directory, and prints the source commit used. To rebuild from a specific
+commit, run `make wolftpm WOLFTPM_REF=<commit>`. For unmerged local changes,
+run `make WOLFTPM_SOURCE=/path/to/wolfTPM` from the `wolfTPM/` directory with
+the non-Docker build dependencies installed.
+
 ## Contributing
 
 There is a [CONTRIBUTING.md](CONTRIBUTING.md) document which outlines how to add manuals to the tree.

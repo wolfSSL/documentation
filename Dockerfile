@@ -28,8 +28,9 @@ ARG MANPATH
 ARG PDFFILE
 ARG V
 ARG WOLFCOSE_REF=main
+ARG WOLFTPM_REF=master
 WORKDIR /src/wolfssl/${MANPATH}
-RUN make pdf V=${V} WOLFCOSE_REF=${WOLFCOSE_REF}
+RUN make pdf V=${V} WOLFCOSE_REF=${WOLFCOSE_REF} WOLFTPM_REF=${WOLFTPM_REF}
 
 # Build wolfSSL HTML
 FROM wolfssl-stage1 AS wolfssl-stage2
@@ -39,6 +40,8 @@ ARG V
 WORKDIR /src/wolfssl/${MANPATH}
 RUN if [ "${MANPATH}" = wolfCOSE ]; then \
         WOLFCOSE_REF="$(git -C wolfcose rev-parse HEAD)" make html V=${V}; \
+    elif [ "${MANPATH}" = wolfTPM ]; then \
+        WOLFTPM_REF="$(git -C wolftpm rev-parse HEAD)" make html V=${V}; \
     else \
         make html V=${V}; \
     fi

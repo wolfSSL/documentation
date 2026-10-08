@@ -60,10 +60,13 @@ jobs:
       run: cd wolfSSH && export PATH=$PATH:"/home/runner/work/documentation" && make html
     - name: wolfssh pdf
       run: cd wolfSSH && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
-    - name: wolftpm html
-      run: cd wolfTPM && export PATH=$PATH:"/home/runner/work/documentation" && make html
-    - name: wolfTPM pdf
-      run: cd wolfTPM && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+    - name: Pin wolfTPM source for this build
+      run: |
+        ref=$(git ls-remote https://github.com/wolfSSL/wolfTPM.git refs/heads/master | cut -f1)
+        test -n "$ref"
+        echo "WOLFTPM_REF=$ref" >> "$GITHUB_ENV"
+    - name: wolftpm html and pdf
+      run: cd wolfTPM && export PATH=$PATH:"/home/runner/work/documentation" && make
     - name: wolfmqtt html
       run: cd wolfMQTT && export PATH=$PATH:"/home/runner/work/documentation" && make html
     - name: wolfmqtt pdf
