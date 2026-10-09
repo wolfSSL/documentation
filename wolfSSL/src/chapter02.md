@@ -855,7 +855,7 @@ An OCSP hardening option. Responder hosts taken from the Authority Information A
 
 #### WOLFSSL_OCSP_FAIL_IF_NOT_SUPPORTED
 
-An OCSP hardening option. With OCSP checking on, a certificate that advertises no OCSP responder is refused with `OCSP_NEED_URL` instead of the old soft-fail behavior. When the macro is not set, a missing responder only gives the `OCSP_NO_URL` result, and any CRL check that is enabled still runs.
+A runtime OCSP hardening option, not a build macro. Pass it in the options argument of `wolfSSL_CTX_EnableOCSP()`, `wolfSSL_EnableOCSP()`, or `wolfSSL_CertManagerEnableOCSP()`. With it set, a certificate that advertises no OCSP responder is refused with `OCSP_NEED_URL` instead of the default soft-fail behavior. Without this option, a missing responder only gives the `OCSP_NO_URL` result, and any CRL check that is enabled still runs.
 
 #### HAVE_PKCS8
 
@@ -880,7 +880,7 @@ Enables FIPS 204 draft version of Dilithium parameters.
 
 #### HAVE_SPHINCS
 
-Enables SPHINCS+ post-quantum signature scheme support. The SPHINCS+ support this macro originally stood for came from the liboqs integration, which is gone now. Use the native SLH-DSA (FIPS 205) implementation instead, see [`WOLFSSL_HAVE_SLHDSA`](#wolfssl_have_slhdsa).
+Obsolete. This macro enabled pre-standardization SPHINCS+ through the liboqs integration, which was removed in wolfSSL 5.9.2; defining it now does nothing. Use the native SLH-DSA (FIPS 205) implementation instead, see [`WOLFSSL_HAVE_SLHDSA`](#wolfssl_have_slhdsa).
 
 #### WOLFSSL_HAVE_SLHDSA
 
