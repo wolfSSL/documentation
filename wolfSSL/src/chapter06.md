@@ -537,6 +537,8 @@ int myCryptoCallback(int devId, wc_CryptoInfo* info, void* ctx)
 }
 ```
 
+wolfSSL 5.9.4 adds one more request type the callback can receive: `WC_ALGO_TYPE_KEYSTORE` (built with `--enable-cryptocbutils=keystore`). These requests are lifetime operations on keys held in a hardware key store. There are seven of them: import and export in plaintext and wrapped form, derive, delete and get-info. The `wc_KeyStore_*` API in `wolfssl/wolfcrypt/wc_keystore.h` addresses keys by an opaque device-defined reference, which is how a device can create, wrap, derive and destroy keys that never appear in memory.
+
 Some of the simpler algo type unions, such as the RNG and seed unions, require no further processing and can be immediately acted on. However, more complicated operations like cipher or public key types have multiple union variants unto themselves that must be conditionally interpreted in the same manner. The variants and levels of hierarchy of each union are specific to each category of algorithm type, the full definitions of which can be found in the definition of the `wc_CryptoInfo` structure. As a general rule, each level that is a union will contain some sort of type indicator informing how the rest of the union should be dereferenced.
 
 Here is a simplified example for a complex algo type union with multiple levels of union decoding. The callback contains support for random number generation, as well as ECC key agreement, sign, and verify.
@@ -581,6 +583,18 @@ int myCryptoCallback(int devId, wc_CryptoInfo* info, void* ctx)
 
 The data structure for each type of request generally contains a pointer and associated size for input and output data. Depending on the request it may include additional data including cryptographic keys, nonces, or further configuration. The crypto callback should operate on the input data and write relevant output data back to the appropriate variant of the algo type union. Writing data to a union variant that does not correspond to the algorithm type in question (e.g. using `info->cipher`
 when `info->algo_type == WC_ALGO_TYPE_RNG` is a memory error and can result in undefined behavior.
+
+### Asynchronous Crypto Callbacks
+
+A crypto callback may return `WC_PENDING_E` to indicate that the operation was started on a device and has not completed. The application then drives the operation to completion with `wolfSSL_AsyncPoll()`. wolfSSL 5.9.4 extended the TLS 1.3 handshake to support this for the HKDF key schedule, transcript HMAC, AES-GCM record encrypt and decrypt, RNG, ECC and X25519 key shares, and ECDSA and Ed25519 sign and verify. For the TLS record ciphers specifically, define `WOLF_CRYPTO_CB_ASYNC_POLL` to use a poll-to-complete model; without it a pending bulk cipher returns `ASYNC_OP_E` rather than corrupting the record. `WOLFSSL_ASYNC_CERT_YIELD` additionally returns `WC_PENDING_E` after each certificate in a peer chain is verified so a cooperative scheduler can run.
+
+### Device Registration
+
+`wc_CryptoCb_RegisterDevice()` rejects a device ID that is already registered with `ALREADY_E`, and `wc_CryptoCb_IsDeviceRegistered()` reports whether an ID is in use. If a device's register command registers further devices itself, it is not left holding a half-filled slot. `wc_CryptoCb_UnRegisterDevice()` removes a registration.
+
+### Crypto-Callback-Only Builds
+
+If a device always services an algorithm, you can compile its software implementation out. The `WOLF_CRYPTO_CB_ONLY_*` macros do this per algorithm (RSA, ECC, Ed25519, Curve25519, Curve448 and SLH-DSA), and `--enable-cryptocb=only` does it for all of them at once. See [`--enable-cryptocb`](chapter02.md#--enable-cryptocb).
 
 ### Troubleshooting
 
