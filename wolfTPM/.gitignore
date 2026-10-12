@@ -1,0 +1,10 @@
+/build/
+/html/
+/src/
+/wolftpm/
+/api/
+/mkdocs.yml
+/header.txt
+/manual.generated.mk
+/wolfTPM-Manual.pdf
+/wolfTPM-Manual-jp.pdf
