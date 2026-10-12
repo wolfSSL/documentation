@@ -335,12 +335,12 @@ The wire values come from draft-reddy-tls-slhdsa and are the same ones oqs-provi
 
 | Name | Wire Value | Default | configure Option |
 |------|-----------|:-------:|-----------------|
-| `slhdsa_sha2_128s` | `0x09,0x11` | Disabled | `--enable-slhdsa` |
-| `slhdsa_sha2_128f` | `0x09,0x12` | Disabled | `--enable-slhdsa` |
-| `slhdsa_sha2_192s` | `0x09,0x13` | Disabled | `--enable-slhdsa` |
-| `slhdsa_sha2_192f` | `0x09,0x14` | Disabled | `--enable-slhdsa` |
-| `slhdsa_sha2_256s` | `0x09,0x15` | Disabled | `--enable-slhdsa` |
-| `slhdsa_sha2_256f` | `0x09,0x16` | Disabled | `--enable-slhdsa` |
+| `slhdsa_sha2_128s` | `0x09,0x11` | Disabled | `--enable-slhdsa=sha2` |
+| `slhdsa_sha2_128f` | `0x09,0x12` | Disabled | `--enable-slhdsa=sha2` |
+| `slhdsa_sha2_192s` | `0x09,0x13` | Disabled | `--enable-slhdsa=sha2` |
+| `slhdsa_sha2_192f` | `0x09,0x14` | Disabled | `--enable-slhdsa=sha2` |
+| `slhdsa_sha2_256s` | `0x09,0x15` | Disabled | `--enable-slhdsa=sha2` |
+| `slhdsa_sha2_256f` | `0x09,0x16` | Disabled | `--enable-slhdsa=sha2` |
 | `slhdsa_shake_128s` | `0x09,0x17` | Disabled | `--enable-slhdsa` |
 | `slhdsa_shake_128f` | `0x09,0x18` | Disabled | `--enable-slhdsa` |
 | `slhdsa_shake_192s` | `0x09,0x19` | Disabled | `--enable-slhdsa` |

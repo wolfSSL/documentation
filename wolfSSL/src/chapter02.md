@@ -5101,7 +5101,7 @@ Enable ML-DSA (FIPS 204) / Dilithium. Off by default. Takes a comma separated li
 
 ### `--enable-slhdsa`
 
-Enable the SLH-DSA (FIPS 205) stateless hash-based signatures, all twelve parameter sets. Off by default. Pass `--enable-slhdsa=verify-only` to keep only verification. With TLS 1.3 / DTLS 1.3, the draft-reddy-tls-slhdsa signature schemes can authenticate the handshake. Defines [`WOLFSSL_HAVE_SLHDSA`](#wolfssl_have_slhdsa). New in wolfSSL 5.9.4.
+Enable the SLH-DSA (FIPS 205) stateless hash-based signatures, all twelve parameter sets can be enabled with --enable-slhdsa=sha2,yes. Off by default. Pass `--enable-slhdsa=sha2,yes,verify-only` to keep only verification. With TLS 1.3 / DTLS 1.3, the draft-reddy-tls-slhdsa signature schemes can authenticate the handshake. Defines [`WOLFSSL_HAVE_SLHDSA`](#wolfssl_have_slhdsa). New in wolfSSL 5.9.4.
 
 ### `--enable-falcon`
 
