@@ -1,6 +1,6 @@
-#  wolfSSL SFTP API リファレンス
+# wolfSSH SFTP API リファレンス
 
-##  接続機能
+##  接続関数
 
 
 
@@ -8,142 +8,217 @@
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_accept(WOLFSSH* ssh);
+```
 
 **説明**
 
-クライアントからの接続要求を処理します
+クライアントからの受信 SFTP 接続要求を処理します。SSH セッションが確立された後、
+サーバー側で呼び出します。
 
-**戻り値**
-
-**WS_SFTP_COMPLETE** - 成功
+アプリケーション駆動チャネルが有効な場合（wolfSSH_CTX_SetAppChannels() または
+wolfSSH_SetAppChannels()）、この関数は、アプリケーションのサブシステムコールバックが
+"sftp" サブシステムを許可したセッションチャネルのみを処理します。サブシステム名は
+"sftp" と完全に一致する必要があります。その許可より前に呼び出された場合は、セッションに
+エラーを記録せずに `WS_INVALID_STATE_E` を返します。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - 接続に使用する wolfSSH セッションへのポインター
 
+**戻り値**
 
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_accept(WOLFSSH* ssh );
-```
-**使用例**
-
-```
-WOLFSSH* ssh;
-
-//create new WOLFSSH structure
-...
-
-if (wolfSSH_SFTP_accept(ssh) != WS_SUCCESS) {
-//handle error case
-}
-```
+- 成功時は `WS_SFTP_COMPLETE`
+- `ssh` が `NULL` の場合は `WS_BAD_ARGUMENT`
+- アプリケーション駆動チャネルモードで sftp サブシステムが許可されていない場合は
+  `WS_INVALID_STATE_E`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_free()<br>
-
-wolfSSH_new()<br>
-
-wolfSSH_SFTP_connect()<br>
-
+- `wolfSSH_SFTP_connect()`
+- `wolfSSH_SFTP_negotiate()`
 
 ### wolfSSH_SFTP_connect()
 
 
-**用法**
+
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_connect(WOLFSSH* ssh);
+```
 
 **説明**
 
-SFTPサーバーへの接続を開始します。
-
-**戻り値**
-
-**WS_SFTP_COMPLETE** - 成功<br>
+サーバーへの SFTP 接続を開始します。SSH セッションが確立された後、クライアント側で
+呼び出します。
 
 **引数**
 
-**ssh** - – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - 接続に使用する wolfSSH セッションへのポインター
 
+**戻り値**
 
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_connect(WOLFSSH* ssh );
-```
-
-
-**使用例**
-
-```
-WOLFSSH* ssh;
-
-//after creating a new WOLFSSH structure
-
-wolfSSH_SFTP_connect(ssh);
-```
+- 成功時は `WS_SFTP_COMPLETE`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
-
-wolfSSH_new()<br>
-
-wolfSSH_free()<br>
-
+- `wolfSSH_SFTP_accept()`
+- `wolfSSH_SFTP_negotiate()`
 
 ### wolfSSH_SFTP_negotiate()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_negotiate(WOLFSSH* ssh);
+```
 
 **説明**
 
-本関数はクライアントからの接続要求かサーバーへの接続要求のいずれかを処理します。いずれを処理するかはwolfSSHオブジェクトにセットされているアクションに依存します。
-
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+SFTP プロトコルのネゴシエーションを実行します。セッションがどちら側のために作成
+されたかに応じて、クライアントからの受信接続を処理するか、サーバーへ接続要求を
+送信します。
 
 **引数**
 
-**ssh** - – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - 接続に使用する wolfSSH セッションへのポインター
 
+**戻り値**
 
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_negotiate(WOLFSSH* ssh)
-```
-
-**使用例**
-
-```
-WOLFSSH* ssh;
-
-//create new WOLFSSH structure with side of connection
-set
-....
-
-if (wolfSSH_SFTP_negotiate(ssh) != WS_SUCCESS) {
-//handle error case
-}
-```
+- 成功時は `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_free()<br>
-
-wolfSSH_new()<br>
-
-wolfSSH_SFTP_connect()<br>
-
-wolfSSH_SFTP_accept()<br>
+- `wolfSSH_SFTP_accept()`
+- `wolfSSH_SFTP_connect()`
 
 
+### wolfSSH_SFTP_SetDefaultPath()
 
-##  プロトコル関係
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_SetDefaultPath(WOLFSSH* ssh, const char* path);
+```
+
+**説明**
+
+SFTP セッションの開始パスを設定します。開始パスは、セッションが開始するディレクトリ
+であり、サーバーが相対的な要求パスを解決する際の基準となります。開始パスはセッションが
+どこで開始するかを設定するだけで、アクセスの許可や拒否は一切行いません。セッションが
+到達できるパスを制限するには wolfSSH_SFTP_SetConfinePath() を使用します。これは
+この設定とは独立しています。
+
+パスは保存される前に正規化されます。相対的な `path` は、プロセスの現在の作業
+ディレクトリを基準に解決されます。この関数を再度呼び出すと、以前の開始パスが置き換え
+られます。置き換え用のメモリを確保できない場合、既存の開始パスはそのまま残ります。
+`NULL` のパスを渡すと現在の設定は変更されず、`WS_SUCCESS` を返します。
+
+クライアントから最初の REALPATH 要求を受信した時点で開始パスが設定されていない場合、
+サーバーは開始パスを自身の現在の作業ディレクトリに設定します。これによってセッションが
+制限されることはありません。
+
+**注意：** wolfSSH v1.6.0 以降、開始パスはセッションを制限しなくなりました。以前の
+リリースでは、デフォルトパスの外側に解決される要求は拒否されていました。その動作に
+依存していたアプリケーションは、wolfSSH_SFTP_SetConfinePath() も呼び出す必要が
+あります。
+
+**引数**
+
+- `ssh` - wolfSSH セッションへのポインター
+- `path` - NULL 終端の開始パス。または現在の設定を変更しない場合は `NULL`
+
+**戻り値**
+
+- `WS_SUCCESS`
+- `WS_BAD_ARGUMENT` - `ssh` が `NULL`
+- `WS_BUFFER_E` - パス、またはその解決の基準となる作業ディレクトリが
+  `WOLFSSH_MAX_FILENAME` に収まらない
+- `WS_INVALID_PATH_E` - 現在の作業ディレクトリを読み取れなかった、またはパスを正規化
+  できなかった
+- `WS_FATAL_ERROR` - メモリ確保に失敗した（`ssh->error` は `WS_MEMORY_E` に設定
+  されます）
+
+**関連項目**
+
+- `wolfSSH_SFTP_SetConfinePath()`
+
+### wolfSSH_SFTP_SetConfinePath()
+
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_SetConfinePath(WOLFSSH* ssh, const char* path);
+```
+
+**説明**
+
+SFTP セッションのサーバー側を、`path` をルートとするディレクトリツリーに制限します。
+各要求パスは開始パス（wolfSSH_SFTP_SetDefaultPath() を参照）を基準に解決され、
+正規化されます。その結果がルート自体でもルート配下のパスでもない場合、要求は
+`WS_PERMISSIONS` で拒否されます。制限ルートが設定されていない場合、またはルートが "/"
+の場合、セッションは制限されません。ルートが "/" の場合は、解決結果が絶対パスである
+要求のみが受け付けられます。Windows では、プレフィックスの比較は大文字と小文字を区別
+しません。
+
+制限と開始パスは互いに独立しています。サーバーは、ジェイルの深い位置でセッションを
+開始する（例えば /srv/data/user7 で開始し、/srv/data に制限する）ことも、セッションが
+開始する場所を変えずに制限することも、どちらも行わずにオペレーティングシステムの
+パーミッションに任せることもできます。wolfSSHd は最後の方法を採用しており、制限ルートを
+設定せず、認証されたユーザーに権限を降格します。開始パスは制限ルートの内側に設定して
+ください。開始パスがルートの外側にあると、相対的な要求がルートの外側に解決され、
+それらの要求は拒否されます。
+
+パスは保存される前に正規化されます。相対的な `path` は、プロセスの現在の作業
+ディレクトリを基準に解決されます。この関数を再度呼び出すと、以前のルートが置き換え
+られます。`NULL` のパスを渡すと現在の設定は変更されず、`WS_SUCCESS` を返します。
+
+パスは字句的に解決されるため、ジェイル内のシンボリックリンクがジェイル内にとどまる
+ことを保証できません。そのため、シンボリックリンクをサポートするビルド
+（`WOLFSSH_HAVE_SYMLINK`）では、制限されたセッションは、ルート配下のパスに既存の
+シンボリックリンクの構成要素を含むすべての要求を拒否します。リンク先がジェイル内に
+とどまるリンクも例外ではありません。まだ存在しない末端要素は許可されるため、作成操作は
+引き続き機能します。`WOLFSSH_NO_SYMLINK_CHECK` を定義するとこのチェックが削除され、
+それによる脱出防止も失われます。ルート自体は信頼され、チェックされることはないため、
+シンボリックリンクを経由して到達するルートは、そのリンク先と同じ範囲になります。
+サーバーが管理し、シンボリックリンクの構成要素を含まないルートを使用してください。
+
+シンボリックリンクのチェックは多層防御の一つであり、セキュリティ境界ではありません。
+これはチェック時と使用時の間の競合（TOCTOU）の影響を受けるチェックです。ジェイル内で
+並行して書き込みを行う者が、操作の実行前にチェック済みの構成要素をリンクに置き換える
+可能性があります。悪意のあるテナントが混在するデプロイメントでは、OS レベルのジェイル
+（chroot と権限の降格）を使用してください。
+
+**引数**
+
+- `ssh` - wolfSSH セッションへのポインター
+- `path` - NULL 終端の制限ルート。または現在の設定を変更しない場合は `NULL`
+
+**戻り値**
+
+- `WS_SUCCESS`
+- `WS_BAD_ARGUMENT` - `ssh` が `NULL`
+- `WS_BUFFER_E` - パス、またはその解決の基準となる作業ディレクトリが
+  `WOLFSSH_MAX_FILENAME` に収まらない
+- `WS_INVALID_PATH_E` - 現在の作業ディレクトリを読み取れなかった、またはパスを正規化
+  できなかった
+- `WS_FATAL_ERROR` - メモリ確保に失敗した（`ssh->error` は `WS_MEMORY_E` に設定
+  されます）
+
+**関連項目**
+
+- `wolfSSH_SFTP_SetDefaultPath()`
+
+##  プロトコルレベル関数
 
 
 
@@ -151,694 +226,444 @@ wolfSSH_SFTP_accept()<br>
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+WS_SFTPNAME* wolfSSH_SFTP_RealPath(WOLFSSH* ssh, char* dir);
+```
 
 **説明**
 
-REALPATHパケットを相手に送信し、相手から取得したファイル名を返します。
-
-
-**戻り値**
-
-成功時にはWS_SFTPNAME構造体へのポインターを返します。エラー発生時にはNULLを返します。
-
+ピアに REALPATH 要求を送信し、ファイルまたはディレクトリの正規名を返します。返された
+`WS_SFTPNAME` は wolfSSH_SFTPNAME_free() で解放する必要があります。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `dir` - 解決するファイル名またはディレクトリ名
 
-**dir** - 実際のパスを取得するためのディレクトリ/ファイル名
+**戻り値**
 
-
-
-```
-#include <wolfssh/wolfsftp.h>
-WS_SFTPNAME* wolfSSH_SFTP_RealPath(WOLFSSH* ssh , char* dir);
-```
-**使用例**
-
-```
-WOLFSSH* ssh ;
-
-//set up ssh and do sftp connections
-...
-
-if (wolfSSH_SFTP_read( ssh ) != WS_SUCCESS) {
-//handle error case
-}
-```
+- 成功時は `WS_SFTPNAME` 構造体へのポインター
+- エラー時は `NULL`
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
-
-wolfSSH_SFTP_connect()<br>
-
-
+- `wolfSSH_SFTPNAME_free()`
 
 ### wolfSSH_SFTP_Close()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_Close(WOLFSSH* ssh, byte* handle, word32 handleSz);
+```
 
 **説明**
 
-相手にクローズパケットを送信します。
-
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+指定されたファイルハンドルについて、ピアにクローズ要求を送信します。このハンドルは、
+以前の wolfSSH_SFTP_Open() の呼び出しから取得したものです。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `handle` - クローズするファイルハンドル
+- `handleSz` - ハンドルバッファのサイズ
 
-**handle** - 閉じようとするハンドル<br>
+**戻り値**
 
-**handleSz** - ハンドルバッファーのサイズ
-
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_Close(WOLFSSH* ssh , byte* handle , word32 handleSz );
-```
-**使用例**
-
-```
-WOLFSSH* ssh;
-byte handle[HANDLE_SIZE];
-word32 handleSz = HANDLE_SIZE;
-
-//set up ssh and do sftp connections
-...
-
-if (wolfSSH_SFTP_Close(ssh, handle, handleSz) != WS_SUCCESS) {
-//handle error case
-}
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
-
-wolfSSH_SFTP_connect()<br>
-
+- `wolfSSH_SFTP_Open()`
 
 ### wolfSSH_SFTP_Open()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_Open(WOLFSSH* ssh, char* dir, word32 reason,
+        WS_SFTP_FILEATRB* atr, byte* handle, word32* handleSz);
+```
 
 **説明**
 
-Openパケットを相手に送信します。結果を受け取るバッファサイズのをhandleSzで指定し、相手から受け取ったハンドルをバッファに格納します。
-
-
-openの理由として取り得る値は:<br>
-
-WOLFSSH_FXF_READ<br>
-
-WOLFSSH_FXF_WRITE<br>
-
-WOLFSSH_FXF_APPEND<br>
-
-WOLFSSH_FXF_CREAT<br>
-
-WOLFSSH_FXF_TRUNC<br>
-
-WOLFSSH_FXF_EXCL<br>
-
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+`dir` で指定された名前のファイルについて、ピアにオープン要求を送信します。成功時、
+得られたファイルハンドルが `handle` に格納され、そのサイズが `handleSz` に書き込ま
+れます。`reason` 引数はオープンフラグのビットマスクで、`WOLFSSH_FXF_READ`、
+`WOLFSSH_FXF_WRITE`、`WOLFSSH_FXF_APPEND`、`WOLFSSH_FXF_CREAT`、`WOLFSSH_FXF_TRUNC`、
+`WOLFSSH_FXF_EXCL` のいずれかです。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `dir` - オープンするファイルの名前
+- `reason` - オープンフラグのビットマスク（上記を参照）
+- `atr` - 初期ファイル属性
+- `handle` - 得られたファイルハンドルの出力バッファ
+- `handleSz` - 入力時はバッファのサイズ、出力時はハンドルのサイズが設定される
 
-**dir** - 開くファイルの名前<br>
+**戻り値**
 
-**reason** - ファイルを開く理由<br>
-
-**atr** - ファイルの初期属性<br>
-
-**handle** - 結果として得られるハンドル<br>
-
-**handleSz** - ハンドル用バッファのサイズ<br>
-
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_Open(WOLFSSH* ssh , char* dir , word32　reason, WS_SFTP_FILEATRB* atr , byte* handle , word32* handleSz);
-```
-
-**使用例**
-
-
-
-```
-WOLFSSH* ssh ;
-char name[NAME_SIZE];
-byte handle[HANDLE_SIZE];
-word32 handleSz = HANDLE_SIZE;
-WS_SFTP_FILEATRB atr;
-
-//set up ssh and do sftp connections
-...
-
-if (wolfSSH_SFTP_Open( ssh , name , WOLFSSH_FXF_WRITE | WOLFSSH_FXF_APPEND | WOLFSSH_FXF_CREAT , &atr , handle , &handleSz ) != WS_SUCCESS) {
-//handle error case
-}
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
-
-wolfSSH_SFTP_connect()<br>
-
+- `wolfSSH_SFTP_Close()`
+- `wolfSSH_SFTP_SendReadPacket()`
+- `wolfSSH_SFTP_SendWritePacket()`
 
 ### wolfSSH_SFTP_SendReadPacket()
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_SendReadPacket(WOLFSSH* ssh, byte* handle,
+        word32 handleSz, const word32* ofst, byte* out, word32 outSz);
+```
 
 **説明**
 
-readパケットを相手に送信します。ハンドル用のバッファは直前のwolfSSH_SFTP_Openで得られたハンドルを格納していなければなりません。読みだすことができたデータはoutバッファに格納されます。
-
-
-**戻り値**
-
-成功時には読みだしたデータ数を返します。エラー発生時には、負の値を返します。
+`handle`（wolfSSH_SFTP_Open() から取得）が参照するファイルについて、ピアに読み取り
+要求を送信します。読み取られたバイトは `out` バッファに格納されます。`ofst` 引数は、
+読み取りを開始するファイルオフセットを指します。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `handle` - 読み取り元のファイルハンドル
+- `handleSz` - ハンドルバッファのサイズ
+- `ofst` - 読み取りを開始するファイルオフセットへのポインター
+- `out` - 読み取ったデータを保持するバッファ
+- `outSz` - 出力バッファのサイズ
 
-**handle** - 読みだそうとするハンドル<br>
+**戻り値**
 
-**handleSz** - ハンドルバッファのサイズ<br>
-
-**ofst** - 読み出しを開始するオフセット<br>
-
-**out** - 読み出した結果を格納するバッファ<br>
-
-**outSz** - バッファサイズ
-
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_SendReadPacket(WOLFSSH* ssh , byte*　handle , word32 handleSz , word64 ofst , byte* out , word32 outSz );
-```
-
-
-
-**使用例**
-
-```
-WOLFSSH* ssh;
-byte handle[HANDLE_SIZE];
-word32 handleSz = HANDLE_SIZE;
-byte out[OUT_SIZE];
-word32 outSz = OUT_SIZE;
-word32 ofst = 0;
-int ret;
-
-//set up ssh and do sftp connections
-...
-//get handle with wolfSSH_SFTP_Open()
-
-if ((ret = wolfSSH_SFTP_SendReadPacket(ssh, handle, handleSz, ofst, out, outSz)) < 0) {
-//handle error case
-}
-//ret holds the number of bytes placed into out buffer
-```
+- 0 以上 - 成功時に読み取ったバイト数
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_SendWritePacket()<br>
-
-wolfSSH_SFTP_Open()<br>
-
+- `wolfSSH_SFTP_SendWritePacket()`
+- `wolfSSH_SFTP_Open()`
 
 ### wolfSSH_SFTP_SendWritePacket()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_SendWritePacket(WOLFSSH* ssh, byte* handle,
+        word32 handleSz, const word32* ofst, byte* out, word32 outSz);
+```
 
 **説明**
 
-writeパケットを相手に送信します。ハンドル用のバッファは直前のwolfSSH_SFTP_Openで得られたハンドルを格納していなければなりません。
-
-**戻り値**
-
-成功時には書き込んだサイズを返します。エラー発生時には負の値を返します。
+`handle`（wolfSSH_SFTP_Open() から取得）が参照するファイルについて、ピアに書き込み
+要求を送信し、`out` バッファの内容を書き込みます。`ofst` 引数は、書き込みを行う
+ファイルオフセットを指します。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `handle` - 書き込み先のファイルハンドル
+- `handleSz` - ハンドルバッファのサイズ
+- `ofst` - 書き込みを開始するファイルオフセットへのポインター
+- `out` - ピアに送信するデータのバッファ
+- `outSz` - バッファのサイズ
 
-**handle** - 書き込もうとするハンドル<br>
+**戻り値**
 
-**handleSz** - ハンドルバッファのサイズ<br>
-
-**ofst** - 書き込みを開始するオフセット<br>
-
-**out** - 書き込むデータを保持するバッファ<br>
-
-**outSz** - バッファサイズ<br>
-
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_SendWritePacket(WOLFSSH* ssh, byte*　handle, word32　handleSz, word64 ofst, byte* out, word32 outSz);
-```
-
-**使用例**
-
-
-```
-WOLFSSH* ssh;
-byte handle[HANDLE_SIZE];
-word32 handleSz = HANDLE_SIZE;
-byte out[OUT_SIZE];
-word32 outSz = OUT_SIZE;
-word32 ofst = 0;
-int ret;
-
-//set up ssh and do sftp connections
-...
-//get handle with wolfSSH_SFTP_Open()
-
-if ((ret = wolfSSH_SFTP_SendWritePacket(ssh, handle, handleSz, ofst, out, outSz)) < 0) {
-//handle error case
-}
-//ret holds the number of bytes written
-```
+- 0 以上 - 成功時に書き込んだバイト数
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_SendReadPacket()<br>
-
-wolfSSH_SFTP_Open()<br>
-
+- `wolfSSH_SFTP_SendReadPacket()`
+- `wolfSSH_SFTP_Open()`
 
 ### wolfSSH_SFTP_STAT()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_STAT(WOLFSSH* ssh, char* dir, WS_SFTP_FILEATRB* atr);
+```
 
 **説明**
 
-STATパケットを相手に送信します。ファイルあるいはディレクトリの属性を取得します。ファイルが存在しないかあるいは属性が存在しない場合は相手はエラーを返します。
-
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+ファイルまたはディレクトリの属性を取得するために、ピアに STAT 要求を送信します。
+シンボリックリンクをたどります。対象が存在しない場合、ピアはエラーを返し、この関数は
+エラー値を返します。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `dir` - ファイルまたはディレクトリの NULL 終端の名前
+- `atr` - 得られた属性を受け取る構造体
 
-**dir** - NULLターミネートされたファイルあるいはディレクトリ名<br>
+**戻り値**
 
-**atr** - 属性値がこの構造体に返却されます
-
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_STAT(WOLFSSH* ssh , char* dir, WS_SFTP_FILEATRB* atr);
-```
-**使用例**
-
-```
-WOLFSSH* ssh;
-byte name[NAME_SIZE];
-int ret;
-WS_SFTP_FILEATRB atr;
-
-//set up ssh and do sftp connections
-...
-
-if ((ret = wolfSSH_SFTP_STAT(ssh, name, &atr)) < 0) {
-//handle error case
-}
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_LSTAT()<br>
-
-wolfSSH_SFTP_connect()<br>
-
+- `wolfSSH_SFTP_LSTAT()`
+- `wolfSSH_SFTP_SetSTAT()`
 
 ### wolfSSH_SFTP_LSTAT()
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_LSTAT(WOLFSSH* ssh, char* dir, WS_SFTP_FILEATRB* atr);
+```
 
 **説明**
 
-LSTATパケットを相手に送信します。ファイルあるいはディレクトリの属性値を取得します。STATパケットがシンボリックリンクをたどりませんがLSTATパケットはシンボリックリンクをたどって処理します。ファイルが存在しないかあるいは属性が存在しない場合は相手はエラーを返します。
-
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+ファイルまたはディレクトリの属性を取得するために、ピアに LSTAT 要求を送信します。
+wolfSSH_SFTP_STAT() とは異なり、LSTAT はシンボリックリンクをたどらず、リンク自体の
+属性を返します。対象が存在しない場合、ピアはエラーを返し、この関数はエラー値を
+返します。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `dir` - ファイルまたはディレクトリの NULL 終端の名前
+- `atr` - 得られた属性を受け取る構造体
 
-**dir** - NULLターミネートされたファイルあるいはディレクトリ名<br>
+**戻り値**
 
-**atr** - 属性値がこの構造体に返却されます
-
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_LSTAT(WOLFSSH* ssh, char* dir, WS_SFTP_FILEATRB* atr);
-```
-**使用例**
-```
-WOLFSSH* ssh;
-byte name[NAME_SIZE];
-int ret;
-WS_SFTP_FILEATRB atr;
-
-//set up ssh and do sftp connections
-...
-
-if ((ret = wolfSSH_SFTP_LSTAT(ssh, name, &atr)) < 0) {
-//handle error case
-}
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_STAT()<br>
+- `wolfSSH_SFTP_STAT()`
+- `wolfSSH_SFTP_SetSTAT()`
 
-wolfSSH_SFTP_connect()<br>
+### wolfSSH_SFTP_SetSTAT()
 
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_SetSTAT(WOLFSSH* ssh, char* dir, WS_SFTP_FILEATRB* atr);
+```
+
+**説明**
+
+`atr` の属性（例えばパーミッション、サイズ、タイムスタンプ）を指定されたファイル
+またはディレクトリに適用するために、ピアに SETSTAT 要求を送信します。`atr->flags` で
+フラグが設定されている属性のみが送信されます。wolfSSH v1.6.0 以降のサーバーは属性を
+適用するか、`SSH_FX_OP_UNSUPPORTED` で応答します。それより前のサーバーは常に
+`SSH_FX_OK` で応答していました。
+
+**引数**
+
+- `ssh` - wolfSSH セッションへのポインター
+- `dir` - ファイルまたはディレクトリの NULL 終端の名前
+- `atr` - 適用する属性
+
+**戻り値**
+
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
+
+**関連項目**
+
+- `wolfSSH_SFTP_STAT()`
 
 ### wolfSSH_SFTPNAME_free()
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+void wolfSSH_SFTPNAME_free(WS_SFTPNAME* n);
+```
 
 **説明**
 
-単一のWS_SFTPNAMEノードを解放します。指定したノードがノードリストの途中のものであった場合には、リストは壊れます。
+単一の `WS_SFTPNAME` ノードを解放します。ノードがリストの途中にある場合、それを解放
+するとリストが壊れます。リスト全体を解放するには wolfSSH_SFTPNAME_list_free() を使用
+してください。
+
+**引数**
+
+- `n` - 解放する `WS_SFTPNAME` ノード
 
 **戻り値**
 
 なし
 
-**引数**
-
-**name** - 解放されるノード
-
-
-
-
-```
-#include <wolfssh/wolfsftp.h>
-void wolfSSH_SFTPNAME_free(WS_SFTPNAME* name );
-```
-**使用例**
-
-```
-WOLFSSH* ssh;
-WS_SFTPNAME* name;
-
-//set up ssh and do sftp connections
-...
-name = wolfSSH_SFTP_RealPath(ssh, path);
-if (name != NULL) {
-wolfSSH_SFTPNAME_free(name);
-}
-```
-
 **関連項目**
 
-wolfSSH_SFTPNAME_list_free()
-
+- `wolfSSH_SFTPNAME_list_free()`
 
 ### wolfSSH_SFTPNAME_list_free()
 
+```c
+#include <wolfssh/wolfsftp.h>
 
-
-**用法**
+void wolfSSH_SFTPNAME_list_free(WS_SFTPNAME* n);
+```
 
 **説明**
 
-リスト中の全WS_SFTPNAMEノードを解放します。
+wolfSSH_SFTP_LS() が返すリストのような、`WS_SFTPNAME` ノードのリスト全体を解放し
+ます。
 
+**引数**
+
+- `n` - 解放する `WS_SFTPNAME` リストの先頭
 
 **戻り値**
 
 なし
 
-**引数**
-
-**name** - 解放するリストの先頭
-
-
-
-```
-#include <wolfssh/wolfsftp.h>
-void wolfSSH_SFTPNAME_list_free(WS_SFTPNMAE* name );
-```
-
-**使用例**
-
-```
-WOLFSSH* ssh;
-WS_SFTPNAME* name;
-
-//set up ssh and do sftp connections
-...
-
-name = wolfSSH_SFTP_LS(ssh, path);
-if (name != NULL) {
-wolfSSH_SFTPNAME_list_free(name);
-}
-```
-
 **関連項目**
 
-wolfSSH_SFTPNAME_free()
+- `wolfSSH_SFTPNAME_free()`
 
-
-##  Reget/Reput 機能
+##  Reget / Reput 関数
 
 ### wolfSSH_SFTP_SaveOfst()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_SaveOfst(WOLFSSH* ssh, char* frm, char* to,
+        const word32* ofst);
+```
 
 **説明**
-get あるいはputコマンドが中断された場合のオフセットを保存します。オフセットはwolfSSH_SFTP_GetOfstで復元できます。
 
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+中断された get または put の転送オフセットを、ソース（`frm`）と宛先（`to`）のパスを
+キーとして保存します。保存されたオフセットは、後で wolfSSH_SFTP_GetOfst() により
+取得できます。各パスは `WOLFSSH_MAX_FILENAME` バイトより短くなければなりません。
+そうでない場合は `WS_BUFFER_E` を返します。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `frm` - NULL 終端のソースパス
+- `to` - NULL 終端の宛先パス
+- `ofst` - 保存するオフセットへのポインター
 
-**from** - NULL終端されたソースパスを示す文字列<br>
+**戻り値**
 
-**to** - NULL終端されたデスティネーションパスを示す文字列<br>
-
-**ofst** - 記憶されるべきファイルのオフセット
-
-
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_SaveOfst(WOLFSSH* ssh , char* from , char*
-to ,
-word64 ofst );
-```
-
-**使用例**
-
-```
-WOLFSSH* ssh;
-char from[NAME_SZ];
-char to[NAME_SZ];
-word64 ofst;
-
-//set up ssh and do sftp connections
-...
-
-if (wolfSSH_SFTP_SaveOfst(ssh, from, to, ofst) !=　WS_SUCCESS) {
-//handle error case
-}
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_GetOfst()<br>
-
-wolfSSH_SFTP_Interrupt()<br>
-
+- `wolfSSH_SFTP_GetOfst()`
+- `wolfSSH_SFTP_Interrupt()`
 
 ### wolfSSH_SFTP_GetOfst()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_GetOfst(WOLFSSH* ssh, char* frm, char* to,
+        word32* ofst);
+```
 
 **説明**
 
-get あるいはputコマンドが中断された場合のオフセットを取得します。
-
-
-**戻り値**
-
-成功時にはオフセット値を返します。オフセットが保存されていない場合には0が返されます。
-
+中断された get または put について、ソース（`frm`）と宛先（`to`）のパスをキーとして
+保存された転送オフセットを取得し、`ofst` に書き込みます。保存されたオフセットが
+見つからない場合、`ofst` は 0 に設定されます。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `frm` - NULL 終端のソースパス
+- `to` - NULL 終端の宛先パス
+- `ofst` - 保存されたオフセットの出力
 
-**from** - NULL終端されたソースパスを示す文字列<br>
+**戻り値**
 
-**to** - NULL終端されたデスティネーションパスを示す文字列<br>
-
-
-```
-#include <wolfssh/wolfsftp.h>
-word64 wolfSSH_SFTP_GetOfst(WOLFSSH* ssh, char* from, char* to);
-```
-
-**使用例**
-
-```
-WOLFSSH* ssh;
-char from[NAME_SZ];
-char to[NAME_SZ];
-word64 ofst;
-
-//set up ssh and do sftp connections
-...
-
-ofst = wolfSSH_SFTP_GetOfst(ssh, from, to);
-//start reading/writing from ofst
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_SaveOfst()<br>
-
-wolfSSH_SFTP_Interrup()<br>
-
-
+- `wolfSSH_SFTP_SaveOfst()`
+- `wolfSSH_SFTP_Interrupt()`
 
 ### wolfSSH_SFTP_ClearOfst()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_ClearOfst(WOLFSSH* ssh);
+```
 
 **説明**
 
-保存されている全オフセット値をクリアします。
-
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+セッションについて保存されているすべての転送オフセットをクリアします。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
 
+**戻り値**
 
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_ClearOfst(WOLFSSH* ssh);
-```
-**使用例**
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_SaveOfst()<br>
-
-wolfSSH_SFTP_GetOfst()<br>
-
+- `wolfSSH_SFTP_SaveOfst()`
+- `wolfSSH_SFTP_GetOfst()`
 
 ### wolfSSH_SFTP_Interrupt()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+void wolfSSH_SFTP_Interrupt(WOLFSSH* ssh);
+```
 
 **説明**
 
-中断フラグをセットし、get/putコマンドを停止します。
+進行中の get または put の転送を停止するために、セッションに割り込みフラグを設定
+します。転送を後で再開できるように、現在のオフセットを wolfSSH_SFTP_SaveOfst() で
+保存できます。
 
+**引数**
+
+- `ssh` - wolfSSH セッションへのポインター
 
 **戻り値**
 
 なし
 
-**引数**
-
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
-
-
-```
-#include <wolfssh/wolfsftp.h>
-void wolfSSH_SFTP_Interrupt(WOLFSSH* ssh);
-```
-
-**使用例**
-
-```
-WOLFSSH* ssh;
-
-//set up ssh and do sftp connections
-...
-
-if (wolfSSH_SFTP_ClearOfst(ssh) != WS_SUCCESS) {
-//handle error
-}
-```
-
-
-```
-WOLFSSH* ssh;
-char from[NAME_SZ];
-char to[NAME_SZ];
-word64 ofst;
-
-//set up ssh and do sftp connections
-...
-
-wolfSSH_SFTP_Interrupt(ssh);
-wolfSSH_SFTP_SaveOfst(ssh, from, to, ofst);
-```
-
 **関連項目**
 
-wolfSSH_SFTP_SaveOfst()<br>
+- `wolfSSH_SFTP_SaveOfst()`
+- `wolfSSH_SFTP_GetOfst()`
 
-wolfSSH_SFTP_GetOfst()<br>
-
-
-##  コマンド機能
+##  コマンド関数
 
 
 
@@ -846,385 +671,262 @@ wolfSSH_SFTP_GetOfst()<br>
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_Remove(WOLFSSH* ssh, char* f);
+```
 
 **説明**
 
-"remove"パケットをチャネルを通じて送信します。削除するファイル名"f"は相手に渡されます。
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+`f` で指定された名前のファイルを削除するために、ピアに remove 要求を送信します。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
-**f** - 削除したいファイル名
+- `ssh` - wolfSSH セッションへのポインター
+- `f` - 削除するファイルの NULL 終端の名前
 
+**戻り値**
 
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_Remove(WOLFSSH* ssh , char* f );
-```
-
-**使用例**
-
-```
-WOLFSSH* ssh;
-int ret;
-char* name[NAME_SZ];
-
-//set up ssh and do sftp connections
-...
-
-ret = wolfSSH_SFTP_Remove(ssh, name);
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
-
-wolfSSH_SFTP_connect()<br>
-
+- `wolfSSH_SFTP_RMDIR()`
 
 ### wolfSSH_SFTP_MKDIR()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_MKDIR(WOLFSSH* ssh, char* dir, WS_SFTP_FILEATRB* atr);
+```
 
 **説明**
 
-チャネルを通して“mkdir”パケットを送信します。相手に作成するディレクトリ名が"dir"として渡されます。現時点では、属性は使用されず、既定の属性が使用されます。
-
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+`dir` で指定された名前のディレクトリを作成するために、ピアに mkdir 要求を送信します。
+`atr` 属性は現在使用されておらず、代わりにデフォルトの属性が適用されます。
 
 **引数**
 
-ssh – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `dir` - 作成するディレクトリの NULL 終端の名前
+- `atr` - 新しいディレクトリの属性（現在は未使用）
 
-dir - NULL終端された作成するディレクトリ名を示す文字列<br>
+**戻り値**
 
-atr - ディレクトリ作成に使う属性値
-
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_MKDIR(WOLFSSH* ssh, char* dir,　WS_SFTP_FILEATRB* atr);
-```
-
-**使用例**
-
-```
-WOLFSSH* ssh;
-int ret;
-char* dir[DIR_SZ];
-
-//set up ssh and do sftp connections
-...
-
-ret = wolfSSH_SFTP_MKDIR(ssh, dir, DIR_SZ);
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
-
-wolfSSH_SFTP_connect()<br>
+- `wolfSSH_SFTP_RMDIR()`
 
 ### wolfSSH_SFTP_RMDIR()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_RMDIR(WOLFSSH* ssh, char* dir);
+```
 
 **説明**
 
-“rmdir”パケットをチャネルを通じて送信します。削除するディレクトリ名は"dir"として相手に送られます。
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+`dir` で指定された名前のディレクトリを削除するために、ピアに rmdir 要求を送信します。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `dir` - 削除するディレクトリの NULL 終端の名前
 
-**dir** - NULL終端された削除するディレクトリ名を示す文字列<br>
+**戻り値**
 
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_RMDIR(WOLFSSH* ssh , char* dir );
-```
-**使用例**
-
-```
-WOLFSSH* ssh;
-int ret;
-char* dir[DIR_SZ];
-
-//set up ssh and do sftp connections
-...
-
-ret = wolfSSH_SFTP_RMDIR(ssh, dir);
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
-
-wolfSSH_SFTP_connect()<br>
+- `wolfSSH_SFTP_MKDIR()`
 
 ### wolfSSH_SFTP_Rename()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_Rename(WOLFSSH* ssh, const char* old, const char* nw);
+```
 
 **説明**
 
-“rename”パケットをチャネルを通じて送信します。相手側のファイル名を“old” から “nw”に変更しようとします。
-
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+ピアに rename 要求を送信し、ファイル `old` を `nw` に名前変更します。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `old` - 現在のファイル名
+- `nw` - 新しいファイル名
 
-**old** - 旧ファイル名<br>
+**戻り値**
 
-**nw** - 新ファイル名
-
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_Rename(WOLFSSH* ssh , const char* old ,　const char* nw);
-```
-
-**使用例**
-
-
-```
-WOLFSSH* ssh;
-int ret;
-char* old[NAME_SZ];
-char* nw[NAME_SZ]; //new file name
-
-//set up ssh and do sftp connections
-...
-
-ret = wolfSSH_SFTP_Rename(ssh, old, nw);
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
-
-wolfSSH_SFTP_connect()
-
+- `wolfSSH_SFTP_Remove()`
 
 ### wolfSSH_SFTP_LS()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+WS_SFTPNAME* wolfSSH_SFTP_LS(WOLFSSH* ssh, char* dir);
+```
 
 **説明**
 
-LS操作（全ファイルとディレクトリのリストを取得する）を現在のワーキングディレクトリで実行します。
-この関数はREALPATH, OPENDIR, READDIR と CLOSE操作を実行する高水準関数です。
-
-**戻り値**
-
-成功時にはWS_SFTPNAME構造体のリストを返します。失敗時にはNULLを返します。
+`dir` 内のファイルとディレクトリを一覧表示します。これは REALPATH、OPENDIR、READDIR、
+CLOSE の各操作を実行する高レベルのヘルパーです。返されたリストは
+wolfSSH_SFTPNAME_list_free() で解放する必要があります。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `dir` - 一覧表示するディレクトリ
 
-**dir** - リストを作成するディレクトリ名
+**戻り値**
 
-
-```
-#include <wolfssh/wolfsftp.h>
-WS_SFTPNAME* wolfSSH_SFTP_LS(WOLFSSH* ssh , char* dir );
-```
-
-
-
-**使用例**
-
-```
-WOLFSSH* ssh;
-int ret;
-char* dir[DIR_SZ];
-WS_SFTPNAME* name;
-WS_SFTPNAME* tmp;
-
-//set up ssh and do sftp connections
-...
-
-name = wolfSSH_SFTP_LS(ssh, dir);
-tmp = name;
-while (tmp != NULL) {
-printf("%s\n", tmp->fName);
-tmp = tmp->next;
-}
-wolfSSH_SFTPNAME_list_free(name);
-```
+- 成功時は `WS_SFTPNAME` 構造体のリストへのポインター
+- 失敗時は `NULL`
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
+- `wolfSSH_SFTPNAME_list_free()`
+- `wolfSSH_SFTP_RealPath()`
 
-wolfSSH_SFTP_connect()<br>
+### wolfSSH_SFTP_CHMOD()
 
-wolfSSH_SFTPNAME_list_free()<br>
+```c
+#include <wolfssh/wolfsftp.h>
 
+int wolfSSH_SFTP_CHMOD(WOLFSSH* ssh, char* n, char* oct);
+```
+
+**説明**
+
+ファイルまたはディレクトリ `n` のパーミッションビットを、8 進文字列 `oct`（例えば
+"644"）で指定されたモードに変更します。STAT 要求に続いて、新しいパーミッション
+（`WOLFSSH_FILEATRB_PERM`）のみを含む SETSTAT 要求を送信することで実装されています。
+ファイルのその他の属性は再送信されません。
+
+**引数**
+
+- `ssh` - wolfSSH セッションへのポインター
+- `n` - ファイルまたはディレクトリの NULL 終端の名前
+- `oct` - 8 進のパーミッション文字列（例えば "755"）
+
+**戻り値**
+
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
+
+**関連項目**
+
+- `wolfSSH_SFTP_SetSTAT()`
 
 ### wolfSSH_SFTP_Get()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_Get(WOLFSSH* ssh, char* from, char* to,
+        byte resume, WS_STATUS_CB* statusCb);
+```
 
 **説明**
 
-相手からファイルを取得するget操作を実行し、ローカルディレクトリに配置します。この関数は高水準関数であり、LSTAT, OPEN, READ, とCLOSEを実行します。関数の実行を中断したい場合には、wolfSSH_SFTP_Interruptを呼び出すことができます。
+ピアからローカルパスへファイルをダウンロードします。これは STAT、OPEN、READ、CLOSE
+の各操作を実行する高レベルのヘルパーです。進行中の転送は wolfSSH_SFTP_Interrupt() で
+中断できます。
 
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
-その他の値はすべてエラーとみなすべきです。
+`resume` が非ゼロの場合、`from` と `to` の組に対して保存されたオフセット
+（wolfSSH_SFTP_SaveOfst() を参照）は、リモートファイルにそのオフセットより先の
+バイトがまだあり、かつローカルファイルの長さがちょうどそのバイト数である場合にのみ
+使用されます。それ以外の場合、転送は最初からやり直されます。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `from` - 取得するリモートファイルの名前
+- `to` - ファイルを書き込むローカルパス
+- `resume` - 以前に中断した転送を再開するには非ゼロ、それ以外は 0
+- `statusCb` - 転送の進捗とともに呼び出されるコールバック。または `NULL`
 
-**from** - 取得するファイルの名前<br>
+**戻り値**
 
-**to** - 配置する際のファイルの名前<br>
-
-**resume** - 操作を再開するか（1は再開する、0はしない）<br>
-
-**statusCb** - ステータスを取得するコールバック関数
-
-
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_Get(WOLFSSH* ssh , char* from , char* to ,　byte resume ,　WS_STATUS_CB* statusCb );
-```
-
-**使用例**
-
-```
-static void myStatusCb(WOLFSSH* sshIn, long bytes, char* name)
-{
-char buf[80];
-WSNPRINTF(buf, sizeof(buf), "Processed %8ld\t bytes
-\r", bytes);
-WFPUTS(buf, fout);
-(void)name;
-(void)sshIn;
-}
-...
-WOLFSSH* ssh;
-char* from[NAME_SZ];
-char* to[NAME_SZ];
-
-//set up ssh and do sftp connections
-...
-
-if (wolfSSH_SFTP_Get( ssh , from , to , 0 , & myStatusCb ) != WS_SUCCESS) {
-//handle error case
-}
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
-
-wolfSSH_SFTP_connect()<br>
-
+- `wolfSSH_SFTP_Put()`
+- `wolfSSH_SFTP_Interrupt()`
 
 ### wolfSSH_SFTP_Put()
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_Put(WOLFSSH* ssh, char* from, char* to,
+        byte resume, WS_STATUS_CB* statusCb);
+```
 
 **説明**
 
-ローカルのファイルを相手のディレクトリに配置するput操作を実行します。この関数は高水準関数であり、OPEN, WRITE, と CLOSE操作を実行します。操作を中断する場合にはwolfSSH_SFTP_Interruptを呼び出してください。
+ローカルファイルをピアへアップロードします。これは OPEN、WRITE、CLOSE の各操作を
+実行する高レベルのヘルパーです。進行中の転送は wolfSSH_SFTP_Interrupt() で中断でき
+ます。
 
-
-**戻り値**
-
-**WS_SUCCESS** - 成功<br>
-
-その他の値はすべてエラーとみなすべきです。
+`resume` が非ゼロで、`from` と `to` の組に対してオフセットが保存されている場合、この
+関数はまずリモートファイルに対して STAT 要求を送信します。保存されたオフセットは、
+ローカルファイルにそのオフセットより先のバイトがまだあり、かつリモートファイルの長さが
+ちょうどそのバイト数である場合にのみ使用されます。それ以外の場合、転送は最初から
+やり直されます。リモートファイルは、転送がオフセット 0 から開始する場合にのみ
+`WOLFSSH_FXF_TRUNC` 付きでオープンされるため、再開された put が宛先を切り詰めることは
+ありません。書き込みが拒否された場合、転送は成功を報告せずにエラーで終了します。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
+- `from` - 送信するローカルファイルの名前
+- `to` - ファイルを書き込むリモートパス
+- `resume` - 以前に中断した転送を再開するには非ゼロ、それ以外は 0
+- `statusCb` - 転送の進捗とともに呼び出されるコールバック。または `NULL`
 
-**from** - 配置したい対象ファイルの名前<br>
+**戻り値**
 
-**to** - 配置先でのファイルの名前<br>
-
-**resume** - 操作を再開するかのフラグ(1は再開、0は再開しない）<br>
-
-**statusCb** - ステータスを取得するコールバック関数
-
-
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_Put(WOLFSSH* ssh, char* from, char* to, byte resume, WS_STATUS_CB* statusCb);
-```
-**使用例**
-
-```
-static void myStatusCb(WOLFSSH* sshIn, long bytes, char* name)
-{
-char buf[80];
-WSNPRINTF(buf, sizeof(buf), "Processed %8ld\t bytes
-\r", bytes);
-WFPUTS(buf, fout);
-(void)name;
-(void)sshIn;
-}
-...
-
-WOLFSSH* ssh;
-char* from[NAME_SZ];
-char* to[NAME_SZ];
-
-//set up ssh and do sftp connections
-...
-
-if (wolfSSH_SFTP_Put(ssh, from, to, 0, &myStatusCb) !=
-WS_SUCCESS) {
-//handle error case
-}
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
+- `wolfSSH_SFTP_Get()`
+- `wolfSSH_SFTP_Interrupt()`
 
-wolfSSH_SFTP_connect()<br>
-
-
-##  SFTPサーバー機能
+##  SFTP サーバー関数
 
 
 
@@ -1232,42 +934,55 @@ wolfSSH_SFTP_connect()<br>
 
 
 
-**用法**
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_read(WOLFSSH* ssh);
+```
 
 **説明**
 
-メインのSFTPサーバー機能を提供する関数です。到着するパケットを処理し、I/O　バッファからデータを読み出しSFTPパケットのタイプに応じて内部の関数を呼び出します。
-
-
-**戻り値**
-
-**WS_SUCCESS** - 成功
+サーバー側 SFTP のメインエントリポイントです。I/O バッファから読み取り、受信した
+SFTP パケットの種類に基づいて適切な内部ハンドラーへディスパッチします。SFTP 要求を
+処理するために、サーバーループからこれを呼び出します。
 
 **引数**
 
-**ssh** – WOLFSSHオブジェクトへのポインター<br>
+- `ssh` - wolfSSH セッションへのポインター
 
+**戻り値**
 
-```
-#include <wolfssh/wolfsftp.h>
-int wolfSSH_SFTP_read(WOLFSSH* ssh );
-```
-
-
-**使用例**
-
-```
-WOLFSSH* ssh;
-
-//set up ssh and do sftp connections
-...
-if (wolfSSH_SFTP_read(ssh) != WS_SUCCESS) {
-//handle error case
-}
-```
+- `WS_SUCCESS`
+- 失敗時は負のエラーコード
 
 **関連項目**
 
-wolfSSH_SFTP_accept()<br>
+- `wolfSSH_SFTP_accept()`
+- `wolfSSH_SFTP_PendingSend()`
 
-wolfSSH_SFTP_connect()<br>
+### wolfSSH_SFTP_PendingSend()
+
+```c
+#include <wolfssh/wolfsftp.h>
+
+int wolfSSH_SFTP_PendingSend(WOLFSSH* ssh);
+```
+
+**説明**
+
+SFTP レイヤーに、送信待ちのバッファされた送出データがあるかどうかを報告します。これ
+は、非ブロッキング I/O を駆動する際に、もう一度送信を試みる必要があることを知るのに
+役立ちます。
+
+**引数**
+
+- `ssh` - wolfSSH セッションへのポインター
+
+**戻り値**
+
+- 送信待ちのデータがある場合は非ゼロ
+- 送信待ちのデータがない場合は 0
+
+**関連項目**
+
+- `wolfSSH_SFTP_read()`
