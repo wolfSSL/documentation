@@ -113,6 +113,10 @@ After building wolfSSL with these settings the function
 struct and `wc_SetUnknownExtCallback()` can be used to register a callback for
 handling unknown extension OIDs in a `DecodedCert` struct.
 
+### Strict DER Parsing
+
+wolfSSL 5.9.4 rejects a certificate that carries trailing bytes after the DER structure, and only the certificate itself is copied into a `WOLFSSL_X509`. Define `WOLFSSL_NO_ASN_STRICT` to accept such certificates. The parser also rejects certificates with critical policyConstraints or inhibitAnyPolicy extensions, empty certificatePolicies, trailing bytes after the last PolicyInformation, or duplicate Netscape certificate type extensions. Extended Key Usage is enforced on every CA the peer transmits in its chain, not only on the leaf: a chain CA that does not carry the purpose in use fails the handshake with `EXTKEYUSE_AUTH_E`. A chain certificate that matches a loaded trust anchor (same subject and same public key) is exempt, as RFC 5280 keeps the anchor outside the certification path; a self-issued certificate with a different key, such as a key rollover certificate, is still checked. An absent extension and anyExtendedKeyUsage leave all purposes valid, and `IGNORE_KEY_EXTENSIONS` opts out.
+
 ## Certificate Loading
 
 Certificates are normally loaded using the file system (although loading from memory buffers is supported as well - see [No File System and using Certificates](#no-file-system-and-using-certificates)).

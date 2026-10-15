@@ -176,6 +176,43 @@ wc_Poly1305Final(&pmac, pmacDigest);
 
 `pmacDigest` now contains the digest of the hashed data in buffer.
 
+### KMAC and cSHAKE
+
+wolfCrypt includes the two SP 800-185 functions derived from SHA-3: cSHAKE (customizable SHAKE) and KMAC (Keccak Message Authentication Code). They are enabled with [`--enable-cshake`](chapter02.md#--enable-cshake) and [`--enable-kmac`](chapter02.md#--enable-kmac) respectively, and both are declared in `wolfssl/wolfcrypt/sha3.h`. KMAC works on a key plus an optional customization string. It can produce a fixed-length tag with `wc_Kmac128_Final()` / `wc_Kmac256_Final()`, or an output of arbitrary length with `wc_Kmac128_FinalXof()` / `wc_Kmac256_FinalXof()`.
+
+```c
+wc_Kmac kmac;
+byte    key[32];        /*fill key with keying material*/
+byte    buffer[2048];   /*fill buffer with data to authenticate*/
+byte    tag[32];
+
+wc_InitKmac256(&kmac, key, sizeof(key), (const byte*)"My App", 6,
+               NULL, INVALID_DEVID);
+wc_Kmac256_Update(&kmac, buffer, sizeof(buffer));
+wc_Kmac256_Final(&kmac, tag, sizeof(tag));
+wc_Kmac256_Free(&kmac);
+```
+
+`tag` now contains the KMAC256 authentication tag of the data in buffer.
+
+## Password Hashing
+
+### Argon2
+
+Argon2 (RFC 9106) is a memory-hard password hashing function. It has been available in wolfSSL since 5.9.4 with [`--enable-argon2`](chapter02.md#--enable-argon2), covering all three variants: Argon2d, Argon2i and Argon2id. The API is in `wolfssl/wolfcrypt/argon2.h`. The one-shot `wc_Argon2()` function derives a single tag from a password, salt, and the memory, time and parallelism cost parameters:
+
+```c
+byte password[] = "password";
+byte salt[16];          /*fill salt with random bytes*/
+byte tag[32];
+
+ret = wc_Argon2(WC_ARGON2_ID, tag, sizeof(tag),
+                password, sizeof(password) - 1, salt, sizeof(salt),
+                4 /*parallelism*/, 65536 /*memory in KiB*/, 3 /*passes*/);
+```
+
+If an application derives many tags with the same parameters, the context API (`wc_Argon2Init()`, `wc_Argon2SetParams()`, `wc_Argon2DeriveTag()`, `wc_Argon2Free()`) is the better fit; it allocates the memory block array once and reuses it. With [`--enable-argon2-threads`](chapter02.md#--enable-argon2-threads) the segments of a slice are filled in parallel, and `wc_Argon2SetThreads()` sets the thread count for a context. Either way, threading does not change the derived tag.
+
 ## Block Ciphers
 
 ### AES
@@ -221,6 +258,10 @@ GCM mode is available for both encryption and decryption through the [`wc_AesGcm
 CCM-8 mode is supported for both encryption and decryption through the [`wc_AesCcmSetKey()`](group__AES.md#function-wc_aesccmsetkey), [`wc_AesCcmEncrypt()`](group__AES.md#function-wc_aesccmencrypt), and [`wc_AesCcmDecrypt()`](group__AES.md#function-wc_aesccmdecrypt) functions.  For a usage example, see the `aesccm_test()` function in `<wolfssl_root>/wolfcrypt/test/test.c`.
 
 CTR mode is available for both encryption and decryption through the [`wc_AesCtrEncrypt()`](group__AES.md#function-wc_aesctrencrypt) function. The encrypt and decrypt actions are identical so the same function is used for both. For a usage example, see the function `aes_test()` in file `wolfcrypt/test/test.c`.
+
+AES-GCM-SIV (RFC 8452), a nonce misuse resistant AEAD, is available with [`--enable-aesgcm-siv`](chapter02.md#--enable-aesgcm-siv). It comes as one-shot `wc_AesGcmSivEncrypt()` and `wc_AesGcmSivDecrypt()` functions, which take the key, nonce, additional data, and input directly rather than an `Aes` object. For a usage example, see the AES-GCM-SIV test in `wolfcrypt/test/test.c`.
+
+AES Key Wrap (RFC 3394) is provided by `wc_AesKeyWrap()` / `wc_AesKeyUnWrap()` with [`--enable-aeskeywrap`](chapter02.md#--enable-aeskeywrap). The padded variant, AES Key Wrap with Padding (RFC 5649), accepts key material that is not a multiple of 8 bytes; it is provided by `wc_AesKeyWrap_Pad()` / `wc_AesKeyUnWrap_Pad()` with `--enable-aeskeywrap=padding`.
 
 #### DES and 3DES
 

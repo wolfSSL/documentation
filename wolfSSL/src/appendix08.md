@@ -75,6 +75,10 @@
 | STM32L4/L5/WB55 | AES, SHA (partial) | `STM32_CRYPTO` | HAL auto-detected | port/st/stm32.c |
 | STM32U5 (DHUK) | AES with key wrapping | `WOLFSSL_STM32U5_DHUK` | Auto-detected | port/st/stm32.c |
 | STM32MP1/MP13/MP25 | AES, SHA, RSA, ECC | `WOLFSSL_STM32_CRYPT` | Auto-detected | port/st/stm32.c |
+| STM32V8 (Cortex-M85) | AES, SHA, PKA, RNG | `WOLFSSL_STM32V8` | Auto-detected | port/st/stm32.c |
+| STM32 bare-metal (direct register access, no HAL, ~27 families) | HASH, AES, PKA, RNG, DHUK wrapped keys, CCB protected ECDSA | `WOLFSSL_STM32_BARE` | user_settings.h | port/st/stm32.c |
+| STM32 CubeMX / CubeMX2 crypto callback device | AES (plaintext key), AES-GCM, ECDSA | `WOLFSSL_STM32_CUBEMX` / `WOLFSSL_MX2_CONF_INCLUDE` | Auto-detected | port/st/ |
+| STSAFE-A100/A120 | ECDSA, ECDH | `WOLFSSL_STSAFEA100` / `WOLFSSL_STSAFEA120` | Auto-detected | port/st/stsafe.c |
 | **NXP** | | | | |
 | i.MX RT (DCP) | AES-ECB/CBC/CTR/GCM, SHA | `WOLFSSL_IMXRT_DCP` | Auto-detected | port/nxp/dcp_port.c |
 | i.MX 6/8 (CAAM) | AES, SHA, RSA, ECC, DH, HMAC | `WOLFSSL_IMX6_CAAM` / `WOLFSSL_SECO_CAAM` | `--enable-caam` | port/caam/* |
@@ -101,6 +105,17 @@
 | **Xilinx** | | | | |
 | Zynq / Zynq-7000 | AES, SHA, RSA, ECC | `WOLFSSL_XILINX_CRYPT` | `--enable-xilinx` | port/xilinx/xil-*.c |
 | Versal | AES-GCM, SHA-3, RNG | `WOLFSSL_XILINX_CRYPT_VERSAL` | `--enable-xilinx` | port/xilinx/xil-versal-*.c |
+| Versal Gen2 (ASU) | TRNG, hashes, HMAC, AES ciphers, CMAC, GMAC, RSA (raw, PSS, OAEP), ECC, ECDH, ECIES, EdDSA, X25519/X448 | `WOLFSSL_VERSAL_GEN2_ASU` | Vitis 2026.1 | port/xilinx/versal_gen2_asu/ |
+| **Texas Instruments** | | | | |
+| C2000 C28x (AESA crypto callback device) | AES-ECB/CBC/CTR, oscillator jitter entropy | `WOLFSSL_C2000_AES` / `WOLFSSL_C2000_ENTROPY` (with `WOLFSSL_WIDE_BYTE`) | user_settings.h | port/ti/ti-c2000-*.c |
+| **RealTek** | | | | |
+| AmebaPro2 (RTL8735B HUK crypto callback device) | AES, HMAC-SHA256, ECDSA, TRNG | `WOLFSSL_RTL8735B_HUK` / `WOLFSSL_RTL8735B_AES` | user_settings.h | port/realtek/rtl8735b.c |
+| **WISeKey / SealSQ** | | | | |
+| VaultIC secure element | P-256 sign, verify, keygen, ECDH | `WOLFSSL_VAULTIC` | user_settings.h | port/sealsq/vaultic.c |
+| **Tropic Square** | | | | |
+| TROPIC01 secure element | AES-CBC, AES-GCM, ECDSA, RNG | `WOLFSSL_TROPIC01` | user_settings.h | port/tropicsquare/tropic01.c |
+| **Vorago** | | | | |
+| VA416x0 | TRNG (seeds the Hash-DRBG) | `WOLFSSL_VA416X0_TRNG` | user_settings.h | wolfcrypt/src/random.c |
 | **ARM CryptoCell** | | | | |
 | CC-300/312/700/712/714 | AES, SHA, RSA, ECC, ChaCha, Poly1305 | `WOLFSSL_CRYPTOCELL` | `--enable-cryptocell` | port/arm/cryptocell*.c |
 | **IoT-Safe (SIM)** | ECC, SHA, RNG | `WOLFSSL_IOTSAFE` | `--enable-iotsafe` | port/iotsafe/ |

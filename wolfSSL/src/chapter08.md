@@ -15,6 +15,16 @@ typedef void (*wolfSSL_Logging_cb)(const int logLevel,
 
 The log levels can be found in `wolfssl/wolfcrypt/logging.h`, and the implementation is located in `logging.c`.  By default, wolfSSL logs to `stderr` with `fprintf`.
 
+### Verbose Logging
+
+wolfSSL 5.9.4 moved the highest-volume trace messages into a separate tier: `WOLFSSL_MSG_VERBOSE()`, `WOLFSSL_ENTER_VERBOSE()` and `WOLFSSL_LEAVE_VERBOSE()`. These are the container helpers, name entry handling and similar code that a single API call can hit thousands of times. They are compiled out of a normal `DEBUG_WOLFSSL` build, which cuts the volume of debug output considerably (about 62% for the unit test suite). To see them, define `WOLFSSL_VERBOSE_LOGGING` in addition to `DEBUG_WOLFSSL`:
+
+```sh
+./configure --enable-debug CPPFLAGS=-DWOLFSSL_VERBOSE_LOGGING
+```
+
+`WOLFSSL_VERBOSE_LOGGING` on its own produces no output; it only admits the verbose traces into a build that is already logging. The older `WOLFSSL_DEBUG_OPENSSL` macro, which did the same job inside the OpenSSL compatibility layer, now works as an alias for it.
+
 ## Error Codes
 
 wolfSSL tries to provide informative error messages in order to help with debugging.

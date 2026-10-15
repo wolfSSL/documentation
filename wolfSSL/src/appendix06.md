@@ -141,6 +141,8 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `DH_PARAMS_NOT_FFDHE_E` | -432 | DH params from server not FFDHE |
 | `TCA_INVALID_ID_TYPE` | -433 | TLSX TCA ID type invalid |
 | `TCA_ABSENT_ERROR` | -434 | TLSX TCA ID no response |
+| `TOO_MUCH_EARLY_DATA` | -442 | Too much early data, the AEAD key usage limit was hit before the handshake finished |
+| `OCSP_NO_URL` | -522 | The certificate does not advertise an OCSP responder URL |
 
 Negotiation Parameter Errors
 
@@ -308,7 +310,12 @@ wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error.h`.
 | `CRYPTOCB_UNAVAILABLE` | -271 | Crypto callback unavailable |
 | `PKCS7_SIGNEEDS_CHECK` | -272 | Signature needs verified by caller |
 | `ASN_SELF_SIGNED_E` | -275 | ASN self-signed certificate error |
+| `MISSING_KEY` | -278 | Key was not set |
 | `MIN_CODE_E` | -300 | errors -101 -  -299 |
+| `ALREADY_E` | -1007 | The operation was already done, e.g. registering the same crypto callback device ID twice |
+| `PUF_READ_E` | -1010 | PUF SRAM readout failed the startup health check |
+| `FIPS_BAD_VALUE_E` | -1027 | The value given is not allowed by FIPS policy |
+| `FIPS_UNAPPROVED_E` | -1028 | The operation ran, but the parameters are not FIPS approved |
 
 ## Common Error Codes and their Solution
 
