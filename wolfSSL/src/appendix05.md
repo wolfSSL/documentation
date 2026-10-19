@@ -7,7 +7,7 @@
 * TLS v1.1 - [RFC4346](https://www.ietf.org/rfc/rfc4346.txt)
 * TLS v1.2 - [RFC5246](https://www.ietf.org/rfc/rfc5246.txt)
 * TLS v1.3 - [RFC8446](https://www.ietf.org/rfc/rfc8446.txt)
-* DTLS - [RFC4347](https://tools.ietf.org/html/rfc4347) [Specification document](https://crypto.stanford.edu/~nagendra/papers/dtls.pdf)
+* DTLS - [RFC9147](https://datatracker.ietf.org/doc/html/rfc9147) [Specification document](https://crypto.stanford.edu/~nagendra/papers/dtls.pdf)
 * IPv4 - [Wikipedia](https://en.wikipedia.org/wiki/IPv4)
 * IPv6 - [Wikipedia](https://en.wikipedia.org/wiki/IPv6)
 
