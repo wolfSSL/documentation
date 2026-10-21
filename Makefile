@@ -8,7 +8,7 @@ WOLFCOSE_REF ?= main
 WOLFTPM_REF ?= master
 DOCKER_CMD=DOCKER_BUILDKIT=1 docker build $(DOCKER_CMD_EXTRA_ARGS) -t doc_build --build-arg MANPATH=$(MANPATH) --build-arg PDFFILE=$(PDFFILE) --build-arg V=$(V) --build-arg WOLFCOSE_REF=$(WOLFCOSE_REF) --build-arg WOLFTPM_REF=$(WOLFTPM_REF) --target=manual --output=build -f Dockerfile .
 
-all: wolfssl wolfssh wolfboot wolfclu wolfcrypt-jni wolfmqtt wolfsentry wolfssl-jni wolftpm wolfhsm wolfcose wolfengine wolfprovider fips-ready tuning porting faq fips-faq bc-migration
+all: wolfssl wolfssh wolfboot wolfclu wolfcrypt-jni wolfmqtt wolfsentry wolfssl-jni wolftpm wolfhsm wolfcose wolfengine wolfprovider fips-ready tuning porting faq fips-faq bc-migration mbedtls-migration
 
 build:
 	$(Q)mkdir -p build
@@ -132,6 +132,12 @@ fips-faq: build
 bc-migration: MANPATH=BouncyCastle-Migration
 bc-migration: PDFFILE=BouncyCastle-wolfSSL-Migration-Guide.pdf
 bc-migration: build
+	$(Q)$(DOCKER_CMD)
+
+.PHONY: mbedtls-migration
+mbedtls-migration: MANPATH=MbedTLS-Migration
+mbedtls-migration: PDFFILE=MbedTLS-wolfSSL-Migration-Guide.pdf
+mbedtls-migration: build
 	$(Q)$(DOCKER_CMD)
 
 clean:

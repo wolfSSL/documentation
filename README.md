@@ -24,6 +24,7 @@ To build the documentation you will need Docker running on your system. In this 
 * `make porting`
 * `make fips-ready`
 * `make bc-migration`
+* `make mbedtls-migration`
 
 The wolfCOSE target reads manual pages from `wolfSSL/wolfCOSE` `main` by
 default and prints the source commit used. Edit those pages in wolfCOSE; this
