@@ -10,95 +10,77 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    # pandoc/latex ships pandoc and a minimal TeX Live, which is much faster
+    # to pull than installing texlive-full from apt
+    container: pandoc/latex:latest-ubuntu
 
     steps:
-    - uses: actions/checkout@master
-      with:
-        repository: matusnovak/doxybook2
-        path: ./doxy
-    - name: Download Japanese fonts
-      run: curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Black.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Bold.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-DemiLight.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Light.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Medium.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Regular.otf && curl -LO https://github.com/googlefonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Thin.otf
-    - name: Install Japanese fonts
-      run: sudo mkdir -p /usr/local/share/fonts; sudo cp NotoSans* /usr/local/share/fonts/. && sudo fc-cache -f -v
-    - name: wget vcpkg
-      working-directory: ./doxy 
-      run: wget -O vcpkg.tar.gz https://github.com/microsoft/vcpkg/archive/master.tar.gz
-    - name: mkdir vcpkg
-      working-directory: ./doxy 
-      run: sudo mkdir /opt/vcpkg
-    - name: tar vcpkg
-      working-directory: ./doxy 
-      run: sudo tar xf vcpkg.tar.gz --strip-components=1 -C /opt/vcpkg
-    - name: build vcpkg
-      working-directory: ./doxy 
-      run: sudo /opt/vcpkg/bootstrap-vcpkg.sh
-    - name: Doxybook depenecies
-      working-directory: ./doxy 
-      run: vcpkg install --triplet x64-linux $(cat vcpkg.txt)
-    - name: doxy mkdir build
-      working-directory: ./doxy 
-      run: mkdir build
-    - name: doxy cmake setup
-      working-directory: ./doxy 
-      run: cmake -B ./build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake .
-    - name: doxy cmake
-      working-directory: ./doxy 
-      run: cmake --build ./build --config MinSizeRel
-    - name: doxybook2 add to path
-      working-directory: ./doxy
-      run: cp build/src/DoxybookCli/doxybook2 ../..
-    - uses: actions/checkout@master
-    - name: Update apt sources
-      run:  sudo apt-get update
+    # git must be present before checkout so it makes a real clone that the
+    # submodule and wolfTPM/wolfCOSE make rules can use
     - name: Install Dependencies
-      run:  sudo apt install pandoc texlive-full mkdocs doxygen
+      run: |
+        apt-get update
+        DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+          git make patch unzip wget ca-certificates mkdocs doxygen \
+          fonts-noto-core fonts-noto-mono
+        git config --global --add safe.directory '*'
+    - name: Install LaTeX packages
+      run: |
+        tlmgr update --self
+        tlmgr install titlesec tocloft fvextra listings fancyhdr
+    - name: Install doxybook2
+      run: |
+        wget -q -O /tmp/doxybook2.zip https://github.com/matusnovak/doxybook2/releases/download/v1.5.0/doxybook2-linux-amd64-v1.5.0.zip
+        unzip -q /tmp/doxybook2.zip -d /tmp/doxybook2
+        cp /tmp/doxybook2/bin/doxybook2 /usr/local/bin/
+    - uses: actions/checkout@v4
     - name: wolfssl html
-      run: cd wolfSSL && export PATH=$PATH:"/home/runner/work/documentation" && make html
+      run: cd wolfSSL && make html
     - name: wolfssl pdf
-      run: cd wolfSSL && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+      run: cd wolfSSL && make pdf
     - name: wolfssh html
-      run: cd wolfSSH && export PATH=$PATH:"/home/runner/work/documentation" && make html
+      run: cd wolfSSH && make html
     - name: wolfssh pdf
-      run: cd wolfSSH && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+      run: cd wolfSSH && make pdf
     - name: Pin wolfTPM source for this build
       run: |
         ref=$(git ls-remote https://github.com/wolfSSL/wolfTPM.git refs/heads/master | cut -f1)
         test -n "$ref"
         echo "WOLFTPM_REF=$ref" >> "$GITHUB_ENV"
     - name: wolftpm html and pdf
-      run: cd wolfTPM && export PATH=$PATH:"/home/runner/work/documentation" && make
+      run: cd wolfTPM && make
     - name: wolfmqtt html
-      run: cd wolfMQTT && export PATH=$PATH:"/home/runner/work/documentation" && make html
+      run: cd wolfMQTT && make html
     - name: wolfmqtt pdf
-      run: cd wolfMQTT && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+      run: cd wolfMQTT && make pdf
     - name: wolfBoot html
-      run: cd wolfBoot && export PATH=$PATH:"/home/runner/work/documentation" && make html
+      run: cd wolfBoot && make html
     - name: wolfBoot pdf
-      run: cd wolfBoot && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+      run: cd wolfBoot && make pdf
     - name: wolfSentry html
-      run: cd wolfSentry && export PATH=$PATH:"/home/runner/work/documentation" && make html
+      run: cd wolfSentry && make html
     - name: wolfSentry pdf
-      run: cd wolfSentry && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+      run: cd wolfSentry && make pdf
     - name: wolfclu html
-      run: cd wolfCLU && export PATH=$PATH:"/home/runner/work/documentation" && make html
+      run: cd wolfCLU && make html
     - name: wolfclu pdf
-      run: cd wolfCLU && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+      run: cd wolfCLU && make pdf
     - name: wolfssl-jni html
-      run: cd wolfSSL-JNI && export PATH=$PATH:"/home/runner/work/documentation" && make html
+      run: cd wolfSSL-JNI && make html
     - name: wolfssl-jni pdf
-      run: cd wolfSSL-JNI && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+      run: cd wolfSSL-JNI && make pdf
     - name: wolfcrypt-jni html
-      run: cd wolfCrypt-JNI && export PATH=$PATH:"/home/runner/work/documentation" && make html
+      run: cd wolfCrypt-JNI && make html
     - name: wolfcrypt-jni pdf
-      run: cd wolfCrypt-JNI && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+      run: cd wolfCrypt-JNI && make pdf
     - name: wolfHSM html
-      run: cd wolfHSM && export PATH=$PATH:"/home/runner/work/documentation" && make html
+      run: cd wolfHSM && make html
     - name: wolfHSM pdf
-      run: cd wolfHSM && export PATH=$PATH:"/home/runner/work/documentation" && make pdf
+      run: cd wolfHSM && make pdf
     - name: Pin wolfCOSE source for this build
       run: |
         ref=$(git ls-remote https://github.com/wolfSSL/wolfCOSE.git refs/heads/main | cut -f1)
         test -n "$ref"
         echo "WOLFCOSE_REF=$ref" >> "$GITHUB_ENV"
     - name: wolfCOSE html and pdf
-      run: cd wolfCOSE && export PATH=$PATH:"/home/runner/work/documentation" && make
+      run: cd wolfCOSE && make
