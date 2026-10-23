@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+    # Each manual is a separate docker build, so run them in parallel and
+    # keep each one's output together in the log
     - name: Docker Make all
-      run: sudo make
+      run: sudo make -j$(nproc) --output-sync
