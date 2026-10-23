@@ -17,7 +17,10 @@ nav:
     - "11. サポートとコンサルティング": chapter11.md
     - "12. wolfSSHのアップデート": chapter12.md
     - "13. APIリファレンス": chapter13.md
-    - "14. wolfSSL SFTP API リファレンス": chapter14.md
+    - "14. SFTP API リファレンス": chapter14.md
+    - "15. SCP API リファレンス": chapter15.md
+    - "16. その他のAPIリファレンス": chapter16.md
+    - "17. プリプロセッサ ガードマクロ": chapter17.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material
