@@ -284,7 +284,7 @@ Renegotiation Indication Extension Special Suite:
 
 ### AEAD Suites
 
-wolfSSL supports AEAD suites, including AES-GCM, AES-CCM, and CHACHA-POLY1305. The big difference between these AEAD suites and others is that they authenticate the encrypted data with any additional cleartext data. This helps with mitigating man in the middle attacks that result in having data tampered with. AEAD suites use a combination of a block cipher (or more recently also a stream cipher) algorithm combined with a tag produced by a keyed hash algorithm. Combining these two algorithms is handled by the wolfSSL encrypt and decrypt process which makes it easier for users. All that is needed for using a specific AEAD suite is simply enabling the algorithms that are used in a supported suite.
+wolfSSL supports AEAD suites, including AES-GCM, AES-CCM, and CHACHA-POLY1305. wolfCrypt additionally provides the AES-GCM-SIV (RFC 8452) nonce misuse resistant AEAD, enabled with [`--enable-aesgcm-siv`](chapter02.md#--enable-aesgcm-siv), for application use outside of TLS. The big difference between these AEAD suites and others is that they authenticate the encrypted data with any additional cleartext data. This helps with mitigating man in the middle attacks that result in having data tampered with. AEAD suites use a combination of a block cipher (or more recently also a stream cipher) algorithm combined with a tag produced by a keyed hash algorithm. Combining these two algorithms is handled by the wolfSSL encrypt and decrypt process which makes it easier for users. All that is needed for using a specific AEAD suite is simply enabling the algorithms that are used in a supported suite.
 
 ### Block and Stream Ciphers
 
@@ -302,7 +302,9 @@ Stream ciphers work well for large or small chunks of data. They are suitable fo
 
 ### Hashing Functions
 
-wolfSSL supports several different hashing functions, including **MD2**, **MD4**, **MD5**, **SHA-1**, **SHA-2** (SHA-224, SHA-256, SHA-384, SHA-512), **SHA-3** (BLAKE2), and **RIPEMD-160**.  Detailed usage of these functions can be found in the wolfCrypt Usage Reference, [Hash Functions](chapter10.md#hash-functions).
+wolfSSL supports several different hashing functions, including **MD2**, **MD4**, **MD5**, **SHA-1**, **SHA-2** (SHA-224, SHA-256, SHA-384, SHA-512), **SHA-3** (including the SHAKE128 and SHAKE256 extendable output functions), **BLAKE2**, and **RIPEMD-160**.  Detailed usage of these functions can be found in the wolfCrypt Usage Reference, [Hash Functions](chapter10.md#hash-functions).
+
+The SP 800-185 SHA-3 derived functions **cSHAKE** and **KMAC** are available with [`--enable-cshake`](chapter02.md#--enable-cshake) and [`--enable-kmac`](chapter02.md#--enable-kmac). For password hashing, wolfCrypt provides PBKDF2, scrypt and, as of wolfSSL 5.9.4, **Argon2** (RFC 9106, all of Argon2d, Argon2i and Argon2id) with [`--enable-argon2`](chapter02.md#--enable-argon2).
 
 ### Public Key Options
 
@@ -315,6 +317,16 @@ ML-KEM (Module Lattice Key Encapsulation Mechanism) is a NIST-standardized, latt
 ML-DSA (Module Lattice Digital Signature Algorithm) is a NIST-standardized, lattice-based post-quantum digital signature scheme derived from Dilithium. It enables a sender to produce a verifiable signature that proves the origin and integrity of a message.
 
 Both ML-KEM and ML-DSA are public-key algorithms designed to resist cryptographically relevant quantum computers. They are part of NIST's Post-Quantum Cryptography standards (FIPS 203 and FIPS 204) and can be deployed today, often in hybrid form, to prepare for the post-quantum era.
+
+#### SLH-DSA, Falcon, FrodoKEM
+
+SLH-DSA (Stateless Hash-based Digital Signature Algorithm, FIPS 205) is the NIST-standardized form of SPHINCS+. Its security rests only on the underlying hash function, making it a conservative choice alongside the lattice based schemes. wolfCrypt implements all twelve parameter sets. wolfSSL 5.9.4 added the ability to use SLH-DSA to authenticate TLS 1.3 and DTLS 1.3 handshakes (draft-reddy-tls-slhdsa). Enable it with [`--enable-slhdsa`](chapter02.md#--enable-slhdsa).
+
+Falcon is a lattice based signature scheme with compact signatures. wolfSSL 5.9.4 brought Falcon (levels 1 and 5) in as a native wolfCrypt implementation with crypto callback support and ARM DSP / AArch64 NEON acceleration, dropping the old liboqs dependency. Enable it with [`--enable-falcon`](chapter02.md#--enable-falcon).
+
+FrodoKEM is a conservative, unstructured lattice (LWE) key encapsulation mechanism. The wolfCrypt implementation includes fast, small and small-stack C code and assembly for x86_64, AArch64, AArch32 and Thumb2, along with ASN.1 keys and X.509 certificates. Enable it with [`--enable-frodokem`](chapter02.md#--enable-frodokem) (experimental).
+
+wolfSSL 5.9.4 also supports TLS 1.3 builds that use only post-quantum algorithms: ML-KEM for the key exchange, ML-DSA or SLH-DSA for authentication, and no RSA, ECC or DH. See the appendix [Experimenting with Post-Quantum Cryptography](appendix09.md#experimenting-with-post-quantum-cryptography).
 
 ### ECC Support
 
@@ -414,6 +426,10 @@ For streaming when decoding/verifying bundles the following functions are suppor
 5. `wc_PKCS7_DecodeAuthEnvelopedData()`
 
 **Note**: that when calling [`wc_PKCS7_VerifySignedData_ex`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata_ex) it is expected that the argument pkiMsgFoot is the full buffer. The internal structure only supports streaming of one buffer, which in this case would be `pkiMsgHead`.
+
+##### PKCS #7 Enrollment and Post-Quantum Support
+
+wolfSSL 5.9.4 can now encode degenerate certs-only SignedData and SignedData with absent eContent (signed-attributes-only), the forms used by EST and SCEP enrollment, and it includes a multi-certificate decode fix. ML-DSA (FIPS 204) signing and verification of SignedData follows RFC 9882.
 
 #### PKCS #12
 
@@ -515,6 +531,10 @@ The `name` (friendlyName) and `keyType` arguments are accepted for API compatibi
 
 When the compatibility layer is enabled, the familiar OpenSSL spellings are also available from `<wolfssl/openssl/pkcs12.h>`: `d2i_PKCS12_bio()`, `PKCS12_parse()`, `PKCS12_verify_mac()`, and `PKCS12_create()`. These map onto [`wolfSSL_d2i_PKCS12_bio()`](group__openSSL.md), `wolfSSL_PKCS12_parse()`, and friends, which wrap the wolfCrypt functions described above and return `WOLFSSL_X509` and `WOLFSSL_EVP_PKEY` objects instead of DER buffers.
 
+#### Time-Stamp Protocol (RFC 3161)
+
+wolfCrypt includes an RFC 3161 Time-Stamp Protocol implementation, enabled with [`--enable-tsp`](chapter02.md#--enable-tsp). The `wc_TspRequest_*` functions build a TimeStampReq (hash algorithm, message imprint, optional nonce and policy), and the `wc_TspResponse_*` functions decode and verify the TimeStampResp returned by a Time Stamping Authority. `wc_TspResponse_Verify()` requires a trusted TSA certificate, and the message imprint setters cross-check the digest length against the hash algorithm. An OpenSSL compatibility layer, tests, certificates and examples are provided.
+
 ### Forcing the Use of a Specific Cipher
 
 By default, wolfSSL will pick the “best” (highest security) cipher suite that both sides of the connection can support.  To force a specific cipher, such as 128 bit AES, add something similar to:
@@ -530,9 +550,9 @@ ctx = wolfSSL_CTX_new(method);
 wolfSSL_CTX_set_cipher_list(ctx, "AES128-SHA");
 ```
 
-### OpenQuantumSafe's liboqs Integration
+### Post-Quantum Cryptography
 
-Please see the appendix [Experimenting with Post-Quantum Cryptography](appendix09.md#experimenting-with-post-quantum-cryptography) in this document for more details.
+All post-quantum algorithms in wolfSSL (ML-KEM, ML-DSA, SLH-DSA, Falcon, FrodoKEM, LMS/HSS and XMSS/XMSS^MT) are now native wolfCrypt implementations; the earlier integration with the Open Quantum Safe liboqs library is gone. Please see the appendix [Experimenting with Post-Quantum Cryptography](appendix09.md#experimenting-with-post-quantum-cryptography) in this document for more details.
 
 ## Hardware Accelerated Crypto
 

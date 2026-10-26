@@ -35,5 +35,6 @@ jobs:
           #   callin        - verbatim wolfSentry example output
           #   Incomming     - verbatim lwIP echoserver example output
           #   psuedo        - verbatim wolfSSH client --help output
-          ignore_words_list: TE,Thi,inter-operability,regist,Writen,Challener,cant,mot,callin,Incomming,psuedo
+          #   fpr           - assembly instruction reference
+          ignore_words_list: TE,Thi,inter-operability,regist,Writen,Challener,cant,mot,callin,Incomming,psuedo,fpr
           skip: '.git'

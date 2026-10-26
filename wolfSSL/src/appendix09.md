@@ -1,6 +1,6 @@
 # Experimenting with Post-Quantum Cryptography
 
-A while back, the wolfSSL team integrated experimental post-quantum cryptographic algorithms into the wolfSSL library. This was done by integrating with the Open Quantum Safe team's liboqs. Currently, wolfCrypt implements LMS, XMSS, ML-DSA and ML-KEM. So, for the purpose of code size reduction and ease of maintenance, the wolfSSL team removed the integration with liboqs.
+A while back, the wolfSSL team integrated experimental post-quantum cryptographic algorithms into the wolfSSL library. This was done by integrating with the Open Quantum Safe team's liboqs. wolfCrypt now has its own implementations of ML-KEM, ML-DSA, SLH-DSA, Falcon, FrodoKEM and the stateful hash based schemes (LMS/HSS, XMSS/XMSS^MT), so the liboqs integration was removed to keep the code base small and the library easier to maintain. As of wolfSSL 5.9.4 liboqs is not used for any algorithm, and the `--with-liboqs` configure option is deprecated and ignored.
 
 This appendix is intended for anyone that wants to start learning about post-quantum cryptography in the context of (D)TLS 1.3. It explains why post-quantum algorithms are important, what we have done in response to the quantum threat and how you can start experimenting with these new algorithms.
 
@@ -46,9 +46,22 @@ These use different kinds of math from the conventional algorithms. They are des
 **Note**: Dilithium Signature Scheme's AES variants were deprecated and removed
           as NIST is not considering them for standardization.
 
-**Note**: When the liboqs integration was removed, we also removed the FALCON
-          and SPHINCS+ signature schemes. We will have our own implementations
-          in the future.
+**Note**: Removing the liboqs integration also took the FALCON and SPHINCS+
+          signature schemes with it at the time. Both are back, implemented
+          natively in wolfCrypt: SLH-DSA, the standardized form of SPHINCS+
+          (FIPS 205), behind `--enable-slhdsa`, and Falcon at levels 1 and 5
+          behind `--enable-falcon`, starting with wolfSSL 5.9.4. FrodoKEM,
+          a key encapsulation mechanism, is available too with
+          `--enable-frodokem` (experimental).
+
+Besides ML-KEM and ML-DSA, wolfSSL also supports these post-quantum algorithms:
+
+* the SLH-DSA (FIPS 205) signature scheme in all twelve parameter sets. SLH-DSA can sign TLS 1.3 and DTLS 1.3 handshakes per draft-reddy-tls-slhdsa; the code points are listed in [Appendix G](appendix07.md#c-9-slh-dsa-fips-205).
+* the Falcon signature scheme, native to wolfCrypt with crypto callbacks and ARM DSP / AArch64 NEON acceleration.
+* the FrodoKEM key encapsulation mechanism (wolfCrypt only, experimental).
+* the stateful hash based signature schemes LMS/HSS and XMSS/XMSS^MT, covered later in this appendix.
+
+As of wolfSSL 5.9.4 you can also build TLS 1.3 with nothing but post-quantum algorithms: ML-KEM for the key exchange, ML-DSA or SLH-DSA for authentication, and no RSA, ECC or DH. `--enable-all-quantum-crypto` turns on all of the quantum-resistant asymmetric algorithms in one go.
 
 An explanation of lattice-based cryptography would fall outside the scope of this document but more information about these algorithms can be found in their NIST submissions at <https://csrc.nist.gov/projects/post-quantum-cryptography/round-3-submissions>.
 
@@ -62,7 +75,13 @@ The following instructions will get you started from a clean Linux development e
 
 ### Build Instructions
 
-Please see the wolfSSL repo's INSTALL file (https://github.com/wolfSSL/wolfssl/blob/master/INSTALL). Item 15 has instructions on how to configure and build wolfSSL with ML-KEM and ML-DSA enabled.
+Please see the wolfSSL repo's INSTALL file (https://github.com/wolfSSL/wolfssl/blob/master/INSTALL). Item 15 has instructions on how to configure and build wolfSSL with ML-KEM and ML-DSA enabled. None of the post-quantum algorithms need an external library; they all build from the wolfSSL sources. A typical configuration is:
+
+```sh
+./configure --enable-mlkem --enable-mldsa --enable-slhdsa
+```
+
+For the experimental algorithms, add `--enable-experimental --enable-falcon` or `--enable-experimental --enable-frodokem`. Those two options take sub-options as well; see [`--enable-falcon`](chapter02.md#--enable-falcon) and [`--enable-frodokem`](chapter02.md#--enable-frodokem).
 
 You will need the patched OQS OpenSSL Provider fork in order to generate X.509 certificates with post-quantum cryptographic keys and signatures. Instructions can be found at https://github.com/wolfSSL/osp/tree/master/oqs/README.md. For your convenience, pre-generated certificates can be found there as well.
 
