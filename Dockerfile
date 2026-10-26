@@ -1,14 +1,13 @@
-FROM texlive/texlive:latest AS builder
+# Doxybook2 is built in its own stage so BuildKit runs it in parallel with
+# the builder setup below
+FROM pandoc/latex:latest-ubuntu AS doxybook2
 
 WORKDIR /deps
 
 RUN apt-get -y update
-# Pandoc and mkdocs are the tools we use
-# Doxygen to convert the Doxygen docs
 # build-essential and cmake to build the dependencies
 # libfmt-dev nlohmann-json3-dev libspdlog-dev and libcxxopts-dev are needed by Doxybook2
-# fonts-noto is needed by our PDF generator
-RUN apt-get -y install pandoc mkdocs doxygen git build-essential cmake libfmt-dev nlohmann-json3-dev libspdlog-dev libcxxopts-dev fonts-noto
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends git ca-certificates build-essential cmake libfmt-dev nlohmann-json3-dev libspdlog-dev libcxxopts-dev
 
 # Inja is a dep for Doxybook2
 RUN git clone --depth=1 https://github.com/pantor/inja
@@ -18,6 +17,20 @@ RUN git clone https://github.com/dgarske/doxybook2
 # Checkout to working version of doxybook2
 RUN cd doxybook2 && git checkout master
 RUN cd doxybook2 && cmake . && make install
+
+# pandoc/latex provides pandoc and a minimal TeX Live
+FROM pandoc/latex:latest-ubuntu AS builder
+
+RUN apt-get -y update
+# mkdocs is used for the HTML manuals
+# Doxygen to convert the Doxygen docs
+# The Noto fonts are needed by our PDF generator
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends mkdocs doxygen git make patch ca-certificates fonts-noto-core fonts-noto-mono fonts-noto-cjk
+# The LaTeX packages our PDF headers use beyond the minimal TeX Live
+RUN tlmgr update --self && tlmgr install titlesec tocloft fvextra listings fancyhdr
+COPY --from=doxybook2 /usr/local/bin/doxybook2 /usr/local/bin/doxybook2
+RUN doxybook2 --version
+
 # Copy the source files into Docker, this and any subsequent steps won't be cached
 WORKDIR /src/wolfssl
 COPY . .
