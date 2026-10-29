@@ -1,0 +1,35 @@
+site_name: Mbed TLS 移行ガイド
+site_url: https://wolfssl.com/
+docs_dir: build/html/
+site_dir: html/
+copyright: Copyright © 2026 wolfSSL Inc.
+nav:
+    - "1. はじめに": index.md
+    - "2. 設計上の違い": chapter02.md
+    - "3. TLS クライアントの移植": chapter03.md
+    - "4. よくある落とし穴": chapter04.md
+    - "5. ハードウェアとプラットフォーム": chapter05.md
+    - "6. Mbed TLS にない機能": chapter06.md
+    - "7. はじめよう": chapter07.md
+    - "8. API 対応表": chapter08.md
+    - "9. 設定オプションの対応": chapter09.md
+    - "10. サポート": chapter10.md
+theme:
+  name: null
+  custom_dir: ../mkdocs-material/material
+  language: ja
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon: "logo.png"
+  logo: logo.png
+  favicon: logo.png
+  feature:
+    tabs: true
+extra_css: [skin.css]
+extra:
+    generator: false
+use_directory_urls: false
