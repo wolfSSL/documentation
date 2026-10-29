@@ -119,33 +119,48 @@ wolfssh クライアントアプリケーションはすべてのセッション
 
 ##  Windows 上でのビルド
 
-Visual Studio のプロジェクトファイルは *ide\\winvs* ディレクトリにあります。
+Visual Studio のプロジェクトファイルは `ide\winvs` ディレクトリにあります。
 
-ソリューションファイル 'wolfssh.sln' により、wolfSSH とそのサンプルおよびテストプログラムをビルドできます。このソリューションは、スタティックおよびダイナミックの 32 ビットまたは 64 ビットライブラリの Debug ビルドと Release ビルドの両方を提供します。wolfSSL のビルドをコンフィギュレーションするには user_settings.h を使用してください。
+ソリューションファイル `wolfssh.sln` により、wolfSSH とそのサンプルおよびテストプログラムをビルドできます。このソリューションは、スタティックおよびダイナミックの 32 ビットまたは 64 ビットライブラリの Debug ビルドと Release ビルドの両方を提供します。wolfSSL のビルドをコンフィギュレーションするには `user_settings.h` を使用してください。
 
 このプロジェクトは、wolfSSH と wolfSSL のソースディレクトリが隣り合わせにインストールされ、そのフォルダ名にバージョン番号が含まれていないことを前提としています:
 
 ```
 Projects\
-wolfssh\
-wolfssl\
+    wolfssh\
+    wolfssl\
 ```
 
-`wolfssh\ide\winvs\user_settings.h` ファイルには、wolfSSL を適切な設定でコンフィギュレーションするための設定が含まれています。このファイルは `wolfssh\ide\winvs` ディレクトリから `wolfssl\IDE\WIN` へコピーする必要があります。一方のコピーを変更した場合は、両方のコピーを変更しなければなりません。`WOLFCRYPT_ONLY` オプションは wolfSSL ファイルのビルドを無効にし、wolfCrypt アルゴリズムのみをビルドします。wolfSSL も残すには、このオプションを削除してください。X.509 証明書サポートには TLS 層が必要なため、このファイルの X.509 ブロックでは `WOLFSSH_CERTS` を定義するとともに `WOLFCRYPT_ONLY` を削除しています。
+wolfSSH は次の手順でビルドします:
+
+1. `wolfssh\ide\winvs\user_settings.h` を `wolfssl\IDE\WIN` にコピーします。
+   このファイルには wolfSSL をコンフィギュレーションするための設定が含まれています。
+   一方のコピーを変更した場合は、両方のコピーを変更しなければなりません。
+   `WOLFCRYPT_ONLY` オプションは wolfSSL ファイルのビルドを無効にし、
+   wolfCrypt アルゴリズムのみをビルドします。wolfSSL も残すには、このオプションを削除してください。
+   X.509 証明書サポートには TLS 層が必要なため、このファイルの X.509 ブロックでは
+   `WOLFSSH_CERTS` を定義するとともに `WOLFCRYPT_ONLY` を削除しています。
+2. `wolfssl\wolfssl64.sln` を使って wolfSSL をビルドします。
+3. `wolfssh\ide\winvs\wolfssh.sln` を使って wolfSSH をビルドします。
+
+wolfSSH をビルドする前に、同じ構成（Debug、Release、DLL Debug、DLL Release）と
+プラットフォーム（Win32 または x64）で wolfSSL をビルドしておく必要があります。
+wolfSSH のプロジェクトは `wolfssl\<構成>\<プラットフォーム>`
+（例：`wolfssl\DLL Release\x64`）にある wolfSSL ライブラリを使用します。
 
 各プロジェクトは、Windows 証明書ストアのサポート（`WOLFSSH_WINDOWS_CERT_STORE`）のために Windows の `crypt32.lib` および `ncrypt.lib` インポートライブラリとリンクします。これを使用するには、`user_settings.h` のコメントブロックの説明にしたがって、`WOLFSSH_CERTS` とともに `WOLFSSH_WINDOWS_CERT_STORE` を定義してください。
 
 ### Windows 上でのビルドに使用するユーザーマクロ
 
-このソリューションでは、wolfSSL ライブラリとヘッダーの場所を示すためにユーザーマクロを使用します。すべてのパスは wolfssl64 ソリューションの既定のビルド出力先に設定されています。ユーザーマクロ wolfCryptDir は、ライブラリを検索するためのベースパスとして使用されます。初期値は `..\..\..\..\wolfssl` に設定されています。そして、例えば API テストプロジェクトの追加インクルードディレクトリの値は `$(wolfCryptDir)` に設定されています。
+このソリューションでは、wolfSSL ライブラリとヘッダーの場所を示すためにユーザーマクロを使用します。すべてのパスは wolfssl64 ソリューションの既定のビルド出力先に設定されています。ユーザーマクロ `wolfCryptDir` は、ライブラリを検索するためのベースパスとして使用されます。初期値は `..\..\..\..\wolfssl` に設定されています。そして、例えば API テストプロジェクトの追加インクルードディレクトリの値は `$(wolfCryptDir)` に設定されています。
 
-wolfCryptDir パスは、プロジェクトファイルからの相対パスでなければなりません。プロジェクトファイルはすべて 1 つ下のディレクトリにあります。
+`wolfCryptDir` のパスは、プロジェクトファイルからの相対パスでなければなりません。プロジェクトファイルはすべて 1 つ下のディレクトリにあります。
 
 ```
 wolfssh/wolfssh.vcxproj
 unit-test/unit-test.vcxproj
 ```
-その他のユーザーマクロは、異なるビルド向けの wolfSSL ライブラリが見つかるディレクトリです。したがって、ユーザーマクロ 'wolfCryptDllRelease64' は初期値として次のように設定されています:
+その他のユーザーマクロは、異なるビルド向けの wolfSSL ライブラリが見つかるディレクトリです。したがって、ユーザーマクロ `wolfCryptDllRelease64` は初期値として次のように設定されています:
 ```
 $(wolfCryptDir)\DLL Release\x64
 ```
