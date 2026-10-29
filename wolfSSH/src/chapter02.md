@@ -73,43 +73,58 @@ $ make src/libwolfssh.la
 ```
 ##  Building on Windows
 
-The Visual Studio project file can be found in the directory *ide\\winvs*.
+The Visual Studio project file can be found in the directory `ide\winvs`.
 
-The solution file, 'wolfssh.sln', facilitates building wolfSSH and its example and test programs. The solution provides both Debug and Release builds of Static and Dynamic 32- or 64-bit libraries. The file user_settings.h should be used in the wolfSSL build to configure it.
+The solution file, `wolfssh.sln`, facilitates building wolfSSH and its example and test programs. The solution provides both Debug and Release builds of Static and Dynamic 32- or 64-bit libraries. The file `user_settings.h` should be used in the wolfSSL build to configure it.
 
 This project assumes that the wolfSSH and wolfSSL source directories are installed side-by-side and do not have the version number in their names:
 
 ```
 Projects\
-wolfssh\
-wolfssl\
+    wolfssh\
+    wolfssl\
 ```
 
-The file `wolfssh\ide\winvs\user_settings.h` contains the settings used to
-configure wolfSSL with the appropriate settings. This file must be copied
-from the directory `wolfssh\ide\winvs` to `wolfssl\IDE\WIN`. If you change
-one copy you must change both copies. The option `WOLFCRYPT_ONLY` disables
-the build of the wolfSSL files and only builds the wolfCrypt algorithms. To
-also keep wolfSSL, delete that option.
+Build wolfSSH with the following steps:
+
+1. Copy `wolfssh\ide\winvs\user_settings.h` to `wolfssl\IDE\WIN`.
+   This file contains the settings used to configure wolfSSL. If you
+   change one copy, you must change both copies. The option
+   `WOLFCRYPT_ONLY` disables the build of the wolfSSL files and only
+   builds the wolfCrypt algorithms. To also keep wolfSSL, delete that
+   option.
+2. Build wolfSSL with `wolfssl\wolfssl64.sln`.
+3. Build wolfSSH with `wolfssh\ide\winvs\wolfssh.sln`.
+
+wolfSSL must be built beforehand with the same configuration (Debug,
+Release, DLL Debug, or DLL Release) and platform (Win32 or x64) as the
+wolfSSH build. The wolfSSH projects use the wolfSSL library found in
+`wolfssl\<Configuration>\<Platform>`, for example
+`wolfssl\DLL Release\x64`.
 
 ### User Macros for Building on Windows
 
-The solution is using user macros to indicate the location of the wolfSSL library and headers. All paths are set to the default build destinations in the wolfssl64 solution. The user macro wolfCryptDir is used as the base path for finding the libraries. It is initially set to `..\..\..\..\wolfssl`. And then, for example, the additional include directories value for the API test project is set to `$(wolfCryptDir)`.
+The solution uses user macros to indicate the location of the wolfSSL library and headers. All paths are set to the default build destinations in the wolfssl64 solution. The user macro `wolfCryptDir` is used as the base path for finding the libraries. It is initially set to `..\..\..\..\wolfssl`. For example, the additional include directories value for the API test project is set to `$(wolfCryptDir)`.
 
-The wolfCryptDir path must be relative to the project files, which are all one directory down
+The `wolfCryptDir` path must be relative to the project files, which are all one directory down, for example:
 
 ```
 wolfssh/wolfssh.vcxproj
 unit-test/unit-test.vcxproj
 ```
-The other user macros are the directories where the wolfSSL libraries for the different builds may be found. So the user macro 'wolfCryptDllRelease64' is initially set to:
+
+The other user macros are the directories where the wolfSSL libraries for the different builds may be found. So the user macro `wolfCryptDllRelease64` is initially set to:
+
 ```
-$(wolfCryptDir)\x64\DLL Release
+$(wolfCryptDir)\DLL Release\x64
 ```
-This value is used in the debugging environment for the echoserver's 64-bit DLL Release build is set to:
+
+This value is used in the debugging environment of the echoserver's 64-bit DLL Release build, where PATH is set to:
+
 ```
 PATH=$(wolfCryptDllRelease64);%PATH%
 ```
+
 When you run the echoserver from the debugger, it finds the wolfSSL DLL in that directory.
 
 ##  Building in a non-standard environment

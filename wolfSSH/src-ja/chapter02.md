@@ -88,35 +88,45 @@ $ make src/libwolfssh.la
 
 ##  Windows上でのwolfSSHのビルド
 
-Visual Studioプロジェクトファイルは以下で取得できます:
-https://github.com/wolfSSL/wolfssh/blob/master/ide/winvs/wolfssh.sln
+Visual Studioプロジェクトファイルは`ide\winvs`ディレクトリにあります。
 
 
-ソリューションファイル'wolfssh.sln'はwolfSSH,そのサンプルプログラムとテストプログラムをビルドするように構成されています。DebugビルドとReleaseビルドの構成をスタティックリンクライブラリとダイナミック（32/64ビット）ライブラリの両形式で提供しています。user_settings.hはwolfSSLのコンフィギュレーションで必要となります。
+ソリューションファイル`wolfssh.sln`は、wolfSSHとそのサンプルプログラム、テストプログラムをビルドするように構成されています。32ビット版と64ビット版それぞれのスタティックライブラリとダイナミックライブラリについて、DebugビルドとReleaseビルドの構成を提供しています。wolfSSLのビルド設定には`user_settings.h`を使用してください。
 
 
-このプロジェクトファイルではwolfSSHとwolfSSLのソースフォルダ階層が隣同士に配置されていることを前提にしています。また、それらのルートフォルダにはバージョン番号が含まれていないフォルダ名となっていることを前提としています。つまり、次のようなフォルダ構成です:
+このプロジェクトファイルは、wolfSSHとwolfSSLのソースディレクトリが同じ階層に並べて配置されており、ディレクトリ名にバージョン番号が含まれていないことを前提としています。つまり、次のようなディレクトリ構成です:
 
 
 ```
 Projects\
-wolfssh\
-wolfssl\
+    wolfssh\
+    wolfssl\
 ```
 
-`wolfssh\ide\winvs\user_settings.h`ファイルはwolfSSLに対する設定も既に含んだ適切な内容となっています。このファイルを忘れずに`wolfssh\ide\winvs`フォルダから`wolfssl\IDE\WIN`フォルダにコピーしてください。もし、一方の内容を変更した場合には、
-その内容を他方にもコピーして下さい。
+wolfSSHは次の手順でビルドします:
 
-`WOLFCRYPT_ONLY`マクロ定義はwolfSSLコードをビルド対象から除外し、wolfCryptのアルゴリズム部分のみをビルドするの為に指定してあります。もし、wolfSSLコードもビルドする場合にはこの定義を削除してください。
+1. `wolfssh\ide\winvs\user_settings.h`を`wolfssl\IDE\WIN`にコピーします。
+   このファイルにはwolfSSLを構成するための設定が含まれています。
+   一方を変更した場合は、もう一方も同じように変更してください。
+   `WOLFCRYPT_ONLY`マクロはwolfSSLコードをビルド対象から除外し、
+   wolfCryptのアルゴリズム部分のみをビルドするために定義されています。
+   wolfSSLコードもビルドする場合は、この定義を削除してください。
+2. `wolfssl\wolfssl64.sln`を使ってwolfSSLをビルドします。
+3. `wolfssh\ide\winvs\wolfssh.sln`を使ってwolfSSHをビルドします。
+
+wolfSSHをビルドする前に、同じ構成（Debug、Release、DLL Debug、DLL Release）と
+プラットフォーム（Win32またはx64）でwolfSSLをビルドしておく必要があります。
+wolfSSHのプロジェクトは`wolfssl\<構成>\<プラットフォーム>`
+（例：`wolfssl\DLL Release\x64`）にあるwolfSSLライブラリを使用します。
 
 
 ### Windows上でのビルドに使用するユーザーマクロ定義
 
 
 
-ソリューションではwolfSSLライブラリとヘッダーファイルのロケーションを指定するためにユーザーマクロを利用します。wolfssl64ソリューションでは全てのパスは既定のビルド出力先に設定されます。ユーザーマクロ'wolfCryptDir'はライブラリを検索するためのベースパスとして使用します。初期値として、`..\..\..\..\wolfssl`に設定されています。その後、例えば追加のインクルードファイル検索パスが追加される場合には、`$(wolfCryptDir)`に対して追加を行います。
+ソリューションでは、wolfSSLライブラリとヘッダーファイルの場所を指定するためにユーザーマクロを使用します。すべてのパスは、wolfssl64ソリューションの既定のビルド出力先に設定されています。ユーザーマクロ`wolfCryptDir`は、ライブラリを検索するためのベースパスとして使用します。初期値は`..\..\..\..\wolfssl`です。例えば、APIテストプロジェクトの「追加のインクルードディレクトリ」には`$(wolfCryptDir)`が設定されています。
 
-wolfCryptDirパスはプロジェクトファイルからの相対位置で表せなければなりません。
+`wolfCryptDir`のパスは、プロジェクトファイルからの相対パスで指定する必要があります。プロジェクトファイルはいずれも1階層下のディレクトリにあります（例）:
 
 
 
@@ -125,20 +135,20 @@ wolfssh/wolfssh.vcxproj
 unit-test/unit-test.vcxproj
 ```
 
-そのほかのユーザーマクロは異なるビルドターゲットのためのディレクトリを表すために使用されます。例えば、   `wolfCryptDllRelease64` は次のフォルダを表します:
+そのほかのユーザーマクロは、各ビルド構成のwolfSSLライブラリが置かれているディレクトリを示します。例えば、`wolfCryptDllRelease64`の初期値は次のとおりです:
 
 
 ```
-$(wolfCryptDir)\x64\DLL Release
+$(wolfCryptDir)\DLL Release\x64
 ```
 
-このパスはechoserverサンプルプログラムのデバッグ環境設定で64-bit DLLリリースビルド版の出力先を表現するのに次の様に使われます:
+この値は、echoserverの64ビットDLL Releaseビルドのデバッグ環境で次のように使用されます:
 
 ```
 PATH=$(wolfCryptDllRelease64);%PATH%
 ```
 
-echoserverプログラムをデバッガーを使って実行する際にはこの設定によってwolfSSL DLLがこのディレクトリから見つかります。
+デバッガーからechoserverを実行すると、このディレクトリにあるwolfSSL DLLが読み込まれます。
 
 
 ##  その他の環境上でのビルド
