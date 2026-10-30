@@ -54,15 +54,16 @@ generated for each key storage operation, and the AES-CBC IV is also randomly
 generated for each key storage operation. The PBKDF2 iteration count defaults
 to 210,000 (current OWASP recommendation), but is user overridable with the
 `wolfjce.wks.iterationCount` Security property in the `java.security` file
-(10,000 minimum). More details on the design of the WKS type can be found in
-the WolfSSLKeyStore design document (`docs/design/WolfSSLKeyStore.md` in the
-wolfcrypt-jni package).
+(10,000 minimum, 10,000,000 maximum). More details on the design of the WKS
+type can be found in the WolfSSLKeyStore design document
+(`docs/design/WolfSSLKeyStore.md` in the wolfcrypt-jni package).
 
 WKS KeyStores support storage of PrivateKey, Certificate, and SecretKey objects.
-PrivateKey storage includes RSA, RSASSA-PSS, ECC, ML-DSA (FIPS 204), and
-SLH-DSA (FIPS 205) keys. ML-DSA and SLH-DSA key support requires native wolfSSL
-to be built with the respective algorithm enabled
-(see [Chapter 2](chapter02.md#native-feature-requirements-for-post-quantum-and-hash-based-algorithms)).
+PrivateKey storage includes RSA, RSASSA-PSS, ECC, Ed25519, Ed448, ML-DSA
+(FIPS 204), and SLH-DSA (FIPS 205) keys. Ed25519, Ed448, ML-DSA, and SLH-DSA
+key support requires native wolfSSL to be built with the respective algorithm
+enabled (see
+[Chapter 2](chapter02.md#native-feature-requirements-for-optional-algorithms)).
 
 ### WKS Security Properties
 
@@ -70,12 +71,24 @@ The behavior of the WKS KeyStore can be customized with the following Java
 Security properties, set in the `java.security` file:
 
 | Security Property | Default | Description |
-| --- | --- | --- |
-| wolfjce.wks.iterationCount | 210,000 | PBKDF2 iteration count (10,000 minimum) |
+| ---------------------------------------- | ------------------ | ---------------------------------------- |
+| wolfjce.wks.iterationCount | 210,000 | PBKDF2 iteration count (10,000 minimum, 10,000,000 maximum) |
+| wolfjce.wks.maxIterations | 10,000,000 | Max PBKDF2 iteration count accepted when loading WKS |
 | wolfjce.wks.maxCertChainLength | 100 | Max cert chain length |
 | wolfjce.wks.maxEntrySize | 10485760 | Max encoded entry size in bytes when loading WKS (10 MB default) |
 | wolfjce.keystore.kekCacheEnabled | false | Enable KEK caching for performance |
 | wolfjce.keystore.kekCacheTtlSec | 300 | KEK cache TTL in seconds (1 second minimum) |
+
+The PBKDF2 iteration count used when writing WKS entries
+(`wolfjce.wks.iterationCount`) is capped at 10,000,000. When loading a WKS
+KeyStore, an entry with an iteration count above `wolfjce.wks.maxIterations`
+causes `load()` to fail with an `IOException`, which bounds the work an
+untrusted KeyStore file can cause. If
+`wolfjce.wks.maxIterations` is set lower than `wolfjce.wks.iterationCount`, it
+is raised to match. WKS KeyStores written by a release before 1.12.0 with an
+iteration count above 10,000,000 will only load after raising
+`wolfjce.wks.maxIterations`. Both properties are read when the WKS KeyStore
+class is first loaded.
 
 ### KEK Caching for Performance
 
