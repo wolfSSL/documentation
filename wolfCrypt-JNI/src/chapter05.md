@@ -12,6 +12,7 @@ version of “wolfcrypt-jni.jar” that does not include the JCE provider classe
 ```
 wolfcrypt-jni/
     .github                        GitHub Actions workflows
+    .mvn/                          Maven Wrapper and Maven configuration
     AUTHORS
     COPYING
     ChangeLog.md                   Version ChangeLog
@@ -33,11 +34,14 @@ wolfcrypt-jni/
     lib/                           Compiled library artifacts
     makefile.linux                 Linux-specific Makefile
     makefile.macosx                macOS-specific Makefile
+    mvnw, mvnw.cmd                 Maven Wrapper scripts
     pom.xml                        Maven build file
     rpm/                           Linux rpm files
     scripts/                       Test scripts (Facebook Infer, etc)
+    spotbugs-exclude.xml           SpotBugs static analysis exclusions
     src/                           Source code
         java9/                     module-info.java (Java 9+ JPMS support)
+        java15/                    JDK 15+ EdDSA multi-release classes
         main/java                  Java source files
         test/java                  JUnit test source files
 
