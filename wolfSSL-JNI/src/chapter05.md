@@ -11,22 +11,26 @@ wolfJSSE / wolfSSL JNI package structure:
 wolfssljni/
     build.xml       ant build script
     pom.xml         Maven build configuration
+    ChangeLog.md    Release notes
     COPYING
     docs/           Javadocs
     examples/       Example apps
+        provider/   wolfJSSE provider examples
     IDE/            IDE projects
         Android/    Android Studio
         WIN/        Windows Visual Studio
     java.sh         Script to build native C JNI sources
     LICENSING
-    Makefile
+    Makefile        Builds native JNI library and invokes ant
     lib/            Output directory for compiled library
     native/         Native C JNI binding source files
     platform/       Android AOSP build files
     README.md
     rpm/            rpm spec files
+    scripts/        Helper and CI check scripts
     src/
         java/       Java source files
+        java9/      module-info.java for Java 9+ (JPMS) builds
         test/       Test source files
 ```
 

@@ -1,29 +1,84 @@
 # wolfSSL JNI and wolfJSSE Compilation
 
-There are three ways to compile wolfJSSE listed in this chapter, including
-using the Unix Command Line, Android Studio Build and Generic IDE Build.
+This chapter describes several ways to compile wolfJSSE, including using the
+Unix command line (make, ant, or Maven), Windows Visual Studio, Android Studio,
+and a generic IDE build.
 
 ## Unix Command Line
 
 Before following steps in this section, please ensure that the dependencies
 listed in Chapter 2 are installed.
 
-The `java.sh` script in the root package directory is used to compile the native
-JNI C source files into a shared library for either Unix/Linux or Mac OSX.
-This script tries to auto-detect between OSX (Darwin) and Linux to set up
-include paths and shared library extension type. This script directly calls gcc
-on the JNI C source files, producing `./lib/libwolfssljni.so` or
-`./lib/libwolfssljni.dylib`.
+### Building with make
+
+The `Makefile` in the root package directory compiles the native JNI C sources
+into a shared library (`./lib/libwolfssljni.so` or `./lib/libwolfssljni.dylib`)
+and then invokes `ant` to build the Java sources and JAR files. The Makefile
+auto-detects between OSX (Darwin) and Linux to set up include paths and the
+shared library extension type. It will also auto-detect `JAVA_HOME` if not
+already set. To explicitly specify a Java installation, set the `JAVA_HOME`
+environment variable before running `make`.
+
+To build and test wolfJSSE:
+
+```
+$ cd wolfssljni
+$ export JUNIT_HOME=/path/to/junit/jars
+$ make
+$ make check
+```
+
+Available `make` targets are:
+
+- `make` / `make build` (compiles the native JNI library and Java sources/JARs)
+- `make check` (builds, then runs JUnit tests, requires `JUNIT_HOME`)
+- `make native` (compiles only the native JNI shared library)
+- `make clean` (cleans all Java and native artifacts)
+- `make clean-native` (cleans only native artifacts)
+- `make install` (installs the shared library and JAR files to `/usr/local/lib`,
+  or `$PREFIX/lib` if `PREFIX` is set)
+- `make uninstall` (removes installed files)
+
+If linking against a native wolfSSL library not installed to `/usr/local`, or
+a wolfSSL library with a custom name (for example when wolfSSL was compiled
+with `--with-libsuffix`), these can be passed to `make`:
+
+```
+$ make WOLFSSL_INSTALL_DIR=/path/to/wolfssl/install WOLFSSL_LIBNAME=wolfssljsse
+```
+
+Preset `CFLAGS` can be passed to `make`:
+
+```
+$ make CFLAGS="-DWOLFJNI_USE_IO_SELECT"
+```
+
+On x86_64 and Aarch64 Linux hosts, `-fPIC` is automatically added to CFLAGS.
+
+Set `V=1` to see the full compiler commands:
+
+```
+$ make V=1
+```
+
+Set `ENABLE_PATCHES=1` to automatically detect and enable JNI code that depends
+on native wolfSSL pull request patches (`WOLFSSL_PR*_PATCH_APPLIED` defines).
+This requires a recent build of native wolfSSL that includes those patches,
+often newer than the latest tagged wolfSSL release.
+
+```
+$ make ENABLE_PATCHES=1
+```
+
+### java.sh Script
+
+The `java.sh` script in the root package directory is a convenience wrapper
+around the Makefile. It compiles only the native JNI shared library by running
+`make clean-native` followed by `make native`, doing a clean rebuild of the
+native library each time.
 
 ```
 $ ./java.sh
-
-Compiling Native JNI library:
-    WOLFSSL_INSTALL_DIR = /usr/local
-    Detected Linux host OS
-        Linux x86_64
-    Java Home = /usr/lib/jvm/java-8-openjdk-amd64
-    Generated ./lib/libwolfssljni.so
 ```
 
 If linking against a native wolfSSL library not installed to `/usr/local`, one
@@ -41,21 +96,16 @@ against. This is useful when wolfSSL was compiled with `--with-libsuffix`:
 $ ./java.sh /usr/local wolfssljsse
 ```
 
-The script will attempt to auto-detect `JAVA_HOME` if not set. To explicitly
-specify a Java installation, set the `JAVA_HOME` environment variable before
-running.
-
-Preset `CFLAGS` can be passed to the script via the environment:
+`CFLAGS` can be set in the environment prior to running the script:
 
 ```
 $ CFLAGS="-DWOLFJNI_USE_IO_SELECT" ./java.sh
 ```
 
-On x86_64 and Aarch64 Linux hosts, `-fPIC` is automatically added to CFLAGS.
-
 ## Building with ant
 
-To compile the Java sources, `ant` is used:
+The Java sources can also be compiled by calling `ant` directly, after the
+native JNI library has been compiled with `make native` or `java.sh`:
 
 ```
 $ ant
@@ -69,31 +119,37 @@ Available build targets for `ant` are :
 - `ant clean` (cleans all Java artifacts)
 - `ant cleanjni` (cleans native artifacts)
 
-These two commands will build the wolfJSSE jar and native code necessary to use
-wolfJSSE in a project. To compile and run JUnit tests the command `ant test`
-is used:
+To compile and run JUnit tests the command `ant test` (or `make check`) is
+used:
 
 ```
 $ ant test
 ```
 
-This will compile tests and the main wolfJSSE code and output with the results
-of the tests will be displayed along with a summary of total tests that passed
-at the end of the wolfJSSE testsuite and wolfSSL JNI testsuite. A successful
-build will display the message “BUILD SUCCESSFUL” at the end.
+This will compile the tests and main wolfJSSE code, then run the wolfSSL JNI
+and wolfJSSE test suites. Results are grouped by test class, with each test
+method listed along with the time it took to run in milliseconds. Tests that
+are skipped, for example because a feature is not compiled into native wolfSSL,
+are labeled `SKIP` instead of showing a time. After each test suite finishes,
+a summary line shows the number of tests run, failures, errors, and skipped
+tests. A successful build will display the message “BUILD SUCCESSFUL” at the
+end.
 
 ```
-[junit] WolfSSLTrustX509 Class
-[junit] Testing parse all_mixed.jks ... passed
-[junit] Testing loading default certs ... passed
-[junit] Testing parse all.jks ... passed
-[junit] Testing verify ... passed
+    [junit] WolfSSLContext Class
+    [junit]       465.26 ms  testInit
+    [junit]       577.66 ms  testWolfJSSEEnabledCipherSuites
+    [junit]      1135.56 ms  testJdkTlsDisabledAlgorithms
+    [junit]       218.36 ms  testGetSessionContext
+    [junit]         0.21 ms  testGetSSLContextFromProvider
+    [junit]       205.77 ms  testGetDefaultSSLParameters
+    [junit]        78.93 ms  testContextDefaultParamsExcludeAnon
+    [junit]         0.18 ms  testGetSessionContextBeforeInit
+    [junit]       211.86 ms  testGetSupportedSSLParameters
+    [junit]         3.70 ms  testGetSocketFactory
 ...
 
-build:
-
 BUILD SUCCESSFUL
-Total time: 18 seconds
 ```
 
 To compile and run examples bundled with wolfJSSE the command `ant examples`
@@ -108,11 +164,11 @@ $ ant examples
 wolfJSSE supports building and packaging with Maven for projects that consume
 Maven packages.
 
-First, compile the native JNI shared library using `java.sh` as described above.
+First, compile the native JNI shared library as described above.
 This creates the native library under `./lib`:
 
 ```
-$ ./java.sh
+$ make native
 ```
 
 Compile the Java sources (output to `./target/classes`):
@@ -161,8 +217,59 @@ Applications can include wolfJSSE as a Maven dependency:
 <dependency>
     <groupId>com.wolfssl</groupId>
     <artifactId>wolfssl-jsse</artifactId>
-    <version>1.16.0-SNAPSHOT</version>
+    <version>1.19.0-SNAPSHOT</version>
 </dependency>
+```
+
+## Java Module System (JPMS) Build
+
+wolfSSL JNI/JSSE supports the Java Platform Module System (JPMS) introduced in
+Java 9. When built with Java 9 or later, the JAR produced is a modular JAR that
+works on both the classpath and module path. When built with Java 8,
+`module-info.java` is automatically excluded and a standard classpath JAR is
+produced.
+
+| JDK Used to Build | Resulting JAR |
+| --- | --- |
+| Java 8 | Standard JAR (classpath only) |
+| Java 9+ | Modular JAR (classpath and module path) |
+
+The modular JAR declares the module `com.wolfssl`, exports the `com.wolfssl`
+and `com.wolfssl.provider.jsse` packages, and registers `WolfSSLProvider` as a
+`java.security.Provider` service.
+
+To build a modular JAR, use a JDK 9 or newer when building with either ant or
+Maven. Maven uses a profile (`java9-module`) that activates automatically on
+Java 9+:
+
+```
+$ export JAVA_HOME=/path/to/jdk11
+$ make
+```
+
+Module support can be verified with `jar --describe-module`, which should
+print output similar to:
+
+```
+$ jar --describe-module --file=lib/wolfssl-jsse.jar
+com.wolfssl jar:file:///path/to/lib/wolfssl-jsse.jar!/module-info.class
+exports com.wolfssl
+exports com.wolfssl.provider.jsse
+requires java.logging
+uses java.security.Provider
+provides java.security.Provider with com.wolfssl.provider.jsse.WolfSSLProvider
+```
+
+The modular JAR can be used with `jlink` to create a custom Java runtime that
+includes wolfJSSE:
+
+```
+$ jlink \
+    --module-path lib/wolfssl-jsse.jar \
+    --add-modules com.wolfssl \
+    --output custom-runtime \
+    --no-header-files \
+    --no-man-pages
 ```
 
 ## Windows Visual Studio Build
@@ -176,8 +283,10 @@ An example Android Studio project is located in the directory `IDE/Android`.
 This is an example Android Studio project file for wolfssljni / wolfJSSE.
 This project should be used for reference only.
 
-More details on tool and version information used when testing can be found in
-the `wolfssljni/IDE/Android/README.md`. The following steps outline what is
+The example project uses Android Gradle Plugin 8.3.1 (Android Studio Iguana
+2023.2.1 or newer), Gradle 8.4, and JDK 17 or newer, with compileSdk/targetSdk
+33 and minSdk 24. More details on tool and version information can be found in
+`wolfssljni/IDE/Android/README.md`. The following steps outline what is
 required to run this example on an Android device or emulator.
 
 ### 1. Add Native wolfSSL Library Source Code to Project
@@ -205,6 +314,8 @@ $ mv wolfssl-X.X.X wolfssljni/IDE/Android/app/src/main/cpp/wolfssl
 ```
 $ cd /IDE/Android/app/src/main/cpp/
 $ git clone https://github.com/wolfssl/wolfssl
+$ cd wolfssl
+$ ./autogen.sh
 $ cp wolfssl/options.h.in wolfssl/options.h
 ```
 
@@ -267,15 +378,10 @@ after the starting Android Studio and compiling the project, but must be done
 before running the app or test cases.
 
 ```
-adb shell
-cd sdcard
-mkdir examples
-mkdir examples/provider
-mkdir examples/certs
-exit
-adb push ./examples/provider/*.bks /sdcard/examples/provider/
-adb push ./examples/certs/ /sdcard/examples/
-adb push ./examples/certs/intermediate/* /sdcard/examples/certs/intermediate/
+adb shell mkdir -p /data/local/tmp/examples/provider
+adb shell mkdir -p /data/local/tmp/examples/certs/intermediate
+adb push ./examples/provider/*.bks /data/local/tmp/examples/provider/
+adb push ./examples/certs/ /data/local/tmp/examples/
 ```
 
 ### 5. Import and Build the Example Project with Android Studio
@@ -285,12 +391,24 @@ in wolfssljni/IDE/. Or, from inside Android Studio, open the `Android` project
 located in the wolfssljni/IDE directory.
 
 2) Build the project and run MainActivity from app -> java/com/example.wolfssl.
-This will ask for permissions to access the certificates in the /sdcard/
-directory and then print out the server certificate information on success.
+This will print out the server certificate information on success.
 
-3) OPTIONAL: The androidTests can be run after permissions has been given.
+3) OPTIONAL: The androidTests can be run to verify functionality.
 app->java->com.wolfssl->provider.jsse.test->WolfSSLJSSETestSuite and
 app->java->com.wolfssl->test->WolfSSLTestSuite
+
+### Additional Android Build Notes
+
+The example project's `CMakeLists.txt` links native shared libraries with
+16 KB ELF segment alignment (`-Wl,-z,max-page-size=16384`), required for
+devices using 16 KB memory pages (Android 15+). NDK r28 and later do this by
+default, but older NDKs need it set explicitly. Applications integrating
+wolfSSL JNI/JSSE into their own Android build should do the same.
+
+The example project also enables Gradle dependency verification, using
+SHA-256 checksums stored in `gradle/verification-metadata.xml`. If dependency
+or plugin versions are changed, this file needs to be regenerated. See
+`IDE/Android/README.md` for instructions.
 
 ## Generic IDE Build
 

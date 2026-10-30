@@ -12,6 +12,7 @@ on the following:
     + Zulu JDK
     + Amazon Corretto
     + Eclipse Temurin
+    + Microsoft Build of OpenJDK
 - Mac OSX
 - Windows (Visual Studio)
 - Android Studio
@@ -36,9 +37,9 @@ To install JUnit4 on a Unix/Linux/OSX system:
 $ export JUNIT_HOME=/path/to/jar/files
 ```
 
-##  System Dependencies (gcc and ant)
+##  System Dependencies (make, gcc, and ant)
 
-**gcc** and **ant** are used to compile native C code and Java code, respectively. Please ensure that these are installed on your development machine. Alternatively, you can choose to compile with **maven** instead of **ant**.
+**gcc** and **ant** are used to compile native C code and Java code, respectively. The included `Makefile` drives both of these, so **make** is also required. Please ensure that these are installed on your development machine. Alternatively, you can choose to compile the Java code with **maven** instead of **ant**.
 
 ##  wolfSSL SSL/TLS Library
 
@@ -74,4 +75,27 @@ If wolfSSL has been installed to a non-standard library installation location, y
 
 ```
 $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/wolfssl/install
+```
+
+If building a wolfSSL FIPS or FIPS Ready release bundle, additional configure
+options may be required. Reference the wolfSSL Manual and FIPS build
+documentation for exact build instructions.
+
+###  Optional Native wolfSSL Features
+
+Some wolfJSSE features depend on additional native wolfSSL configure options:
+
+| Feature | wolfSSL `./configure` Option |
+| --- | --- |
+| Pre-Shared Key (PSK) cipher suites | Enabled by `--enable-jni` |
+| Secure renegotiation | `--enable-secure-renegotiation` |
+| ML-KEM (FIPS 203) TLS 1.3 key exchange | `--enable-mlkem` |
+| ML-DSA (FIPS 204) certificates | `--enable-mldsa` |
+| Pure (non-hybrid) ML-KEM named groups | `--enable-tls-mlkem-standalone` |
+| Native debug logging | `--enable-debug` |
+
+For example, to build wolfSSL with post-quantum support for use with wolfJSSE:
+
+```
+$ ./configure --enable-jni --enable-mlkem --enable-mldsa
 ```
