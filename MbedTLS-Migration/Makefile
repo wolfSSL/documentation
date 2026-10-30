@@ -14,7 +14,11 @@ SOURCES = chapter01.md \
 		  chapter09.md \
 		  chapter10.md
 
-PDF  = MbedTLS-wolfSSL-Migration-Guide.pdf
+ifeq ($(DOC_LANG),JA)
+    PDF  = MbedTLS-wolfSSL-Migration-Guide-jp.pdf
+else
+    PDF  = MbedTLS-wolfSSL-Migration-Guide.pdf
+endif
 
 .PHONY: html-prep
 html-prep:
