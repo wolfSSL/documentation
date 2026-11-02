@@ -9,10 +9,10 @@
 wolfSSL ではこの 2 つが別々の関数に分かれており、`wolfSSL_UseSNI()` は SNI 拡張を送信するだけで、ホスト名の検証は `wolfSSL_check_domain_name()` を呼び出したときにだけ有効になります。
 そのため、[TLS クライアントの移植](chapter03.md)のサンプルのように、両方を呼び出してください。
 `wolfSSL_check_domain_name()` を呼び出さないと、ホスト名は検証されず、信頼された CA が発行した証明書であれば、別のホスト向けの証明書でも受け入れてしまいます。
-Mbed TLS 3.6.3 以降では、このホスト名の検証を省略するとハンドシェイクが失敗するため、移植時に呼び出しを忘れると、Mbed TLS では保証されていた検証が失われます。
+これは Mbed TLS 3.6.3 とそれ以降では必須となっている検証です。
 
 wolfSSL 5.9.2 以降、`wolfSSL_check_domain_name()` は完全修飾ドメイン名（FQDN）と `localhost` のみを受け付け、`gateway` のような単一ラベルの名前や IP アドレスに対しては `WOLFSSL_FAILURE` を返します。
-一方、`mbedtls_ssl_set_hostname()` は任意の名前を受け付けるため、完全修飾名を使用してください。
+一方、`mbedtls_ssl_set_hostname()` は任意の名前を受け付けますが、wolfSSL では完全修飾名を使用してください。
 IP アドレスの場合は `wolfSSL_check_ip_address()` を呼び出し、`--enable-ip-alt-name` を指定してビルドしてください。
 そうしないと、ハンドシェイクが `IPADDR_MISMATCH` で失敗します。
 
@@ -24,21 +24,21 @@ IP アドレスの場合は `wolfSSL_check_ip_address()` を呼び出し、`--en
 wolfCrypt の `wc_*` 関数は、Mbed TLS と同じく成功時に 0 を返す規約に従います。
 `wolfSSL_read()` と `wolfSSL_write()` はバイト数を返し、失敗時は `wolfSSL_get_error(ssl, ret)` で原因を取得できます。
 
-## ライブラリとアプリケーションは同じ定義でビルドする
+## ライブラリとアプリケーションのビルド時の定義の統一
 
 wolfSSL の多くの構造体は、有効にする機能によってサイズが変わります。
 そのため、ライブラリとアプリケーションで定義が一致しないと、コンパイルとリンクは成功しても実行時にメモリを破壊します。
 他のどの wolfSSL ヘッダーよりも先に `<wolfssl/options.h>` をインクルードしてください。
 `user_settings.h` を使う場合は、ライブラリとアプリケーションの両方で `WOLFSSL_USER_SETTINGS` を定義し、同じファイルを共有してください。
 
-## デフォルト設定が異なる
+## デフォルト設定の違い
 
 デフォルトの `./configure` ビルドは最小限の構成です。
 Mbed TLS がデフォルトで有効にしている機能のいくつかは、wolfSSL では明示的なオプション指定が必要です。
 たとえば、組み込みターゲットでの SNI、Curve25519、ALPN、セッションチケット、DTLS、DTLS Connection ID、PSK、AES-CCM（CoAP や LwM2M の `_CCM_8` 暗号スイート用）、Max Fragment Length などです。
 関数が `NOT_COMPILED_IN` を返したり、関数自体が存在しない場合は、[設定オプションの対応](chapter09.md)で該当するオプションを確認してください。
 
-## ピア検証は有効であり、有効のままにすべき
+## デフォルトで有効なピア検証の維持
 
 デフォルトのビルドでは、wolfSSL クライアントは Mbed TLS と同様にサーバーを検証します。
 ただし、`--enable-all` や `--enable-nginx` のような OpenSSL 互換のデフォルトを持つビルドでは、`WOLFSSL_VERIFY_NONE` で開始します。
@@ -48,12 +48,12 @@ CA が見つからない場合、ハンドシェイクは `ASN_NO_SIGNER_E`（-1
 サーバー側で `MBEDTLS_SSL_VERIFY_REQUIRED` と同じ動作にするには、`WOLFSSL_VERIFY_FAIL_IF_NO_PEER_CERT` を追加します。
 `MBEDTLS_SSL_VERIFY_OPTIONAL` に相当する動作にするには、エラーを記録して 1 を返す検証コールバックを使用します。
 
-## カスタム I/O コールバックの戻り値が異なる
+## カスタム I/O コールバックの戻り値の違い
 
 カスタムトランスポートのコールバックは、ほぼ 1 対 1 で移植できます。
 シグネチャは `int recv(WOLFSSL* ssl, char* buf, int sz, void* ctx)` で、送信側も同様です。
 Mbed TLS のコードの代わりに `WOLFSSL_CBIO_ERR_WANT_READ` または `WOLFSSL_CBIO_ERR_WANT_WRITE` を返し、ピアが接続を閉じた場合は `WOLFSSL_CBIO_ERR_CONN_CLOSE` を、DTLS でタイマーが満了した場合は `WOLFSSL_CBIO_ERR_TIMEOUT` を返してください。
-wolfSSL は Mbed TLS のエラーコードを認識しないため、たとえば `MBEDTLS_ERR_SSL_WANT_READ` を返すと、再試行すべき状態ではなく致命的なエラーとして扱い、接続を終了します。
+wolfSSL は Mbed TLS のエラーコードを認識しないため、たとえば `MBEDTLS_ERR_SSL_WANT_READ` を返すと、再試行すべき状態ではなく致命的なエラーとして扱います。
 
 ## PEM と DER のバッファ
 

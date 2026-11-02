@@ -8,7 +8,7 @@
 | `MBEDTLS_SSL_DTLS_SRTP` | `--enable-srtp` | `WOLFSSL_SRTP` |
 | `MBEDTLS_SSL_SERVER_NAME_INDICATION` | `--enable-sni`（デフォルトで有効なのは x86 および aarch64 ホストのみ） | `HAVE_SNI` |
 | `MBEDTLS_SSL_ALPN` | `--enable-alpn` | `HAVE_ALPN` |
-| `MBEDTLS_SSL_SESSION_TICKETS` | `--enable-session-ticket`。wolfSSL 5.9.4 以前（5.9.4 を含む）では、Mbed TLS の TLS 1.3 サーバーと通信するクライアントに `--enable-ticket-nonce-malloc` も必要。 | `HAVE_SESSION_TICKET`, `WOLFSSL_TICKET_NONCE_MALLOC` |
+| `MBEDTLS_SSL_SESSION_TICKETS` | `--enable-session-ticket`。wolfSSL 5.9.4 かそれ以前では、Mbed TLS の TLS 1.3 サーバーと通信するクライアントに `--enable-ticket-nonce-malloc` も必要。 | `HAVE_SESSION_TICKET`, `WOLFSSL_TICKET_NONCE_MALLOC` |
 | `MBEDTLS_SSL_EARLY_DATA` | `--enable-earlydata` と、`--enable-session-ticket` または `--enable-psk` | `WOLFSSL_EARLY_DATA` |
 | `MBEDTLS_SSL_MAX_FRAGMENT_LENGTH` | `--enable-maxfragment` | `HAVE_MAX_FRAGMENT` |
 | `MBEDTLS_SSL_RENEGOTIATION` | `--enable-secure-renegotiation`。アプリケーションが `mbedtls_ssl_conf_renegotiation()` で再ネゴシエーションを有効にしている場合のみ。 | `HAVE_SECURE_RENEGOTIATION` |

@@ -128,7 +128,7 @@ out:
 
 - RNG の設定と `psa_crypto_init()` は不要になります。
 - `wolfSSL_CTX_load_verify_locations()` は 1 回の呼び出しで CA のパースと登録を行います。
-  また、`wolfSSL_CTX_set_verify()` によってピア検証を明示的に指定します（[よくある落とし穴](chapter04.md)の「ピア検証は有効であり、有効のままにすべき」を参照）。
+  また、`wolfSSL_CTX_set_verify()` によってピア検証を明示的に指定します（[よくある落とし穴](chapter04.md)の「デフォルトで有効なピア検証の維持」を参照）。
 - ブロッキングソケットでは、`wolfSSL_connect()` がハンドシェイク全体を実行します。
   ノンブロッキングソケットでは、`wolfSSL_get_error()` が `WOLFSSL_ERROR_WANT_READ` または `WOLFSSL_ERROR_WANT_WRITE` を返す間、再度呼び出します。
 - `wolfSSL_UseSNI()` には SNI サポートが必要です。

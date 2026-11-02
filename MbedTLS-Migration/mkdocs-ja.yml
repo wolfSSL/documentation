@@ -10,7 +10,7 @@ nav:
     - "4. よくある落とし穴": chapter04.md
     - "5. ハードウェアとプラットフォーム": chapter05.md
     - "6. Mbed TLS にない機能": chapter06.md
-    - "7. はじめよう": chapter07.md
+    - "7. 導入手順": chapter07.md
     - "8. API 対応表": chapter08.md
     - "9. 設定オプションの対応": chapter09.md
     - "10. サポート": chapter10.md

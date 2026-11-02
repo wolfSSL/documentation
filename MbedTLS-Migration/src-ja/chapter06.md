@@ -14,8 +14,8 @@
 | OCSP ステープリング | 非対応 | 対応（v1 および v2） |
 | TLS 1.3 ポストハンドシェイク認証 | 非対応 | 対応 |
 | Raw Public Key（RFC 7250） | 非対応 | 対応 |
-| FIPS 140-3 認証済み暗号 | 非対応 | 対応（別途認証を受けた wolfCrypt モジュールを使用） |
-| ハードウェアオフロード | `_ALT` または PSA ドライバ | 暗号コールバックと 30 を超えるツリー内ポート |
+| FIPS 140-3 認証取得済み暗号 | 非対応 | 対応（別途認証を受けた wolfCrypt モジュールを使用） |
+| ハードウェアオフロード | `_ALT` または PSA ドライバ | 暗号コールバックとソースツリー内の 30 を超える移植コード |
 
 ## DTLS 1.3
 
@@ -25,10 +25,10 @@ wolfSSL は DTLS 1.3（RFC 9147）を追加でサポートし、両バージョ�
 移行はメソッドの変更だけで済みます。
 `--enable-dtls13` を指定したビルドでは、`wolfDTLS_client_method()` はサーバーが対応していれば DTLS 1.3 をネゴシエートし、対応していなければ DTLS 1.2 にフォールバックします。
 
-## ポスト量子暗号
+## 耐量子暗号
 
 Mbed TLS のロードマップでは ML-KEM は今後の課題とされており、ML-DSA のコードは開発ブランチ上の実験的な ML-DSA-87 ドライバのみです。
-wolfCrypt は NIST 標準の全アルゴリズムを、独自の実装と Intel および ARM 向けのアセンブリ最適化付きで提供しています。
+wolfCrypt は NIST が標準化した耐量子暗号アルゴリズム一式を、独自の実装と Intel および ARM 向けのアセンブリ最適化付きで提供しています。
 
 - ML-KEM（FIPS 203）。TLS 1.3 では、単体の ML-KEM として、または X25519MLKEM768、SecP256r1MLKEM768、SecP384r1MLKEM1024 などのハイブリッドグループとして使用します。
 - ML-DSA（FIPS 204）。証明書、TLS 1.3 の認証、CMS、証明書生成に使用します。
@@ -46,7 +46,7 @@ ML-DSA と SLH-DSA には `--enable-mldsa` と `--enable-slhdsa` が必要です
 wolfCrypt は FIPS 140-3 認証を取得していますが、Mbed TLS は取得していません。
 お使いのプラットフォームに適した認証については、wolfSSL までお問い合わせください。
 
-## PSA Crypto API を使い続ける
+## PSA Crypto API の継続利用
 
 [wolfPSA](https://github.com/wolfSSL/wolfPSA) は wolfCrypt 上に PSA Crypto API を実装しています。
 そのため、Mbed TLS 4.x 向けにすでに PSA へ移植したコードの大部分は、API を変更せずに wolfCrypt 上で動作します。
