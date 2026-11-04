@@ -22,8 +22,9 @@ The following Java Security properties can be set in the `java.security`
 file for JCE provider customization:
 
 | Security Property | Default | To Enable | Description |
-| --- | --- | --- | --- |
-| wolfjce.wks.iterationCount | 210,000 | Numeric | PBKDF2 iteration count (10,000 minimum) |
+| ---------------------------------------- | ------------- | ------------ | ----------------------------------- |
+| wolfjce.wks.iterationCount | 210,000 | Numeric | PBKDF2 iteration count (10,000 minimum, 10,000,000 maximum) |
+| wolfjce.wks.maxIterations | 10,000,000 | Integer | Max PBKDF2 iteration count accepted when loading WKS |
 | wolfjce.wks.maxCertChainLength | 100 | Integer | Max cert chain length |
 | wolfjce.wks.maxEntrySize | 10485760 | Integer | Max encoded entry size in bytes when loading WKS (10 MB default) |
 | wolfjce.keystore.kekCacheEnabled | false | true | Enable KEK caching in WKS KeyStore for performance |
@@ -40,7 +41,7 @@ The following Java System properties can be set on the command line or
 programmatically for JCE provider customization:
 
 | System Property | Default | To Enable | Description |
-| --- | --- | --- | --- |
+| ---------------------------------------- | ------------- | ------------ | ----------------------------------- |
 | wolfjce.debug | "false" | "true" | Enable wolfJCE debug logging |
 | wolfjce.ioTimeout | UNSET | Integer (seconds) | I/O timeout for OCSP and CRL HTTP operations (0-3600) |
 | wolfssl.skipLibraryLoad | "false" | "true" | Skip automatic native library loading (see [Chapter 4](chapter04.md#custom-native-library-loading)) |

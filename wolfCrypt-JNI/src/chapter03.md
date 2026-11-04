@@ -63,6 +63,12 @@ $ make clean
 
 wolfCrypt JNI/JCE also supports building with Maven. First, compile the native JNI shared library using `make` as described above.
 
+The included Maven Wrapper, `./mvnw` (or `mvnw.cmd` on Windows), can be used
+in place of `mvn` in the commands below. It downloads the Maven release pinned
+in `.mvn/wrapper/maven-wrapper.properties`, verifies its SHA-256 checksum, and
+runs Maven with `--strict-checksums` so that a dependency or plugin download
+that fails its checksum stops the build.
+
 Then compile the Java sources with Maven:
 
 ```
@@ -94,7 +100,7 @@ projects, where the version number will change depending on the current release:
 <dependency>
     <groupId>com.wolfssl</groupId>
     <artifactId>wolfcrypt-jni</artifactId>
-    <version>1.10.0-SNAPSHOT</version>
+    <version>1.12.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -132,6 +138,22 @@ $ ./custom-runtime/bin/java --list-modules
 
 Note that the native wolfCrypt JNI shared library (`libwolfcryptjni.so/dylib`)
 must still be available on the native library search path at runtime.
+
+## JDK 15+ Multi-Release JAR (EdDSA)
+
+When built with JDK 15 or later, `wolfcrypt-jni.jar` is a multi-release JAR
+(`Multi-Release: true`). Classes under `src/java15` are compiled into the
+`META-INF/versions/15` layer of the JAR, so that on JDK 15 and later wolfJCE
+EdDSA keys also implement the JDK `java.security.interfaces.EdECPublicKey` and
+`EdECPrivateKey` interfaces. This allows wolfJCE Ed25519 and Ed448 keys to be
+passed directly to other providers such as SunEC. JDK 8 through 14 and Android
+use the base classes. Both `ant` and Maven build this layer automatically when
+the build JDK is 15 or later.
+
+Multi-release class selection is done by the JAR loader, so the JDK 15 classes
+are only used when wolfJCE is loaded from `wolfcrypt-jni.jar`. A class
+directory such as Maven's `target/classes` (used by `mvn test`) uses the base
+classes. Run `mvn clean` when switching between build JDKs below and above 15.
 
 ## API Javadocs
 

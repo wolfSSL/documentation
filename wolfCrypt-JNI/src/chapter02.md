@@ -36,9 +36,9 @@ You can build and install a wolfSSL (wolfssl-x.x.x), wolfSSL FIPS release (wolfs
 
 The `--enable-jni` option includes all native wolfSSL features needed by both wolfCrypt JNI/JCE (this package) as well as wolfSSL JNI/JSSE (a separate package). If you want the minimal set of requirements needed for only wolfJCE, you can instead use `--enable-keygen --enable-crl`, where CRL support is needed for the JCE `CertPathValidator (PKIX)` CRL support.
 
-#### Native Feature Requirements for Post-Quantum and Hash-Based Algorithms
+#### Native Feature Requirements for Optional Algorithms
 
-Several algorithms supported by wolfJCE are **not** enabled by `--enable-jni` alone and require additional native wolfSSL configure options. If the matching native feature is not compiled into wolfSSL, wolfJCE will still compile and run normally, but the corresponding services will not be registered by the provider.
+Several algorithms supported by wolfJCE depend on native wolfSSL features that are not always enabled by `--enable-jni` alone, and may require additional native wolfSSL configure options. The Notes column lists which ones are enabled by default. If the matching native feature is not compiled into wolfSSL, wolfJCE will still compile and run normally, but the corresponding services will not be registered by the provider.
 
 | Algorithm | Native wolfSSL configure option | Notes |
 | --- | --- | --- |
@@ -47,12 +47,29 @@ Several algorithms supported by wolfJCE are **not** enabled by `--enable-jni` al
 | SLH-DSA (FIPS 205) | `--enable-slhdsa` | `--enable-slhdsa` builds the six SHAKE parameter sets. Use `--enable-slhdsa=yes,sha2` to build all twelve (recommended, since the `SLH-DSA-SHA2-128f` default lives in the SHA2 family) |
 | XMSS / XMSS^MT (RFC 8391) | `--enable-xmss` | Requires wolfSSL 5.9.2 or later. SHAKE-based parameter sets additionally require `--enable-sha3`. Verify-only in wolfJCE |
 | LMS / HSS (RFC 8554) | `--enable-lms` | `--enable-lms=verify-only` is also sufficient. SHAKE256 parameter sets additionally require `--enable-sha3`. Verify-only in wolfJCE |
+| Ed25519 / Ed448 (RFC 8032) | `--enable-ed25519`, `--enable-ed448` | `--enable-ed448` also enables SHAKE256. Both are included in `--enable-all` |
+| AES Key Wrap (RFC 3394) | `--enable-aeskeywrap` | Also enabled by `--enable-all` and `--enable-pkcs7`. Enabled by default in FIPS v6, v7, and FIPS Ready builds |
+| AES-XTS | `--enable-aesxts` | Also enabled by `--enable-all` |
+| AES-CFB | `--enable-aescfb` | Also enabled by `--enable-all` |
+| SHAKE128 / SHAKE256 | `--enable-shake128`, `--enable-shake256` | Enabled by default when SHA-3 is enabled (default on x86_64 and aarch64) for non-FIPS and FIPS v6+ builds |
+| DH | `--enable-dh` or `--enable-dh=conditional` | Enabled by default, except in FIPS v7 and FIPS Ready builds starting with wolfSSL 5.9.4. See [DH in FIPS v7 and FIPS Ready Builds](#dh-in-fips-v7-and-fips-ready-builds) |
 
-Note that these algorithms are **not** enabled by `--enable-all` or
-`--enable-all-crypto`. On wolfSSL versions newer than 5.9.2, all five algorithm
-families in the table above can be enabled at once with
-`--enable-all-quantum-crypto`, which enables ML-KEM, ML-DSA, XMSS, LMS, and all
-twelve SLH-DSA parameter sets (`yes,sha2`).
+Note that the post-quantum and hash-based algorithms above (ML-KEM, ML-DSA,
+SLH-DSA, XMSS, LMS) are **not** enabled by `--enable-all` or
+`--enable-all-crypto`. On wolfSSL versions newer than 5.9.2, all five of these
+algorithm families can be enabled at once with `--enable-all-quantum-crypto`,
+which enables ML-KEM, ML-DSA, XMSS, LMS, and all twelve SLH-DSA parameter sets
+(`yes,sha2`).
+
+The raw RSA `RSA/ECB/NoPadding` Cipher is only registered when native wolfSSL
+has raw RSA support compiled in (`WC_RSA_NO_PADDING` or `WC_RSA_DIRECT`).
+`--enable-jni` defines `WC_RSA_NO_PADDING`, so no additional options are needed
+with it. The minimal `--enable-keygen --enable-crl` build does not define
+either one, so add it to that configure line if `RSA/ECB/NoPadding` is needed:
+
+```
+$ ./configure --enable-keygen --enable-crl CPPFLAGS="-DWC_RSA_NO_PADDING"
+```
 
 XMSS/XMSS^MT and LMS/HSS support in wolfJCE is signature **verification** and public-key handling only. Key generation and signing are not supported, since stateful hash-based signing belongs in hardware (NIST SP 800-208).
 
@@ -96,4 +113,25 @@ This will install the wolfSSL library to your system default installation locati
 ```
 /usr/local/lib
 /usr/local/include
+```
+
+#### DH in FIPS v7 and FIPS Ready Builds
+
+wolfCrypt FIPS v7 places DH outside the FIPS module boundary. Starting with
+wolfSSL 5.9.4, FIPS v7 and FIPS Ready builds leave DH out by default. Add
+`--enable-dh=conditional` to compile DH in but keep it disabled at runtime
+until the application calls `Dh.enable()`, or use `--enable-dh` to enable it at
+compile time. When DH is disabled, `FeatureDetect.DhEnabled()` returns false
+and wolfJCE does not register DH services.
+
+wolfJCE decides which services to register when the provider is created, so
+call `Dh.enable()` before creating or installing the wolfJCE provider. If the
+provider was created before DH was enabled (for example, when wolfJCE is
+registered in `java.security`), refresh its services after calling
+`Dh.enable()`:
+
+```
+Dh.enable();
+WolfCryptProvider prov = (WolfCryptProvider)Security.getProvider("wolfJCE");
+prov.refreshServices();
 ```
