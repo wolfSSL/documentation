@@ -2217,7 +2217,7 @@ An optional RFC 9846 hardening. When set, a TLS 1.3 server only sends NewSession
 
 #### WOLFSSL_TLS13_SHA512
 
-Keeps the SHA-512 transcript hash in a TLS 1.3 only build. wolfSSL 5.9.4 and later drop the TLS 1.2 transcript state (the handshake hashes go from 864 to 352 bytes) and the SHA-512 transcript from such builds unless this macro is set. Enable it with [`--enable-tls13-sha512`](#--enable-tls13-sha512) or the CMake option `WOLFSSL_TLS13_SHA512`.
+Keeps the SHA-512 transcript hash in a TLS 1.3 only build. wolfSSL 5.9.4 and later drop the TLS 1.2 transcript state (the handshake hashes go from 864 to 352 bytes) and the SHA-512 transcript from such builds unless this macro is set. Enable it with [`--enable-tls13-sha512`](#--enable-tls13-sha512) or the CMake option `WOLFSSL_TLS13_SHA512`. Requires `WOLFSSL_SHA512`. No TLS 1.3 cipher suite uses SHA-512, so in TLS 1.3 it is only used for the HelloRetryRequest cookie HMAC, and only when SHA-256 and SHA-384 are not available.
 
 #### WOLFSSL_TLS_READ_AHEAD
 
@@ -2234,11 +2234,7 @@ wolfSSL 5.9.4 and later mask off the top bit of a peer's X25519 public value as 
 
 #### WOLFSSL_TLS13_IGNORE_PT_ALERT_ON_ENC
 
-Ignores plaintext alerts received when encrypted records are expected in TLS 1.3. May improve interoperability with some implementations.
-
-#### WOLFSSL_TLS13_SHA512
-
-Allow generation of SHA-512 digests in handshake - no ciphersuite requires SHA-512 at this time. This enables calculation of a SHA2-512 hash for the handshake messages even though its not used by TLS v1.3 yet.
+Ignores plaintext alerts received when encrypted records are expected in TLS 1.3. May improve interoperability with some implementations. The tolerance starts once wolfSSL is decrypting records from the peer, and ends when the peer sends its first encrypted record or the handshake completes, whichever comes first. After that a plaintext alert is a fatal error again. Encrypted alerts are handled as usual, and ignored plaintext alerts still count toward the `WOLFSSL_ALERT_COUNT_MAX` limit.
 
 #### WOLFSSL_TLS13_TICKET_BEFORE_FINISHED
 
