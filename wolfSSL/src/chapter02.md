@@ -19,11 +19,19 @@ After downloading the ZIP file, unzip the file using the `unzip` command. To use
 > extracted as such, converting line endings, end-of-file characters
 > and the character set itself as necessary. [...]
 
-**NOTE**: Beginning with the release of wolfSSL 2.0.0rc3, the directory structure of wolfSSL was changed as well as the standard install location. These changes were made to make it easier for open source projects to integrate wolfSSL. For more information on header and structure changes, please see [Library Headers](chapter09.md#library-headers) and [Structure Usage](#structure-usage).
+The source code is also available from GitHub:
+
+```sh
+git clone https://github.com/wolfSSL/wolfssl.git
+```
+
+A git checkout does not include the `configure` script. Generate it by running `./autogen.sh` from the wolfSSL root directory before following the steps below. This requires autoconf (2.69 or later), automake (1.13.4 or later) and libtool (2.4.2 or later). The release ZIP files already contain `configure`.
+
+**NOTE**: For the location of the wolfSSL header files, see [Library Headers](chapter09.md#library-headers). For the names of the native wolfSSL structures, see [Structure Usage](chapter09.md#structure-usage).
 
 ## Building on Unix-like Systems
 
-When building wolfSSL on Linux, \*BSD, OS X, Solaris, or other \*nix-like systems, use the autoconf system. To build wolfSSL you only need to run two commands from the wolfSSL root directory, `./configure` and `make`.
+When building wolfSSL on Linux, \*BSD, OS X, Solaris, or other \*nix-like systems, use the autoconf system. To build wolfSSL you only need to run two commands from the wolfSSL root directory, `./configure` and `make` (run `./autogen.sh` first if building from a git checkout).
 
 The `./configure` script sets up the build environment and you can append any number of build options to `./configure`. For a list of available build options, please see [Build Options](#build-options) or run the following command to see a list of possible options to pass to the `./configure` script:
 
@@ -49,6 +57,8 @@ You may need superuser privileges to install, in which case precede the command 
 sudo make install
 ```
 
+`./configure` generates the header `wolfssl/options.h`, which records the build settings. Applications must `#include <wolfssl/options.h>` before any other wolfSSL header (or define `WOLFSSL_USE_OPTIONS_H`, which makes the wolfSSL headers include it automatically) so that they are compiled with the same configuration as the library.
+
 To test the build, run the testsuite program from the root wolfSSL directory:
 
 ```sh
@@ -67,28 +77,79 @@ Further details about expected output of the testsuite program can be found in t
 make src/libwolfssl.la
 ```
 
+### Building Debian and RPM Packages
+
+After running `./configure` with the options you want, `make deb` builds a Debian package (Debian, Ubuntu, Linux Mint and derivatives) and `make rpm` builds an RPM package (RHEL, Fedora, CentOS, SUSE and openSUSE) with that configuration. `make deb-docker` and `make rpm-docker` build the same packages inside a Docker container.
+
+## Building with CMake
+
+wolfSSL can also be configured and built with CMake 3.16 or later (3.22 or later is recommended). The autoconf build is the primary build system; the CMake build supports the commonly used options, but not every `./configure` option.
+
+CMake does not allow building in the source directory, so create a separate build directory. From the wolfSSL root directory:
+
+```sh
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
+
+`cmake --build .` runs the underlying build tool (`make` by default on Unix-like systems), which can also be run directly.
+
+Build options are set with `-D<option>=yes` or `-D<option>=no` on the `cmake` command line. For example, `cmake .. -DWOLFSSL_TLS13=no` is the equivalent of `./configure --disable-tls13`, and `cmake .. -DWOLFSSL_CURVE25519=yes` is the equivalent of `./configure --enable-curve25519`. To list every option with its description and current value, run `cmake -LH ..` from the build directory, use the CMake GUI, or look in `CMakeCache.txt` after the first run. Other useful settings:
+
+* `-DCMAKE_BUILD_TYPE=Debug` builds with debugging information.
+* `-DBUILD_SHARED_LIBS=OFF` builds a static library instead of the default shared library.
+* `-DWOLFSSL_EXAMPLES=no` and `-DWOLFSSL_CRYPT_TESTS=no` skip the example applications and the wolfCrypt test and benchmark.
+
+Like `./configure`, CMake generates `wolfssl/options.h` with the build settings. By default it is written to the build directory, not the source tree. The examples, the unit tests and the wolfCrypt test and benchmark are also built in the build directory, and running `ctest` there runs the unit tests and the wolfCrypt test.
+
+### Installing and Using wolfSSL with CMake
+
+`cmake --install .` installs the library, the headers (including `options.h`), a `wolfssl.pc` pkg-config file and CMake package files. Add `--prefix /path/to/install` to choose the install location, or set `CMAKE_INSTALL_PREFIX` when configuring. Other CMake projects can then find wolfSSL with `find_package()` and link to the imported `wolfssl::wolfssl` target:
+
+```cmake
+find_package(wolfssl CONFIG REQUIRED)
+target_link_libraries(my_app PRIVATE wolfssl::wolfssl)
+```
+
+If wolfSSL is installed in a non-standard location, pass `-DCMAKE_PREFIX_PATH=/path/to/install` when configuring that project. A minimal example project is in `cmake/consumer`. `make install` in the autoconf build also installs CMake package files, under `$(libdir)/cmake/wolfssl`, to support `find_package(wolfssl)`; disable this with `./configure --disable-cmake-install`.
+
+### CMake on Windows
+
+With the CMake GUI, set "Where is the source code" to the wolfSSL root directory and "Where to build the binaries" to a build directory (for example `wolfssl/build`), click Configure, change any options, then click Generate. Open the generated `wolfssl.sln` from the build directory in Visual Studio. Alternatively, run the command line steps above from a Visual Studio developer command prompt (or after running `vcvars64.bat`).
+
+`CMakePresets.json` in the root directory defines a `vs2022-x64` preset: `cmake --preset vs2022-x64` generates a Visual Studio 2022 x64 solution in the `build` directory. Visual Studio 2022 (17.1 or later) also uses this file when the wolfSSL folder is opened directly.
+
+## Installing with vcpkg
+
+wolfSSL is also available as a [vcpkg](https://github.com/microsoft/vcpkg) port, which wolfSSL keeps up to date:
+
+```sh
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.sh
+./vcpkg integrate install
+./vcpkg install wolfssl
+```
+
+On Windows, run `bootstrap-vcpkg.bat` instead of `./bootstrap-vcpkg.sh`.
+
 ## Building on Windows
 
-In addition to the instructions below, you can find instructions and tips for building wolfSSL with Visual Studio [here](https://wolfssl.com/wolfSSL/Docs-wolfssl-visual-studio.html).
+In addition to the instructions below, you can find instructions and tips for building wolfSSL with Visual Studio [here](https://wolfssl.com/wolfSSL/Docs-wolfssl-visual-studio.html). wolfSSL can also be built on Windows with CMake; see [CMake on Windows](#cmake-on-windows).
 
-### VS 2008
+### Visual Studio
 
-Solutions are included for Visual Studio 2008 in the root directory of the install. For use with Visual Studio 2010 and later, the existing project files should be able to be converted during the import process.
+Open the solution `wolfssl64.sln` in the wolfSSL root directory. It builds the wolfSSL library (`wolfssl.vcxproj`), the testsuite, the sslSniffer and the client, server, echoclient and echoserver examples, for Win32, x64 and ARM64. The projects use the Visual Studio 2012 (v110) platform toolset; newer versions of Visual Studio can retarget them to the installed toolset.
 
-**Note**:
-If importing to a newer version of VS you will be asked: “Do you want to overwrite the project and its imported property sheets?” You can avoid the following by selecting “No”. Otherwise if you select “Yes”, you will see warnings about `EDITANDCONTINUE` being ignored due to `SAFESEH` specification. You will need to right click on the testsuite, sslSniffer, server, echoserver, echoclient, and client individually and modify their Properties-\>Configuration Properties-\>Linker-\>Advanced (scroll all the way to the bottom in Advanced window). Locate “Image Has Safe Exception Handlers” and click the drop down arrow on the far right. Change this to No (`/SAFESEH:NO`) for each of the aforementioned. The other option is to disable `EDITANDCONTINUE` which, we have found to be useful for debugging purposes and is therefore not recommended for production software.
+For Visual Studio 2022, the library project `wolfssl-VS2022.vcxproj` uses the v143 toolset. The solutions `wolfcrypt/test/test-VS2022.sln` and `wolfcrypt/benchmark/benchmark-VS2022.sln` build it together with the wolfCrypt test and benchmark applications.
 
-### VS 2010
+Solutions for FIPS builds, which need the FIPS source bundle from wolfSSL, are in `IDE/WIN10` (FIPS v2 and FIPS v5 and later), `IDE/WIN-PQ-FIPSv7` (FIPS 140-3 v7.0.0) and `IDE/WIN` (the original FIPS #2425 certificate). See the README in each directory.
 
-You will need to download Service Pack 1 to build wolfSSL solution once it has been updated. If VS reports a linker error, clean and rebuild the project; the linker error should be taken care of.
+To test each build, choose Build > Build Solution from the Visual Studio menu and then run the testsuite program. To edit build options in the Visual Studio project, select your desired project (wolfssl, echoclient, echoserver, etc.) and browse to the "Properties" panel.
 
-### VS 2013 (64 bit solution)
-
-You will need to download Service Pack 4 to build wolfSSL solution once it has been updated. If VS reports a linker error, clean and rebuild the project; the linker error should be taken care of.
-
-To test each build, choose “Build All” from the Visual Studio menu and then run the testsuite program. To edit build options in the Visual Studio project, select your desired project (wolfssl, echoclient, echoserver, etc.) and browse to the “Properties” panel.
-
-**Note**: After the wolfSSL v3.8.0 release the build preprocessor macros were moved to a centralized file located at `IDE/WIN/user_settings.h`. This file can also be found in the project. To add features such as ECC or ChaCha20/Poly1305, add `#defines` here such as `HAVE_ECC` or `HAVE_CHACHA` / `HAVE_POLY1305`.
+**Note**: After the wolfSSL v3.8.0 release the build preprocessor macros were moved to a centralized file located at `IDE/WIN/user_settings.h`. This file can also be found in the project. To add features such as ChaCha20/Poly1305 or Curve25519, add `#defines` here such as `HAVE_CHACHA` / `HAVE_POLY1305` or `HAVE_CURVE25519`.
 
 ### Cygwin
 
@@ -97,14 +158,9 @@ If building wolfSSL for Windows on a Windows development machine, we recommend u
 1. Go to <https://www.cygwin.com/install.html> and download `setup-x86_64.exe`
 2. Run `setup-x86_64.exe` and install however you choose. Click through the installation menus until you reach the "Select Packages" stage.
 3. Click on the "+" icon to expand "All"
-4. Now go to the "Archive" section and select "unzip" drop down, change "Skip" to 6.0-15 (or some other version).
-5. Under "Devel" click "autoconf" drop down and change "Skip" to "10-1" (or some other version)
-6. Under "Devel" click "automake" drop down and change "Skip" to "10-1" (or some other version)
-7. Under "Devel" click the "gcc-core" drop down and change "Skip" to 7.4.0-1 (NOTE: wolfSSL has not tested GCC 9 or 10 and as they are fairly new does not recommend using them until they have had a bit more time to be fine-tuned for development).
-8. Under "Devel" click the "git" drop down and change "Skip" to 2.29.0-1 (or some other version)
-9. Under "Devel" click "libtool" drop down and change "Skip" to "2.4.6-5" (or some other version)
-10. Under "Devel" click the "make" drop down and change "Skip" to 4.2.1-1 (or some other version)
-11. Click "Next" and proceed through the rest of the installation.
+4. Go to the "Archive" section, click the "unzip" drop down and change "Skip" to the current version.
+5. Under "Devel", do the same for each of "autoconf", "automake", "gcc-core", "git", "libtool" and "make", selecting the current version of each.
+6. Click "Next" and proceed through the rest of the installation.
 
 The additional packages list should include:
 
@@ -136,25 +192,29 @@ Download the complete wolfSSL source code package from the wolfSSL website, extr
 ### 1. wolfSSL Library Build Project
 
 - **Register source files to be compiled**  
-  Register all `*.c` files under `./src` and all `*.c` files under `./wolfcrypt/src`.  
-  Exclude the following files:
+  Register all `*.c` files in `./src` and all `*.c` files in the top level of `./wolfcrypt/src`. Add files from `./wolfcrypt/src/port/<vendor>/` and any assembly files (`.S` / `.asm`) only as needed for your target.  
+  Exclude the following files, which are `#include`d by other source files and must not be compiled separately:
 
-./src/ssl_.c, ./src/x509_.c,
-src/conf.c, src/bio.c
-wolfcrypt/src/misc.c, ./wolfcrypt/src/evp.c
+        src/ssl_*.c          (all ssl_*.c files; keep src/ssl.c itself)
+        src/x509.c  src/x509_str.c
+        src/bio.c  src/conf.c
+        src/pk.c  src/pk_ec.c  src/pk_rsa.c
+        wolfcrypt/src/evp.c  wolfcrypt/src/evp_pk.c
+        wolfcrypt/src/asn_orig.c  wolfcrypt/src/asn_tsp.c
+        wolfcrypt/src/asm.c
+        wolfcrypt/src/misc.c  (unless NO_INLINE is defined)
 
 - **Define configuration options**  
-Store the configuration definitions in a header file named `user_settings.h`.
-
-Refer to:
-- `wolfssl/examples/configs/README.md`
-- `wolfssl/examples/configs/user_settings_template.h`
+  Store the configuration definitions in a header file named `user_settings.h`.  
+  Refer to:
+    - `wolfssl/examples/configs/README.md`
+    - `wolfssl/examples/configs/user_settings_template.h`
 
 - **Register predefined macro names**  
-When `WOLFSSL_USER_SETTINGS` is defined, the above `user_settings.h` file is included at build time.
+  When `WOLFSSL_USER_SETTINGS` is defined, the above `user_settings.h` file is included at build time.
 
 - **Register include paths**  
-Register the path to the wolfSSL source file root and the path to the above `user_settings.h`.
+  Register the path to the wolfSSL source file root and the path to the above `user_settings.h`.
 
 ---
 
@@ -174,9 +234,9 @@ While not officially supported, we try to help users wishing to build wolfSSL in
 1. The source and header files need to remain in the same directory structure as they are in the wolfSSL download package.
 2. Some build systems will want to explicitly know where the wolfSSL header files are located, so you may need to specify that. They are located in the `<wolfssl_root>/wolfssl` directory. Typically, you can add the `<wolfssl_root>` directory to your include path to resolve header problems.
 3. wolfSSL defaults to a little endian system unless the configure process detects big endian. Since users building in a non-standard environment aren't using the configure process, `BIG_ENDIAN_ORDER` will need to be defined if using a big endian system.
-4. wolfSSL benefits speed-wise from having a 64-bit type available. The configure process determines if long or long long is 64 bits and if so sets up a define. So if `sizeof(long)` is 8 bytes on your system, define `SIZEOF_LONG 8`. If it isn't but `sizeof(long long)` is 8 bytes, then define `SIZEOF_LONG_LONG 8`.
+4. wolfSSL benefits speed-wise from having a 64-bit type available. The configure process determines if long or long long is 64 bits and if so sets up a define. So if `sizeof(long)` is 8 bytes on your system, define `SIZEOF_LONG 8`. If it isn't but `sizeof(long long)` is 8 bytes, then define `SIZEOF_LONG_LONG 8`. If neither is defined, `wolfssl/wolfcrypt/types.h` tries to detect them: from `limits.h` when `HAVE_LIMITS_H` or `_WIN32` is defined, otherwise from common 64-bit compiler macros (such as `__x86_64__` or `__aarch64__`). A manual define is only needed when this detection fails.
 5. Try to build the library, and let us know if you run into any problems. If you need help, contact us at [facts@wolfssl.com](mailto:facts@wolfssl.com).
-6. Some defines that can modify the build are listed in the following sub-sections, below. For more verbose descriptions of many options, please see [Build Options](#build-options).
+6. Some defines that can modify the build are listed in [Features Defined as C Pre-processor Macro](#features-defined-as-c-pre-processor-macro). For more verbose descriptions of many options, please see [Build Options](#build-options).
 
 ### Building into Yocto Linux
 
@@ -200,58 +260,61 @@ wolfSSL also includes recipes for building wolfSSL on Yocto Linux and OpenEmbedd
 
 3. **Build a wolfSSL product recipe**
 
-    bitbake can be used to build one of the three following wolfSSL product recipes:
-    *wolfssl*, *wolfssh*, and *wolfmqtt*. Simply pass one of those recipes into the bitbake
-    command (example: `bitbake wolfssl`). This allows the user to personally
-    confirm compilation succeeds without issues.
+    bitbake can be used to build wolfSSL product recipes such as *wolfssl*, *wolfssh*,
+    *wolfmqtt*, *wolftpm*, *wolfclu*, *wolfpkcs11*, *wolfprovider* and *wolfengine*
+    (see the meta-wolfssl README for the full list). Simply pass one of those recipes
+    into the bitbake command (example: `bitbake wolfssl`). This allows the user to
+    personally confirm compilation succeeds without issues.
 
 4. **Edit local.conf**
 
     The final step is to edit the build's local.conf file, which allows desired libraries to
-    be included with the image being built. Edit the `IMAGE_INSTALL_append` line
+    be included with the image being built. Edit the `IMAGE_INSTALL:append` line
     to include the name of the desired recipe(s). An example of this is shown below:
 
     ```sh
-    IMAGE_INSTALL_append = "wolfssl wolfssh wolfmqtt"
+    IMAGE_INSTALL:append = " wolfssl wolfssh wolfmqtt"
     ```
+
+    Note the leading space inside the quotes: `append` does not add a separator,
+    so without it the first name is joined onto the previous entry. The colon
+    override syntax is used by Yocto Dunfell (3.1) and newer; older releases use
+    `IMAGE_INSTALL_append` instead.
 
 Once the image has been built, wolfSSL's default location (or related products from recipes) will be the `/usr/lib/` directory.
 
-Additionally, wolfSSL can be customized when building into Yocto by using the enable and disable options listed in [Build Options](#build-options). This requires creating a `.bbappend` file and placing it within the wolfSSL application/recipe layer. The contents of this file should include a line specifying content to concatenate onto the `EXTRA_OECONF` variable. An example of this is shown below to enable TLS 1.3 support through the TLS 1.3 enable option:
+Additionally, wolfSSL can be customized when building into Yocto by using the enable and disable options listed in [Build Options](#build-options). This requires creating a `.bbappend` file and placing it within the wolfSSL application/recipe layer. The contents of this file should include a line specifying content to concatenate onto the `EXTRA_OECONF` variable. An example of this is shown below to enable Curve25519 support, which is disabled by default:
 
 ```sh
-EXTRA_OECONF += "--enable-tls13"
+EXTRA_OECONF += " --enable-curve25519"
 ```
 
 Further documentation on building into Yocto can be found in the meta-wolfssl README, located here: <https://github.com/wolfSSL/meta-wolfssl/blob/master/README.md>
 
-### Building with Atollic TrueSTUDIO
+### Building with STM32CubeIDE
 
-Versions of wolfSSL following 3.15.5 include a TrueSTUDIO project file that is used to build wolfSSL on ARM M4-Cortex devices. The TrueSTUDIO project file simplifies the process of building on STM32 devices, is free to download, and is createed by Atollic - a part of ST Microelectronics. To build the wolfSSL static library project file in TrueSTUDIO, it will require the user perform the following steps after opening TrueSTUDIO:
-
-1. Import the project into the workspace (File > Import)
-2. Build the project (Project > Build project)
-
-The build then includes the settings located inside of `user_settings.h` at build-time. The default content of the `user_settings.h` file is minimal, and does not contain many features. Users are able to modify this file and add or remove features with options listed in the remainder of this chapter.
+For STM32 devices, wolfSSL is available as the I-CUBE-wolfSSL Cube pack for STM32CubeMX and STM32CubeIDE. Add the wolfSSL pack components to a CubeMX project ("Software Packs" -> "Select Components"), configure the pack parameters, generate the code and open the project in STM32CubeIDE. The example in `<wolfssl_root>/IDE/STM32Cube` runs the wolfCrypt test, the wolfCrypt benchmark and a TLS client/server test. See `<wolfssl_root>/IDE/STM32Cube/README.md` for installing the pack, the example projects and the configuration options.
 
 ### Building with IAR
 
-The `<wolfssl_root>/IDE/IAR-EWARM` directory contains the following files:
+The `<wolfssl_root>/IDE/IAR-EWARM/Projects` directory contains the following files:
 
 1. Workspace: `wolfssl.eww`
    The workspace includes wolfSSL-Lib library and wolfCrypt-test, wolfCrypt-benchmark
    executable projects.
-2. wolfSSL-Lib Project: `lib/wolfSSL-lib.ewp`
+2. wolfSSL-Lib Project: `lib/wolfSSL-Lib.ewp`
    generates full set library of wolfCrypt and wolfSSL functions.
 3. Test suites Project: `test/wolfCrypt-test.ewp`
    generates test.out test suites executable
 4. Benchmark Project: `benchmark/wolfCrypt-benchmark.ewp`
    generates benchmark.out benchmark executable
 
-These projects have been set up to generic ARM Cortex-M MPUs. In order to generate project for specific target MPU, take following steps.
+Projects for use with the Segger embOS RTOS are in `<wolfssl_root>/IDE/IAR-EWARM/embOS`.
+
+These projects have been set up for generic ARM Cortex-M MCUs. In order to generate project for specific target MCU, take following steps.
 
 1. Default Setting: Default Target of the projects are set to Cortex-M3 Simulator. user_settings.h includes default options for the projects. You can build and
-download the to the simulator. Open Terminal I/O window, by "view"->"Terminal I/O", and start execution.
+download them to the simulator. Open Terminal I/O window, by "view"->"Terminal I/O", and start execution.
 
 2. Project option settings: For each project, choose appropriate "Target" options.
 
@@ -269,17 +332,16 @@ The `<wolfssl_root>/IDE/XCODE` directory contains the following files:
 
 1. `wolfssl.xcworkspace` -- workspace with library and testsuite client
 2. `wolfssl_testsuite.xcodeproj` -- project to run the testsuite.
-3. `wolfssl.xcodeproj` -- project to build OS/x and iOS libraries for wolfSSL and/or wolfCrypt
+3. `wolfssl.xcodeproj` -- project to build macOS, iOS and tvOS libraries for wolfSSL and/or wolfCrypt
 4. `wolfssl-FIPS.xcodeproj` -- project to build wolfSSL and wolfCrypt-FIPS if available
 5. `user_settings.h` -- custom library settings, which are shared across projects
 
-The library will output as `libwolfssl_osx.a` or `libwolfssl_ios.a` depending on the target. It will also copy the wolfSSL/wolfCrypt (and the CyaSSL/CtaoCrypt
-compatibility) headers into an `include` directory located in
+The library will output as `libwolfssl_osx.a`, `libwolfssl_ios.a` or `libwolfssl_tvos.a` depending on the target. It will also copy the wolfSSL/wolfCrypt headers into an `include` directory located in
 `Build/Products/Debug` or `Build/Products/Release`.
 
 For the library and testsuite to link properly the build location needs to be configured relative to the workspace.
 
-1. File -> Workspace Settings (or Xcode -> Preferences -> Locations -> Locations)
+1. File -> Workspace Settings (or Xcode -> Settings -> Locations)
 2. Derived Data -> Advanced
 3. Custom -> Relative to Workspace
 4. Products -> Build/Products
@@ -290,22 +352,28 @@ If needed the Xcode preprocessors can be modified with these steps:
 
 1. Click on the Project in "Project Navigator".
 2. Click on the "Build Settings" tab.
-3. Scroll down to the "Apple LLVM 6.0 - Preprocessing" section.
+3. Scroll down to the "Apple Clang - Preprocessing" section.
 4. Open the disclosure for "Preprocessor Macros" and use the "+" and
 "-" buttons to modify. Remember to do this for both Debug and Release.
 
 This project should build wolfSSL and wolfCrypt using the default settings.
 
+#### Universal framework built with configure
+
+`<wolfssl_root>/IDE/apple-universal/build-wolfssl-framework.sh` builds wolfSSL with `./configure` as a static library for macOS, iOS, tvOS and watchOS devices and their simulators, and packages the results as an `xcframework` that can be added to an Xcode project. Extra configure options can be passed with `-c "<options>"`. The directory also contains an example multiplatform Xcode app that uses the framework; see its `README.md`.
+
+When building with `./configure` on an Apple Silicon (ARM64) Mac, make sure the host CPU is detected as `aarch64`; if it is not, pass `--host=aarch64-apple-darwin` to `./configure`.
+
 ### Building with GCC ARM
 
-In the `<wolfssl_root>/IDE/GCC-ARM` directory, you will find an example wolfSSL project for Cortex M series, but it can be adopted for other architectures.
+In the `<wolfssl_root>/IDE/GCC-ARM` directory, you will find an example wolfSSL project for Cortex M series, but it can be adapted for other architectures.
 
 1. Make sure you have `gcc-arm-none-eabi` installed.
 2. Modify the `Makefile.common`:
    * Use correct toolchain path `TOOLCHAIN`.
-   * Use correct architecture 'ARCHFLAGS'. See [GCC ARM Options](https://gcc.gnu.org/onlinedocs/gcc-4.7.3/gcc/ARM-Options.html) `-mcpu=name`.
+   * Use correct architecture 'ARCHFLAGS'. See [GCC ARM Options](https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html) `-mcpu=name`.
    * Confirm memory map in linker.ld matches your flash/ram or comment out `SRC_LD = -T./linker.ld` in Makefile.common.
-3. Use `make` to build the static library (libwolfssl.a), wolfCrypt test/benchmark and wolfSSL TLS client targets as `.elf` and `.hex` in `/Build`.
+3. Use `make` to build the static library (libwolfssl.a), wolfCrypt test/benchmark and wolfSSL TLS client and server targets as `.elf` and `.hex` in `./Build`.
 
 #### Building with generic makefile cross-compile
 
@@ -314,7 +382,7 @@ Example `Makefile.common` changes for Raspberry Pi with Cortex-A53:
 1. In Makefile.common change `ARCHFLAGS` to `-mcpu=cortex-a53 -mthumb`.
 2. Comment out `SRC_LD`, since custom memory map is not applicable.
 3. Clear `TOOLCHAIN`, so it will use default `gcc`. Set `TOOLCHAIN =`
-4. Comment out `LDFLAGS += --specs=nano.specs` and `LDFLAGS += --specs=nosys.specs` to nosys and nano.
+4. Comment out the `LDFLAGS += --specs=nano.specs` and `LDFLAGS += --specs=nosys.specs` lines.
 
 #### Building with configure with cross-compile
 
@@ -345,8 +413,14 @@ list of CFLAGS.
 
 You can find detailed instructions and tips for building wolfSSL on Keil MDK-ARM [here](https://www.wolfssl.com/docs/keil-mdk-arm/).
 
-**Note**: If MDK-ARM is not installed in the default installation location, you need to change all of the referencing path definitions in the project file to the
-install location.
+wolfSSL is distributed for Keil MDK 5 as the `wolfSSL::wolfSSL` CMSIS pack:
+
+1. Install the pack with the Keil Pack Installer (under "Generic").
+2. Add it to your project with Project -> Manage -> "Run-Time Environment", checking wolfCrypt CORE and wolfSSL CORE (and the test or example components if needed).
+3. Define `WOLFSSL_USER_SETTINGS` (Options for Target -> C/C++ -> Preprocessor Symbols).
+4. Configure the pack's `user_settings.h` with its `MDK_CONF_*` settings, for example the math library (`MDK_CONF_MATH`), RTOS (`MDK_CONF_THREAD`) and TCP stack (`MDK_CONF_NETWORK`).
+
+Example projects (library builds, the wolfCrypt test and benchmark, and TLS client and server examples) are in `<wolfssl_root>/IDE/MDK5-ARM/Projects`. See `<wolfssl_root>/IDE/MDK5-ARM/README.md` for details.
 
 ## Features Defined as C Pre-processor Macros
 
@@ -5179,65 +5253,79 @@ Not configure options but Makefile targets, new in wolfSSL 5.9.4, for EU Cyber R
 
 ### `--enable-fastmath`
 
-Enable FastMath implementation. Both FastMath and Big Integer library are disabled if Single-Precision (SP) math is enabled.
+Enable the legacy Tom's Fast Math back end (`tfm.c`). Disabled by default. Passing `--enable-fastmath` turns off the default `--enable-sp-math-all`; if `--enable-sp-math-all` or `--enable-sp-math` is also passed explicitly, SP math takes precedence and fastmath is not used.
 
 See USE_FAST_MATH and Big Integer Math Library sections.
 
 ### `--enable-fasthugemath`
 
-Enable fast math + huge code.
+Enable the legacy Tom's Fast Math back end + huge code. Implies `--enable-fastmath`. The SP math equivalent is `--enable-sp-math-all=huge`, which adds the huge code optimization CFLAGS and defines `WOLFSSL_SP_INT_LARGE_COMBA`.
 
 Enabling fasthugemath includes support for the FastMath library and greatly increases the code size by unrolling loops for popular key sizes during public key operations. Try using the benchmark utility before and after using fasthugemath to see if the slight speedup is worth the increased code size.
 
 ### `--enable-sp-math`
 
-Enable Single-Precision (SP) math implementation with restricted algorithm suite. Unsupported algorithms are disabled. Overrides `--enable-sp`, `--enable-sp-math-all`, `--enable-fastmath` and `--enable-fasthugemath`.
+Enable Single-Precision (SP) math implementation with restricted algorithm suite. Unsupported algorithms are disabled. Disables the default `--enable-sp-math-all` and fastmath. Cannot be combined with an explicit `--enable-sp-math-all` (configure reports an error), and requires `--enable-sp` for RSA, DH and ECC. On x86_64 and aarch64, `--enable-sp-math` turns on `--enable-sp-asm` by default, which in turn turns on `--enable-sp`.
 
 - Replaces the math implementation with that in sp_int.c
 - A minimal implementation, turns on portions of sp_int.c but not all.
-- MUST combine with --enable-sp to turn on the solutions in sp_x86_64.c or sp_arm.c etc (list of files below depending on the target system) to be able to perform RSA/ECC/DH operations.
+- MUST combine with --enable-sp to turn on the solutions in sp_x86_64.c, sp_arm32.c, sp_arm64.c etc (list of files below depending on the target system) to be able to perform RSA/ECC/DH operations.
 - Not to be combined with --enable-sp-math-all (below)
 
 FILE LIST (platform dependent, chosen by configure based on system specs or can
 be manually controlled when using a Makefile/IDE solution):
-sp_arm32.c
-sp_arm64.c
-sp_armthumb.c
-sp_cortexm.c
-sp_dsp32.c
-sp_x86_64.c
-sp_x86_64_asm.S
-sp_x86_64_asm.asm
+
+* sp_c32.c, sp_c64.c (portable C, 32-bit and 64-bit)
+* sp_arm32.c
+* sp_arm64.c
+* sp_armthumb.c
+* sp_cortexm.c
+* sp_dsp32.c
+* sp_riscv64.c
+* sp_x86_64.c
+* sp_x86_64_asm.S
+* sp_x86_64_asm.asm
+* sp_sm2_*.c and sp_sm2_x86_64_asm.S (SM2 variants of the above)
 
 ### `--enable-sp-math-all`
 
-Enabled by default. Enable Single-Precision (SP) math implementation with full algorithm suite. Unsupported algorithms are enabled, but unoptimized. Overrides `--enable-sp`, `--enable-fastmath` and `--enable-fasthugemath`.
+Enabled by default. Enable Single-Precision (SP) math implementation with full algorithm suite. Unsupported algorithms are enabled, but unoptimized. Overrides `--enable-fastmath` and `--enable-fasthugemath` when given explicitly. Can be combined with `--enable-sp`.
 
 - Replaces the math implementation with that in sp_int.c
 - A FULL implementation, does not depend on --enable-sp to work
 - Can be combined with --enable-sp to allow use of the implementations written in portable c assembly (non-hardware specific assembly) in sp_c32.c for 32-bit or sp_c64.c for 64-bit when possible. The rest of the time (when not possible) the implementations in sp_int.c are used. The portable C assembly gives significant performance gains on targets that do not have hardware optimizations available.
 - Not to be combined with --enable-sp-math (above)
 
-**NOTE**: If you are using asymmetric cryptography with key length in bits [256, 384, 521, 1024, 2048, 3072, 4096], you should consider using --enable-sp-math option to get maximum performance with a larger footprint size.
+Takes an optional comma separated list of options:
+
+* `small`: smaller code (defines `WOLFSSL_SP_SMALL`).
+* `huge`: larger, faster code (huge code optimization CFLAGS and `WOLFSSL_SP_INT_LARGE_COMBA`).
+* `256`, `384`, `521`, `1024`, `2048`, `3072` or `4096`: the maximum key size in bits to support.
+* `nomalloc`: defines `WOLFSSL_SP_NO_MALLOC`.
+* `neg`: support negative numbers (defines `WOLFSSL_SP_INT_NEGATIVE`).
+
+For example, `--enable-sp-math-all=small,2048`.
+
+**NOTE**: If you are using asymmetric cryptography with key length in bits [256, 384, 521, 1024, 2048, 3072, 4096], you should consider `--enable-sp` (with `--enable-sp-asm` where available) for maximum performance at a larger footprint; add `--enable-sp-math` to drop the generic sp_int code when only those key sizes are needed.
 
 ### `--enable-sp-asm`
 
 Enable Single-Precision (SP) assembly implementation.
 
-Can be used to enable Single-Precision performance improvements through assembly with Intel x86\_64 and ARM architectures.
+Can be used to enable Single-Precision performance improvements through assembly with x86\_64, ARM (32-bit, Thumb, Cortex-M, AArch64) and RISC-V 64 architectures. Requires SP (`--enable-sp` is turned on automatically). Not supported for x86\_64 Windows hosts (MinGW/Cygwin).
 
 ### `--enable-sp=OPT`
 
 Enable Single-Precision (SP) math for RSA, DH, and ECC to improve performance.
 
-There are many possible values for OPT. Below is a list of ways to call enable-sp and the resulting macros that will be defined as a result. All of these can be combined in a coma separated list. For example, `--enable-sp=ec256,ec384`. The meaning of the macros that will be defined are defined above in the [wolfSSL’s Proprietary Single Precision (SP) Math Support] section.
+There are many possible values for OPT. Below is a list of ways to call enable-sp and the resulting macros that will be defined as a result. All of these can be combined in a comma separated list. For example, `--enable-sp=ec256,ec384`. The meaning of the macros that will be defined are defined above in the [Proprietary Single Precision (SP) Math Support](#proprietary-single-precision-sp-math-support) section.
 
 **NOTE**:
 1) "--enable-sp=small --enable-sp-math" can be smaller than...
 2) "--enable-sp-math-all=small"...
 as (1) only has implementations of specific key sizes while (2) has implementations to support all key sizes.
 
-**NOTE**: This is for x86_64 and with no other configuration flags; your results may vary depending on your architectures and other configuration flags that you specify. For example,  WOLFSSL_SP_384, WOLFSSL_SP_521 and WOLFSSL_SP_4096 will only be enabled for 64-bit Intel/ARM targets (x86_64, amd64, aarch64).
+**NOTE**: This is for x86_64 and with no other configuration flags; your results may vary depending on your architectures and other configuration flags that you specify. For example, WOLFSSL_SP_384, WOLFSSL_SP_521 and WOLFSSL_SP_4096 in the `yes`, `small` and `smallfast` lists are only enabled for 64-bit Intel/ARM targets (x86_64, amd64, aarch64). WOLFSSL_SP_LARGE_CODE is likewise only defined on those targets, and only when `small` is not used; this applies to every entry below that lists it. HAVE_ECC384 and HAVE_ECC521 are defined together with WOLFSSL_SP_384 and WOLFSSL_SP_521.
 
 #### `--enable-sp=no` or `--disable-sp`
 
@@ -5248,38 +5336,35 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 * WOLFSSL_HAVE_SP_RSA
 * WOLFSSL_HAVE_SP_ECC
 * WOLFSSL_HAVE_SP_DH
-* WOLFSSL_SP_384
-* WOLFSSL_SP_521
+* WOLFSSL_SP_384 and HAVE_ECC384
+* WOLFSSL_SP_521 and HAVE_ECC521
 * WOLFSSL_SP_4096
 * WOLFSSL_SP_LARGE_CODE
 
-(`WOLFSSL_SP_384`, `WOLFSSL_SP_521` and `WOLFSSL_SP_4096` are added on 64-bit Intel/ARM targets by default; see the note above. For other targets, they should be added manually.)
+(`WOLFSSL_SP_384`, `WOLFSSL_SP_521`, `WOLFSSL_SP_4096` and `WOLFSSL_SP_LARGE_CODE` are added on 64-bit Intel/ARM targets by default; see the note above. For other targets, the first three should be added manually if needed.)
 
 #### `--enable-sp=small`
 
 * WOLFSSL_HAVE_SP_RSA
 * WOLFSSL_HAVE_SP_DH
 * WOLFSSL_HAVE_SP_ECC
-* WOLFSSL_SP_4096
-* WOLFSSL_SP_384
-* WOLFSSL_SP_4096
 * WOLFSSL_SP_SMALL
-* WOLFSSL_SP_LARGE_CODE
-* WOLFSSL_SP_384
+* WOLFSSL_SP_384 and HAVE_ECC384 (64-bit Intel/ARM)
+* WOLFSSL_SP_521 and HAVE_ECC521 (64-bit Intel/ARM)
+* WOLFSSL_SP_4096 (64-bit Intel/ARM)
 
 #### `--enable-sp=smallfast`
 
 * WOLFSSL_HAVE_SP_RSA
 * WOLFSSL_HAVE_SP_DH
 * WOLFSSL_HAVE_SP_ECC
-* WOLFSSL_SP_4096
-* WOLFSSL_SP_384
 * WOLFSSL_SP_SMALL
-* WOLFSSL_SP_4096
-* WOLFSSL_SP_LARGE_CODE
 * WOLFSSL_SP_FAST_MODEXP
+* WOLFSSL_SP_384 and HAVE_ECC384 (64-bit Intel/ARM)
+* WOLFSSL_SP_521 and HAVE_ECC521 (64-bit Intel/ARM)
+* WOLFSSL_SP_4096 (64-bit Intel/ARM)
 
-#### `--enable-sp=ec256` or `--enable-sp=p256` or `--enable-sp=p256`
+#### `--enable-sp=ec256` or `--enable-sp=p256` or `--enable-sp=256`
 
 * WOLFSSL_HAVE_SP_ECC
 
@@ -5291,13 +5376,26 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 #### `--enable-sp=ec384` or `--enable-sp=p384` or `--enable-sp=384`
 
 * WOLFSSL_HAVE_SP_ECC
-* WOLFSSL_SP_384
+* WOLFSSL_SP_384 and HAVE_ECC384
 * WOLFSSL_SP_NO_256
 
 #### `--enable-sp=smallec384` or `--enable-sp=smallp384` or `--enable-sp=small384`
 
 * WOLFSSL_HAVE_SP_ECC
-* WOLFSSL_SP_384
+* WOLFSSL_SP_384 and HAVE_ECC384
+* WOLFSSL_SP_NO_256
+* WOLFSSL_SP_SMALL
+
+#### `--enable-sp=ec521` or `--enable-sp=p521` or `--enable-sp=521`
+
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_SP_521 and HAVE_ECC521
+* WOLFSSL_SP_NO_256
+
+#### `--enable-sp=smallec521` or `--enable-sp=smallp521` or `--enable-sp=small521`
+
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_SP_521 and HAVE_ECC521
 * WOLFSSL_SP_NO_256
 * WOLFSSL_SP_SMALL
 
@@ -5314,6 +5412,23 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 * WOLFSSL_SP_NO_256
 * WOLFSSL_SP_SMALL
 
+#### `--enable-sp=sm2`
+
+Use together with `--enable-sm2`.
+
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_SP_SM2
+* WOLFSSL_SP_NO_256
+
+#### `--enable-sp=smallsm2`
+
+Use together with `--enable-sm2`.
+
+* WOLFSSL_HAVE_SP_ECC
+* WOLFSSL_SP_SM2
+* WOLFSSL_SP_NO_256
+* WOLFSSL_SP_SMALL
+
 #### `--enable-sp=2048`
 
 * WOLFSSL_HAVE_SP_DH
@@ -5325,7 +5440,6 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 
 * WOLFSSL_HAVE_SP_DH
 * WOLFSSL_HAVE_SP_RSA
-* WOLFSSL_SP_LARGE_CODE
 * WOLFSSL_SP_NO_3072
 * WOLFSSL_SP_SMALL
 
@@ -5338,7 +5452,6 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 #### `--enable-sp=smallrsa2048`
 
 * WOLFSSL_HAVE_SP_RSA
-* WOLFSSL_SP_LARGE_CODE
 * WOLFSSL_SP_NO_3072
 * WOLFSSL_SP_SMALL
 
@@ -5353,7 +5466,6 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 
 * WOLFSSL_HAVE_SP_DH
 * WOLFSSL_HAVE_SP_RSA
-* WOLFSSL_SP_LARGE_CODE
 * WOLFSSL_SP_NO_2048
 * WOLFSSL_SP_SMALL
 
@@ -5365,7 +5477,7 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 
 #### `--enable-sp=smallrsa3072`
 
-* WOLFSSL_SP_LARGE_CODE
+* WOLFSSL_HAVE_SP_RSA
 * WOLFSSL_SP_NO_2048
 * WOLFSSL_SP_SMALL
 
@@ -5383,7 +5495,6 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 * WOLFSSL_HAVE_SP_DH
 * WOLFSSL_HAVE_SP_RSA
 * WOLFSSL_SP_4096
-* WOLFSSL_SP_LARGE_CODE
 * WOLFSSL_SP_NO_2048
 * WOLFSSL_SP_NO_3072
 * WOLFSSL_SP_SMALL
@@ -5400,7 +5511,6 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 
 * WOLFSSL_HAVE_SP_RSA
 * WOLFSSL_SP_4096
-* WOLFSSL_SP_LARGE_CODE
 * WOLFSSL_SP_NO_2048
 * WOLFSSL_SP_NO_3072
 * WOLFSSL_SP_SMALL
@@ -5415,9 +5525,30 @@ No new macros defined. Equivalent of not using `--enable-sp`.
 * WOLFSSL_SP_NONBLOCK
 * WOLFSSL_SP_SMALL
 
+#### `--enable-sp=nonblocklarge`
+
+Non-blocking ECC using the larger (not small) implementation.
+
+* WOLFSSL_SP_NO_MALLOC
+* WOLFSSL_SP_NONBLOCK
+
+#### `--enable-sp=smallstack`
+
+* WOLFSSL_SP_SMALL_STACK
+
+#### `--enable-sp=transposedtable` and `--enable-sp=notransposedtable`
+
+`transposedtable` is the default: base point table lookups read one byte per block instead of scanning every entry. `notransposedtable` scans every entry of the table instead, so that no memory address depends on the index, and defines:
+
+* WOLFSSL_SP_NO_TRANSPOSED_TABLE
+
 #### `asm`
 
 Combine with other algorithm options to indicate that assembly code is turned on for those options. For example, `--enable-sp=rsa2048,asm`.
+
+#### `noasm`
+
+Turns off the SP assembly code, for example `--enable-sp-math --enable-sp=yes,noasm` on x86_64 or aarch64, where `--enable-sp-math` otherwise turns on `--enable-sp-asm` by default.
 
 ## Cross Compiling
 
@@ -5432,13 +5563,7 @@ When cross compiling, you’ll need to specify the host to `./configure`, such a
 You may also need to specify the compiler, linker, etc. that you want to use:
 
 ```sh
-./configure --host=arm-linux CC=arm-linux-gcc AR=arm-linux-ar RANLIB=arm-linux
-```
-
-There is a bug in the configure system which you might see when cross compiling and detecting user overriding malloc. If you get an undefined reference to `rpl_malloc` and/or `rpl_realloc`, please add the following to your `./configure` line:
-
-```sh
-ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes
+./configure --host=arm-linux CC=arm-linux-gcc AR=arm-linux-ar RANLIB=arm-linux-ranlib
 ```
 
 After correctly configuring wolfSSL for cross-compilation, you should be able to follow standard autoconf practices for building and installing the library:
@@ -5499,7 +5624,8 @@ If you have any additional tips or feedback about cross compiling wolfSSL, pleas
 #### armv7m-uclibc
 
 ```sh
-./configure --enable-static --disable-shared \--host=arm-linux CC=arm-linux-gcc \
+./configure --enable-static --disable-shared \
+        --host=arm-linux CC=arm-linux-gcc \
         LD=arm-linux-ld AR=arm-linux-ar \
         RANLIB=arm-linux-ranlib \
         CFLAGS="-DWOLFSSL_USER_IO -Os" \
@@ -5559,7 +5685,8 @@ If you have any additional tips or feedback about cross compiling wolfSSL, pleas
         CC=x86_64-linux-gcc LD=x86_64-linux-ld \
         AR=x86_64-linux-ar \
         RANLIB=x86_64-linux-ranlib \
-        CFLAGS="-DWOLFSSL_USER_IO -Os" \CPPFLAGS="-I./"
+        CFLAGS="-DWOLFSSL_USER_IO -Os" \
+        CPPFLAGS="-I./"
 ```
 
 #### x86-64-core-i7-uclibc
@@ -5575,16 +5702,15 @@ If you have any additional tips or feedback about cross compiling wolfSSL, pleas
 
 ## Building Ports
 
-wolfSSL has been ported to many environments and devices. A portion of these ports and accompanying documentation for them is located in the directory `wolfssl-X.X.X/IDE`, where X.X.X is the current wolfSSL version number. This directory also contains helpful information and code for IDE’s used to build wolfSSL for the environments.
+wolfSSL has been ported to many environments and devices. A portion of these ports and accompanying documentation for them is located in the directory `wolfssl-X.X.X/IDE`, where X.X.X is the current wolfSSL version number. This directory also contains helpful information and code for IDEs used to build wolfSSL for the environments.
 
 PORT Lists:
 
 * Arduino
-* LPCXPRESSO
 * Wiced Studio
 * CSBench
 * SGX Windows and Linux
-  * These directories (`wolfssl/IDE/WIN-SGX` and `wolfssl/IDE/LINUX-SGX`) contain Makefiles for and Visual Studio solutions for building wolfSSL as a library to be used in an Intel SGX project.
+  * These directories (`wolfssl/IDE/WIN-SGX` and `wolfssl/IDE/LINUX-SGX`) contain Makefiles and Visual Studio solutions for building wolfSSL as a library to be used in an Intel SGX project.
 * Hexagon
   * This directory (`wolfssl/IDE/HEXAGON`) contains a Makefile for building with the Hexagon tool chain. It can be used to build wolfSSL for offloading ECC verify operations to a DSP processor. The directory contains a README file to help with the steps required to build.
 * Hexiwear
@@ -5592,27 +5718,49 @@ PORT Lists:
   * In the directory (`wolfssl/IDE/M68K`) there is a Makefile for building wolfSSL for a MCF5441X device using the Netburner RTOS.
 * Renesas
   * This directory (`wolfssl/IDE/Renesas`) contains multiple builds for different Renesas devices. It also has example builds that demonstrate using hardware acceleration.
-* XCode
+* XCODE (Xcode)
 * Eclipse
 * Espressif
 * IAR-EWARM
-* Kinetis Design Studio (KDS)
 * Rowley Crossworks ARM
-* OpenSTM32
 * RISCV
-* Zephyr
-* Mynewt
+* Zephyr (the Zephyr module itself is in the top-level `zephyr` directory)
 * INTIME-RTOS
+* Android
+* apple-universal (Apple platforms xcframework built with configure)
+* AURIX (Infineon AURIX Development Studio)
+* C2000 (TI C2000 C28x)
+* Gaisler-BCC (Gaisler LEON)
+* GCC-ARM
+* IAR-MSP430
+* Infineon (ModusToolbox)
+* iotsafe (IoT-SAFE)
+* MCUEXPRESSO (NXP MCUXpresso, including RT1170 and RW612)
+* MDK5-ARM (Keil MDK 5)
+* MPLABX16 (Microchip MPLAB X with XC16)
+* MQX
+* MYSQL (CMake files for building wolfSSL into MySQL)
+* NETOS
+* PlatformIO
+* QNX (including the CAAM driver)
+* SimplicityStudio (Silicon Labs)
+* STARCORE
+* STM32Cube (STM32CubeIDE and STM32CubeMX)
+* VisualDSP
+* VS-AZURE-SPHERE and MSVS-2019-AZSPHERE (Microsoft Azure Sphere)
+* WINCE
+* WORKBENCH (Wind River Workbench with VxWorks)
+* XilinxSDK (Xilinx SDK and AMD Vitis)
 
 ## Building For NXP CAAM
 
 ### i.MX8 (Linux)
 
 #### Known Issues
-- If exiting an open HSM key store session before closing up the HSM session (wc_SECO_CloseHSM and wolfSSL_CLeanup or wolfCrypt_Cleanup) the next time the NVM is started up it segfaults. A power cycle is needed to work around it.
+- If exiting an open HSM key store session before closing up the HSM session (wc_SECO_CloseHSM and wolfSSL_Cleanup or wolfCrypt_Cleanup) the next time the NVM is started up it segfaults. A power cycle is needed to work around it.
 
 #### Limitations Found
-- AES operations with large inputs (i.e. 1 megabyte) fails with the SECO getting “Not enough space in shared memory”.
+- AES operations with large inputs (e.g. 1 megabyte) fail with the SECO getting "Not enough space in shared memory".
 - After creating 2 keystores the attempt to create a 3rd will fail. To reset the keystores do rm -rf /etc/seco_hsm and power cycle the device.
 
 #### Intro
@@ -5622,7 +5770,7 @@ On i.MX8 devices there is a SECO hardware module available for heightened securi
 Versions of software used:
 
 - imx-seco-libs branch imx_5.4.24_2.1.0
-- NXP “repo” tool and Yocto build. Documentation on Yocto setup is here
+- NXP "repo" tool and Yocto build. Documentation on the Yocto setup is in the README of NXP's imx-manifest repository: <https://github.com/nxp-imx/imx-manifest>
 - wolfSSL 5.2.0 + (was developed after 5.2.0 release)
 
 
@@ -5641,7 +5789,7 @@ Supported algorithms, modes, and operations include:
 
 #### Building Image
 ##### “repo” Setup
-Setting up the NXP “repo” command tool was done on Ubuntu 18.04 LTS\
+Setting up the NXP "repo" command tool was done on Ubuntu 18.04 LTS
 
 ```
 sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib
@@ -5678,17 +5826,17 @@ mkdir imx-yocto-bsp
 cd imx-yocto-bsp/
 ```
 
-After setting up NXP’s “repo” command tool, initialize and sync a directory with the desired version of Linux. In this case 5.4.24_2.1.0.\
+After setting up NXP's "repo" command tool, initialize and sync a directory with the desired version of Linux. In this case 5.4.24_2.1.0. NXP's i.MX repositories were moved from CodeAurora (source.codeaurora.org, now retired) to GitHub, so the manifest is fetched from <https://github.com/nxp-imx/imx-manifest>.
 
 ```
-repo init -u https://source.codeaurora.org/external/imx/imx-manifest -b imx-linux-zeus -m imx-5.4.24-2.1.0.xml
+repo init -u https://github.com/nxp-imx/imx-manifest -b imx-linux-zeus -m imx-5.4.24-2.1.0.xml
 repo sync
 
 DISTRO=fsl-imx-wayland MACHINE=imx8qxpc0mek source imx-setup-release.sh -b build-xwayland
 ```
 
 ##### Additional Yocto CAAM Layers
-Next download the CAAM driver expansion layers that will apply patches to cryptodev-module, cryptodev-linux, and to files in `linux-imx/drivers/crypto/caam/*`. The base blob and ECDSA (sign/verify/keygen) is located here (https://source.codeaurora.org/external/imxsupport/imx_sec_apps/). The layer that expands that farther to have RSA black key, ECDH, and Curve25519 support is meta-imx-expand-caam. Place both of these directories into the sources directory next to the other existing meta-\* directories.
+Next download the CAAM driver expansion layers that will apply patches to cryptodev-module, cryptodev-linux, and to files in `linux-imx/drivers/crypto/caam/*`. The base blob and ECDSA (sign/verify/keygen) is located here (<https://github.com/nxp-imx-support/imx_sec_apps>, formerly on source.codeaurora.org). The layer that expands that farther to have RSA black key, ECDH, and Curve25519 support is meta-imx-expand-caam. Place both of these directories into the sources directory next to the other existing meta-\* directories.
 
 
 ```sh
@@ -5702,7 +5850,7 @@ cp -r imx_sec_apps/meta-imx-expand-caam ../sources/
 
 # or
 
-git clone https://source.codeaurora.org/external/imxsupport/imx_sec_apps.git
+git clone https://github.com/nxp-imx-support/imx_sec_apps.git
 #(meta-imx-expand-caam comes from wolfSSL)
 unzip meta-imx-expand-caam.zip
 
@@ -5759,7 +5907,7 @@ Note: 5m is for Mac OS, use 5M for Linux. diskX should be replaced with the loca
 For use with building wolfssl/examples later export the install directory using the following:
 
 ```
-export　CRYPTODEV_DIR=`pwd`/tmp/sysroots-components/aarch64/cryptodev-linux/usr/include/
+export CRYPTODEV_DIR=`pwd`/tmp/sysroots-components/aarch64/cryptodev-linux/usr/include/
 ```
 
 
@@ -5772,7 +5920,7 @@ sudo ./tmp/deploy/sdk/<version>.sh
 
 #### Building NXP HSM
 ##### Build zlib
-Multiple ways to do this, one is to add it to the Yocto build one way is to build it using bitbake as follows.
+There are multiple ways to do this; one is to build it with bitbake as follows.
 
 
 ```
@@ -5828,8 +5976,8 @@ Make install places the results in the subdirectory “export” by default.
 
 ##### Building Using Autoconf
 
-If setting up the Yocto image with development tools then wolfSSL can be built directly on the system. For a more minimalistic approach cross compiling can be used. Debug messages can be enabled with –enable-debug. Extra debug messages specific to the SECO work can be enabled by defining the macro DEBUG_SECO and for the /dev/crypto calls DEBUG_DEVCRYPTO. The extra debug messages for both make use of printf, outputting on the stdout pipe.
-There are a couple key enable options for use with SECO. --enable-caam=seco, --enable-devcrypto=seco, --with-seco=/hsm-lib/export.
+If setting up the Yocto image with development tools then wolfSSL can be built directly on the system. For a more minimalistic approach cross compiling can be used. Debug messages can be enabled with `--enable-debug`. Extra debug messages specific to the SECO work can be enabled by defining the macro DEBUG_SECO and for the /dev/crypto calls DEBUG_DEVCRYPTO. The extra debug messages for both make use of printf, outputting on the stdout pipe.
+There are a couple key enable options for use with SECO: `--enable-caam=seco`, `--enable-devcrypto=seco` and `--with-seco=$HSM_DIR` (where `HSM_DIR` is the `export/usr/` install directory of imx-seco-libs from the step above). configure reads the headers from `$HSM_DIR/include` and links `$HSM_DIR/lib/hsm_lib.a` and `$HSM_DIR/lib/seco_nvm_manager.a`. `--enable-caam` also turns on the crypto callbacks (`WOLF_CRYPTO_CB`) automatically.
 
 
 Example build with HSM SECO only (no devcrypto support for additional algorithms)
@@ -5842,7 +5990,8 @@ source /opt/fsl-imx-wayland/5.4-zeus/environment-setup-aarch64-poky-linux
 sudo apt-get install autoconf automake libtool
 
 ./autogen.sh
-./configure --host=aarch64-poky-linux --with-libz=$ZLIB_DIR --with-seco=$HSM_DIR \ --enable-caam=seco --enable-cmac --enable-aesgcm --enable-aesccm --enable-keygen \
+./configure --host=aarch64-poky-linux --with-libz=$ZLIB_DIR --with-seco=$HSM_DIR \
+--enable-caam=seco --enable-cmac --enable-aesgcm --enable-aesccm --enable-keygen \
 CPPFLAGS="-DHAVE_AES_ECB"
 make
 ```
@@ -5878,16 +6027,19 @@ These are the macros that can be enabled for building without autotools:
 
 ***CAAM***
 
+- WOLFSSL_SECO_CAAM - Enable SECO HSM use with CAAM (AES-GCM is required and used as the algo for importing plain keys into the HSM). Defining it also defines WOLFSSL_CAAM, WOLFSSL_HASH_KEEP and WOLFSSL_NO_CAAM_BLOB.
 - WOLFSSL_CAAM - Main macro switch to enable CAAM support.
-- WOLF_CRYPTO_CB - CAAM support makes use of crypto callbacks
-- WOLFSSL_SECO_CAAM - Enable SECO HSM use with CAAM (AES-GCM is required and used as the algo for importing plain keys into the HSM).
+- WOLF_CRYPTO_CB - CAAM support makes use of crypto callbacks. This must be defined in user_settings.h; configure adds it automatically for `--enable-caam`.
 - WOLFSSL_HASH_KEEP - When hashing with algos like SHA256 build up the message and send it to be hashed only on a call to Final.
-- WOLFSSL_CAAM_ECC - Enable CAAM ECC support.
-- WOLFSSL_CAAM_CMAC - Enable CAAM CMAC support.
-- WOLFSSL_CAAM_CIPHER - Enable CAAM AES support.
-- WOLFSSL_CAAM_HMAC - Enable CAAM HMAC support.
-- WOLFSSL_CAAM_HASH - Enable CAAM hashing support such as SHA256.
-- WOLFSSL_CAAM_CURVE25519 - Enable CAAM Curve25519 support.
+
+WOLFSSL_CAAM turns on the CAAM algorithm support automatically (in `wolfssl/wolfcrypt/settings.h`): WOLFSSL_CAAM_CIPHER (AES, including CMAC as WOLFSSL_CAAM_CMAC), WOLFSSL_CAAM_HASH, WOLFSSL_CAAM_ECC, WOLFSSL_CAAM_HMAC when WOLFSSL_DEVCRYPTO_HMAC is defined, and WOLFSSL_CAAM_CURVE25519 with WOLFSSL_SECO_CAAM. These are not normally set by hand. To turn individual parts off, use:
+
+- WOLFSSL_NO_CAAM_HASH - Do not use the CAAM for hashing.
+- WOLFSSL_NO_CAAM_ECC - Do not use the CAAM for ECC.
+- WOLFSSL_NO_CAAM_CMAC - Do not use the CAAM for AES-CMAC.
+- WOLFSSL_NO_CAAM_AESCCM - Do not use the CAAM for AES-CCM.
+- WOLFSSL_NO_CAAM_BLOB - Disable CAAM blob support.
+- WOLFSSL_LP_ONLY_CAAM_AES - The CAAM has only the low power AES module, so AES-GCM and AES-XTS are not done by the CAAM.
 
 
 ***cryptodev-linux***
@@ -6006,9 +6158,9 @@ To build a single source file linking to wolfSSL the following commands could be
 
 
 ```
-source /opt/fsl-imx-xwayland/5.4-zeus/environment-setup-aarch64-poky-linux
+source /opt/fsl-imx-wayland/5.4-zeus/environment-setup-aarch64-poky-linux
 
-$CC -DWOLFSSL_USER_SETTINGS -I /path/to/user_settings.h \
+$CC -DWOLFSSL_USER_SETTINGS -I /path/to/dir/containing/user_settings.h \
 -I $CRYPTODEV_DIR -I $HSM_DIR/include -I ./wolfssl server-dtls.c \
 libwolfssl.a $HSM_DIR/lib/hsm_lib.a $HSM_DIR/lib/seco_nvm_manager.a \
 $ZLIB_DIR/lib/libz.a -lpthread -lm
@@ -6032,21 +6184,28 @@ Getter function for the SECO key ID set in the Cmac structure.
 This function should be called before doing any operations that require the keystore. Such as ECC or AES operations. The first argument is the keystore ID, “nonce” is the specific 32bit sequence used when creating and unlocking an already existing keystore, “maxUpdates” sets the max number of times the key store can be updated, “flag” is used for optional flags and takes in whether or not the key store is being created. To create the HSM keystore the flag should be CAAM_KEYSTORE_CREATE otherwise to open an existing keystore or update it the flag should be CAAM_KEYSTORE_UPDATE.
 - int wc_SECO_CloseHSM(void);
 This function must be called when done with the keystore and before calling wolfCrypt_Cleanup/wolfSSL_Cleanup. It closes down the currently open keystore.
-- int wc_SECO_GenerateKey(int flags, int group, byte* out, int outSz, int keyType, int keyInfo, unsigned int* keyIdOut);\
+- int wc_SECO_GenerateKey(int flags, int group, byte* out, int outSz, int keyType, int keyInfo, unsigned int* keyIdOut);
 This function can be used for generating new keys in the SECO. For key generation the flag should be CAAM_GENERATE_KEY. For updating a key the flag should be CAAM_UPDATE_KEY. The keyIdOut argument is an in/out argument that gets populated on key creation and should be set as an input on key update. In the case of updating a key it should be a transient type and the group should be set to 0 for updating. Transient type is set as the keyInfo arg, possible options for keyInfo and KeyTypes are;
     - CAAM_KEY_TRANSIENT (keyInfo)
     - CAAM_KEY_PERSISTENT (keyInfo)
+    - CAAM_KEY_KEK (keyInfo, the key is used as a key encryption key)
     - CAAM_KEYTYPE_ECDSA_P256 (keyType)
     - CAAM_KEYTYPE_ECDSA_P384 (keyType)
+    - CAAM_KEYTYPE_ECDSA_P521 (keyType)
     - CAAM_KEYTYPE_AES128 (keyType)
+    - CAAM_KEYTYPE_AES192 (keyType)
+    - CAAM_KEYTYPE_AES256 (keyType)
+    - CAAM_KEYTYPE_HMAC224, CAAM_KEYTYPE_HMAC256, CAAM_KEYTYPE_HMAC384, CAAM_KEYTYPE_HMAC512 (keyType, when supported by the NXP HSM library)
 - int wc_SECO_DeleteKey(unsigned int keyId, int group, int keyTypeIn);
 Used to delete a key from the keystore.
+- word32 wc_SECO_WrapKey(word32 keyID, byte* in, word32 inSz, byte* iv, word32 ivSz, int keyType, int keyInfo, int group);
+Encrypts the plain key "in" with AES-GCM under a key encryption key and imports it into the keystore. If keyID is 0 the device's unique root KEK is used, otherwise keyID is the ID of a KEK already in the keystore. The IV must be 12 bytes. keyType, keyInfo and group are the same as for wc_SECO_GenerateKey. Returns the new key ID on success and 0 on failure.
 
 ##### Native wolfSSL API With CAAM Support
 
 This is a list of native wolfSSL API that now have CAAM support with the SECO build outlined in this documentation.
 
-For generation of any AES encrypt and decrypt operations the key can be generated using the following process. Using wc_SECO_GenerateKey(CAAM_GENERATE_KEY, groupID, pubOut, 0, CAAM_KEYTPE_AES128, CAAM_KEY_PERSISTENT, &keyIdOut); where groupID is a specified group number and pubOut is a 32 byte buffer, and the variable keyIdOut gets set to a the new key ID generated. This new key ID generated can then be set in an Aes structure using wc_SECO_AesSetKeyID(Aes, keyIdOut); . Once the key ID has been set in the structure and the Aes structure has been initialized as a WOLFSSL_SECO_DEVID type it will use that key ID for all encrypt and decrypt operations.
+For generation of any AES encrypt and decrypt operations the key can be generated using the following process. Using wc_SECO_GenerateKey(CAAM_GENERATE_KEY, groupID, pubOut, 0, CAAM_KEYTYPE_AES128, CAAM_KEY_PERSISTENT, &keyIdOut); where groupID is a specified group number and pubOut is a 32 byte buffer, and the variable keyIdOut gets set to the new key ID generated. This new key ID generated can then be set in an Aes structure using wc_SECO_AesSetKeyID(Aes, keyIdOut); . Once the key ID has been set in the structure and the Aes structure has been initialized as a WOLFSSL_SECO_DEVID type it will use that key ID for all encrypt and decrypt operations.
 
 ###### ***AES (ECB/CBC)***
 
@@ -6076,15 +6235,14 @@ Once finished with the Aes structure it must be free’d using wc_AesFree(Aes); 
 
 
 The AES-CCM encrypt function takes in the Aes structure, output buffer, input buffer, input buffer size, nonce, nonce size (required to be 12 bytes), MAC or known as tag, tag size (required to be 16 bytes), additional data, additional data size (0 bytes). The additional data buffer should be NULL and a size of 0 is required with the NXP HSM library. On encryption the input buffer is encrypted and the tag buffer is filled with a created MAC.
-\
+
 For AES-CCM decrypt the function takes in the Aes structure, plain text output buffer, cipher text input buffer, input buffer size, nonce, nonce size (12 bytes), previously created tag from encryption call, tag buffer size, additional data, additional data size. Similar to the encrypt function the additional data buffer should be NULL. On decryption the tag buffer is checked to verify the message's integrity.
-\
-Once finished with the Aes structure it must be free’d using wc_AesFree(Aes); .
-\
+
+Once finished with the Aes structure it must be free'd using wc_AesFree(Aes); .
 
 ###### ***AES CMAC***
 
-For AES CMAC operations the AES key can be generated using wc_SECO_GenerateKey(CAAM_GENERATE_KEY, groupID, pubOut, 0, CAAM_KEYTPE_AES128, CAAM_KEY_PERSISTENT, &keyIdOut); where groupID is a specified group number and pubOut is a 32 byte buffer, and the variable keyIdOut gets set to a the new key ID generated. This new key ID generated can then be set in an Aes structure using wc_SECO_CMACSetKeyID(Cmac, keyIdOut); . Once the key ID has been set in the structure and the Aes structure has been initialized as a WOLFSSL_SECO_DEVID type it will use that key ID for all encrypt and decrypt operations.
+For AES CMAC operations the AES key can be generated using wc_SECO_GenerateKey(CAAM_GENERATE_KEY, groupID, pubOut, 0, CAAM_KEYTYPE_AES128, CAAM_KEY_PERSISTENT, &keyIdOut); where groupID is a specified group number and pubOut is a 32 byte buffer, and the variable keyIdOut gets set to the new key ID generated. This new key ID generated can then be set in a Cmac structure using wc_SECO_CMACSetKeyID(cmac, keyIdOut). Once the key ID has been set in the structure and the Cmac structure has been initialized with WOLFSSL_SECO_DEVID it will use that key ID for all CMAC operations.
 
 Since the HSM library is a single shot type, each call to wc_CmacUpdate stores up the input into an internal buffer. Then once wc_CmacFinal is called the whole buffer is passed on to the hardware for creating the MAC.
 
@@ -6108,30 +6266,30 @@ wc_FreeRsaKey(key)
 
 ECC sign and verify operations can use either the cryptodev-linux module or the NXP HSM library. ECDH operations for creating a shared secret can only be done with the cryptodev-linux module.
 
-For use with SECO (using the NXP HSM library) the dev ID flag of WOLFSSL_SECO_DEVID should be used when initializing the ecc_key structure. For use with the cryptodev-linux module the dev ID flag WOLFSSL_CAAM_DEVID should be used. After initialization with the function wc_ecc_init_ec(key, heap-hint (can be NULL), dev ID); then both use cases follow the same function native wolfSSL function calls for sign and verify.
+For use with SECO (using the NXP HSM library) the dev ID flag of WOLFSSL_SECO_DEVID should be used when initializing the ecc_key structure. For use with the cryptodev-linux module the dev ID flag WOLFSSL_CAAM_DEVID should be used. After initialization with the function wc_ecc_init_ex(key, heap-hint (can be NULL), devId); then both use cases follow the same function native wolfSSL function calls for sign and verify.
 
 Example function calls after initialization of the ecc_key structure would be:
 
 
-> ```lang-c
-> wc_ecc_make_key(&rng, ECC_P256_KEYSIZE, key);
-> wc_ecc_sign_hash(hash, hashSz, sigOut, sigOutSz, &rng, key);
-> wc_ecc_verify_hash(sig, sigSz, hash, hashSz, &result, key);
-> ```
+```lang-c
+wc_ecc_make_key(&rng, 32, key); /* 32 byte key size: P-256 */
+wc_ecc_sign_hash(hash, hashSz, sigOut, &sigOutSz, &rng, key);
+wc_ecc_verify_hash(sig, sigSz, hash, hashSz, &result, key);
+```
 
 
 And with the cryptodev-linux module (WOLFSSL_CAAM_DEVID) the ECDH function can be used:
 
 
 ```lang-c
-wc_ecc_shared_secret(keyA, keyB, sharedSecret, sharedSecretSz);
+wc_ecc_shared_secret(keyA, keyB, sharedSecret, &sharedSecretSz);
 ```
 
 ###### ***Hash (Sha256, Sha384, HMAC)***
 
 SHA256 and SHA384 operations use the NXP HSM library. HMAC operations make use of the cryptodev-linux module.
 
-By default SHA operations try to make use of the NXP HSM library, but explicitly set them to the dev ID WOLFSSL_SECO_DEVID can be used.
+By default SHA operations try to make use of the NXP HSM library, but they can also be explicitly set to the dev ID WOLFSSL_SECO_DEVID.
 
 
 ```lang-c
@@ -6167,7 +6325,7 @@ Example API calls would be as follows:
 ```lang-c
 wc_curve25519_init_ex(key, heap-hint, WOLFSSL_CAAM_DEVID);
 wc_curve25519_make_key(&rng, CURVE25519_KEYSIZE,  key);
-wc_curve25519_shared_secret(key, keyB, sharedSecretOut, sharedSecretOutSz);
+wc_curve25519_shared_secret(key, keyB, sharedSecretOut, &sharedSecretOutSz);
 ```
 
 ###### ***RNG***
@@ -6183,11 +6341,26 @@ wc_FreeRng(rng);
 
 ### i.MX8 (QNX)
 
-<Documentation available, not inserted here yet @TODO>
+On QNX the CAAM is used through a wolfCrypt resource manager. First build wolfSSL with the configure option `--enable-caam=qnx` using the QNX toolchain, for example (set `--host` to match your target):
+
+```sh
+source ~/qnx700/qnxsdp-env.sh
+./configure --host=arm-unknown-nto-qnx7.0.0eabi --enable-caam=qnx
+make
+```
+
+Then run `make` in `IDE/QNX/CAAM-DRIVER` to build the resource manager, and start it on the device with root permissions. Any user with access to `/dev/wolfCrypt` can then make use of the driver. On AArch64 the driver assumes an i.MX8 QXP and uses the block of memory set aside for job ring 2.
+
+`IDE/QNX` also contains Makefiles for the wolfSSL library and the wolfCrypt tests, TLS client and server and CMAC examples, and projects for the Momentics IDE. See `IDE/QNX/README.md` for the Momentics import steps and the list of operations supported by the driver (ECC black keys, blobs, cover keys, CMAC, AES-CTR and the TRNG).
 
 ### i.MX6 (QNX)
 
-<Documentation available, not inserted here yet @TODO>
+The steps are the same as for i.MX8 (QNX). For i.MX6Q devices build with `--enable-caam=qnx,imx6q`, which defines `WOLFSSL_IMX6Q_CAAM`: that part has only the low power AES module (no AES-GCM) and no CAAM ECC. configure also accepts `imx6ul`. The CAAM base address used by the resource manager is set in `IDE/QNX/CAAM-DRIVER/Makefile`: `-DWOLFSSL_CAAM_IMX6Q` (set by default) selects the i.MX6Q address; without it the i.MX6UL address is used.
+
+### Other CAAM Targets
+
+- `--enable-caam=linux` drives a CAAM job ring directly from a Linux user space process (developed on a QorIQ T1040, accelerating AES-CBC, AES-CTR, AES-ECB and the TRNG). See `wolfcrypt/src/port/caam/README.md` for the required kernel and memory setup.
+- For i.MX under INTEGRITY, see `wolfcrypt/src/port/caam/caam_doc.pdf`.
 
 ### IMXRT1170 (FreeRTOS)
 
@@ -6198,11 +6371,13 @@ Example IDE Setup for use with IMXRT1170 can be found in the directory IDE/MCUEX
 
 - Open MCUEXPRESSO and set the workspace to wolfssl/IDE/MCUEXPRESSO/RT1170
 - File -> Open Projects From File System... -> Directory : and set the browse to wolfssl/IDE/MCUEXPRESSO/RT1170 directory then click "select directory"
-- Select wolfssl_cm7, wolfcrypt_test_cm7, CSR_example, PKCS7_example
+- Select wolfssl_cm7 and wolfcrypt_test_cm7
 - Right click the projects -> SDK Management -> Refresh SDK Components and click "yes"
-- increase the size of configTOTAL_HEAP_SIZE in FreeRTOSConfig.h to be 60240 for CSR and PKCS7 example and around 100000 for wolfcrypt_test_cm7
+- increase the size of configTOTAL_HEAP_SIZE in FreeRTOSConfig.h (`IDE/MCUEXPRESSO/README.md` uses 200000 for the wolfCrypt test and benchmark projects)
 - (note board files need to be recreated .... this can be done by creating a new project that has the same settings and copying over the generated board/* files)
 - Build the projects
+
+CSR and PKCS7 examples, and an example of building with CMake, are in the cmake directory of the wolfssl-examples repository (<https://github.com/wolfssl/wolfssl-examples>).
 
 
 #### Expanding RT1170 CAAM Driver
@@ -6212,38 +6387,11 @@ the existing NXP CAAM driver for use with creating/opening Blobs and generating
 and using ECC black keys.
 
 To apply the patches first create a project that has the caam driver. This will
-generate the base fsl_caam.c and fsl_caam.h in the drivers directory. (i.e PKCS7_example_cm7/drivers/fls_caam.{c,h})
-. Once the base files are generated then 'cd' to the drivers directory and apply
-the patch (cd PKCS7_example_cm7/drivers/ && patch -p1 < ../../fsl_caam_c.patch && patch -p1 < ../../fsl_caam_h.patch)
+generate the base fsl_caam.c and fsl_caam.h in the drivers directory (e.g. wolfcrypt_test_cm7/drivers/fsl_caam.{c,h}).
+Once the base files are generated then 'cd' to the drivers directory and apply
+the patch (cd wolfcrypt_test_cm7/drivers/ && patch < ../../fsl_caam_c.patch && patch < ../../fsl_caam_h.patch)
 
 In the patch for fsl_caam.h there are macros defined for both the ECC and Blob
 expansion (CAAM_ECC_EXPANSION and CAAM_BLOB_EXPANSION). When wolfSSL code finds
 that these macros are defined (the patch has been applied) then it tries to
 compile in use of the expanded driver.
-
-#### WOLFSSL_HAVE_ERROR_QUEUE
-
-Enables an OpenSSL-compatible error queue for storing and retrieving error information via `ERR_get_error()` and related functions.
-
-#### WOLFSSL_HAVE_CERT_SERVICE
-
-Enables certificate service callbacks for custom certificate handling during the TLS handshake.
-
-
-#### WOLFSSL_HEAP_TEST
-
-Enables heap-related testing utilities for verifying memory allocation behavior in wolfSSL.
-
-#### WOLFSSL_NO_OPENSSL_RAND_CB
-
-Disables OpenSSL RAND callback compatibility. Prevents the RNG from being overridden via OpenSSL-style `RAND_set_rand_method()` callbacks.
-
-
-#### WOLFSSL_NO_REALLOC
-
-Disables use of `realloc()`. All buffer resizing will be done via `malloc()` + `memcpy()` + `free()` instead.
-
-
-#### WOLFSSL_DEBUG_DTLS
-
-Enables debug logging for DTLS-specific operations including retransmission, epoch management, and record processing.
