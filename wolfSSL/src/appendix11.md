@@ -26,15 +26,15 @@ git clone https://github.com/wolfssl/wolfsm.git
 wolfSSL is needed to build and test the SM algorithm implementations.
 Checkout the wolfSSL repository from GitHub beside wolfSM:
 
-```sh
+```text
 # Directory structure should be:
 # <install-dir>
-# ├── wolfsm
-# └── wolfssl
+# |-- wolfsm
+# `-- wolfssl
 ```
 
 ```sh
-cd .. # To directory containing wolfsm
+# From <install-dir>, the directory containing wolfsm
 git clone https://github.com/wolfssl/wolfssl.git
 ```
 
@@ -63,6 +63,7 @@ Choose which algorithms you require on the configure line:
 For example, to include SM3, SM4-GCM and SM2:
 
 ```sh
+cd ../wolfssl
 ./autogen.sh
 ./configure --enable-sm3 --enable-sm4-gcm --enable-sm2
 make
@@ -73,8 +74,8 @@ sudo make install
 
 To use optimized implementations of SM2 you can either use C only code or C code with the faster assembly code.
 
-For C code only: `--enable-sp`
-For C and assembly code: `--enable-sp --enable-sp-asm`
+* For C code only: `--enable-sp`
+* For C and assembly code: `--enable-sp --enable-sp-asm`
 
 Optimized C code is available for 32 and 64 bit CPUs.
 
@@ -84,6 +85,7 @@ Assembly code is available for the following platforms:
 * ARM 32-bit
 * ARM Thumb2
 * ARM Thumb
+* RISC-V 64-bit
 
 ## Testing wolfSM
 
@@ -111,7 +113,7 @@ To benchmark specific algorithms, add to the command line the option/s matching 
 
 SM ciphers are able to be used with TLSv1.2 and TLSv1.3.
 
-Note: SM2, SM3 and at least one SM4 cipher must be built in order for SM ciphers suite to work. All algorithms must be SM.
+Note: SM2, SM3 and at least one SM4 cipher must be built in order for the SM cipher suites to work. All algorithms must be SM.
 
 The cipher suites added are:
   - ECDHE-ECDSA-SM4-CBC-SM3 (TLSv1.2, `--enable-sm2 --enable-sm3 --enable-sm4-cbc`)
