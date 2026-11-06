@@ -1,29 +1,35 @@
+/* wolfSSL Brand Colors
+ * Primary Teal: #00B2A9 (PANTONE 7466 U)
+ * CMYK: 70/0/23/0 (from 2012 original logo)
+ * Previous incorrect value: #1fbeca
+ */
+
 .md-header{
     background-color: #fff;
 }
 
 .md-ellipsis{
-    color: #1fbeca;
+    color: #00B2A9;
     font-size: 1.1rem;
 }
 
 .md-ellipsis-nav {
     margin-right: 3%;
-    color: #1fbeca;
+    color: #00B2A9;
     font-size: 16px;
     width: 450px;
 }
 
 .md-ellipsis-nav a{
     color:#fff;
-    background-color: #1fbeca;
+    background-color: #00B2A9;
     padding: 6px;
     border-radius: 3.5px;
     margin-left: 3px;
 }
 
 .md-ellipsis-nav a:hover{
-    color: #1fbeca;
+    color: #00B2A9;
     background-color: #000;
 }
 
@@ -53,11 +59,11 @@
 }
 
 .md-nav__link:is(:focus, :hover){
-    color: #1fbeca;
+    color: #00B2A9;
 }
 
 .md-nav__item .md-nav__link--active {
-    color: #1fbeca;
+    color: #00B2A9;
 }
 
 .md-header__button.md-logo :is(img, svg){
@@ -70,7 +76,7 @@
 }
 
 .md-typeset a:hover {
-     color: #1fbeca;
+     color: #00B2A9;
 }
 
 .md-footer {
@@ -79,7 +85,7 @@
 }
 
 .md-icon svg {
-    fill: #1fbeca;
+    fill: #00B2A9;
 }
 
 .md-footer-meta {
