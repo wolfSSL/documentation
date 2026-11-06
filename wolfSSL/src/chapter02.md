@@ -2766,11 +2766,27 @@ Adds `WC_ALGO_TYPE_KEYSTORE`, a crypto callback algorithm type for handling keys
 
 #### WOLFSSL_ASYNC_CERT_YIELD
 
-Optional asynchronous TLS chain processing. After each certificate in a peer chain is verified the call returns `WC_PENDING_E`, giving a cooperative scheduler a chance to run in between.
+Optional asynchronous TLS chain processing. Requires [`WOLFSSL_ASYNC_CRYPT`](#wolfssl_async_crypt). After each certificate in a peer chain is verified the call returns `WC_PENDING_E`, giving a cooperative scheduler a chance to run in between. These yields do not queue an async device event, so they are only suitable for cooperative schedulers that call `wolfSSL_connect()` / `wolfSSL_accept()` again; leave the macro undefined for fd/event-driven async use. See `README-async.md`.
 
 #### WOLFSSL_DYN_CERT
 
 Allow allocation of subjectCN and publicKey fields when parsing certificates even with WOLFSSL_NO_MALLOC set. If using the WOLFSSL_NO_MALLOC option with RSA certificates the public key needs to be retained for CA's for validate certificates on the peer's certificate. This appears as a ConfirmSignature error -173 BAD_FUNC_ARG, since the ca->publicKey is NULL.
+
+#### WOLFSSL_VERIFY_CB_ALL_CERTS
+
+Calls the certificate verify callback for all certificates in the chain, not just the peer certificate.
+
+#### WOLFSSL_LOCAL_X509_STORE
+
+Uses a local X509 certificate store per SSL context instead of a global one. Provides better isolation between contexts.
+
+#### WOLFSSL_COPY_CERT
+
+Copies the certificate buffer when loading into an SSL object instead of referencing it, ensuring the SSL object owns its own copy of the data.
+
+#### WOLFSSL_COPY_KEY
+
+Copies the private key buffer when loading into an SSL object instead of referencing it, ensuring the SSL object owns its own copy of the data.
 
 #### WOLFSSL_USER_IO
 
@@ -2786,7 +2802,7 @@ Disables the automatic inlining of small, heavily used functions. Turning this o
 
 #### NO_DEV_RANDOM
 
-Disables the use of the default `/dev/random` random number generator. If defined, the user needs to write an OS-specific `GenerateSeed()` function (found in `wolfcrypt/src/random.c`).
+Disables the use of the default `/dev/random` random number generator. If defined, the user needs to provide an OS-specific `wc_GenerateSeed()` function (see `wolfcrypt/src/random.c`), or use [`CUSTOM_RAND_GENERATE_SEED`](#custom_rand_generate_seed) / [`CUSTOM_RAND_GENERATE_BLOCK`](#custom_rand_generate_block). With [`WOLF_CRYPTO_CB`](#wolf_crypto_cb) the seed can come from a crypto callback device.
 
 #### NO_MAIN_DRIVER
 
@@ -2798,15 +2814,19 @@ Disables simulation of `writev()` semantics.
 
 #### SINGLE_THREADED
 
-Is a switch that turns off the use of mutexes. wolfSSL currently only uses one for the session cache. If your use of wolfSSL is always single threaded you can turn this on.
+Is a switch that turns off the use of mutexes. wolfSSL uses mutexes for the session cache, the CA, CRL and OCSP tables, the global RNG, reference counts and more. If your use of wolfSSL is always single threaded you can turn this on.
+
+#### WOLFSSL_CLEANUP_THREADSAFE_BY_ATOMIC_OPS
+
+Uses atomic operations to make `wolfSSL_Cleanup()` thread-safe without requiring a mutex.
 
 #### USER_TICKS
 
-Allows the user to define their own clock tick function if time(0) is not wanted. Custom function needs second accuracy, but doesn’t have to be correlated to Epoch. See `LowResTimer()` function in `wolfssl_int.c`.
+Allows the user to define their own clock tick function if time(0) is not wanted. Custom function needs second accuracy, but doesn't have to be correlated to Epoch. See `LowResTimer()` in `src/internal.c`.
 
 #### USER_TIME
 
-Disables the use of time.h structures in the case that the user wants (or needs) to use their own. See `wolfcrypt/src/asn.c` for implementation details. The user will need to define and/or implement `XTIME()`, `XGMTIME()`, and `XVALIDATE_DATE()`.
+Disables the use of time.h structures in the case that the user wants (or needs) to use their own. With `USER_TIME` the user only provides `XTIME()` (seconds since the epoch); wolfSSL supplies its own `gmtime()` ([`WOLFSSL_GMTIME`](#wolfssl_gmtime)) and its own `time_t` / `struct tm` types (unless `HAVE_TIME_T_TYPE` / `HAVE_TM_TYPE` is defined). To override `XGMTIME()` as well, use [`TIME_OVERRIDES`](#time_overrides). `XVALIDATE_DATE()` can be overridden independently. See `wolfssl/wolfcrypt/wc_port.h`.
 
 #### USE_CERT_BUFFERS_256
 
@@ -2834,7 +2854,7 @@ Enables Ed25519 test certificate and key buffers located in `<wolfssl_root>/wolf
 
 #### USE_WOLFSSL_IO
 
-This macro enables callbacks to send/recv. You can find an example of it in use here: (https://github.com/wolfSSL/wolfssl-examples/blob/master/tls/client-tls-callback.c#L6)
+Builds wolfSSL's default socket I/O callbacks ([`EmbedSend()`](wolfio_8h.md#function-embedsend) and [`EmbedReceive()`](wolfio_8h.md#function-embedreceive)). It is defined automatically unless [`WOLFSSL_USER_IO`](#wolfssl_user_io) (or [`WOLFSSL_NO_SOCK`](#wolfssl_no_sock), [`MICRIUM`](#micrium) or [`WOLFSSL_CONTIKI`](#wolfssl_contiki)) is defined. An example that replaces the default callbacks with custom ones can be found here: (https://github.com/wolfSSL/wolfssl-examples/blob/master/tls/client-tls-callback.c#L6)
 
 #### CUSTOM_RAND_GENERATE_SEED
 
@@ -2842,18 +2862,21 @@ Allows user to define custom function equivalent to `wc_GenerateSeed(byte* outpu
 
 #### CUSTOM_RAND_GENERATE_BLOCK
 
-Allows user to define custom random number generation function. Examples of use are as follows.
+Allows user to define custom random number generation function. `random.c` calls the function directly, so its prototype must be visible when wolfSSL is compiled and the function must be linked in. Examples of use are as follows.
+
+With configure, put the prototype in a header and add it to `CFLAGS` with `-include` (GCC and Clang). A static library does not need the function until the application is linked:
 
 ```sh
-./configure --disable-hashdrbg
-CFLAGS="-DCUSTOM_RAND_GENERATE_BLOCK= custom_rand_generate_block"
+./configure --disable-hashdrbg --enable-static --disable-shared \
+    CFLAGS="-DCUSTOM_RAND_GENERATE_BLOCK=custom_rand_generate_block -include /path/to/custom_rand.h"
 ```
 
-Or
+Or in `user_settings.h`:
 
 ```c
 /* RNG */
 /* #define HAVE_HASHDRBG */
+#define CUSTOM_RAND_GENERATE_BLOCK custom_rand_generate_block
 extern int custom_rand_generate_block(unsigned char* output, unsigned int sz);
 ```
 
@@ -2916,7 +2939,7 @@ The Hamming weight band, in percent, a raw SRAM PUF readout has to fall in (35% 
 
 #### WOLFSSL_RNG_USE_FULL_SEED
 
-Uses the full seed length (384 bits) for DRBG seeding instead of the minimum required. Provides additional entropy margin.
+Non-FIPS builds only. Passes the whole gathered seed buffer to the DRBG instead of gathering an extra `SEED_BLOCK_SZ` bytes and reserving that first block for the seed health test. The seed size is not fixed: it is `RNG_SECURITY_STRENGTH * ENTROPY_SCALE_FACTOR / 8` bytes (256 bits by default in non-FIPS builds).
 
 #### WOLFSSL_GENSEED_FORTEST
 
@@ -2964,7 +2987,7 @@ Enables use of AMD's RDSEED instruction for direct hardware entropy. Similar to 
 
 #### IDIRECT_DEV_RANDOM
 
-Specifies a custom path for the random device on iDirect platforms instead of the default `/dev/random`.
+On iDirect platforms, seeds the DRBG from the platform's `getRandom()` function instead of `/dev/random`.
 
 #### WIN_REUSE_CRYPT_HANDLE
 
@@ -3068,15 +3091,15 @@ Use this if you have done your own custom hardware port and not provided a publi
 
 #### NO_PUBLIC_CCM_SET_NONCE
 
-Use this if you have done your own custom hardware port and not provided a public implementation of `wc_AesGcmSetNonce()`
+Use this if you have done your own custom hardware port and not provided a public implementation of [`wc_AesCcmSetNonce()`](group__AES.md#function-wc_aesccmsetnonce)
 
 #### NO_GCM_ENCRYPT_EXTRA
 
-Use this if you have done your own custom hardwareport and not provided an implementation of `wc_AesGcmEncrypt_ex()`
+Use this if you have done your own custom hardware port and not provided an implementation of `wc_AesGcmEncrypt_ex()`
 
-#### WOLFSSL_STM32[F1 | F2 | F4 | F7 | L4]
+#### WOLFSSL_STM32[F1 | F2 | F3 | F4 | F7 | L4 | L5 | WB | WBA | WL | G0 | G4 | H5 | H7 | H7S | U0 | U3 | U5 | MP13 | N6 | C5 | V8]
 
-Use one of these defines when building for the appropriate STM32 device. Update `wolfssl-root/wolfssl/wolfcrypt/settings.h` section with regards to the wolfSSL porting guide (<https://www.wolfssl.com/docs/porting-guide/>) as appropriate.
+Use one of these defines when building for the appropriate STM32 device family (<https://www.st.com/>). Each of them also enables STM32 hardware crypto (`STM32_CRYPTO`), hash (`STM32_HASH`, `STM32_HMAC`) and RNG (`STM32_RNG`) support in wolfSSL, unless the matching [`NO_STM32_CRYPTO`](#no_stm32_crypto), [`NO_STM32_HASH`](#no_stm32_hash), `NO_STM32_HMAC` or [`NO_STM32_RNG`](#no_stm32_rng) is defined. Update `wolfssl-root/wolfssl/wolfcrypt/settings.h` section with regards to the wolfSSL porting guide (<https://www.wolfssl.com/docs/porting-guide/>) as appropriate.
 
 #### WOLFSSL_STM32_CUBEMX
 
@@ -3092,7 +3115,7 @@ Enables hardware crypto support for the STM32V8 family (Cortex-M85, Armv8.1-M). 
 
 #### WOLFSSL_CUBEMX_USE_LL
 
-When using the CubeMX tool to generate APIs there are two options, HAL (Hardware Abstraction Layer) or Low Layer (LL). Use this define to control which headers are include in `wolfssl-root/wolfssl/wolfcrypt/settings.h` in the `WOLFSSL_STM32[F1/F2/F4/F7/L4]` section.
+When using the CubeMX tool to generate APIs there are two options, HAL (Hardware Abstraction Layer) or Low Layer (LL). Use this define to control which headers are included in `wolfssl-root/wolfssl/wolfcrypt/settings.h` in the `WOLFSSL_STM32` family section. Currently it only selects the LL RNG header (`stm32l4xx_ll_rng.h`) for STM32L4.
 
 #### NO_STM32_CRYPTO
 
@@ -3124,10 +3147,6 @@ operation during a TLS connection.
 
 RT-THREAD macro is used when porting rtthread IoT to wolfSSL.
 
-#### SO_REUSEPORT
-
-Allows local address and port reuse.
-
 #### INTIME_RTOS
 
 Port setting for INtime RTOS.
@@ -3141,15 +3160,11 @@ Used when porting to SGX.
 
 #### TFM_TIMING_RESISTANT
 
-Can be defined when using fast math ([`USE_FAST_MATH`](#use_fast_math)) on systems with a small stack size. This will get rid of the large static arrays.
+Makes fast math ([`USE_FAST_MATH`](#use_fast_math), `tfm.c`) operations constant time (timing resistant). Strongly recommended with `USE_FAST_MATH`. It also lowers stack use by avoiding the large exponentiation windows, which helps on systems with a small stack size.
 
 #### ECC_TIMING_RESISTANT
 
 This is used as a Timing Resistance feature that enables code in ecc.c to prevent side channel and differential power analysis (DPA) attacks.
-
-#### FUSION_RTOS
-
-A Fusion RTOS implementation is used for tickets to represent the difference between when they are first seen and when they are sent. It returns the time in milliseconds as a 32-bit value.
 
 #### WOLFSSL_WIDE_BYTE
 
@@ -3169,7 +3184,7 @@ With `OPENSSL_ALL`, `WOLFSSL_SIGNER_DER_CERT` is now defined so that `X509_STORE
 
 #### WOLFSSL_SMALL_STACK
 
-Can be used for devices which have a small stack size. This increases the use of dynamic memory in `wolfcrypt/src/integer.c`, but can lead to slower performance.
+Can be used for devices which have a small stack size. Large local variables throughout wolfSSL and wolfCrypt (math, ciphers, ASN, TLS) are moved from the stack to the heap, at some performance cost.
 
 #### WOLFSSL_PTHREADS
 
@@ -3194,7 +3209,7 @@ Create threads without join capability (detached threads). Useful on platforms t
 
 #### WOLFSSL_THREADED_CRYPT
 
-Enables multi-threaded cryptographic operations for improved performance on multi-core systems. Allows encryption/decryption to run in parallel.
+Lets the application run TLS record encryption (AES-GCM only) for a connection on its own worker threads, using `wolfSSL_AsyncEncrypt()`, `wolfSSL_AsyncEncryptReady()`, `wolfSSL_AsyncEncryptStop()` and `wolfSSL_AsyncEncryptSetSignal()`. Uses pthreads. `WOLFSSL_THREADED_CRYPT_CNT` (default 16) sets the number of encryption slots. Decryption is not covered.
 
 #### WOLFSSL_ALGO_HW_MUTEX
 
@@ -3287,7 +3302,7 @@ If using fast math and RSA/DH you can define this to reduce your ECC memory cons
 
 #### ECC_SHAMIR
 
-Uses variation of ECC math that is slightly faster, but doubles heap usage.
+Uses variation of ECC math that is slightly faster, but doubles heap usage. Enabled by default by configure ([`--enable-eccshamir`](#--enable-eccshamir)). To reduce memory, disable it with `--disable-eccshamir`, or leave it undefined in `user_settings.h`.
 
 #### RSA_LOW_MEM
 
@@ -3312,7 +3327,7 @@ Enables SHAKE256 extendable-output function (XOF) based on SHA-3. Provides varia
 
 #### SHA3_BY_SPEC
 
-Uses the specification-ordered Keccak-f permutation. By default, wolfSSL uses an optimized bit-interleaved ordering.
+Uses the literal FIPS 202 form of the Keccak chi step (`a ^ (~b & c)`). By default, wolfSSL uses an algebraically equivalent rewritten form.
 
 #### WC_SHA3_NO_ASM
 
@@ -3352,7 +3367,7 @@ Relaxes the RFC 5280 strictness in the certificate parser. wolfSSL 5.9.4 rejects
 
 #### GCM_SMALL
 
-Option to reduce AES GCM code size by calculating at runtime instead of using tables. Possible options are: `GCM_SMALL`, `GCM_WORD32` or `GCM_TABLE`.
+Option to reduce AES GCM code size by calculating at runtime instead of using tables. Possible options are: `GCM_SMALL`, `GCM_WORD32`, `GCM_TABLE` or `GCM_TABLE_4BIT`.
 
 #### CURVED25519_SMALL
 
@@ -3420,7 +3435,7 @@ Disables the SHA-512/256 variant. Reduces code size when SHA-512/256 is not need
 
 #### USE_SLOW_SHA2
 
-Disables loop unrolling for all SHA-2 family algorithms. Reduces code size at the cost of performance.
+Deprecated alias for [`USE_SLOW_SHA512`](#use_slow_sha512); it only affects SHA-512 and SHA-384. Use [`USE_SLOW_SHA256`](#use_slow_sha256) for SHA-256 and SHA-224.
 
 #### WOLFSSL_HASH_FLAGS
 
@@ -3498,11 +3513,11 @@ Enables OpenSSL extra compatibility APIs but excludes ASN1 object functions. Use
 
 #### USE_INTEL_SPEEDUP
 
-Enables use of Intel’s AVX/AVX2 instructions for accelerating AES, ChaCha20, Poly1305, SHA256, SHA512, ED25519 and Curve25519.
+Enables use of Intel's AVX/AVX2 instructions for accelerating AES, ChaCha20, Poly1305, SHA256, SHA512, SHA-3/SHAKE, ED25519, Curve25519, ML-KEM, ML-DSA, SLH-DSA, LMS, XMSS and FrodoKEM.
 
 #### WOLFSSL_AESNI
 
-Enables use of AES accelerated operations which are built into some Intel and AMD chipsets. When using this define, the `aes_asm.asm` (for Windows with at&t syntax) or `aes_asm.S` file is used to optimize via the Intel AES new instruction set (AESNI).
+Enables use of AES accelerated operations which are built into some Intel and AMD chipsets. When using this define, the `aes_asm.S` (GCC/Clang, AT&T syntax) or `aes_asm.asm` (MASM, Intel syntax, for Windows) file is used to optimize via the Intel AES new instruction set (AESNI). AES-GCM, AES-XTS and the AVX code paths also need `aes_gcm_asm`, `aes_xts_asm` and `aes_x86_64_asm` (`.S` or `.asm`).
 
 #### WOLFSSL_AESNI_BY4
 
@@ -3534,15 +3549,11 @@ Enables non-constant-time GCM GMULT implementation. Faster but not protected aga
 
 #### NO_WOLFSSL_ALLOC_ALIGN
 
-Disables aligned memory allocation for AES contexts. By default, AES contexts are aligned to cache line boundaries for performance. Disable on platforms that do not support aligned allocation.
+By default, when AES-NI, AF_ALG or Xilinx AES gets a misaligned input or output buffer, wolfSSL allocates a temporary aligned copy. Define this to skip that allocation; misaligned buffers then return `BAD_ALIGN_E`.
 
 #### WC_ASYNC_ENABLE_AES
 
 Enables asynchronous AES operations. Allows AES encrypt/decrypt to be offloaded to hardware accelerators using the wolfSSL async crypto framework.
-
-#### WOLFSSL_CRYPTOCELL_AES
-
-Enables AES acceleration using ARM CryptoCell hardware. Requires the CryptoCell SDK and [`WOLFSSL_CRYPTOCELL`](#wolfssl_cryptocell).
 
 #### WOLFSSL_DEVCRYPTO_AES
 
@@ -3586,11 +3597,11 @@ Restricts STM32 hardware crypto to AES operations only. Other algorithms will us
 
 #### WC_DEBUG_CIPHER_LIFECYCLE
 
-Enables debug logging for AES cipher context lifecycle events (init, set key, free). Useful for debugging resource leaks or double-free issues with AES contexts.
+Adds lifecycle tags to AES contexts and checks them on use, catching use before init and use after free (`BAD_STATE_E`, optionally aborting). In FIPS builds it requires FIPS v6 or later.
 
 #### WOLFSSL_HW_METRICS
 
-Enables tracking of hardware acceleration usage metrics. When enabled, wolfSSL counts how many operations were offloaded to hardware vs. handled in software, accessible via `wolfCrypt_GetHwMetrics()`.
+Espressif ESP32 only. Counts hardware operations and software fallbacks for SHA, AES and RSA math. Print the counters with `esp_hw_show_metrics()`.
 
 #### HAVE_INTEL_RDSEED
 
@@ -3614,7 +3625,7 @@ Sets the lookup table bit size (2-12, default 8) for ECC fixed-point precomputat
 
 #### FP_ECC_CONTROL
 
-Auto-selects cached fixed-point ECC verification using SP functions when [`WOLFSSL_HAVE_SP_ECC`](#wolfssl_have_sp_ecc) is available. Enabled by default when applicable.
+Not defined by default. When defined, SM2 signature verification with SP math ([`WOLFSSL_HAVE_SP_ECC`](#wolfssl_have_sp_ecc) and [`WOLFSSL_SP_SM2`](#wolfssl_sp_sm2)) uses the cached fixed-point path (`sp_ecc_cache_verify_sm2_256()`).
 
 #### HAVE_ECC_CHECK_PUBKEY_ORDER
 
@@ -3651,7 +3662,7 @@ Enables APIs and behaviors needed for the Python wolfSSL module compatibility.
 
 #### SQRTMOD_USE_MOD_EXP
 
-Computes square root modulo prime using modular exponentiation instead of the Jacobi symbol method for compressed key decompression. Off by default.
+Computes square root modulo prime for compressed key decompression using a single modular exponentiation instead of Tonelli-Shanks, which saves stack. Primes that are 1 mod 8 (P-224) are not supported, and primes that are 5 mod 8 (secp224k1) only with `HAVE_ECC_KOBLITZ` or [`WOLFSSL_CUSTOM_CURVES`](#wolfssl_custom_curves). Off by default.
 
 #### WOLFSSL_ECIES_OLD
 
@@ -3672,15 +3683,15 @@ Generates a random IV for ECIES encryption instead of deriving it from the KDF o
 
 #### WOLFSSL_ECIES_STATIC_GCM_NONCE
 
-wolfSSL 5.9.4 added AES-GCM as an ECIES data encapsulation mechanism next to AES-CBC/CTR with HMAC, including ECIES crypto callbacks and `devId` threading. This macro switches ECIES AES-GCM over to a fixed GCM nonce; leave it undefined and a fresh nonce is used for each encryption.
+wolfSSL 5.9.4 added AES-GCM as an ECIES data encapsulation mechanism next to AES-CBC/CTR with HMAC, including ECIES crypto callbacks and `devId` threading. This macro allows the AES-GCM DEM in the default IV mode, where the GCM nonce is a fixed all-zero value. That is only safe because ECIES derives a fresh key from a fresh ephemeral key for each message. Without this macro, AES-GCM in the default IV mode returns `NOT_COMPILED_IN`. It is not needed with [`WOLFSSL_ECIES_GEN_IV`](#wolfssl_ecies_gen_iv) (random nonce) or [`WOLFSSL_ECIES_OLD`](#wolfssl_ecies_old) (KDF-derived nonce).
 
 #### WOLFSSL_SP_521
 
-Enables the single-precision (SP) math optimized implementation for the P-521 ECC curve. Off by default. Enabled by `--enable-sp` and its variants (for example `--enable-sp=521`, `ec521`, `p521`) on 64-bit Intel/ARM targets, by the CMake equivalent, or by defining it manually in `user_settings.h`. It is **not** auto-enabled by the headers from [`WOLFSSL_SP_MATH`](#wolfssl_sp_math) / [`WOLFSSL_SP_MATH_ALL`](#wolfssl_sp_math_all) together with `HAVE_ECC521`; defining `WOLFSSL_SP_521` instead forces `HAVE_ECC521` on. Note that `WOLFSSL_SP_MATH_ALL` alone still provides working (unoptimized, generic) P-521 support; `WOLFSSL_SP_521` adds the curve-specific optimized path.
+Enables the single-precision (SP) math optimized implementation for the P-521 ECC curve. Off by default. Enabled by `--enable-sp` and its variants (for example `--enable-sp=521`, `ec521`, `p521`) on 64-bit Intel/ARM targets, by the CMake equivalent, or by defining it manually in `user_settings.h`. It is **not** auto-enabled by the headers from [`WOLFSSL_SP_MATH`](#wolfssl_sp_math) / [`WOLFSSL_SP_MATH_ALL`](#wolfssl_sp_math_all) together with `HAVE_ECC521`; defining `WOLFSSL_SP_521` instead forces `HAVE_ECC521` on, but only when [`WOLFSSL_SP_MATH`](#wolfssl_sp_math) is used and `ECC_USER_CURVES` is not defined (configure adds `-DHAVE_ECC521` itself). Note that `WOLFSSL_SP_MATH_ALL` alone still provides working (unoptimized, generic) P-521 support; `WOLFSSL_SP_521` adds the curve-specific optimized path.
 
 #### WOLFSSL_SP_SM2
 
-Enables single-precision (SP) math optimized implementation for the SM2 curve (Chinese cryptographic standard). Auto-enabled when [`WOLFSSL_SM2`](#wolfssl_sm2) is set.
+Enables single-precision (SP) math optimized implementation for the SM2 curve (Chinese cryptographic standard). configure defines it when `--enable-sm2` is used with SP ECC; with `user_settings.h` it must be defined explicitly alongside [`WOLFSSL_SM2`](#wolfssl_sm2).
 
 #### WOLF_CRYPTO_CB_ONLY_ECC
 
@@ -3696,7 +3707,7 @@ Enables asynchronous ECC key generation, allowing key generation to be offloaded
 
 #### PLUTON_CRYPTO_ECC
 
-Enables use of ARM Pluton trusted execution environment for ECC operations. Off by default.
+Enables use of the Microsoft Pluton security processor for ECC operations. Off by default.
 
 #### WOLFSSL_CAAM_BLACK_KEY_SM
 
@@ -3708,7 +3719,7 @@ Offloads ECC operations to the Linux Kernel Crypto API (kcAPI) for hardware acce
 
 #### WOLFSSL_ASYNC_CRYPT
 
-This enables support for asynchronous cryptography using hardware based adapters such as the Intel QuickAssist or Marvell (Cavium) Nitrox V. The asynchronous code is not included in the public distribution and is available for evaluation by contacting us via email at facts@wolfssl.com.
+This enables support for asynchronous cryptography using hardware based adapters such as the Intel QuickAssist or Marvell (Cavium) Nitrox V. The asynchronous framework is part of wolfSSL since v5.8.4 (`wolfcrypt/src/async.c`) and is enabled with [`--enable-asynccrypt`](#--enable-asynccrypt). Without a hardware backend a software backend ([`WOLFSSL_ASYNC_CRYPT_SW`](#wolfssl_async_crypt_sw)) using wolfCrypt is used. The hardware backends are Intel QuickAssist (QAT 1.6 and 1.7 drivers) and Cavium Nitrox III and V. See `README-async.md`.
 
 #### WOLFSSL_NO_ASYNC_IO
 
@@ -3723,29 +3734,39 @@ There are 4 variants of GCM performance:
 * `GCM_TABLE` - Fast (FIPS validated)
 * `GCM_TABLE_4BIT` - Fastest (FIPS validated)
 
-### wolfSSL’s Math Options
+With configure, select one with `--enable-aesgcm=small`, `--enable-aesgcm=word32`, `--enable-aesgcm=table` or `--enable-aesgcm=4bit` (see [`--enable-aesgcm`](#--enable-aesgcm)). `--enable-lowresource` selects `GCM_SMALL`. With `user_settings.h`, define the macro directly.
 
-There are three math libraries in wolfSSL.
+### wolfSSL's Math Options
 
-* Big Integer
-* Fast Math
-* Single Precision Math
+wolfSSL has the following multi-precision math options:
 
-When building wolfSSL, only one of these must be used.
+* Single Precision (SP) Math All ([`WOLFSSL_SP_MATH_ALL`](#wolfssl_sp_math_all), `sp_int.c`): the default
+* Single Precision (SP) Math with a restricted set of key sizes and curves ([`WOLFSSL_SP_MATH`](#wolfssl_sp_math))
+* Fast Math ([`USE_FAST_MATH`](#use_fast_math), `tfm.c`): legacy, disabled by default
+* Big Integer (heap) Math ([`USE_INTEGER_HEAP_MATH`](#use_integer_heap_math), `integer.c`): disabled by default
+* No multi-precision math library ([`NO_BIG_INT`](#no_big_int))
+
+Only one of these can be used in a build. If none is selected, `settings.h` defines `WOLFSSL_SP_MATH_ALL`, and configure also uses SP math all by default. FIPS 140-2 builds default to Fast Math instead.
+
+Single Precision (SP) Math Library is our recommended library and the default. It is implemented using both C and assembly. As such, it has optimizations for specific architectures. All math variables are instantiated on the stack, leading to less heap usage. It is always timing resistant. It is generally optimized for speed at the cost of code size, but is highly configurable to compile out unneeded code. We have taken it through DO-178C certifications.
+
+Fast Math Library is the legacy back end. It is disabled by default and must be selected with [`--enable-fastmath`](#--enable-fastmath) or `USE_FAST_MATH`, and it cannot be used with `--enable-linuxkm` (it exceeds the kernel stack limit). It is implemented using both C and assembly. As such, it has optimizations for specific architectures. All math variables are instantiated on the stack, leading to less heap usage. It can be made timing resistant if the `TFM_TIMING_RESISTANT` macro is defined. We have taken it through FIPS 140-2 and 140-3 certifications.
 
 Big Integer Library is the most portable option as it is written in C without any assembly. As such it is not optimized for specific architectures. All math variables are instantiated on the heap; minimal stack usage. Unfortunately, Big Integer Library is not timing resistant.
 
-Fast Math Library is a good option. It is implemented using both C and assembly. As such, it has optimizations for specific architectures. All math variables are instantiated on the stack, leading to less heap usage. It can be made timing resistant if the `TFM_TIMING_RESISTANT` macro is defined. We have taken it through FIPS 140-2 and 140-3 certifications.
+#### Big Integer Math Library
 
-Single Precision (SP) Math Library is our recommended library. It is implemented using both C and assembly. As such, it has optimizations for specific architectures. All math variables are instantiated on the stack, leading to less heap usage. It is always timing resistant. It is generally optimized for speed at the cost of code size, but is highly configurable to compile out unneeded code. We have taken it through DO-178C certifications.
+##### USE_INTEGER_HEAP_MATH
 
-#### Big Integer Math Library (Deprecation Planned)
-
-This library is planned to be deprecated and removed from the wolfSSL/wolfCrypt library by the end of 2023. If desired this can be enabled with `--enable-heapmath` or `CFLAGS=-DUSE_INTEGER_HEAP_MATH`.
+Selects the heap based Big Integer math library (`integer.c`). It is not enabled by default and is not timing resistant. Enable it with `--enable-heapmath` or `CFLAGS=-DUSE_INTEGER_HEAP_MATH`. It cannot be used with [`WOLFSSL_STATIC_MEMORY`](#wolfssl_static_memory).
 
 Forked from public domain LibTomMath library. For more information about LibTomMath, please see <https://www.libtom.net/LibTomMath/>. Please note that our fork is considerably more active and secure than the original public domain code.
 
 This library is generally the most portable and easiest to get going with. The negatives to the normal big integer library are that it is slower, it uses a lot of heap memory as all memory is allocated from the heap, requires an `XREALLOC()` implementation, and is not timing resistant. The implementation can be found in `integer.c`.
+
+#### NO_BIG_INT
+
+Build without any multi-precision math library. RSA, DH, DSA and ECC need one, so they have to be disabled as well. configure defines `NO_BIG_INT` when SP math, SP math all, fast math and heap math are all disabled.
 
 #### Fast Math
 
@@ -3757,19 +3778,11 @@ The FastMath library uses assembly if possible, and will speed up asymmetric pri
 
 For FastMath, all memory is allocated on the stack. Because the stack memory usage can be larger when using FastMath, we recommend defining [`TFM_TIMING_RESISTANT`](#tfm_timing_resistant) as well when using this option. The FastMath code is timing resistant if TFM_TIMING_RESISTANT is defined. This will reduce some of the large math windows for constant time, which use less memory. This uses less stack because there are no shortcuts and therefore less branching during private key operations. This also makes the implementation more secure as timing attacks are a real threat and can give malicious third parties enough information to reproduce the private key.
 
-On ia32, for example, all of the registers need to be available so high optimization and omitting the frame pointer needs to be taken care of. wolfSSL will add `-O3 -fomit-frame-pointer` to GCC for non debug builds. If you're using a different compiler you may need to add these manually to `CFLAGS` during configure.
+For GCC builds without debug, configure adds `-O2` for fast math and for SP builds that do not use one of the small `--enable-sp` variants (such as `--enable-sp=small`), and `-Os` otherwise. `--enable-fasthugemath` also adds `-funroll-loops -DTFM_SMALL_SET -DTFM_HUGE_SET`. If you're using a different compiler you may need to add optimization flags manually to `CFLAGS` during configure.
 
-OS X will also need `-mdynamic-no-pic` added to `CFLAGS`. In addition, if building in shared mode for ia32 on OS X you'll need to pass options to `LDFLAGS` as well:
+FastMath also changes the way dynamic and stack memory are used. The Big Integer (heap) math library (`integer.c`) uses dynamic memory for big integers. FastMath uses fixed size buffers that hold 4096 bit integers by default (the `tfm.h` default), allowing for 2048 bit by 2048 bit multiplications. `settings.h` raises the default to 8192 bits for x86_64 and AArch64 builds and for `OPENSSL_EXTRA` builds, and FIPS 140-2 builds also default to 8192. If you need 4096 bit by 4096 bit multiplications then change `FP_MAX_BITS` in `wolfssl/wolfcrypt/tfm.h`. As `FP_MAX_BITS` is increased, this will also increase the runtime stack usage since the buffers used in the public key operations will now be larger. `FP_MAX_BITS` needs to be double the max key size. For example if your biggest key is 2048-bit, `FP_MAX_BITS` should be 4096 and if it is 4096-bit `FP_MAX_BITS` should be 8192. If using ECC only this can be reduced to the maximum ECC key size times two. A couple of functions in the library use several temporary big integers, meaning the stack can get relatively large. This should only come into play on embedded systems or in threaded environments where the stack size is set to a low value. If stack corruption occurs with FastMath during public key operations in those environments, increase the stack size to accommodate the stack usage.
 
-```sh
-LDFLAGS="-Wl,-read_only_relocs,warning"
-```
-
-This gives warnings for some symbols instead of errors.
-
-FastMath also changes the way dynamic and stack memory are used. The normal math library uses dynamic memory for big integers. FastMath uses fixed size buffers that hold 4096 bit integers by default, allowing for 2048 bit by 2048 bit multiplications. If you need 4096 bit by 4096 bit multiplications then change `FP_MAX_BITS` in `wolfssl/wolfcrypt/tfm.h`. As `FP_MAX_BITS` is increased, this will also increase the runtime stack usage since the buffers used in the public key operations will now be larger. `FP_MAX_BITS` needs to be double the max key size. For example if your biggest key is 2048-bit, `FP_MAX_BITS` should be 4096 and if it is 4096-bit `FP_MAX_BITS` should be 8192. If using ECC only this can be reduced to the maximum ECC key size times two. A couple of functions in the library use several temporary big integers, meaning the stack can get relatively large. This should only come into play on embedded systems or in threaded environments where the stack size is set to a low value. If stack corruption occurs with FastMath during public key operations in those environments, increase the stack size to accommodate the stack usage.
-
-If you are enabling FastMath without using the autoconf system, you’ll need to define `USE_FAST_MATH` and add `tfm.c` to the wolfSSL build while removing `integer.c`. Defining `ALT_ECC_SIZE` will allocate ECC points only from the heap instead of the stack.
+If you are enabling FastMath without using the autoconf system, you'll need to define `USE_FAST_MATH` and make sure `tfm.c` is compiled. `integer.c` and `sp_int.c` guard themselves and compile to nothing, so they do not need to be removed from the build. Defining `ALT_ECC_SIZE` will allocate ECC points only from the heap instead of the stack.
 
 ##### Architecture-Specific Optimizations
 
@@ -3784,7 +3797,7 @@ The following macros can be defined for assembly optimizations with USE_FAST_MAT
 * `TFM_X86`
 * `TFM_X86_64`
 
-If none of these are defined or TFM_NO_ASM is defined, then `TFM_ISO` will be defined and ISO C portable code will be used.
+`TFM_X86_64` and `TFM_X86` are detected automatically from the compiler target unless `TFM_NO_ASM` is defined. `TFM_AARCH_64` is also defined automatically for Apple AArch64 builds, but it only selects 64-bit digits; there is no AArch64 assembly for fast math. If none of these are defined or TFM_NO_ASM is defined, then `TFM_ISO` will be defined and ISO C portable code will be used.
 
 ##### Algorithm-Specific Optimizations
 
@@ -3810,7 +3823,7 @@ Speed optimization for montgomery reduction of smaller numbers on Intel architec
 
 #### Proprietary Single Precision (SP) Math Support
 
-SP math is our recommended default option and has been taken through DO-178C certifications. Use these to speed up public key operations for specific keys sizes and curves that are common. Make sure to include the correct code files such as:
+SP math is our recommended default option and has been taken through DO-178C certifications. `sp_int.c` is the general multi-precision code (SP math all). The other files are fixed-size implementations that speed up public key operations for specific key sizes and curves that are common. They are turned on with [`--enable-sp`](#--enable-spopt) or with [`WOLFSSL_HAVE_SP_RSA`](#wolfssl_have_sp_rsa), [`WOLFSSL_HAVE_SP_DH`](#wolfssl_have_sp_dh) and [`WOLFSSL_HAVE_SP_ECC`](#wolfssl_have_sp_ecc). Make sure to include the correct code files such as:
 
 * `sp_c32.c`
 * `sp_c64.c`
@@ -3818,34 +3831,33 @@ SP math is our recommended default option and has been taken through DO-178C cer
 * `sp_arm64.c`
 * `sp_armthumb.c`
 * `sp_cortexm.c`
+* `sp_dsp32.c` (Qualcomm Hexagon DSP)
 * `sp_int.c`
+* `sp_riscv64.c`
 * `sp_x86_64.c`
 * `sp_x86_64_asm.S`
 * `sp_x86_64_asm.asm`
+* `sp_sm2_*.c` and `sp_sm2_x86_64_asm.S` (SM2 curve, see [`WOLFSSL_SP_SM2`](#wolfssl_sp_sm2))
 
-##### WOLFSSL_SP
-
-Enable Single Precision math support.
-
-#### WOLFSSL_SP_MATH
+##### WOLFSSL_SP_MATH
 
 Enable only SP math and algorithms. Eliminates big integer math code such as normal (`integer.c`) or fast (`tfm.c`). Restricts key sizes and curves to only ones supported by SP.
 
-#### WOLFSSL_SP_MATH_ALL
+##### WOLFSSL_SP_MATH_ALL
 
-Enable SP math and algorithms. Implements big integer math code such as normal (`integer.c`) or fast (`tfm.c`) for key sizes and curves not supported by SP.
+The default math library. `sp_int.c` provides general multi-precision math for all algorithms and key sizes, replacing `integer.c` and `tfm.c`. Key sizes and curves with an optimized SP implementation use it; other sizes use the generic code. Always constant time. Cannot be combined with [`WOLFSSL_SP_MATH`](#wolfssl_sp_math).
 
-#### WOLFSSL_SP_SMALL
+##### WOLFSSL_SP_SMALL
 
 If using SP math this will use smaller versions of the code and avoid large stack variables.
 
 ##### SP_WORD_SIZE
 
-Force 32-bit or 64-bit data type for storing one word of a number.
+Force the word size (8, 16, 32 or 64 bits) used to store one digit of a number.
 
 ##### WOLFSSL_SP_NONBLOCK
 
-Enables "non blocking" mode for Single Precision math, which will return FP_WOULDBLOCK for long operations and function must be called again until complete. Currently, this in only supported for ECC and is used in conjunction with `WC_ECC_NONBLOCK`.
+Enables "non blocking" mode for Single Precision math, which will return `MP_WOULDBLOCK` (`FP_WOULDBLOCK` is an alias) for long operations and function must be called again until complete. It is supported for ECC (`WC_ECC_NONBLOCK`), RSA ([`WC_RSA_NONBLOCK`](#wc_rsa_nonblock)) and DH (`WC_DH_NONBLOCK`). RSA and DH non-blocking also need [`WOLFSSL_SP_SMALL`](#wolfssl_sp_small) and [`WOLFSSL_SP_NO_MALLOC`](#wolfssl_sp_no_malloc), and cannot be used with [`WOLFSSL_SP_FAST_MODEXP`](#wolfssl_sp_fast_modexp).
 
 ##### WOLFSSL_SP_FAST_NCT_EXPTMOD
 
@@ -3861,15 +3873,15 @@ Enable when unaligned access of sp_int_digit pointer is not allowed.
 
 ##### WOLFSSL_HAVE_SP_RSA
 
-Single Precision RSA for 2048, 3072 and 4096 bit.
+Enables Single Precision (SP) math optimizations for RSA operations, which give significant performance improvements for the common key sizes. 2048 and 3072 bit are included by default (disable with `WOLFSSL_SP_NO_2048` / `WOLFSSL_SP_NO_3072`), and 4096 bit needs `WOLFSSL_SP_4096`.
 
 ##### WOLFSSL_HAVE_SP_DH
 
-Single Precision DH for 2048, 3072 and 4096 bit.
+Single Precision DH for 2048, 3072 and 4096 bit. The same `WOLFSSL_SP_NO_2048`, `WOLFSSL_SP_NO_3072` and `WOLFSSL_SP_4096` settings apply.
 
 ##### WOLFSSL_HAVE_SP_ECC
 
-Single Precision ECC for SECP256R1 and SECP384R1.
+Single Precision ECC: P-256 by default (disable with `WOLFSSL_SP_NO_256`), P-384 with `WOLFSSL_SP_384`, P-521 with [`WOLFSSL_SP_521`](#wolfssl_sp_521), SM2 with [`WOLFSSL_SP_SM2`](#wolfssl_sp_sm2), and the 1024-bit SAKKE curve with `WOLFSSL_SP_1024`.
 
 ##### WOLFSSL_SP_LARGE_CODE
 
@@ -3881,15 +3893,15 @@ Indicates that division using a double length word isn't available. For example,
 
 ##### WOLFSSL_SP_DIV_32
 
-Indicates that 32-bit division isn't available and that wolfSSL should use its own Single-Precision (SP) implementation.
+Avoids 64-bit divides. Defining it also defines [`WOLFSSL_SP_DIV_WORD_HALF`](#wolfssl_sp_div_word_half) (in `sp_int.h`), and the Hexagon DSP code (`sp_dsp32.c`) uses it to select a word division that does not use a 64-bit divide.
 
 ##### WOLFSSL_SP_DIV_64
 
-Indicates that 64-bit division isn't available and that wolfSSL should use its own Single-Precision (SP) implementation.
+Has no effect. `settings.h` defines it for some platforms, but no code tests it. On targets without a double-width divide use [`WOLFSSL_SP_DIV_WORD_HALF`](#wolfssl_sp_div_word_half).
 
 ##### WOLFSSL_SP_ASM
 
-Enables Single-Precision (SP) platform specific assembly code implementation that is faster. Platform is detected.
+Enables Single-Precision (SP) platform specific assembly code implementations that are faster, for maximum performance of RSA, ECC and DH operations on supported platforms (x86_64, ARM, RISC-V). With [`--enable-sp-asm`](#--enable-sp-asm) the platform is detected by configure. It is also defined automatically when one of the platform specific `WOLFSSL_SP_*_ASM` macros below is defined.
 
 ##### WOLFSSL_SP_X86_64_ASM
 
@@ -3910,6 +3922,10 @@ Enable Single-Precision (SP) Cortex-M family (including Cortex-M4) assembly impl
 ##### WOLFSSL_SP_ARM_THUMB_ASM
 
 Enable Single-Precision (SP) ARM Thumb assembly implementation (used with -mthumb).
+
+##### WOLFSSL_SP_RISCV64_ASM
+
+Enable Single-Precision (SP) RISC-V 64-bit assembly implementation (`sp_riscv64.c`). configure sets it for `--enable-sp-asm` on riscv64 targets.
 
 ##### WOLFSSL_SP_X86_64
 
@@ -3947,9 +3963,9 @@ Enable Single-Precision (SP) RISCV32 assembly speedup macros. Only applies if `W
 
 Enable Single-Precision (SP) S390X assembly speedup macros. Only applies if `WOLFSSL_SP_MATH_ALL` is defined. See `sp_int.c`.
 
-#### SP_INT_BITS
+##### SP_INT_BITS
 
-The number of bits to have in an sp_int. Which can determine the largest bignum that the library can handle.
+The number of bits in an sp_int, which sets the largest number the library can handle. If it is not set, `settings.h` uses 4096 for SP math all on x86_64, AArch64 and `OPENSSL_EXTRA` builds (8192 with `WOLFSSL_MYSQL_COMPATIBLE`, larger if the FFDHE groups compiled in need it). Otherwise `sp_int.h` derives it from the enabled algorithms, for example 3072 for RSA/DH (4096 with `WOLFSSL_SP_4096`) or the largest curve size for ECC-only builds. configure can also set it, for example from `--with-max-rsa-bits`.
 
 
 ### Stack or Chip Specific Defines
@@ -3978,7 +3994,7 @@ Can be defined when building for Microchip’s PIC32 platform (<https://www.micr
 
 #### MICROCHIP_TCPIP_V5
 
-Can be defined specifically version 5 of microchip tcp/ip stack.
+Can be defined for version 5 of the Microchip TCP/IP stack.
 
 #### MICROCHIP_TCPIP
 
@@ -4000,18 +4016,13 @@ Can be defined when building for the FreeRTOS windows simulator (<https://www.fr
 
 Can be defined when building for ChibiOS RTOS.
 
-
-#### WOLFSSL_CLEANUP_THREADSAFE_BY_ATOMIC_OPS
-
-Uses atomic operations to make `wolfSSL_Cleanup()` thread-safe without requiring a mutex.
-
 #### WOLFSSL_CMSIS_RTOS
 
-Can be defined when building for Mbed CMIS-RTOS.
+Can be defined when building for Arm CMSIS-RTOS.
 
 #### WOLFSSL_CMSIS_RTOSv2
 
-Can be defined when building for Mbed CMIS-RTOSv2.
+Can be defined when building for Arm CMSIS-RTOS v2.
 
 #### WOLFSSL_LWIP_NATIVE
 
@@ -4031,15 +4042,11 @@ Use if building for Linux Kernel Module.
 
 #### WORD64_AVAILABLE
 
-Portability macro to indicate 64-bit types are supported. Typically its better to use `SIZEOF_LONG_LONG` 8.
+Portability macro to indicate 64-bit types are supported. Typically it is better to define `SIZEOF_LONG_LONG` as 8.
 
 #### WOLFSSL_NUCLEUS_1_2
 
 Use if building for Nucleus 1.2.
-
-#### WOLFSSL_PICOTCP
-
-use if if building with PicoTCP.
 
 #### WOLFSSL_RENESAS_RA6M3G
 
@@ -4073,11 +4080,6 @@ Use when building for devkitPro.
 
 Used only with implementation for VxWorks 6.x only.
 
-
-#### WOLFSSL_VERIFY_CB_ALL_CERTS
-
-Calls the certificate verify callback for all certificates in the chain, not just the peer certificate.
-
 #### WOLFSSL_WICED
 
 Used if building for WICED Studio.
@@ -4096,11 +4098,7 @@ Used when building for Freescale Classic MQX version 5.0.
 
 #### WOLFSSL_KEIL_TCP_NET
 
-Configure the TCP stack (`MDK_CONF_NETWORK`). By default uses Keil TCP `WOLFSSL_KEIL_TCP_NET`. Use 0 for none or 2 for user io callbacks.
-
-#### INTEL_GALILEO
-
-Used when configuring ARDUINO and wolfSSL. If building for Intel Galileo platform add: `#define INTEL_GALILEO`
+Use the Keil MDK TCPnet/Network stack for wolfSSL's socket I/O. In the MDK5 pack's `user_settings.h` (`IDE/MDK5-ARM`) it is selected by `MDK_CONF_NETWORK` (1, the default; use 0 for none or 2 for user I/O callbacks).
 
 #### HAVE_KEIL_RTX
 
@@ -4131,42 +4129,13 @@ Can be defined when using wolfSSL with the ISO-TP transport protocol, typically 
 
 Enables IoTSAFE (GSMA) applet support for secure element operations. Allows TLS keys and crypto to be handled by an IoTSAFE-compliant SIM.
 
-#### WOLFSSL_GAME_BUILD
-
-Can be defined when building wolfSSL for a game console.
-
-#### WOLFSSL_LSR
-
-Can be defined if building for LSR.
-
-
-#### WOLFSSL_LOCAL_X509_STORE
-
-Uses a local X509 certificate store per SSL context instead of a global one. Provides better isolation between contexts.
-
 #### FREESCALE_MQX
 
 Can be defined when building for Freescale MQX/RTCS/MFS (<https://www.freescale.com>). This in turn defines `FREESCALE_K70_RNGA` to enable support for the Kinetis H/W Random Number Generator Accelerator
 
-#### WOLFSSL_STM32F2
-
-Can be defined when building for STM32F2. This define also enables STM32F2 hardware crypto and hardware RNG support in wolfSSL (<https://www.st.com/internet/mcu/subclass/1520.jsp>).
-
-#### COMVERGE
-
-Can be defined if using Comverge settings.
-
-#### WOLFSSL_QL
-
-Can be defined if using QL SEP settings.
-
-#### WOLFSSL_EROAD
-
-Can be defined building for EROAD.
-
 #### WOLFSSL_IAR_ARM
 
-Can be defined if build for IAR EWARM.
+Can be defined if building for IAR EWARM.
 
 #### WOLFSSL_TIRTOS
 
@@ -4176,31 +4145,13 @@ Can be defined when building for TI-RTOS.
 
 Can be defined when building with Rowley CrossWorks.
 
-#### WOLFSSL_NRF51
+#### WOLFSSL_NRF5x
 
-Can be defined when porting to Nordic nRF51.
-
-#### WOLFSSL_NRF51_AES
-
-Can be defined to use built-in AES hardware for AES 128 ECB encrypt when porting to Nordic nRF51.
+Can be defined when porting to Nordic nRF5x. It defines `WOLFSSL_NRF51` internally along with `NO_FILESYSTEM`, `SINGLE_THREADED`, `WOLFSSL_USER_IO`, `NO_DEV_RANDOM`, `NO_WRITEV`, `NO_MAIN_DRIVER`, `NO_SESSION_CACHE` and `TFM_TIMING_RESISTANT`. The port (`wolfcrypt/src/port/nrf51.c`) seeds the RNG from the nRF RNG driver and provides an RTC based timer for the benchmark.
 
 #### WOLFSSL_CONTIKI
 
 Can be defined to enable support for the Contiki operating system.
-
-
-#### WOLFSSL_COPY_CERT
-
-Copies the certificate buffer when loading into an SSL object instead of referencing it, ensuring the SSL object owns its own copy of the data.
-
-
-#### WOLFSSL_COPY_KEY
-
-Copies the private key buffer when loading into an SSL object instead of referencing it, ensuring the SSL object owns its own copy of the data.
-
-#### WOLFSSL_APACHE_MYNEWT
-
-Can be defined to enable the Apache Mynewt port layer.
 
 #### WOLFSSL_APACHE_HTTPD
 
@@ -4208,15 +4159,11 @@ Can be defined to enable support for the Apache HTTPD web server.
 
 #### ASIO_USE_WOLFSSL
 
-Can be defined to make wolfSSL build as an ASIO-compatible version. ASIO then relies on the `BOOST_ASIO_USE_WOLFSSL` preprocessor define.
-
-#### WOLFSSL_CRYPTOCELL
-
-Can be defined to enable using ARM CRYPTOCELL.
+`ASIO_USE_WOLFSSL` and `BOOST_ASIO_USE_WOLFSSL` are read by (Boost.)Asio, not by wolfSSL. Build wolfSSL with [`--enable-asio`](#--enable-asio) (or the CMake option `WOLFSSL_ASIO`), which defines [`WOLFSSL_ASIO`](#wolfssl_asio) (the macro wolfSSL itself checks), turns on `OPENSSL_EXTRA` and `OPENSSL_ALL`, and adds both Asio defines.
 
 #### WOLFSSL_SIFIVE_RISC_V
 
-Can be defined to enable using RISC-V SiFive/HiFive port.
+Not checked by the wolfSSL library. It is a setting in the example project for the SiFive HiFive1 board (`IDE/RISCV/SIFIVE-HIFIVE1/user_settings.h`).
 
 #### WOLFSSL_MDK_ARM
 
@@ -4226,11 +4173,47 @@ Adds support for MDK ARM
 
 Adds support for MDK5 ARM
 
+#### FUSION_RTOS
+
+Can be defined when building for Fusion RTOS. wolfSSL then uses the Fusion RTOS socket (FNS) and C library / file system (FCL) interfaces for I/O, file access and time.
+
+#### WOLFSSL_ZEPHYR
+
+Can be defined when building for the Zephyr RTOS. wolfSSL can be used as a Zephyr module, whose build defines this macro; see `zephyr/README.md` in the wolfSSL source.
+
+#### WOLFSSL_BSDKM
+
+Can be defined when building wolfSSL as a FreeBSD kernel module. configure defines it for `--enable-freebsdkm`. See `bsdkm/README.md` in the wolfSSL source.
+
+#### WOLFSSL_XILINX
+
+Can be defined when building for Xilinx bare metal targets. It uses the FatFs file system (`ff.h`) and the PS RTC (`XRtcPsu`) for time. For the Xilinx hardware crypto engine see [`WOLFSSL_XILINX_CRYPT`](#wolfssl_xilinx_crypt).
+
+#### WOLFSSL_TELIT_M2MB
+
+Can be defined when building for Telit modules with the m2mb SDK. It provides the m2mb file system, mutex, RNG seed and time ports, including `m2mb_xtime()` for `XTIME()` and `m2mb_xtime_ms()` for [`XTIME_MS`](#xtime_ms) with TLS 1.3.
+
+#### WOLFSSL_OPTEE
+
+Can be defined when building wolfSSL into an OP-TEE trusted application (TA). It defines `NO_FILESYSTEM`, `NO_WOLFSSL_DIR`, `NO_WRITEV`, `NO_MAIN_DRIVER` and `SINGLE_THREADED`, and uses the TEE internal API for memory, the RNG seed (`TEE_GenerateRandom()`) and timers. `NO_ASN_TIME` is defined, because the only wall clock a TA can reach belongs to the normal world, unless `WOLFSSL_OPTEE_ASN_TIME` is defined.
+
+#### HAVE_NETX
+
+Can be defined when using the NetX or NetX Duo TCP/IP stack. wolfSSL then uses its NetX I/O callbacks; set the socket for a session with [`wolfSSL_SetIO_NetX()`](group__IO.md#function-wolfssl_setio_netx). DTLS over NetX Duo also needs `WOLFSSL_NETX_DUO` (see [`wolfSSL_SetIO_NetX_Dtls()`](group__IO.md#function-wolfssl_setio_netx_dtls)).
+
+#### WOLFSSL_ARDUINO
+
+Can be defined when building for Arduino. It defines `WOLFSSL_USER_IO`, `SINGLE_THREADED`, `NO_DEV_RANDOM`, `NO_WRITEV`, `NO_WOLFSSL_DIR`, `NO_SESSION_CACHE`, `HAVE_ECC` and `NO_DH`. ESP32 boards use the normal time functions and ARM boards get `NO_ASN_TIME`; on other boards it uses [`TIME_OVERRIDES`](#time_overrides), so `XTIME` and `XGMTIME` must be defined. See `IDE/ARDUINO` in the wolfSSL source.
+
+#### WOLFSSL_RPIPICO
+
+Can be defined when building for the Raspberry Pi RP2040 or RP2350 with the Pico SDK. It provides `wc_pico_rng_gen_block()`; to use the Pico RNG define `WC_NO_HASHDRBG` and `CUSTOM_RAND_GENERATE_BLOCK` as `wc_pico_rng_gen_block`. See `wolfcrypt/src/port/rpi_pico/README.md` in the wolfSSL source.
+
 ### OS Specific Defines
 
 #### USE_WINDOWS_API
 
-Specify use of windows library APIs’ as opposed to Unix/Linux APIs’
+Use the Windows APIs instead of the Unix/Linux APIs.
 
 #### WIN32_LEAN_AND_MEAN
 
