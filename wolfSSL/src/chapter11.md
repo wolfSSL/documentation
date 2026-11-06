@@ -15,9 +15,9 @@ This tutorial assumes that the reader is comfortable with editing and compiling 
 
 ## Quick Summary of SSL/TLS
 
-**TLS** (Transport Layer Security) and **SSL** (Secure Sockets Layer) are cryptographic protocols that allow for secure communication across a number of different transport protocols.  The primary transport protocol used is TCP/IP. The most recent version of SSL/TLS is TLS 1.3. wolfSSL supports SSL 3.0, TLS 1.0, 1.1, 1.2, 1.3 in addition to DTLS 1.0, 1.2, and 1.3
+**TLS** (Transport Layer Security) and **SSL** (Secure Sockets Layer) are cryptographic protocols that allow for secure communication across a number of different transport protocols.  The primary transport protocol used is TCP/IP. The most recent version of SSL/TLS is TLS 1.3. wolfSSL supports TLS 1.2 and 1.3 and DTLS 1.2 and 1.3 (DTLS is enabled with [`--enable-dtls`](chapter02.md#--enable-dtls), plus `--enable-dtls13` for DTLS 1.3). The deprecated SSL 3.0, TLS 1.0, TLS 1.1 and DTLS 1.0 are disabled by default and can be enabled with [`--enable-sslv3`](chapter02.md#--enable-sslv3), [`--enable-tlsv10`](chapter02.md#--enable-tlsv10) or `--enable-oldtls`.
 
-SSL and TLS sit between the Transport and Application layers of the OSI model, where any number of protocols (including TCP/IP, Bluetooth, etc.) may act as the underlying transport medium. Application protocols are layered on top of SSL and can include protocols such as HTTP, FTP, and SMTP. A diagram of how SSL fits into the OSI model, as well as a simple diagram of the SSL handshake process can be found in Appendix A.
+SSL and TLS sit between the Transport and Application layers of the OSI model, where any number of protocols (including TCP/IP, Bluetooth, etc.) may act as the underlying transport medium. Application protocols are layered on top of SSL and can include protocols such as HTTP, FTP, and SMTP. A diagram of how SSL fits into the OSI model, as well as a simple diagram of the SSL handshake process can be found in Appendix D, [SSL/TLS Overview](appendix04.md).
 
 ## Getting the Source Code
 
@@ -105,14 +105,15 @@ A set of tests will be run on wolfCrypt and wolfSSL to verify it has been instal
 
 ```text
 ------------------------------------------------------------------------------
- wolfSSL version 5.7.0
+ wolfSSL version 5.9.4
 ------------------------------------------------------------------------------
+macro    test passed!
 error    test passed!
+WCFLAGS  test passed!
 MEMORY   test passed!
+octets   test passed!
 base64   test passed!
 asn      test passed!
-RANDOM   test passed!
-MD5      test passed!
 SHA      test passed!
 SHA-224  test passed!
 SHA-256  test passed!
@@ -121,8 +122,14 @@ SHA-512  test passed!
 SHA-512/224  test passed!
 SHA-512/256  test passed!
 SHA-3    test passed!
+RANDOM   test passed!
+RNGTHRD  test passed!
+RNGSVC   test passed!
+RNGEPOCH test passed!
+RNGLIFE  test passed!
+SHAKE128 test passed!
+SHAKE256 test passed!
 Hash     test passed!
-HMAC-MD5 test passed!
 HMAC-SHA test passed!
 HMAC-SHA224 test passed!
 HMAC-SHA256 test passed!
@@ -139,22 +146,29 @@ ChaCha20-Poly1305 AEAD test passed!
 AES      test passed!
 AES192   test passed!
 AES256   test passed!
+AES-CBC  test passed!
 AES-GCM  test passed!
 RSA      test passed!
 DH       test passed!
 PWDBASED test passed!
 ECC      test passed!
+MLKEM    test passed!
 logging  test passed!
 time     test passed!
 mutex    test passed!
 memcb    test passed!
 Test complete
+listening on port 58396
+connecting to 127.0.0.1:58396
+listening on port 58401
+connecting to 127.0.0.1:58401
+connecting to 127.0.0.1:58401
 
 Running simple test
 SSL version is TLSv1.2
-SSL version is TLSv1.2
 SSL cipher suite is TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 SSL curve name is SECP256R1
+SSL version is TLSv1.2
 SSL cipher suite is TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 SSL curve name is SECP256R1
 Client message: hello wolfssl!
@@ -165,7 +179,7 @@ sending server shutdown command: quit!
 client sent quit command: shutting down!
 ciphers = TLS13-AES128-GCM-SHA256:TLS13-AES256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305-OLD:ECDHE-ECDSA-CHACHA20-POLY1305-OLD:DHE-RSA-CHACHA20-POLY1305-OLD
 33bc1a4570f4f1abccd5c48aace529b01a42ab51293954a297796e90d20970f0  input
-33bc1a4570f4f1abccd5c48aace529b01a42ab51293954a297796e90d20970f0  /var/folders/dy/888x7r7d6dgcqw4840l32tpw0000gp/T//testsuite-output-9Ymbuv
+33bc1a4570f4f1abccd5c48aace529b01a42ab51293954a297796e90d20970f0  /tmp/testsuite-output-07sDcT
 
 All tests passed!
 ```
@@ -230,33 +244,37 @@ Before we can use wolfSSL in our code, we need to initialize the library and the
 
 The `WOLFSSL_CTX` structure (wolfSSL Context) contains global values for each SSL connection, including certificate information. A single `WOLFSSL_CTX` can be used with any number of `WOLFSSL` objects created. This allows us to load certain information, such as a list of trusted CA certificates only once.
 
-To create a new `WOLFSSL_CTX`, use [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new). This function requires an argument which defines the SSL or TLS protocol for the client or server to use. There are several options for selecting the desired protocol. wolfSSL currently supports SSL 3.0, TLS 1.0, TLS 1.1, TLS 1.2, TLS 1.3, DTLS 1.0, DTLS 1.2, and DTLS 1.3. Each of these protocols have a corresponding function that can be used as an argument to [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new). The possible client and server protocol options are shown below. SSL 2.0 is not supported by wolfSSL because it has been insecure for several years.
+To create a new `WOLFSSL_CTX`, use [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new). This function requires an argument which defines the SSL or TLS protocol for the client or server to use. There are several options for selecting the desired protocol. wolfSSL currently supports TLS 1.2, TLS 1.3, DTLS 1.2, and DTLS 1.3, plus the deprecated SSL 3.0, TLS 1.0, TLS 1.1 and DTLS 1.0 when they are enabled at build time. Each of these protocols have a corresponding function that can be used as an argument to [`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new). The possible client and server protocol options are shown below. The SSL 3.0 methods are only available with [`--enable-sslv3`](chapter02.md#--enable-sslv3), the TLS 1.0 methods with [`--enable-tlsv10`](chapter02.md#--enable-tlsv10), and the TLS 1.1 and DTLS 1.0 methods with `--enable-oldtls`; the DTLS methods also need [`--enable-dtls`](chapter02.md#--enable-dtls) (and `--enable-dtls13` for DTLS 1.3). SSL 2.0 is not supported by wolfSSL because it has been insecure for several years.
 
 EchoClient:
 
-* [`wolfSSLv3_client_method();`](group__Setup.md#function-wolfsslv3_client_method) - SSL 3.0
-* [`wolfTLSv1_client_method();`](group__Setup.md#function-wolftlsv1_client_method) - TLS 1.0
-* [`wolfTLSv1_1_client_method();`](group__Setup.md#function-wolftlsv1_1_client_method) - TLS 1.1
+* [`wolfSSLv3_client_method();`](group__Setup.md#function-wolfsslv3_client_method) - SSL 3.0 (`--enable-sslv3`)
+* [`wolfTLSv1_client_method();`](group__Setup.md#function-wolftlsv1_client_method) - TLS 1.0 (`--enable-tlsv10`)
+* [`wolfTLSv1_1_client_method();`](group__Setup.md#function-wolftlsv1_1_client_method) - TLS 1.1 (`--enable-oldtls`)
 * [`wolfTLSv1_2_client_method();`](group__Setup.md#function-wolftlsv1_2_client_method) - TLS 1.2
 * [`wolfTLSv1_3_client_method();`](group__Setup.md#function-wolftlsv1_3_client_method) - TLS 1.3
-* [`wolfSSLv23_client_method();`](group__Setup.md#function-wolfsslv23_client_method) - Use highest version possible from SSL 3.0 - TLS 1.3
-* [`wolfDTLSv1_client_method();`](group__Setup.md#function-wolfdtlsv1_client_method) - DTLS 1.0
-* [`wolfDTLSv1_2_client_method_ex();`](ssl_8h.md#function-wolfdtlsv1_2_client_method_ex) - DTLS 1.2
-* [`wolfDTLSv1_3_client_method_ex();`](ssl_8h.md#function-wolfdtlsv1_3_client_method_ex) - DTLS 1.3
+* [`wolfSSLv23_client_method();`](group__Setup.md#function-wolfsslv23_client_method) - Negotiate the highest version both sides support (TLS 1.3 or TLS 1.2 in a default build)
+* `wolfTLS_client_method();` - Same as `wolfSSLv23_client_method()`
+* [`wolfDTLSv1_client_method();`](group__Setup.md#function-wolfdtlsv1_client_method) - DTLS 1.0 (`--enable-oldtls`)
+* `wolfDTLSv1_2_client_method();` - DTLS 1.2
+* [`wolfDTLSv1_3_client_method();`](group__Setup.md#function-wolfdtlsv1_3_client_method) - DTLS 1.3
+* [`wolfDTLS_client_method();`](group__Setup.md#function-wolfdtls_client_method) - Negotiate the highest DTLS version both sides support
 
 EchoServer:
 
-* [`wolfSSLv3_server_method();`](group__Setup.md#function-wolfsslv3_server_method) - SSL 3.0
-* [`wolfTLSv1_server_method();`](group__Setup.md#function-wolftlsv1_server_method) - TLS 1.0
-* [`wolfTLSv1_1_server_method();`](group__Setup.md#function-wolftlsv1_1_server_method) - TLS 1.1
+* [`wolfSSLv3_server_method();`](group__Setup.md#function-wolfsslv3_server_method) - SSL 3.0 (`--enable-sslv3`)
+* [`wolfTLSv1_server_method();`](group__Setup.md#function-wolftlsv1_server_method) - TLS 1.0 (`--enable-tlsv10`)
+* [`wolfTLSv1_1_server_method();`](group__Setup.md#function-wolftlsv1_1_server_method) - TLS 1.1 (`--enable-oldtls`)
 * [`wolfTLSv1_2_server_method();`](group__Setup.md#function-wolftlsv1_2_server_method) - TLS 1.2
 * [`wolfTLSv1_3_server_method();`](group__Setup.md#function-wolftlsv1_3_server_method) - TLS 1.3
-* [`wolfSSLv23_server_method();`](group__Setup.md#function-wolfsslv23_server_method) - Allow clients to connect with TLS 1.0+
-* [`wolfDTLSv1_server_method();`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS 1.0
+* [`wolfSSLv23_server_method();`](group__Setup.md#function-wolfsslv23_server_method) - Accept the highest version both sides support (TLS 1.3 or TLS 1.2 in a default build)
+* `wolfTLS_server_method();` - Same as `wolfSSLv23_server_method()`
+* [`wolfDTLSv1_server_method();`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS 1.0 (`--enable-oldtls`)
 * [`wolfDTLSv1_2_server_method();`](ssl_8h.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
-* [`wolfDTLSv1_3_server_method();`](ssl_8h.md#function-wolfdtlsv1_3_server_method) - DTLS 1.3
+* [`wolfDTLSv1_3_server_method();`](group__Setup.md#function-wolfdtlsv1_3_server_method) - DTLS 1.3
+* [`wolfDTLS_server_method();`](group__Setup.md#function-wolfdtls_server_method) - Accept the highest DTLS version both sides support
 
-We need to load our CA (Certificate Authority) certificate into the `WOLFSSL_CTX` so that the when the echoclient connects to the echoserver, it is able to verify the server’s identity. To load the CA certificates into the `WOLFSSL_CTX`, use [`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations). This function requires three arguments: a `WOLFSSL_CTX` pointer, a certificate file, and a path value. The path value points to a directory which should contain CA certificates in PEM format. When looking up certificates, wolfSSL will look at the certificate file value before looking in the path location. In this case, we don’t need to specify a certificate path because we will specify one CA file - as such we use NULL for the path argument. The [`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations) function returns either `SSL_SUCCESS` or `SSL_FAILURE`:
+We need to load our CA (Certificate Authority) certificate into the `WOLFSSL_CTX` so that the when the echoclient connects to the echoserver, it is able to verify the server's identity. To load the CA certificates into the `WOLFSSL_CTX`, use [`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations). This function requires three arguments: a `WOLFSSL_CTX` pointer, a certificate file, and a path value. The path value points to a directory which should contain CA certificates in PEM format. When looking up certificates, wolfSSL will look at the certificate file value before looking in the path location. In this case, we don't need to specify a certificate path because we will specify one CA file - as such we use NULL for the path argument. The [`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations) function returns `WOLFSSL_SUCCESS` on success, or a negative error code on failure (0 when wolfSSL is built with `WOLFSSL_ERROR_CODE_OPENSSL`):
 
 ```c
 wolfSSL_CTX_load_verify_locations(WOLFSSL_CTX* ctx, const char* file, const char* path)
@@ -279,7 +297,7 @@ EchoClient:
 
     /* Load CA certificates into WOLFSSL_CTX */
     if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", NULL) !=
-        SSL_SUCCESS) {
+        WOLFSSL_SUCCESS) {
         fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
             "please check the file.\n");
         exit(EXIT_FAILURE);
@@ -305,7 +323,7 @@ if ( (ctx = wolfSSL_CTX_new(wolfTLSv1_2_server_method())) == NULL) {
 
 /* Load CA certificates into WOLFSSL_CTX */
 if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", NULL) !=
-         SSL_SUCCESS) {
+         WOLFSSL_SUCCESS) {
     fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
         "please check the file.\n");
     exit(EXIT_FAILURE);
@@ -313,16 +331,16 @@ if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", NULL) !=
 
 /* Load server certificates into WOLFSSL_CTX */
 if (wolfSSL_CTX_use_certificate_file(ctx, "../certs/server-cert.pem",
-        SSL_FILETYPE_PEM) != SSL_SUCCESS) {
-    fprintf(stderr, "Error loading ../certs/server-cert.pem, please"
+        WOLFSSL_FILETYPE_PEM) != WOLFSSL_SUCCESS) {
+    fprintf(stderr, "Error loading ../certs/server-cert.pem, please "
         "check the file.\n");
     exit(EXIT_FAILURE);
 }
 
 /* Load keys */
 if (wolfSSL_CTX_use_PrivateKey_file(ctx, "../certs/server-key.pem",
-        SSL_FILETYPE_PEM) != SSL_SUCCESS) {
-    fprintf(stderr, "Error loading ../certs/server-key.pem, please check"
+        WOLFSSL_FILETYPE_PEM) != WOLFSSL_SUCCESS) {
+    fprintf(stderr, "Error loading ../certs/server-key.pem, please check "
         "the file.\n");
     exit(EXIT_FAILURE);
 }
@@ -362,7 +380,7 @@ if( (ssl = wolfSSL_new(ctx)) == NULL) {
 wolfSSL_set_fd(ssl, sockfd);
 ```
 
-One thing to notice here is that we haven’t made a call to the [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) function. [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) initiates the SSL/TLS handshake with the server, and is called during [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) if it hadn't been called previously. In our case, we don’t explicitly call [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect), as we let our first [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) do it for us.
+One thing to notice here is that we haven't made a call to the [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) function. [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect) initiates the SSL/TLS handshake with the server, and is called during [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) or [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) if it hadn't been called previously. In our case, we don't explicitly call [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect), as we let our first [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) do it for us.
 
 ### EchoServer
 
@@ -400,7 +418,7 @@ str_cli(stdin, ssl);
 
 Inside the `str_cli()` function, `Writen()` and `Readline()` are replaced with calls to [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) and [`wolfSSL_read()`](group__IO.md#function-wolfssl_read) functions, and the `WOLFSSL` object (`ssl`) is used instead of the original file descriptor(`sockfd`). The new `str_cli()` function is shown below. Notice that we now need to check if our calls to [`wolfSSL_write`](group__IO.md#function-wolfssl_write) and [`wolfSSL_read`](group__IO.md#function-wolfssl_read) were successful.
 
-The authors of the Unix Programming book wrote error checking into their `Writen()` function which we must make up for after it has been replaced. We add a new int variable, `n`, to monitor the return value of [`wolfSSL_read`](group__IO.md#function-wolfssl_read) and before printing out the contents of the buffer, `recvline`, the end of our read data is marked with a `\0`:
+The authors of the Unix Programming book wrote error checking into their `Writen()` function which we must make up for after it has been replaced. We add a new int variable, `n`, to monitor the return value of [`wolfSSL_read`](group__IO.md#function-wolfssl_read) and before printing out the contents of the buffer, `recvline`, the end of our read data is marked with a `\0`. One byte of `recvline` is kept free for it, so at most `MAXLINE - 1` bytes are read:
 
 ```c
 void
@@ -416,7 +434,7 @@ str_cli(FILE *fp, WOLFSSL* ssl)
             err_sys("wolfSSL_write failed");
         }
 
-        if ((n = wolfSSL_read(ssl, recvline, MAXLINE)) <= 0)
+        if ((n = wolfSSL_read(ssl, recvline, MAXLINE - 1)) <= 0)
             err_quit("wolfSSL_read error");
 
         recvline[n] = '\0';
@@ -478,9 +496,9 @@ We will free the `ctx` and cleanup before the call to exit.
 
 ## Signal Handling
 
-### Echoclient / Echoserver
+### Echoserver
 
-In the echoclient and echoserver, we will need to add a signal handler for when the user closes the app by using “Ctrl+C”. The echo server is continually running in a loop. Because of this, we need to provide a way to break that loop when the user presses “Ctrl+C”. To do this, the first thing we need to do is change our loop to a while loop which terminates when an exit variable (cleanup) is set to true.
+In the echoserver, we will need to add a signal handler for when the user closes the app by using "Ctrl+C". The echoclient does not need one: it leaves its loop at end of input and then frees its objects, and "Ctrl+C" simply ends it. The echo server is continually running in a loop. Because of this, we need to provide a way to break that loop when the user presses "Ctrl+C". To do this, the first thing we need to do is change our loop to a while loop which terminates when an exit variable (cleanup) is set to true.
 
 First, define a new static int variable called `cleanup` at the top of `tcpserv04.c` right after the `#include` statements:
 
@@ -497,17 +515,12 @@ while(cleanup != 1)
 }
 ```
 
-For the echoserver we need to disable the operating system from restarting calls which were being executed before the signal was handled after our handler has finished. By disabling these, the operating system will not restart calls to `accept()` after the signal has been handled. If we didn’t do this, we would have to wait for another client to connect and disconnect before the echoserver would clean up resources and exit. To define the signal handler and turn off `SA_RESTART`, first define `act` and `oact` structures in the echoserver’s `main()` function:
-
-```c
-struct sigaction     act, oact;
-```
-
-Insert the following code after variable declarations, before the call to [`wolfSSL_Init()`](group__TLS.md#function-wolfssl_init) in the main function:
+For the echoserver we need to disable the operating system from restarting calls which were being executed before the signal was handled after our handler has finished. By disabling these, the operating system will not restart calls to `accept()` after the signal has been handled. If we didn't do this, we would have to wait for another client to connect and disconnect before the echoserver would clean up resources and exit. To define the signal handler and turn off `SA_RESTART`, we declare `act` and `oact` structures in the echoserver's `main()` function and set them up. Insert the following code at the end of the variable declarations, before the call to [`wolfSSL_Init()`](group__TLS.md#function-wolfssl_init) in the main function:
 
 ```c
 /* Signal handling code */
 struct sigaction act, oact;         /* Declare the sigaction structs    */
+
 act.sa_handler = sig_handler;       /* Tell act to use sig_handler      */
 sigemptyset(&act.sa_mask);          /* Tells act to exclude all sa_mask *
                                      * signals during execution of      *
@@ -518,7 +531,7 @@ sigaction(SIGINT, &act, &oact);     /* Tells the program to use (o)act  *
                                      * on a signal or interrupt         */
 ```
 
-The echoserver’s sig_handler function is shown below:
+The echoserver's `sig_handler()` function is shown below. Define it (or add a prototype for it) above `main()` in `tcpserv04.c`, so that it is declared before `main()` refers to it:
 
 ```c
 void sig_handler(const int sig)
@@ -539,7 +552,7 @@ What we did:
 * Created a `WOLFSSL` object to use for sending and receiving data
 * Replaced calls to `Writen()` and `Readline()` with [`wolfSSL_write()`](group__IO.md#function-wolfssl_write) and [`wolfSSL_read()`](group__IO.md#function-wolfssl_read)
 * Freed `WOLFSSL`, `WOLFSSL_CTX`
-* Made sure we handled client and server shutdown with signal handler
+* Made sure the server shuts down cleanly with a signal handler, and the client frees its objects when it finishes
 
 There are many more aspects and methods to configure and control the behavior of your SSL connections. For more detailed information, please see additional wolfSSL documentation and resources.
 
