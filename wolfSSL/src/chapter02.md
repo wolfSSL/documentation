@@ -4237,21 +4237,53 @@ By default, wolfSSL only builds in shared mode, with static mode being disabled.
 
 Enable wolfSSL debugging support. Enabling debug support allows easier debugging by compiling with debug information and defining the constant [`DEBUG_WOLFSSL`](#debug_wolfssl) which outputs messages to `stderr`. To turn debug on at runtime, call [`wolfSSL_Debugging_ON()`](group__Debug.md#function-wolfssl_debugging_on). To turn debug logging off at runtime, call [`wolfSSL_Debugging_OFF()`](group__Debug.md#function-wolfssl_debugging_off). For more information, see [Debugging](chapter08.md#debugging).
 
+### `--enable-debug-trace-errcodes`
+
+Print a trace message each time the library raises an error code (defines `WOLFSSL_DEBUG_TRACE_ERROR_CODES`). `--enable-debug-trace-errcodes=backtrace` also prints a backtrace and links with `libbacktrace`. Off by default.
+
+### `--enable-debug-code-points`
+
+Include the source file name and line number in the [`--enable-debug`](#--enable-debug) messages (defines `WOLFSSL_DEBUG_CODEPOINTS`). Off by default.
+
 ### `--enable-distro`
 
-Enable wolfSSL distro build.
+Enable the distribution package build: builds shared and static libraries, turns on [`--enable-all`](#--enable-all), enables [`--enable-reproducible-build`](#--enable-reproducible-build) by default and disables early data. Cannot be combined with `--enable-experimental`.
 
-### `--enable-singlethread`
+### `--enable-singlethreaded`
 
-Enable single threaded mode, no multi thread protections.
+Enable single threaded mode, no multi thread protections (defines `SINGLE_THREADED`). Single threaded mode is also selected automatically when configure cannot find a POSIX threads library.
 
 Enabling single threaded mode turns off multi thread protection of the session cache. Only enable single threaded mode if you know your application is single threaded or your application is multithreaded and only one thread at a time will be accessing the library.
+
+### `--disable-threadlocal`
+
+Thread local storage is used by default when the compiler supports it (defines `HAVE_THREAD_LS`). `--disable-threadlocal` turns it off. Some features, such as the per-thread error queue, need it.
 
 ### `--enable-dtls`
 
 Enable wolfSSL DTLS support
 
 Enabling DTLS support allows users of the library to also use the DTLS protocol in addition to TLS and SSL. For more information, see the [DTLS](chapter04.md#dtls) section.
+
+### `--enable-dtls13`
+
+Enable DTLS 1.3 (defines `WOLFSSL_DTLS13`). Off by default. DTLS and TLS 1.3 are turned on automatically, and so is the server HelloRetryRequest cookie ([`--enable-hrrcookie`](#--enable-hrrcookie)) unless `--disable-hrrcookie` is given. When ML-KEM is enabled (the default), DTLS 1.3 ClientHello fragmenting is turned on as well.
+
+### `--enable-dtlscid`
+
+Enable the DTLS Connection ID extension (defines `WOLFSSL_DTLS_CID`). Off by default.
+
+### `--enable-dtls-frag-ch`
+
+Enable fragmenting of the DTLS 1.3 ClientHello, for ClientHello messages (for example with post-quantum key shares) that do not fit in one datagram. Requires `--enable-dtls13`. Off by default, but turned on automatically when both ML-KEM and DTLS 1.3 are enabled.
+
+### `--enable-dtls-mtu`
+
+Allow the application to set the DTLS MTU size. Off by default.
+
+### `--enable-srtp`
+
+Enable DTLS-SRTP (RFC 5764). Off by default. Turns on DTLS, the SRTP KDF and the keying material exporter.
 
 ### `--disable-rng`
 
@@ -4279,15 +4311,23 @@ Enable extra OpenSSL API compatibility, increases the size
 
 Enabling OpenSSL Extra includes a larger set of OpenSSL compatibility functions. The basic build will enable enough functions for most TLS/SSL needs, but if you're porting an application that uses 10s or 100s of OpenSSL calls, enabling this will allow better support. The wolfSSL OpenSSL compatibility layer is under active development, so if there is a function missing which you need, please contact us and we'll try to help. For more information about the OpenSSL Compatibility Layer, please see [OpenSSL Compatibility](chapter13.md#openssl-compatibility).
 
+`--enable-opensslextra=noinstall` skips installing the `wolfssl/openssl/` compatibility headers. On its own this value does not define `OPENSSL_EXTRA`, so combine it with an option that turns the compatibility layer on, such as [`--enable-opensslall`](#--enable-opensslall).
+
 ### `--enable-opensslall`
 
 Enable all OpenSSL API.
 
+### `--enable-opensslcoexist`
+
+Build wolfSSL so that it can be linked beside OpenSSL's libcrypto (defines `OPENSSL_COEXIST` and drops the old wolfSSL and wolfCrypt compatibility names). Off by default. Cannot be combined with `--enable-opensslall`.
+
 ### `--enable-maxstrength`
 
-Enable Max Strength build, allows TSLv1.2-AEAD-PFS ciphers only. This is
+Enable Max Strength build, allows TLSv1.2-AEAD-PFS ciphers only. This is
 disabled by default because it can cause interoperability issues. It also
-enables glitching detection.
+enables glitching detection. It defines `WOLFSSL_MAX_STRENGTH` and
+`WOLFSSL_CIPHER_TEXT_CHECK`, forces old TLS off (`NO_OLD_TLS`), and cannot be
+combined with `--enable-leanpsk` or `--enable-sslv3`.
 
 ### `--disable-harden`
 
@@ -4304,6 +4344,22 @@ To disable via user_settings.h the equivalent settings would be:
 * Remove the setting `WC_RSA_BLINDING` if present or un-define it
 * Remove the setting `ECC_TIMING_RESISTANT` if present or un-define it
 * Remove the setting `TFM_TIMING_RESISTANT` if present or un-define it
+
+### `--enable-harden-tls`
+
+Enable the TLS requirements of RFC 9325 (defines `WOLFSSL_HARDEN_TLS`). Off by default. Takes `yes`, `112` or `128`, the minimum security strength in bits; `yes` is the same as `112`. It forces old TLS off and cannot be combined with `--enable-legacy-server-connect`.
+
+### `--enable-faultharden`
+
+Enable fault injection hardening, for example checking a TLS ECC signature after it is made and adding redundant checks to signature verification (defines `WOLFSSL_CHECK_SIG_FAULTS`, `WOLFSSL_CHECK_VER_FAULTS`, `WC_SHA3_FAULT_HARDEN`, `WC_MLKEM_FAULT_HARDEN` and `WC_MLDSA_FAULT_HARDEN`). Off by default.
+
+### `--enable-compileharden`
+
+Add extra hardening compiler flags (`-Wa,-mbranches-within-32B-boundaries -falign-loops=64`). Off by default. The `-mbranches-within-32B-boundaries` assembler option is x86 specific, and configure fails if the toolchain does not accept it.
+
+### `--enable-aes-touch-lines`
+
+Touch every AES table cache line on each table lookup, for cache-timing resistance (defines `WOLFSSL_AES_TOUCH_LINES`; `--disable-aes-touch-lines` defines `WOLFSSL_AES_NO_TOUCH_LINES`). On by default on RISC-V, off elsewhere.
 
 ### `--enable-ipv6`
 
@@ -4325,7 +4381,11 @@ Very small build using PSK, and eliminating many features from the library. Appr
 
 Implements a lean TLS 1.2 client only (no client auth), ECC256, AES128 and SHA256 w/o Shamir. Meant to be used by itself at the moment and not in conjunction with other build options.
 
-Enabling produces a small footprint TLS client that supports TLS 1.2 client only (no client auth), ECC256, AES128 and SHA256 w/o Shamir. Meant to be used by itself at the moment and not in conjunction with other build options.
+The option defines `WOLFSSL_LEANTLS`, `NO_WOLFSSL_SERVER`, `NO_RSA`, `NO_DH` and `NO_OLD_TLS` among others, and also turns on [`--enable-lowresource`](#--enable-lowresource). TLS 1.3 is not turned off: it stays enabled (the default), and AES-GCM is kept while TLS 1.3 is on. Add [`--disable-tls13`](#--disable-tls13) to get the TLS 1.2 only client described here.
+
+### `--enable-lowresource`
+
+Enable settings for low memory and flash use. Off by default. It disables the session cache and selects the small, slower variants of RSA, Curve25519, Ed25519, SHA-1, SHA-256, SHA-512, AES and AES-GCM (for example `RSA_LOW_MEM`, `CURVE25519_SMALL`, `ED25519_SMALL`, `USE_SLOW_SHA256`, `GCM_SMALL`), and drops ECC Shamir.
 
 ### `--enable-tinytls13`
 
@@ -4437,7 +4497,7 @@ The profile is driven entirely by the `WOLFSSL_TINY_TLS13` family of macros. Eac
 
 The `p256`, `sha384` and `mldsa` configure items have no dedicated tiny macro; they are selected with the standard wolfSSL macros (`HAVE_ECC` with `ECC_USER_CURVES`, `WOLFSSL_SHA384`, and `WOLFSSL_HAVE_MLDSA` with `WOLFSSL_MLDSA_VERIFY_ONLY`). See `examples/configs/user_settings_tinytls13.h` for the exact blocks.
 
-A self contained, single process TLS 1.3 handshake smoke test for the profile is provided in `examples/configs/tinytls13_smoke.c`. It wires an in memory client and server together with no sockets or threads, so it can validate a tiny build that has no example or test harness available.
+A self contained, single process TLS 1.3 handshake smoke test for the profile is provided in `examples/tls13/tls13_memio.c`. It wires an in memory client and server together with no sockets or threads, so it can validate a tiny build that has no example or test harness available.
 
 #### Dos and don'ts
 
@@ -4446,14 +4506,14 @@ A self contained, single process TLS 1.3 handshake smoke test for the profile is
 * Do pair `mldsa` and `rsaverify` with the `cert` profile. They are certificate verification algorithms, so on the PSK floor they only confirm the build links.
 * Do supply a real hardware entropy source through `CUSTOM_RAND_GENERATE_SEED` on bare metal. The default seed sources are not present once `NO_FILESYSTEM` and similar are set.
 * Do not combine the profile with a FIPS build. It is a non FIPS footprint profile.
-* Do not define `WOLFSSL_NO_MALLOC` and expect the standard `make check` test suite to run, since that suite needs an allocator. Validate a zero heap build by linking it and running the smoke test instead.
+* Do not define `WOLFSSL_NO_MALLOC` and expect the standard `make check` test suite to run, since that suite needs an allocator. Validate a zero heap build by linking it and running `examples/tls13/tls13_memio.c` instead.
 * Note that AES-256-GCM-SHA384 uses a SHA-384 transcript. With an external pre shared key, provision the key for SHA-384 through the cipher suite specific PSK callback, or use the cipher on the certificate profile, otherwise the PSK binder will not match.
 
 ### `--enable-bigcache`
 
 Enable a big session cache.
 
-Enabling the big session cache will increase the session cache from 33 sessions to 20,027 sessions. The default session cache size of 33 is adequate for TLS clients and embedded servers. The big session cache is suitable for servers that aren't under heavy load, basically allowing 200 new sessions per minute or so.
+Enabling the big session cache will increase the session cache from 33 sessions to 20,027 sessions. The default session cache size of 33 is adequate for TLS clients and embedded servers.
 
 ### `--enable-hugecache`
 
@@ -4461,11 +4521,17 @@ Enable a huge session cache.
 
 Enabling the huge session cache will increase the session cache size to 65,791 sessions. This option is for servers that are under heavy load, over 13,000 new sessions per minute are possible or over 200 new sessions per second.
 
+### `--enable-titancache`
+
+Enable a titan session cache (defines `TITAN_SESSION_CACHE`). Off by default.
+
+The titan session cache holds just over 2 million sessions and turns on row level locking of the cache. It is meant for servers with a lot of memory, long session ID timeouts and high levels of traffic.
+
 ### `--enable-smallcache`
 
 Enable small session cache.
 
-Enabling the small session cache will cause wolfSSL to only store 6 sessions. This may be useful for embedded clients or systems where the default of nearly 3kB is too much RAM. This define uses less than 500 bytes of RAM.
+Enabling the small session cache will cause wolfSSL to only store 6 sessions. This may be useful for embedded clients or systems where the default is too much RAM. The default cache (33 sessions) takes about 13 KB for the session cache plus 17 KB for the client cache; the small cache takes about 2 KB plus 3 KB.
 
 ### `--enable-savesession`
 
@@ -4491,39 +4557,75 @@ Enable Public Key Callbacks
 
 Enabling this option will turn on Public Key callbacks, allowing the application to register its own ECC sign/verify and RSA sign/verify and encrypt/decrypt callbacks.
 
+### `--enable-cert-setup-cb`
+
+Enable a callback that loads the TLS certificate and key dynamically during the handshake (defines `WOLFSSL_CERT_SETUP_CB`). Off by default.
+
+### `--enable-chain-verify-cb`
+
+Let the application replace the verification of the peer certificate chain with its own callback (defines `WOLFSSL_CHAIN_VERIFY_CB`). Off by default.
+
+### `--enable-writedup`
+
+Enable write duplication of `WOLFSSL` objects, so that one thread can read and another can write on the same connection (defines `HAVE_WRITE_DUP`). Off by default.
+
 ### `--enable-sniffer`
 
 Enable wolfSSL sniffer support.
 
 Enabling sniffer (SSL inspection) support will allow the collection of SSL traffic packets as well as the ability to decrypt those packets with the correct key file.
 
-Currently the sniffer supports the following RSA ciphers:
+The option defines `WOLFSSL_SNIFFER` and `WOLFSSL_STATIC_EPHEMERAL`. It needs ECC, RSA or Curve25519, and the sniffer test program is built only when libpcap is available. The sniffer can decode TLS 1.2 and TLS 1.3 sessions that use AES-GCM, AES-CCM, ChaCha20-Poly1305, AES-CBC or Camellia-CBC (and 3DES or RC4 when those are enabled; both are off by default). Sessions that use an ephemeral (EC)DHE key exchange, as TLS 1.3 sessions do, can be decoded only when the server uses a static ephemeral key, or from an NSS keylog file when wolfSSL is built with `WOLFSSL_SNIFFER_KEYLOGFILE`. See `sslSniffer/README.md` in the wolfSSL source for details.
 
-CBC ciphers:
+### `--enable-keylog-export`
 
-* AES-CBC
-* Camellia-CBC
-* 3DES-CBC
-
-Stream ciphers:
-
-* RC4
+Enable export of TLS secrets to an NSS keylog file (defines `WOLFSSL_SSLKEYLOGFILE`, `HAVE_SECRET_CALLBACK` and `SHOW_SECRETS`). Off by default. This is insecure and must not be used in production; configure prints a warning when it is enabled.
 
 ### `--enable-aesgcm`
 
-Enable AES-GCM support.
+Enable AES-GCM support. Enabled by default; `--disable-aesgcm` turns it off.
 
-Enabling AES-GCM will add these cipher suites to wolfSSL.  wolfSSL offers four different implementations of AES-GCM balancing speed versus memory consumption. If available, wolfSSL will use 64-bit or 32-bit math. For embedded applications, there is a speedy 8-bit version that uses RAM-based lookup tables (8KB per session) which is speed comparable to the 64-bit version and a slower 8-bit version that doesn't take up any additional RAM. The --enable-aesgcm configure option may be modified with the options `=word32`, `=table`, or `=small`, i.e. `--enable-aesgcm=table`.
+Enabling AES-GCM will add these cipher suites to wolfSSL.  wolfSSL offers four different implementations of AES-GCM balancing speed versus memory consumption. If available, wolfSSL will use 64-bit or 32-bit math. For embedded applications, there is a speedy 8-bit version that uses RAM-based lookup tables (8KB per session) which is speed comparable to the 64-bit version and a slower 8-bit version that doesn't take up any additional RAM. The --enable-aesgcm configure option may be modified with the options `=4bit`, `=word32`, `=table`, or `=small`, i.e. `--enable-aesgcm=table`. The default implementation is `4bit` (`GCM_TABLE_4BIT`), and `=word` is the same as `=yes`.
+
+### `--enable-aesgcm-stream`
+
+Enable the AES-GCM streaming API, which encrypts or decrypts in several update calls (defines `WOLFSSL_AESGCM_STREAM`). Off by default.
 
 ### `--enable-aesccm`
 
-Enable AES-CCM support
+Enable AES-CCM support (`HAVE_AESCCM`), including Counter with CBC-MAC Mode with 8-byte authentication (CCM-8) for AES.
 
 ### `--disable-aescbc`
 
-Used to with [`--disable-aescbc`](#--disable-aescbc) to compile out AES-CBC
+AES-CBC is enabled by default. `--disable-aescbc` compiles it out (defines `NO_AES_CBC`). [`--enable-she`](#--enable-she) and `--enable-aescts` require AES-CBC.
 
-AES-GCM will enable Counter with CBC-MAC Mode with 8‑byte authentication (CCM-8) for AES.
+### `--enable-aesecb`
+
+Enable AES-ECB support (defines `HAVE_AES_ECB`). Off by default, although the configure help text says enabled.
+
+### `--enable-aesofb`
+
+Enable AES-OFB mode support. Off by default.
+
+### `--enable-aescts`
+
+Enable AES-CTS (ciphertext stealing) mode support (defines `WOLFSSL_AES_CTS`). Off by default. Requires AES-CBC.
+
+### `--enable-aeseax`
+
+Enable AES-EAX mode support. Off by default.
+
+### `--enable-aessiv`
+
+Enable AES-SIV (RFC 5297) support (defines `WOLFSSL_AES_SIV`). Off by default.
+
+### `--enable-aesxts`
+
+Enable AES-XTS mode (defines `WOLFSSL_AES_XTS`). Off by default. The old name `--enable-xts` is still accepted.
+
+### `--enable-aesxts-stream`
+
+Enable the AES-XTS streaming API. When `--enable-aesxts` is given, this is on by default unless `--enable-armasm` is also used.
 
 ### `--enable-aescfb`
 
@@ -4541,15 +4643,39 @@ Enable wolfSSL Intel AES-NI support
 
 Enabling AES-NI support will allow AES instructions to be called directly from the chip when using an AES-NI supported chip. This provides speed increases for AES functions.  See [Features](chapter04.md#features) for more details regarding AES-NI.
 
+### `--enable-aesni-with-avx`
+
+Enable AES-NI with additional AVX acceleration for AES. Off by default. Needs an x86 or x86_64 host.
+
 ### `--enable-intelasm`
 
 Enable ASM speedups for Intel and AMD processors.
 
 Enabling the intelasm option for wolfSSL will utilize expanded capabilities of your processor that dramatically enhance AES performance. The instruction sets leveraged when configure option is enabled include AVX1, AVX2, BMI2, RDRAND, RDSEED, AESNI, and ADX. These were first introduced into Intel processors and AMD processors have started adopting them in recent years. When enabled, wolfSSL will check the processor and take advantage of the instruction sets your processor supports.
 
+### `--enable-intelrand`, `--enable-intelrdseed` and `--enable-amdrdseed`
+
+Use a hardware random number instruction as the preferred source: `--enable-intelrand` uses Intel RDRAND for random numbers (`HAVE_INTEL_RDRAND`), `--enable-intelrdseed` uses Intel RDSEED to seed the RNG (`HAVE_INTEL_RDSEED`), and `--enable-amdrdseed` (alias `--enable-amdrand`) uses AMD RDSEED to seed the RNG (`HAVE_AMD_RDSEED`). All are off by default.
+
+### `--disable-asm`
+
+Assembly code is enabled by default. `--disable-asm` turns off all assembly (defines `TFM_NO_ASM` and `WOLFSSL_NO_ASM`) and builds the C implementations only.
+
+### `--enable-all-asm`
+
+Enable all assembly accelerations that apply to the host, for example `--enable-intelasm` on x86_64 and `--enable-armasm` on AArch64, plus the SP math assembly. Off by default, but turned on by [`--enable-all-crypto`](#--enable-all-crypto) when building with a GCC compatible compiler outside a kernel module. Cannot be combined with options that turn assembly off, such as `--disable-asm`, `--disable-intelasm` or `--disable-armasm`.
+
 ### `--enable-camellia`
 
 Enable Camellia support
+
+### `--enable-aria`
+
+Enable ARIA cipher support (defines `HAVE_ARIA`). Off by default. ARIA is provided by the external MagicCrypto library, which configure expects in a `MagicCrypto` directory in the build directory.
+
+### `--enable-sm2`, `--enable-sm3` and `--enable-sm4-ecb`, `--enable-sm4-cbc`, `--enable-sm4-ctr`, `--enable-sm4-gcm`, `--enable-sm4-ccm`
+
+Enable the Chinese ShangMi algorithms: the SM2 elliptic curve signatures and key exchange (`WOLFSSL_SM2`, needs ECC), the SM3 hash (`WOLFSSL_SM3`) and the SM4 block cipher in the selected modes. All are off by default. The implementation is not in the wolfSSL source tree; it is added from the separate [wolfsm](https://github.com/wolfSSL/wolfsm) repository.
 
 ### `--enable-md2`
 
@@ -4563,9 +4689,9 @@ Enable wolfSSL NULL cipher support (no encryption)
 
 Enable wolfSSL RIPEMD-160 support
 
-### `--enable-blake2`
+### `--enable-blake2b`
 
-Enable wolfSSL BLAKE2 support
+Enable wolfSSL BLAKE2b support (defines `HAVE_BLAKE2B`). `--enable-blake2` is accepted as a backward compatible alias.
 
 ### `--enable-blake2s`
 
@@ -4573,15 +4699,25 @@ Enable wolfSSL BLAKE2s support
 
 ### `--enable-sha3`
 
-Enabled by default on x86\_64 and Aarch64.
+Enabled by default on x86\_64, amd64 and AArch64, and on every other target whenever ML-KEM (on by default), ML-DSA, FrodoKEM or Falcon is enabled, since those turn SHA-3 and SHAKE on.
 
-Enables wolfSSL SHA3 support (`=small` for small build)
+Enables wolfSSL SHA3 support (`=small` for small build, `=noasm` to disable the SHA-3 assembly)
 
-### `--enable-sha512`
+### `--enable-shake128` and `--enable-shake256`
 
-Enabled by default on x86\_64.
+Enable the SHAKE128 and SHAKE256 extendable output functions. On by default whenever SHA-3 is enabled (in FIPS builds, only from FIPS v6). ML-KEM needs both and turns them back on if they are disabled.
 
-Enable wolfSSL SHA-512 support
+### `--disable-sha256`
+
+Disable SHA-256 support. SHA-256 is enabled by default.
+
+### `--disable-sha384`
+
+Disable SHA-384 support. SHA-384 is enabled by default.
+
+### `--disable-sha512`
+
+Disable wolfSSL SHA-512 support. SHA-512 is enabled by default on all targets, and is turned off by [`--enable-leanpsk`](#--enable-leanpsk), [`--enable-leantls`](#--enable-leantls) and `--enable-16bit`.
 
 ### `--enable-she`
 
@@ -4592,7 +4728,9 @@ Two modes are available:
 - `--enable-she=standard` - Standard SHE support (defines `WOLFSSL_SHE`)
 - `--enable-she=extended` - Standard plus extended overrides for custom KDF constants and message headers (defines `WOLFSSL_SHE` and `WOLFSSL_SHE_EXTENDED`)
 
-SHE automatically enables its dependencies: AES, AES-CBC, AES-direct, and CMAC.
+A mode is required. Plain `--enable-she` (value `yes`) neither defines `WOLFSSL_SHE` nor builds the SHE sources.
+
+SHE automatically enables its dependencies: AES, AES-CBC, AES-direct, and CMAC. Configure fails if `--disable-aescbc` is also given.
 
 The following defines can be used to compile out optional features:
 
@@ -4609,11 +4747,15 @@ Enable session cert storing
 
 ### `--enable-keygen`
 
-Enable key generation (applies to RSA key generation only)
+Enable key generation (`WOLFSSL_KEY_GEN`): RSA key generation, DSA key generation, DH parameter generation and the key to DER export functions such as `wc_RsaKeyToDer()`. Also accepts a comma separated list: `all`, or `no-dh-params` to drop DH domain parameter generation while keeping DH key generation (defines `WOLFSSL_NO_DH_GEN_PARAMS`).
 
 ### `--enable-certgen`
 
 Enable cert generation
+
+### `--enable-certsigncb`
+
+Enable the certificate signing callback API, so that a certificate can be signed by a TPM or HSM that holds the private key (defines `WOLFSSL_CERT_SIGN_CB`). Off by default.
 
 ### `--enable-certext`
 
@@ -4629,35 +4771,57 @@ Enable SEP extensions
 
 ### `--enable-hkdf`
 
-Enable HKDF (HMAC-KDF)
+Enable HKDF (HMAC-KDF). Enabled automatically whenever TLS 1.3 is enabled (the default).
+
+### `--enable-hpke`
+
+Enable Hybrid Public Key Encryption (HPKE, RFC 9180), defines `HAVE_HPKE`. Off by default. HKDF is turned on with it. [`--enable-ech`](#--enable-ech) uses HPKE.
 
 ### `--enable-x963kdf`
 
 Enable X9.63 KDF support
 
+### `--enable-srtp-kdf`
+
+Enable the SRTP and SRTCP key derivation functions (defines `WC_SRTP_KDF`). Off by default. Turned on by [`--enable-srtp`](#--enable-srtp).
+
+### `--enable-cmac`
+
+Enable AES-CMAC (defines `WOLFSSL_CMAC`). Off by default. Turned on automatically by options that need it, such as `--enable-aessiv`, `--enable-aeseax`, `--enable-cmac-kdf` and `--enable-she`.
+
+### `--enable-cmac-kdf`
+
+Enable the two-step KDF with AES-CMAC from NIST SP 800-56C, `wc_KDA_KDF_twostep_cmac()` (defines `HAVE_CMAC_KDF`). Off by default. Requires the KDF code, which is on by default (`--enable-kdf`).
+
 ### `--enable-dsa`
 
 Enable Digital Signature Algorithm (DSA).
 
-NIST approved digital signature algorithm along with RSA and ECDSA as defined by FIPS 186-4 and are used to generate and verify digital signatures if used in conjunction with an approved hash function as defined by the Secure Hash Standard (FIPS 180-4).
+DSA is a legacy algorithm. It was approved along with RSA and ECDSA in FIPS 186-4, but FIPS 186-5, which supersedes FIPS 186-4, no longer approves DSA for generating signatures (it may still be used to verify them). wolfSSL groups DSA with the obsolete FIPS algorithms that [`--enable-all-legacy-crypto`](#--enable-all-legacy-crypto) turns on.
 
-### `--enable-eccshamir`
+### `--disable-eccshamir`
 
-Enabled by default on x86\_64
+Enabled by default on all targets. `--disable-eccshamir` turns off ECC Shamir (`ECC_SHAMIR`), which is also dropped by [`--enable-lowresource`](#--enable-lowresource).
 
-Enable ECC Shamir
+### `--disable-ecc`
 
-### `--enable-ecc`
-
-Enabled by default on x86\_64
-
-Enable ECC.
-
-Enabling this option will build ECC support and cipher suites into wolfSSL.
+ECC support and the ECC cipher suites are built into wolfSSL by default on all targets. `--disable-ecc` builds without them.
 
 ### `--enable-ecccustcurves`
 
 Enable ECC custom curves (`=all` to enable all curve types)
+
+### `--enable-brainpool`
+
+Enable the Brainpool ECC curves (defines `HAVE_ECC_BRAINPOOL`). On by default whenever `--enable-ecccustcurves` is on, and requires it.
+
+### `--with-eccminsz=BITS`
+
+Set the minimum ECC key size that is accepted (`ECC_MIN_KEY_SZ`). The default is 224 bits, or 192 bits in FIPS builds.
+
+### `--with-max-ecc-bits=BITS`
+
+Set the largest ECC key size, in bits, that the build supports. Must be between 112 and 1024.
 
 ### `--enable-compkey`
 
@@ -4667,13 +4831,25 @@ Enable compressed keys support
 
 Enable Curve25519 (or `--enable-curve25519=small` for CURVE25519\_SMALL).
 
-An elliptic curve offering 128 bits of security and to be used with ECDH key  agreement (see [Cross Compiling](#cross-compiling)). Enabling curve25519 option allows for the use of the curve25519 algorithm. The default curve25519 is set to use more memory but have a faster run time. To have the algorithm use less memory the option `--enable-curve25519=small` can be used. Although using less memory there is a trade off in speed.
+An elliptic curve offering 128 bits of security and to be used with ECDH key  agreement. Enabling curve25519 option allows for the use of the curve25519 algorithm. The default curve25519 is set to use more memory but have a faster run time. To have the algorithm use less memory the option `--enable-curve25519=small` can be used. Although using less memory there is a trade off in speed.
+
+`--enable-curve25519=nonblock` adds non-blocking key generation and shared secret computation (`WC_X25519_NONBLOCK`, which also selects the small implementation) and turns on `--enable-asynccrypt` and `--enable-asynccrypt-sw`. `--enable-curve25519=noasm` disables the x86\_64 assembly for Curve25519 and Ed25519.
 
 ### `--enable-ed25519`
 
 Enable ED25519 (or `--enable-ed25519=small` for ED25519\_SMALL)
 
-Enabling ed25519 option allows for the use of the ed25519 algorithm. The default ed25519 is set to use more memory but have a faster run time. To have the algorithm use less memory the option `--enable-ed25519=small` can be used. Like with curve25519 using this enable option less is a trade off between speed and memory.
+Enabling ed25519 option allows for the use of the ed25519 algorithm. The default ed25519 is set to use more memory but have a faster run time. To have the algorithm use less memory the option `--enable-ed25519=small` can be used. As with curve25519, the `small` option trades speed for lower memory use.
+
+`--enable-ed25519-stream` adds the streaming verify API, for messages that are verified in several updates. Off by default.
+
+### `--enable-curve448`
+
+Enable Curve448 (X448) key agreement. Off by default. `--enable-curve448=small` selects the small implementation.
+
+### `--enable-ed448`
+
+Enable Ed448 signatures. Off by default. `--enable-ed448=small` selects the small implementation, and `--enable-ed448-stream` adds the streaming verify API. Ed448 needs SHAKE256, so SHA-3 is turned on with it.
 
 ### `--enable-fpecc`
 
@@ -4681,20 +4857,39 @@ Enable Fixed Point cache ECC
 
 ### `--enable-eccencrypt`
 
-Enable ECC encrypt
+Enable ECC encrypt (ECIES). Takes `yes` (SEC1 standard), `geniv` (generate the IV), `iso18033` (ISO 18033 standard) or `old` (the original wolfSSL algorithm). Requires ECC and HKDF.
+
+### `--enable-eccsi`
+
+Enable ECCSI, Elliptic Curve-Based Certificateless Signatures for Identity-Based Encryption (RFC 6507). Off by default. Requires ECC.
+
+### `--enable-sakke`
+
+Enable SAKKE, Sakai-Kasahara Key Encryption (RFC 6508), a pairing based identity key exchange. Off by default. Requires ECC. `--enable-sakke=small` selects a smaller implementation.
 
 ### `--enable-psk`
 
 Enable PSK (Pre Shared Keys)
 
+### `--enable-cert-with-extern-psk`
+
+Enable TLS 1.3 certificate authentication together with an external PSK (RFC 9973), defines `WOLFSSL_CERT_WITH_EXTERN_PSK`. Off by default. Needs TLS 1.3 and `--enable-psk`; without them it is turned off.
+
 ### `--disable-errorstrings`
 
 Disable the error strings table
 
-### `--disable-oldtls`
+### `--disable-errorqueue`
 
-Disable old TLS version < 1.2. This is the default; the corresponding
-`--enable-oldtls` leaves `NO_OLD_TLS` undefined.
+The OpenSSL compatible error queue is enabled by default when the OpenSSL compatibility layer is built. `--disable-errorqueue` stops errors from being added to the queue (defines `NO_ERROR_QUEUE`).
+
+### `--enable-error-queue-per-thread`
+
+Keep one error queue per thread (defines `ERROR_QUEUE_PER_THREAD`). Requires thread local storage. Although the configure help text says disabled, it is turned on by default when thread local storage is available and the build is not single threaded.
+
+### `--enable-oldtls`
+
+Enable old TLS versions < 1.2. Off by default (`NO_OLD_TLS` is defined); `--enable-oldtls` leaves `NO_OLD_TLS` undefined. `--enable-harden-tls`, `--enable-leanpsk`, `--enable-leantls`, `--enable-cryptonly` and `--enable-maxstrength` turn old TLS off.
 
 **Warning:** Building with `--enable-oldtls` is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. RFC 8996 deprecates TLS 1.0 and TLS 1.1, and RFC 9846 states that SSL 2.0, SSL 3.0, TLS 1.0 and TLS 1.1 "MUST NOT be negotiated for any reason".
 
@@ -4702,13 +4897,13 @@ Disable old TLS version < 1.2. This is the default; the corresponding
 
 Enable TLS version 1.0 (defines `WOLFSSL_ALLOW_TLSV10`, and enables old TLS).
 
-**Warning:** Building with `--enable-tlsv10` is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. See `--disable-oldtls` above.
+**Warning:** Building with `--enable-tlsv10` is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. See [`--enable-oldtls`](#--enable-oldtls) above.
 
 ### `--enable-sslv3`
 
 Enable SSL version 3.0 (defines `WOLFSSL_ALLOW_SSLV3`, and enables old TLS).
 
-**Warning:** Building with `--enable-sslv3` violates RFC 7568. SSL 3.0 is deprecated by RFC 7568 and states "SSLv3 MUST NOT be used."
+**Warning:** Building with `--enable-sslv3` violates RFC 7568. SSL 3.0 is deprecated by RFC 7568, which states "SSLv3 MUST NOT be used."
 
 ### `--enable-stacksize`
 
@@ -4718,13 +4913,33 @@ Enable stack size info on examples
 
 Disable memory callbacks
 
+### `--enable-trackmemory`
+
+Print memory use information when wolfCrypt and wolfSSL are cleaned up (defines `WOLFSSL_TRACK_MEMORY`; `=verbose` also defines `WOLFSSL_TRACK_MEMORY_VERBOSE`). Off by default. Requires the wolfSSL memory callbacks (do not use `--disable-memory`).
+
+### `--enable-memorylog`
+
+Log dynamic memory allocations (defines `WOLFSSL_MEMORY_LOG`). Off by default.
+
+### `--enable-stacklog`
+
+Log stack usage using compiler function instrumentation (defines `WOLFSSL_STACK_LOG` and adds `-finstrument-functions`). Off by default.
+
 ### `--disable-rsa`
 
 Disable RSA
 
 ### `--enable-rsapss`
 
-Enable RSA-PSS
+Enable RSA-PSS. Enabled automatically whenever RSA and TLS 1.3 are enabled (the default); defines `WC_RSA_PSS` and `WOLFSSL_PSS_LONG_SALT`.
+
+### `--disable-oaep`
+
+Disable RSA OAEP padding. OAEP is enabled by default.
+
+### `--with-max-rsa-bits=BITS`
+
+Set the largest RSA, DH and DSA key size, in bits, that the build supports. Must be between 1024 and 16384.
 
 ### `--disable-dh`
 
@@ -4737,6 +4952,28 @@ Enable Anonymous
 ### `--disable-asn`
 
 Disable ASN
+
+ASN.1 support is enabled by default and uses the template based implementation. The option also takes a comma separated list: `template` (or `yes`, the default), `original` (the older, non-template code, defines `WOLFSSL_ASN_ORIGINAL`), `nocrypt` (defines `NO_ASN_CRYPT` and turns off password based cryptography), `all` (all ASN.1 features, defines `WOLFSSL_ASN_ALL`) or `no`. Configure only accepts `--disable-asn` together with `--disable-rsa` and `--enable-psk`.
+
+### `--enable-acert`
+
+Enable attribute certificate support (defines `WOLFSSL_ACERT`). Off by default.
+
+### `--disable-pkcs8`
+
+Disable PKCS #8 key packages (defines `NO_PKCS8`). PKCS #8 is enabled by default.
+
+### `--enable-enckeys`
+
+Enable PEM encrypted private key support (defines `WOLFSSL_ENCRYPTED_KEYS`). Off by default.
+
+### `--enable-ip-alt-name`
+
+Enable IP address subject alternative names (defines `WOLFSSL_IP_ALT_NAME`). Off by default.
+
+### `--enable-indef`
+
+Enable parsing of BER messages with indefinite length encoding (defines `ASN_BER_TO_DER`). Off by default.
 
 ### `--disable-aes`
 
@@ -4752,17 +4989,17 @@ Enabled by default on x86\_64
 
 Enable Base64 encoding
 
-### `--disable-des3`
+### `--enable-des3`
 
-Disable DES3
+Enable DES3. Off by default. It is turned on automatically by some application builds (for example `--enable-openssh`, `--enable-openvpn` and `--enable-wpas`) unless FIPS 140-3 is used. The 3DES TLS cipher suites also need `--enable-des3-tls-suites`.
 
 ### `--enable-arc4`
 
 Enable ARC4
 
-### `--disable-md5`
+### `--enable-md5`
 
-Disable MD5
+Enable MD5. Off by default. It is turned on automatically by `--enable-opensslextra`, `--enable-opensslall`, `--enable-oldtls`, `--enable-des3` and several application builds. When MD5 is off, `NO_MD5` and `NO_OLD_TLS` are defined.
 
 ### `--disable-sha`
 
@@ -4778,11 +5015,11 @@ This turns on functions required over the standard build that will allow full fu
 
 Enable FIPS 140-2 / 140-3 (Must have license to implement.) Takes a module version such as `v7`, `ready` or `dev`. For bring-up and debugging there is `--enable-fips=dev-no-post` (new in wolfSSL 5.9.4), which builds the development FIPS module without the power-on self test.
 
-A few more FIPS behaviors came with wolfSSL 5.9.4: HMAC-MD5 is rejected, AES-GCM encryption with an IV shorter than 12 bytes returns `FIPS_BAD_VALUE_E` (override with `WC_FIPS_AESGCM_ALLOW_SHORT_NONCES`), a CMAC tag needs at least 64 bits, and RSA-PSS salts longer than the hash are refused (FIPS 186-5). Also, `--enable-wolfclu` does not enable MD5, Ed25519 or ASN relaxation on FIPS builds anymore.
+A few more FIPS behaviors came with wolfSSL 5.9.4: HMAC-MD5 is rejected, AES-GCM encryption with an IV shorter than 12 bytes returns `FIPS_BAD_VALUE_E` (override with `WC_FIPS_AESGCM_ALLOW_SHORT_NONCES`), a CMAC tag needs at least 64 bits, and RSA-PSS salts longer than the hash are refused (FIPS 186-5). Also, on FIPS 140-3 (v5 and later) builds `--enable-wolfclu` no longer enables MD5 or DES3, and on FIPS builds it no longer relaxes ASN.1 checking (`WOLFSSL_NO_ASN_STRICT`). It enables Ed25519 on non-FIPS builds and on FIPS v6 and later.
 
 ### `--enable-sha224`
 
-Enabled by default on x86\_64
+Enabled by default on x86\_64, amd64 and AArch64, except when AF\_ALG or `/dev/crypto` is used, or in FIPS builds other than FIPS v2.
 
 Enable wolfSSL SHA-224 support
 
@@ -4793,6 +5030,18 @@ Disable wolfSSL POLY1305 support
 ### `--disable-chacha`
 
 Disable CHACHA
+
+### `--enable-xchacha`
+
+Enable XChaCha, the extended nonce variant of ChaCha (defines `HAVE_XCHACHA`). Off by default. Requires ChaCha.
+
+### `--enable-ascon`
+
+Enable the Ascon lightweight cryptography (Ascon-Hash256 and Ascon-AEAD128), defines `HAVE_ASCON`. Off by default.
+
+### `--enable-siphash`
+
+Enable SipHash (defines `WOLFSSL_SIPHASH`). Off by default.
 
 ### `--disable-hashdrbg`
 
@@ -4808,13 +5057,17 @@ This makes it easier to disable filesystem use.  This option defines [`NO_FILESY
 
 Disable inline functions.
 
-Disabling this option disables function inlining in wolfSSL.  Function placeholders that are not linked against but, rather, the code block is inserted into the function call when function inlining is enabled.
+Disabling this option disables function inlining in wolfSSL.  Inline functions are expanded at the call site instead of being called. This option defines `NO_INLINE` to turn that off, which can reduce code size. It is the default with `--enable-c89`.
 
 ### `--enable-ocsp`
 
 Enable Online Certificate Status Protocol (OCSP).
 
 Enabling this option adds OCSP (Online Certificate Status Protocol) support to wolfSSL. It is used to obtain the revocation status of x.509 certificates as described in RFC 6960.
+
+### `--enable-ocsp-responder`
+
+Enable the OCSP responder API, for building OCSP responses (defines `HAVE_OCSP_RESPONDER`). Off by default.
 
 ### `--enable-ocspstapling`
 
@@ -4826,7 +5079,7 @@ Enable OCSP Stapling version 2
 
 ### `--enable-crl`
 
-Enable CRL (Certificate Revocation List)
+Enable CRL (Certificate Revocation List). `--enable-crl=io` also enables inline CRL fetching over HTTP GET (`HAVE_CRL_IO`).
 
 ### `--enable-crl-monitor`
 
@@ -4834,11 +5087,15 @@ Enable CRL Monitor.
 
 Enabling this option adds the ability to have wolfSSL actively monitor a specific CRL (Certificate Revocation List) directory.
 
+### `--enable-altcertchains`
+
+Enable alternative certificate chains (defines `WOLFSSL_ALT_CERT_CHAINS`): only the peer (leaf) certificate has to validate to a trusted CA, so a CA certificate in the peer chain that has no known signer is not treated as an error. Off by default.
+
 ### `--enable-sni`
 
 Enable Server Name Indication (SNI).
 
-Enabling this option will turn on the TLS Server Name Indication (SNI) extension.
+Enabling this option will turn on the TLS Server Name Indication (SNI) extension. Enabled by default on x86\_64, x86, aarch64 and amd64 (use `--disable-sni` there). It is forced on by `--enable-qt` and `--enable-quic`.
 
 ### `--enable-maxfragment`
 
@@ -4856,35 +5113,61 @@ Enable Truncated Keyed-hash MAC (HMAC).
 
 Enabling this option will turn on the TLS Truncated HMAC extension.
 
+### `--enable-trustedca`
+
+Enable the TLS Trusted CA Indication extension (defines `HAVE_TRUSTED_CA`). Off by default. Turned on by [`--enable-tlsx`](#--enable-tlsx).
+
 ### `--enable-renegotiation-indication`
 
 Enable Renegotiation Indication.
 
-As described in [RFC 5746](https://datatracker.ietf.org/doc/html/rfc5746), this specification prevents an SSL/TLS attack involving renegotiation splicing by tying the renegotiations to the TLS connection they are performed over.
+This is a client only, "fake" form of secure renegotiation (defines `HAVE_RENEGOTIATION_INDICATION`): the client sends the `TLS_EMPTY_RENEGOTIATION_INFO_SCSV` signaling cipher suite but does not renegotiate. It cannot be combined with `--enable-secure-renegotiation`, and it turns off `--enable-secure-renegotiation-info`. The `renegotiation_info` extension handling of [RFC 5746](https://datatracker.ietf.org/doc/html/rfc5746), which prevents renegotiation splicing attacks by tying renegotiations to the TLS connection they are performed over, is provided by `--enable-secure-renegotiation-info` (on by default).
 
 ### `--enable-secure-renegotiation`
 
 Enable Secure Renegotiation
 
-### `--enable-supportedcurves`
+### `--disable-secure-renegotiation-info`
 
-Enable Supported Elliptic Curves.
+The RFC 5746 `renegotiation_info` extension is enabled by default for TLS 1.2 (defines `HAVE_SERVER_RENEGOTIATION_INFO`). `--disable-secure-renegotiation-info` turns it off. It is also off when TLS 1.2 or ASN.1 is disabled, or with `--enable-renegotiation-indication`.
 
-Enabling this option will turn on the TLS Supported ECC Curves extension.
+### `--enable-legacy-server-connect`
+
+By default a TLS 1.2 client requires the server to acknowledge the `renegotiation_info` extension on the initial handshake (RFC 5746, RFC 9325). This option also allows connections to legacy servers that do not support secure renegotiation (defines `WOLFSSL_ALLOW_LEGACY_SERVER_CONNECT`). Off by default and not recommended. It cannot be combined with `--enable-harden-tls`.
+
+### `--disable-supportedcurves`
+
+The TLS Supported Elliptic Curves extension is enabled by default. `--disable-supportedcurves` turns it off. It is also turned off automatically when ECC, Curve25519 and Curve448 are all disabled.
 
 ### `--enable-session-ticket`
 
 Enable Session Ticket
 
-### `--enable-extended-master`
+### `--disable-extended-master`
 
-Enable Extended Master Secret
+Extended Master Secret is enabled by default (and off with `--enable-cryptonly`). `--disable-extended-master` turns it off.
+
+### `--disable-enc-then-mac`
+
+The TLS Encrypt-then-MAC extension is enabled by default (defines `HAVE_ENCRYPT_THEN_MAC`). `--disable-enc-then-mac` turns it off.
+
+### `--enable-keying-material`
+
+Enable the TLS keying material exporters of RFC 5705 (defines `HAVE_KEYING_MATERIAL`). Off by default. Turned on by options that need it, such as `--enable-srtp`, `--enable-chrony`, `--enable-wpas` and `--enable-openvpn`.
+
+### `--enable-ech`
+
+Enable TLS 1.3 Encrypted Client Hello (defines `HAVE_ECH`). Off by default. Unless they are explicitly disabled, it also turns on HPKE, ECC, Curve25519, SHA-256, SNI and TLS 1.3.
+
+### `--enable-rpk`
+
+Enable Raw Public Keys in TLS (RFC 7250), defines `HAVE_RPK`. Off by default.
 
 ### `--enable-tlsx`
 
 Enable all TLS extensions.
 
-Enabling this option will turn on all TLS extensions currently supported by wolfSSL.
+Turns on SNI, Maximum Fragment Length, Truncated HMAC, ALPN, Trusted CA Indication, Encrypt-then-MAC and Supported Curves. Session tickets, OCSP stapling, ECH, early data and the other extensions have their own options.
 
 ### `--enable-pkcs7`
 
@@ -4970,16 +5253,6 @@ When enabled, the wolfSSL example applications will be built ([client](chapter03
 
 Disable Crypt Bench/Test
 
-### `--enable-fast-rsa`
-
-Enable RSA using Intel IPP.
-
-Enabling fast-rsa speeds up RSA operations by using IPP libraries. It has a larger memory consumption then the default RSA set by wolfSSL. If IPP libraries can not be found an error message will be displayed during configuration. The first location that autoconf will look is in the directory `wolfssl_root/IPP` the second is standard location for libraries on the machine such as `/usr/lib/` on linux systems.
-
-The libraries used for RSA operations are in the directory `wolfssl-X.X.X/IPP/` where X.X.X is the current wolfSSL version number. Building from the bundled libraries is dependent on the directory location and name of IPP so the file structure of the subdirectory IPP should not be changed.
-
-When allocating memory the fast-rsa operations have a memory tag of `DYNAMIC_TYPE_USER_CRYPTO`. This allows for viewing the memory consumption of RSA operations during run time with the fast-rsa option.
-
 ### `--enable-staticmemory`
 
 Enable static memory use
@@ -4991,6 +5264,8 @@ Enable Microchip API
 ### `--enable-asynccrypt`
 
 Enable Asynchronous Crypto
+
+When no hardware backend (Cavium, Intel QuickAssist, crypto callbacks or PK callbacks) is enabled, this also turns on the software simulator (`WOLFSSL_ASYNC_CRYPT_SW`, see [`--enable-asynccrypt-sw`](#--enable-asynccrypt-sw)).
 
 ### `--enable-sessionexport`
 
@@ -5030,9 +5305,9 @@ Enabling libz will allow compression support in wolfSSL from the libz library. T
 
 Path to cavium/software directory.
 
-### `--with-user-crypto`
+### `--with-cavium-v`, `--with-octeon-sync` and `--with-intelqa`
 
-Path to USER\_CRYPTO install (default `/usr/local`).
+Further asynchronous crypto hardware backends, each taking the path to the vendor software: `--with-cavium-v=PATH` for Cavium Nitrox V, `--with-octeon-sync=PATH` for the Cavium Octeon SDK (synchronous use) and `--with-intelqa=PATH` for the Intel QuickAssist (QAT) driver.
 
 ### `--enable-rsavfy`
 
@@ -5044,27 +5319,73 @@ Enables RSA public key only support (**note** requires [`--enable-cryptonly`](#-
 
 ### `--enable-armasm`
 
-Enables ARMv8 ASM support.
+Enables ARMv8 ASM support. It also covers 32-bit ARM, including Thumb2 targets such as ARMv7-M.
 
-The default configure sets mcpu or mfpu based on 64 vs 32 bit system. It does not overwrite mcpu or mfpu setting passed in by use of CPPFLAGS. On some compilers `-mstrict-align` may be needed due to the constraiants and `-mstrict-align` is now also set by default unless a user passes in mcpu/mfpu flags with `CPPFLAGS`.
+The default configure sets mcpu or mfpu based on 64 vs 32 bit system. It does not overwrite mcpu or mfpu setting passed in by use of CPPFLAGS. On some compilers `-mstrict-align` may be needed due to the constraints and `-mstrict-align` is now also set by default unless a user passes in mcpu/mfpu flags with `CPPFLAGS`.
+
+The option takes a comma separated list of sub-options:
+
+* `inline`: use the inline assembly versions.
+* `no-crypto`: do not use the ARMv8 cryptographic extension instructions.
+* `sha512-crypto` / `sha3-crypto` (AArch64 only): use the SHA-512 and SHA-3 instructions (ARMv8.2-A); `no-sha512-crypto` / `no-sha3-crypto` turn them off.
+* `sm3`, `sm4` (AArch64 only): use the SM3 and SM4 instructions.
+* `barrier-sb`, `barrier-detect` (AArch64 only): use the SB speculation barrier instruction (ARMv8.5-A and later), always or when detected at run time.
+* `sha256-small`, `aes-block-dup` (32-bit ARM only): smaller SHA-256 code, and duplicated (inlined) AES block code.
+* `no-base`, `no-neon-impl` (32-bit ARM only): drop the base and NEON run-time fallbacks when the crypto extension is always present.
+
+### `--enable-riscv-asm`
+
+Enable RISC-V assembly. Off by default. Takes a comma separated list of the instruction set extensions to use, for example `zbb`, `zbc`, `zbkb`, `zkned`, `zv` and the vector crypto extensions `zvbb`, `zvbc`, `zvkg` and `zvkned`.
+
+### `--enable-ppc32-asm` and `--enable-ppc64-asm`
+
+Enable PowerPC 32-bit or 64-bit assembly. Off by default. Both take `inline`, `inline-reg` and `small`; `--enable-ppc32-asm` also takes `spe`, and `--enable-ppc64-asm` also takes `crypto` and `power8`.
 
 ### `--disable-tlsv12`
 
 Disable TLS 1.2 support. wolfSSL 5.9.4 and later define [`WOLFSSL_NO_TLS12`](#wolfssl_no_tls12) with this option, so the TLS 1.2 implementation is compiled out. Before that, the option only changed the configure summary and a peer could still negotiate TLS 1.2.
 
-### `--enable-tls13`
+### `--disable-tls13`
 
-Enable TLS 1.3 support
+TLS 1.3 support is enabled by default. `--disable-tls13` builds without it.
 
-This build option can be combined with [`--disable-tlsv12`](#--disable-tlsv12) and [`--disable-oldtls`](#--disable-oldtls) to produce a wolfSSL build that is only TLS 1.3.
+TLS 1.3 is also turned off automatically when no usable key exchange is available (none of ECC, RSA with DH, Curve25519 with Ed25519, Curve448 with Ed448, PSK or ML-KEM). To produce a wolfSSL build that is only TLS 1.3, use [`--disable-tlsv12`](#--disable-tlsv12); old TLS versions are already off by default.
+
+### `--enable-earlydata`
+
+Enable TLS 1.3 early data (0-RTT), defines `WOLFSSL_EARLY_DATA`. Off by default. Needs TLS 1.3 and session tickets or PSK. `--enable-earlydata=group` also sends the early data together with the ClientHello (`WOLFSSL_EARLY_DATA_GROUP`).
+
+### `--enable-postauth`
+
+Enable TLS 1.3 post-handshake authentication (defines `WOLFSSL_POST_HANDSHAKE_AUTH`). Off by default.
+
+### `--enable-hrrcookie`
+
+Let the server send a Cookie extension, holding its state, in a TLS 1.3 HelloRetryRequest (defines `WOLFSSL_SEND_HRR_COOKIE`). A client always echoes back a cookie it receives. Off by default for TLS, but turned on by [`--enable-dtls13`](#--enable-dtls13).
+
+### `--enable-tls13-middlebox-compat`
+
+Enable client side TLS 1.3 middlebox compatibility mode (RFC 8446 Appendix D.4): the client sends a fake session ID and a ChangeCipherSpec message. The server side is always on. Off by default, and not available with ECH.
+
+### `--enable-quic`
+
+Enable the QUIC API on top of TLS 1.3 (defines `WOLFSSL_QUIC`). Off by default. Needs TLS 1.3 and AES-GCM, and turns on the OpenSSL compatibility layer, AES-CTR, ALPN, SNI and (outside FIPS builds) Curve25519.
+
+### `--disable-tls`
+
+TLS support is enabled by default. `--disable-tls` builds without the TLS layer (defines `NO_TLS`), and DTLS then defaults to off. [`--enable-cryptonly`](#--enable-cryptonly) turns TLS off too.
 
 ### `--enable-all`
 
 Enables all wolfSSL features, excluding SSL v3
 
+### `--enable-enterprise`
+
+Enable a maximum interoperability feature set, comparable to a default OpenSSL build. Off by default. It turns on [`--enable-all`](#--enable-all) and [`--enable-all-quantum-crypto`](#--enable-all-quantum-crypto), but leaves RC2 and DES3 off unless they are requested.
+
 ### `--enable-all-crypto`
 
-Enables all wolfCrypt algorithms. wolfSSL 5.9.4 stopped pulling non-FIPS or legacy algorithms into a FIPS build. Those moved to the two bundles below; you can enable or disable them explicitly alongside `--enable-all-crypto` for subtractive selection.
+Enables all wolfCrypt algorithms except the quantum-resistant asymmetric ones (use [`--enable-all-quantum-crypto`](#--enable-all-quantum-crypto) for those). wolfSSL 5.9.4 stopped pulling non-FIPS or legacy algorithms into a FIPS build. Those moved to the two bundles below; you can enable or disable them explicitly alongside `--enable-all-crypto` for subtractive selection.
 
 ### `--enable-all-nonfips-crypto`
 
@@ -5076,11 +5397,7 @@ Enables every legacy wolfCrypt algorithm. Off by default.
 
 ### `--enable-all-quantum-crypto`
 
-Turns on all the quantum-resistant asymmetric algorithms: ML-KEM, ML-DSA, SLH-DSA, LMS and XMSS. Off by default.
-
-### `--enable-xts`
-
-Enables AES-XTS mode
+Turns on all the quantum-resistant asymmetric algorithms: ML-KEM, ML-DSA, SLH-DSA, LMS and XMSS. Off by default. With `--enable-experimental` it also enables FrodoKEM, Falcon and the extra PQ/T hybrid groups (the extra hybrids only on non-FIPS or pre-v7 FIPS builds).
 
 ### `--enable-asio`
 
@@ -5100,10 +5417,6 @@ Enable Qt test compatibility build.
 
 Enables support for building wolfSSL for compatibility with running the built-in Qt tests.
 
-### `--enable-apache-httpd`
-
-Enables Apache httpd support
-
 ### `--enable-afalg`
 
 Enables use of Linux module AF\_ALG for hardware acceleration. Additional Xilinx use with `=xilinx`, `=xilinx-rsa`, `=xilinx-aes`, `=xilinx-sha3`
@@ -5114,7 +5427,7 @@ Is similar to [`--enable-devcrypto`](#--enable-devcrypto) in that it leverages a
 
 Enables use of Linux `/dev/crypto` for hardware acceleration.
 
-Has the ability to receive arguments, being able to receive any combination of `aes` (all aes support), `hash` (all hash algorithms), and `cbc` (aes-cbc only). If no options are given, it will default to using `all`.
+Has the ability to receive an argument, one of `aes` (all aes support), `hash` (all hash algorithms), `hmac` (HMAC only, `WOLFSSL_DEVCRYPTO_HMAC`), `rsa` (RSA only) or `cbc` (aes-cbc only). Each value is matched on its own, so the values cannot be combined in one argument. If no options are given, it will default to using `all`.
 
 ### `--enable-mcast`
 
@@ -5124,28 +5437,28 @@ Enable wolfSSL DTLS multicast support
 
 Disable PKCS12 code
 
-### `--enable-fallback-scsv`
-
-Enables Signaling Cipher Suite Value(SCSV)
-
 ### `--enable-psk-one-id`
 
 Enables support for single PSK ID with TLS 1.3
 
 ### `--enable-cryptocb`
 
-Enable crypto callbacks. Register a crypto callback using wc_CryptoCb_RegisterDevice and set the associated devId using wolfSSL_CTX_SetDevId. wolfSSL 5.9.4 rejects registering the same device ID twice with `ALREADY_E`, and `wc_CryptoCb_IsDeviceRegistered()` tells you whether a device ID is registered.
+Enable crypto callbacks. Register a crypto callback using `wc_CryptoCb_RegisterDevice` and set the associated devId using `wolfSSL_CTX_SetDevId`. wolfSSL 5.9.4 rejects registering the same device ID twice with `ALREADY_E`, and `wc_CryptoCb_IsDeviceRegistered()` tells you whether a device ID is registered. The old name `--enable-cryptodev` is a deprecated alias.
 
 The following defines can be used with `--enable-cryptocb` to compile out the software fallback of an algorithm to optimize for footprint reduction when the software implementation is not required.
 
-* WOLF_CRYPTO_CB_ONLY_RSA - compiles out RSA software crypto fallback
-* WOLF_CRYPTO_CB_ONLY_ECC - compiles out ECC software crypto fallback
-* WOLF_CRYPTO_CB_ONLY_ED25519, WOLF_CRYPTO_CB_ONLY_CURVE25519, WOLF_CRYPTO_CB_ONLY_CURVE448 - compile out the software Ed25519 / Curve25519 / Curve448 implementations
-* WOLF_CRYPTO_CB_ONLY_SLHDSA - compiles out the software SLH-DSA implementation
+* `WOLF_CRYPTO_CB_ONLY_RSA` - compiles out RSA software crypto fallback
+* `WOLF_CRYPTO_CB_ONLY_ECC` - compiles out ECC software crypto fallback
+* `WOLF_CRYPTO_CB_ONLY_ED25519`, `WOLF_CRYPTO_CB_ONLY_CURVE25519`, `WOLF_CRYPTO_CB_ONLY_CURVE448` - compile out the software Ed25519 / Curve25519 / Curve448 implementations
+* `WOLF_CRYPTO_CB_ONLY_SHA256`, `WOLF_CRYPTO_CB_ONLY_SHA512`, `WOLF_CRYPTO_CB_ONLY_AES` - compile out the software SHA-256 / SHA-512 / AES implementations
+* `WOLF_CRYPTO_CB_ONLY_SLHDSA` - compiles out the software SLH-DSA implementation
+* `WOLF_CRYPTO_CB_ONLY_MLKEM`, `WOLF_CRYPTO_CB_ONLY_MLDSA`, `WOLF_CRYPTO_CB_ONLY_FALCON`, `WOLF_CRYPTO_CB_ONLY_FRODOKEM`, `WOLF_CRYPTO_CB_ONLY_LMS`, `WOLF_CRYPTO_CB_ONLY_XMSS` - compile out the software ML-KEM / ML-DSA / Falcon / FrodoKEM / LMS / XMSS implementations
 
-`--enable-cryptocb=only` turns on every `WOLF_CRYPTO_CB_ONLY_*` flag so all crypto operations are offloaded. `--enable-cryptocb=no-default-devid` enables callbacks without a platform specific default device ID.
+`--enable-cryptocb=only` turns on the `WOLF_CRYPTO_CB_ONLY_*` flag of every enabled algorithm listed above, so all crypto operations are offloaded. `--enable-cryptocb=no-default-devid` enables callbacks without a platform specific default device ID.
 
-Use of the WOLF_CRYPTO_CB_ONLY_* options requires disabling the examples. See [`--disable-examples`](#--disable-examples)
+Use of the `WOLF_CRYPTO_CB_ONLY_*` options requires disabling the examples. See [`--disable-examples`](#--disable-examples)
+
+Related options: `--enable-cryptocb-rsa-pad` (defines `WOLF_CRYPTO_CB_RSA_PAD`) passes the RSA padding parameters to the callback so that it can do the padding itself, and `--disable-cryptocb-sw-test` (defines `WC_TEST_NO_CRYPTOCB_SW_TEST`) stops the wolfCrypt tests from also testing the crypto callbacks with software crypto. Both require `--enable-cryptocb`.
 
 ### `--enable-cryptocbutils`
 
@@ -5155,7 +5468,10 @@ Enables crypto callback utilities (all of them when the option is given with no 
 
 Suppresses the binary jitter (timestamps and other non-functional metadata) to allow generation of bitwise-identical binary packages with identical hashes.
 
-### `--enable-sys-ca-certs`
+### `--disable-sys-ca-certs`
+
+Enabled by default (defines `WOLFSSL_SYS_CA_CERTS`); `--disable-sys-ca-certs` turns it off. It is turned off automatically when no certificate support is built, or, outside macOS and Windows, when the filesystem is disabled.
+
 Allows wolfSSL to use trusted system CA certificates for verification when [`wolfSSL_CTX_load_system_CA_certs()`](group__CertsKeys.html#function-wolfssl_ctx_load_system_ca_certs) is called, either by loading them into wolfSSL certificate manager, or by invoking system authentication APIs. See [`wolfSSL_CTX_load_system_CA_certs()`](group__CertsKeys.html#function-wolfssl_ctx_load_system_ca_certs) for more details.
 
 ### `--enable-argon2`
@@ -5200,17 +5516,57 @@ Turns off the per-instance lock that lets one `WC_RNG` be shared between threads
 
 Turns off the `pthread_atfork()` handlers that let a forked child keep using a `WC_RNG`. On by default where supported. See [`WC_RNG_AUTOFORK`](#wc_rng_autofork).
 
+### `--disable-rng-autolock-default`
+
+By default every `WC_RNG` gets the shared-use lock unless the caller asks otherwise. `--disable-rng-autolock-default` keeps the lock built in but uses it only for instances that ask for it with `wc_InitRng_ex2()` (defines `WC_RNG_AUTO_LOCK_DEFAULT_OFF`). It cannot be combined with `--disable-rng-autolock`.
+
+### `--enable-rng-bank` and `--enable-rng-extras`
+
+`--enable-rng-bank` builds RNG banks (defines `HAVE_WC_RNG_BANK`) and requires the RNG. `--enable-rng-extras` adds RNG locks, pools, RBGC and daemon support (defines `WC_RNG_EXTRAS`). Both are off by default, except in kernel module builds, where they default to on.
+
+### `--with-rng-seed-device=PATH`
+
+Seed the RNG from the device `PATH` before the default seed sources (defines `WC_RNG_SEED_DEVICE`). Without a path, `/dev/hwrng` is used. Off by default.
+
+### `--enable-wolfEntropy`
+
+Enable wolfEntropy, the software jitter (memory use) entropy source that is designed to be SP 800-90B certifiable. `--enable-wolfentropy` and `--enable-entropy-memuse` are aliases. Off by default, except in kernel module builds that do not use RDRAND or RDSEED.
+
+### `--enable-noisesrc`
+
+Enable the generic SP 800-90B noise source layer (`wc_NoiseSrc_*`) for ports that have a raw physical noise source. Off by default.
+
+### `--enable-puf`
+
+Enable SRAM PUF (physically unclonable function) support (defines `WOLFSSL_PUF` and `WOLFSSL_PUF_SRAM`). Off by default. The value selects the error correction profile: `small`, `balanced` (the default for `yes`), `strong` or `strongest`. HKDF is turned on with it.
+
 ### `--enable-asynccrypt-sw`
 
 Enable the asynchronous software-based crypto simulation. Off by default. wolfSSL 5.9.4 added end-to-end support for it with `--enable-all`. Defines [`WOLFSSL_ASYNC_CRYPT_SW`](#wolfssl_async_crypt_sw).
 
+### `--disable-mlkem`
+
+ML-KEM (FIPS 203) / Kyber is enabled by default, except in FIPS builds older than FIPS v7 and when SHA-3, SHAKE128 or SHAKE256 is explicitly disabled. `--disable-mlkem` builds without it; `--enable-kyber` is an alias of `--enable-mlkem`. Defines `WOLFSSL_HAVE_MLKEM`. The option also takes a comma separated list, for example `512`, `768` and `1024` to select parameter sets, `make`, `encapsulate` and `decapsulate` to select operations, `small`, `noasm`, and `original` (or `kyber`) to build the original Kyber algorithm instead of ML-KEM (add `ml-kem` to keep both). The PQ/T hybrid groups use ML-KEM-768 or ML-KEM-1024, so a list that selects only `512` also needs `--enable-tls-mlkem-standalone`.
+
+### `--enable-tls-mlkem-standalone`
+
+Allow ML-KEM as a standalone, non-hybrid TLS 1.3 key exchange. Off by default. It is turned on automatically when ML-KEM and TLS 1.3 are enabled but ECC, Curve25519 and Curve448 are all disabled, since the hybrid groups then have no classical part.
+
+### `--disable-pqc-hybrids`
+
+The PQ/T hybrid key exchange groups (ML-KEM combined with ECDHE or X25519/X448) are enabled by default with ML-KEM (defines `WOLFSSL_PQC_HYBRIDS`). `--disable-pqc-hybrids` turns them off; configure then fails unless `--enable-tls-mlkem-standalone` is also given or ML-KEM is disabled.
+
+### `--enable-extra-pqc-hybrids`
+
+Enable the extra PQ/T hybrid group combinations (defines `WOLFSSL_EXTRA_PQC_HYBRIDS`). Off by default. Requires ML-KEM and `--enable-experimental`, and is not available in FIPS v7 builds.
+
 ### `--enable-mldsa`
 
-Enable ML-DSA (FIPS 204) / Dilithium. Off by default. Takes a comma separated list from `all`, `make`, `sign`, `verify`, `verify-only`, `small`, `44`, `65`, `87` and `no-ctx`. `verify-only` keeps only signature verification ([`WOLFSSL_MLDSA_VERIFY_ONLY`](#wolfssl_mldsa_verify_only)). Defines [`HAVE_DILITHIUM`](#have_dilithium). `--enable-dilithium` is an alias.
+Enable ML-DSA (FIPS 204) / Dilithium. Off by default. Takes a comma separated list from `all`, `make`, `sign`, `verify`, `verify-only`, `small`, `44`, `65`, `87`, `draft` (or `fips204-draft`, for the FIPS 204 draft version) and `no-ctx`. `verify-only` keeps only signature verification ([`WOLFSSL_MLDSA_VERIFY_ONLY`](#wolfssl_mldsa_verify_only)). Defines `WOLFSSL_HAVE_MLDSA` (`settings.h` also defines the legacy [`HAVE_DILITHIUM`](#have_dilithium) for compatibility). `--enable-dilithium` is an alias.
 
 ### `--enable-slhdsa`
 
-Enable the SLH-DSA (FIPS 205) stateless hash-based signatures, all twelve parameter sets can be enabled with --enable-slhdsa=sha2,yes. Off by default. Pass `--enable-slhdsa=sha2,yes,verify-only` to keep only verification. With TLS 1.3 / DTLS 1.3, the draft-reddy-tls-slhdsa signature schemes can authenticate the handshake. Defines [`WOLFSSL_HAVE_SLHDSA`](#wolfssl_have_slhdsa). New in wolfSSL 5.9.4.
+Enable SLH-DSA (FIPS 205) stateless hash-based signatures. Plain `--enable-slhdsa` enables the six SHAKE parameter sets; `--enable-slhdsa=sha2,yes` enables all twelve. Other accepted values are `small`, `small-mem`, `128s`, `128f`, `192s`, `192f`, `256s`, `256f`, `no-s`, `no-f`, `sha2-128s` to `sha2-256f`, `no-sha2-s` and `no-sha2-f`. Off by default. Pass `--enable-slhdsa=sha2,yes,verify-only` to keep only verification. With TLS 1.3 / DTLS 1.3, the draft-reddy-tls-slhdsa signature schemes can authenticate the handshake. Defines [`WOLFSSL_HAVE_SLHDSA`](#wolfssl_have_slhdsa). New in wolfSSL 5.9.4.
 
 ### `--enable-falcon`
 
@@ -5223,10 +5579,81 @@ Takes a comma separated list of options:
 * `cache-key`, `cache-basis`: opt-in per-key signing caches; with the default integer backend signing runs about twice as fast.
 * `level1`, `level5`: build just one Falcon level. `wc_falcon_set_level()` returns `BAD_FUNC_ARG` for a level that is not built.
 * `dynamic-keys`: keep the key buffers per level on the heap; `wc_falcon_set_level()` can then return `MEMORY_E`.
+* `verify-no-malloc`: verify in a 4*n byte buffer held in the key instead of allocating one per call; a key then verifies one signature at a time.
 
 ### `--enable-frodokem`
 
-Enable the FrodoKEM reference implementation. Off by default, needs `--enable-experimental`. It ships with fast, small and small-stack C code and assembly for x86_64, AArch64, AArch32 and Thumb2, plus ASN.1 keys and X.509 certificates. Takes an optional comma separated list: `aes` / `no-aes` and `shake` / `no-shake` select the matrix A generation (SHAKE-128 is the default), `small` / `no-small` selects the small code variant, `ephemeral` / `no-ephemeral` adds the eFrodoKEM variants, and `no-640`, `no-976` and `no-1344` remove a parameter set. `--enable-frodokem-shake` and `--enable-frodokem-ephemeral` are standalone forms of the same switches. Defines `WOLFSSL_HAVE_FRODOKEM`. New in wolfSSL 5.9.4.
+Enable the FrodoKEM reference implementation. Off by default, needs `--enable-experimental`. It ships with fast, small and small-stack C code and assembly for x86_64, AArch64, AArch32 and Thumb2, plus ASN.1 keys and X.509 certificates. Takes an optional comma separated list: `aes` / `no-aes` and `shake` / `no-shake` select the matrix A generation (SHAKE-128 is the default), `sve` / `no-sve` and `sme` / `no-sme` select the AArch64 SVE and SME matrix acceleration, `small` / `no-small` selects the small code variant, `ephemeral` / `no-ephemeral` adds the eFrodoKEM variants, `no-640`, `no-976` and `no-1344` remove a parameter set, and `no-make-key`, `no-encapsulate` and `no-decapsulate` remove an operation. Every list item also has a standalone form: `--enable-frodokem-shake`, `--enable-frodokem-aes`, `--enable-frodokem-sve`, `--enable-frodokem-sme`, `--enable-frodokem-ephemeral`, `--enable-frodokem-small`, `--enable-frodokem-640`, `--enable-frodokem-976`, `--enable-frodokem-1344`, `--enable-frodokem-make-key`, `--enable-frodokem-encapsulate` and `--enable-frodokem-decapsulate`. Defines `WOLFSSL_HAVE_FRODOKEM`. New in wolfSSL 5.9.4.
+
+### `--enable-lms`
+
+Enable the stateful LMS/HSS hash-based signatures (defines `WOLFSSL_HAVE_LMS`). Off by default. Takes a comma separated list: `verify-only`, `small`, `sha256-192` and `shake256` (add parameter sets), and `no-sha256-256` (remove the SHA-256/256 sets).
+
+### `--enable-xmss`
+
+Enable the stateful XMSS/XMSS^MT hash-based signatures. Off by default. Takes `verify-only` and `small`.
+
+### `--enable-dual-alg-certs`
+
+Enable X9.146 dual key / dual signature certificates in TLS 1.3 (defines `WOLFSSL_DUAL_ALG_CERTS`). Off by default. Requires `--enable-experimental`.
+
+### `--enable-experimental`
+
+Allow experimental settings in the configuration (defines `WOLFSSL_EXPERIMENTAL_SETTINGS`). Off by default. Needed by [`--enable-falcon`](#--enable-falcon), [`--enable-frodokem`](#--enable-frodokem), [`--enable-extra-pqc-hybrids`](#--enable-extra-pqc-hybrids) and [`--enable-dual-alg-certs`](#--enable-dual-alg-certs). Cannot be combined with [`--enable-distro`](#--enable-distro).
+
+### `--enable-usersettings`
+
+Use your own `user_settings.h` instead of the feature flags that configure normally adds to the compiler command line. Configure then only defines `WOLFSSL_USER_SETTINGS` (and `WOLFSSL_USER_SETTINGS_ASM`) and builds all the source files, so the features come from `user_settings.h`, which configure must be able to find (for example in the top directory of the source tree). Off by default. See [Building in a non-standard environment](#building-in-a-non-standard-environment).
+
+### `--enable-heapmath`
+
+Use the legacy heap based `integer.c` math library (defines `USE_INTEGER_HEAP_MATH`) instead of the default SP math. Off by default. It turns SP math off. See [Special Math Optimization Flags](#special-math-optimization-flags).
+
+### Kernel module options
+
+These options build wolfSSL as an operating system kernel module:
+
+* `--enable-linuxkm`: build the Linux kernel module (`libwolfssl.ko`). Off by default.
+* `--enable-freebsdkm`: build the FreeBSD kernel module. Off by default.
+* `--with-kernel-source=PATH` (or `--with-linux-source=PATH`): the root of the kernel build tree.
+* `--with-linux-arch=ARCH`: the architecture (`SRCARCH`) of the Linux kernel build tree.
+* `--enable-kernel-settings` (alias `--enable-linuxkm-defaults`): default settings suitable for kernel modules; implied by `--enable-linuxkm` and `--enable-freebsdkm`.
+* `--enable-linuxkm-lkcapi-register=LIST`: register wolfCrypt implementations with the Linux kernel crypto API. Takes `none` (the default) or a comma separated list such as `all`, `all-kconfig`, `all-aes`, `cbc(aes)`, `gcm(aes)`, `all-sha`, `all-hmac`, `stdrng`, `ecdsa`, `ecdh`, `rsa`, `dh`, `mldsa` or `mlkem`; prefix an item with `-` to remove it.
+* `--enable-freebsdkm-crypto-register`: register wolfCrypt implementations with the FreeBSD kernel opencrypto framework. Off by default.
+* `--with-bsd-export-syms=LIST`: the `EXPORT_SYMS` of the FreeBSD kernel module: `YES`, `NO` (the default) or a list of symbols.
+* `--enable-kernel-reloc-tables` (alias `--enable-linuxkm-pie`): containerized object build of the wolfCrypt module. Off by default.
+* `--enable-kernel-benchmarks` (alias `--enable-linuxkm-benchmarks`): run the crypto benchmarks when the module is loaded. Off by default.
+* `--enable-kernel-verbose-debug`, `--enable-kernel-stack-debug`: extra run time debug messages, and run time reporting of stack usage, in the kernel module. Off by default.
+
+### Hardware and secure element options
+
+These options enable ports to hardware crypto engines and secure elements. All are off by default.
+
+* `--enable-caam`: NXP CAAM. See [Building For NXP CAAM](#building-for-nxp-caam).
+* `--enable-sec-qoriq`: the NXP QorIQ SEC engine (T1040/T2080).
+* `--enable-ele`: the NXP EdgeLock Secure Enclave.
+* `--with-se050=PATH`: the NXP SE050 secure element (default path `/usr/local`).
+* `--with-els-pkc=PATH`: the NXP EdgeLock ELS/PKC crypto callback port, built against the `els_pkc` checkout at `PATH`.
+* `--enable-stsafe`: the STMicroelectronics STSAFE secure element; `=a100` (the default) uses the legacy STSAFE-A1xx SDK and `=a120` uses STSELib.
+* `--enable-microchip`: the Microchip/Atmel ATECC508A, ATECC608A and TA100 devices.
+* `--with-mpfs-athena=PATH`: the Microchip PolarFire SoC Athena F5200 crypto callback port, using the user-crypto (CAL) directory at `PATH`.
+* `--enable-iotsafe`: the IoT-Safe secure applet.
+* `--enable-xilinx`: Xilinx hardened crypto.
+* `--enable-kcapi`: use `libkcapi` for crypto; `--enable-kcapi-hash`, `--enable-kcapi-hmac`, `--enable-kcapi-aes`, `--enable-kcapi-rsa`, `--enable-kcapi-dh` and `--enable-kcapi-ecc` select single algorithms.
+* `--enable-alterafcs`: Altera Agilex 5 SDM crypto offload via `libfcs`; `=rng` offloads only the RNG.
+* `--enable-vaultic`: the WISeKey/SealSQ VaultIC secure element.
+* `--enable-psa`: use the Platform Security Architecture (PSA) crypto interface.
+
+### Application and integration options
+
+These options set up wolfSSL for a specific application or wolfSSL product, usually by turning on the OpenSSL compatibility layer and the features the project needs. All are off by default.
+
+* `--enable-all-osp`: turns on a group of these builds at once: Tailscale, wolfGuard, the web server, S/MIME, OpenSSH, lighttpd, nginx, OpenVPN, ASIO, libwebsockets, stunnel, curl and tcpdump (some of them are left out in FIPS or `--enable-sp-math` builds). Cannot be used with kernel module settings.
+* Servers, proxies and networking: `--enable-nginx` (nginx), `--enable-haproxy` (HAProxy), `--enable-hitch` (Hitch), `--enable-memcached` (memcached), `--enable-curl` (curl), `--enable-libwebsockets` (libwebsockets), `--enable-tcpdump` (tcpdump), `--enable-rsyslog` (rsyslog), `--enable-mosquitto` (Mosquitto), `--enable-openldap` (OpenLDAP).
+* Security and VPN: `--enable-wpas` (wpa_supplicant), `--enable-strongswan` (strongSwan), `--enable-krb` (Kerberos 5), `--enable-libssh2` (libssh2), `--enable-libest` (libest), `--enable-tailscale` (Tailscale build dependencies), `--enable-wolfguard` (wolfGuard dependencies).
+* Time, DNS and management: `--enable-chrony` (chrony), `--enable-ntp` (NTP), `--enable-bind` (BIND DNS), `--enable-net-snmp` (Net-SNMP).
+* Other projects: `--enable-signal` (Signal), `--enable-ffmpeg` (FFmpeg), `--enable-wolfzfs` (wolfZFS; `=kernel` for the kernel build).
+* wolfSSL products: `--enable-wolfprovider` (wolfProvider; it turns on `--enable-opensslcoexist`, so it cannot be combined with builds that need `--enable-opensslall`), `--enable-engine` (wolfEngine; plain `--enable-engine` selects a FIPS v2 build, use `--enable-engine=no-fips` without FIPS), `--enable-wolftpm` (wolfTPM), `--enable-wolfssh` (wolfSSH, same as [`--enable-ssh`](#--enable-ssh)), `--enable-wolfclu` (wolfCLU).
 
 ### `make sbom` and `make bomsh`
 
