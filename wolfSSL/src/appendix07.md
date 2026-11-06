@@ -252,9 +252,9 @@ Plain `--enable-ecccustcurves` only defines `WOLFSSL_CUSTOM_CURVES`; the Koblitz
 
 | Group Name | ID | Default | configure Option |
 |------------|:--:|:-------:|-----------------|
-| `ML-KEM-512` | 512 | Disabled | `--enable-mlkem` + `--enable-tls-mlkem-standalone` |
-| `ML-KEM-768` | 513 | Disabled | `--enable-mlkem` + `--enable-tls-mlkem-standalone` |
-| `ML-KEM-1024` | 514 | Disabled | `--enable-mlkem` + `--enable-tls-mlkem-standalone` |
+| `ML_KEM_512` (alias `MLKEM512`) | 512 | Disabled | `--enable-mlkem` + `--enable-tls-mlkem-standalone` |
+| `ML_KEM_768` (alias `MLKEM768`) | 513 | Disabled | `--enable-mlkem` + `--enable-tls-mlkem-standalone` |
+| `ML_KEM_1024` (alias `MLKEM1024`) | 514 | Disabled | `--enable-mlkem` + `--enable-tls-mlkem-standalone` |
 
 ### B-8 ML-KEM Hybrid (Standard)
 

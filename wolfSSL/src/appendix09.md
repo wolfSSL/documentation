@@ -30,7 +30,7 @@ From a high level perspective, for every TLS 1.3 connection, authentication, int
 * key establishment algorithms
 * symmetric cipher algorithms
 
-The threat of quantum computers to conventional cryptography takes two forms. Grover’s algorithm reduces the security of modern symmetric cipher algorithms by approximately half while Shor’s algorithm completely breaks the security of modern authentication and key establishment algorithms. As a result, we can continue to protect our communications using the AES-256 symmetric cipher which is considered sufficiently secure even in the presence of a cryptographically relevant quantum computer. We can then replace our conventional authentication and key establishment algorithms with post-quantum algorithms. Note that during TLS 1.3 handshakes, the ciphersuite specifies the symmetric cipher to be used for the duration of the connection. Both CNSA (Commercial National Security Algorithm Suite) 1.0 and 2.0 prescribe using the AES_256_GCM_SHA384 ciphersuite. For key establishment and authentication, there are post-quantum KEMs (Key Encapsulation Mechanisms) and signature schemes.
+The threat of quantum computers to conventional cryptography takes two forms. Grover's algorithm reduces the security of modern symmetric cipher algorithms by approximately half while Shor's algorithm completely breaks the security of modern authentication and key establishment algorithms. As a result, we can continue to protect our communications using the AES-256 symmetric cipher which is considered sufficiently secure even in the presence of a cryptographically relevant quantum computer. We can then replace our conventional authentication and key establishment algorithms with post-quantum algorithms. Note that during TLS 1.3 handshakes, the ciphersuite specifies the symmetric cipher to be used for the duration of the connection. Both CNSA (Commercial National Security Algorithm Suite) 1.0 and 2.0 prescribe using the AES_256_GCM_SHA384 ciphersuite. For key establishment and authentication, there are post-quantum KEMs (Key Encapsulation Mechanisms) and signature schemes.
 
 These use different kinds of math from the conventional algorithms. They are designed specifically for resistance to quantum-computers. The main signature scheme and KEM that NIST has standardized for use with network protocols are lattice-based algorithms; SLH-DSA (FIPS 205) is a hash-based alternative for signatures.
 
@@ -48,7 +48,7 @@ These use different kinds of math from the conventional algorithms. They are des
 
 **Note**: SPHINCS+, which wolfSSL used to take from liboqs, has been replaced
           by the native SLH-DSA (FIPS 205) implementation, enabled with
-          `--enable-slhdsa`. Falcon used liboqs until wolfSSL 5.9.4, which
+          [`--enable-slhdsa`](chapter02.md#--enable-slhdsa). Falcon used liboqs until wolfSSL 5.9.4, which
           replaced it with a native implementation of levels 1 and 5,
           enabled with `--enable-experimental --enable-falcon`. FrodoKEM,
           a key encapsulation mechanism, is available too with
@@ -83,13 +83,13 @@ None of the post-quantum algorithms need an external library; they all build fro
 
 For the experimental algorithms, add `--enable-experimental --enable-falcon` or `--enable-experimental --enable-frodokem`. Those two options take sub-options as well; see [`--enable-falcon`](chapter02.md#--enable-falcon) and [`--enable-frodokem`](chapter02.md#--enable-frodokem).
 
-Item 15 of the wolfSSL repo's INSTALL file (https://github.com/wolfSSL/wolfssl/blob/master/INSTALL) covers the same ground, but it uses the older option names `--enable-kyber` and `--enable-dilithium` (aliases for `--enable-mlkem` and `--enable-mldsa`) and the SecP521r1MLKEM1024 group, which needs `--enable-experimental --enable-extra-pqc-hybrids`.
+Item 15 of the wolfSSL repo's INSTALL file (https://github.com/wolfSSL/wolfssl/blob/master/INSTALL) covers the same ground, but it uses the older option names `--enable-kyber` and `--enable-dilithium` (aliases for `--enable-mlkem` and [`--enable-mldsa`](chapter02.md#--enable-mldsa)) and the SecP521r1MLKEM1024 group, which needs `--enable-experimental --enable-extra-pqc-hybrids`.
 
 #### What Is Enabled by Default
 
-* ML-KEM is enabled by default, unless SHA-3 or SHAKE is disabled. `--enable-mlkem` is only needed to pass sub-options, and `--disable-mlkem` turns ML-KEM off.
-* The standard PQ/T hybrid groups SecP256r1MLKEM768, SecP384r1MLKEM1024 and X25519MLKEM768 come with `--enable-pqc-hybrids`, which is on by default. X25519MLKEM768 also needs [`--enable-curve25519`](chapter02.md#--enable-curve25519), which is off by default.
-* The pure ML-KEM groups ML_KEM_512, ML_KEM_768 and ML_KEM_1024 need `--enable-tls-mlkem-standalone`. The configure script only turns it on by itself when the build has no ECC, Curve25519 or Curve448 to make hybrids with.
+* ML-KEM is enabled by default, unless SHA-3 or SHAKE is disabled. `--enable-mlkem` is only needed to pass sub-options, and [`--disable-mlkem`](chapter02.md#--disable-mlkem) turns ML-KEM off.
+* The standard PQ/T hybrid groups SecP256r1MLKEM768, SecP384r1MLKEM1024 and X25519MLKEM768 come with [`--enable-pqc-hybrids`](chapter02.md#--disable-pqc-hybrids), which is on by default. X25519MLKEM768 also needs [`--enable-curve25519`](chapter02.md#--enable-curve25519), which is off by default.
+* The pure ML-KEM groups ML_KEM_512, ML_KEM_768 and ML_KEM_1024 need [`--enable-tls-mlkem-standalone`](chapter02.md#--enable-tls-mlkem-standalone). The configure script only turns it on by itself when the build has no ECC, Curve25519 or Curve448 to make hybrids with.
 * The extra hybrid groups SecP256r1MLKEM512, SecP384r1MLKEM768, SecP521r1MLKEM1024, X25519MLKEM512 and X448MLKEM768 need `--enable-experimental --enable-extra-pqc-hybrids`. They are not available in FIPS v7 builds.
 * The round 3 Kyber groups need `--enable-mlkem=yes,original` (Kyber instead of ML-KEM) or `--enable-mlkem=yes,all` (Kyber and ML-KEM). Keep `yes` in the list: without it no Kyber or ML-KEM parameter set is built.
 * If the application does not configure any groups, a wolfSSL client sends an X25519MLKEM768 key share when Curve25519 is built in, and a SecP256r1MLKEM768 key share otherwise.
@@ -147,7 +147,7 @@ Further information about other post-quantum examples can be found at https://gi
 
 ### Post-Quantum Algorithms with DTLS
 
-The same groups and certificates work for DTLS 1.3. Configure wolfSSL with `--enable-dtls13` as well, and add `-u` to the example server and client commands above. ML-KEM key shares can make a ClientHello bigger than a single datagram, so when ML-KEM and DTLS 1.3 are both enabled, configure also turns on DTLS 1.3 ClientHello fragmentation (`--enable-dtls-frag-ch`, `WOLFSSL_DTLS_CH_FRAG`). If its first ClientHello would have to be fragmented, a wolfSSL client sends it with an empty key share. The server answers with a HelloRetryRequest, and the client sends its key share in the second ClientHello, which may be fragmented. The server has to allow fragmented ClientHellos with `wolfSSL_dtls13_allow_ch_frag()`; in builds with ML-KEM this is the default. A DTLS 1.3 server with cookies disabled can also process a fragmented first ClientHello, but only while `wolfSSL_dtls13_allow_ch_frag()` is on.
+The same groups and certificates work for DTLS 1.3. Configure wolfSSL with [`--enable-dtls13`](chapter02.md#--enable-dtls13) as well, and add `-u` to the example server and client commands above. ML-KEM key shares can make a ClientHello bigger than a single datagram, so when ML-KEM and DTLS 1.3 are both enabled, configure also turns on DTLS 1.3 ClientHello fragmentation (`--enable-dtls-frag-ch`, `WOLFSSL_DTLS_CH_FRAG`). If its first ClientHello would have to be fragmented, a wolfSSL client sends it with an empty key share. The server answers with a HelloRetryRequest, and the client sends its key share in the second ClientHello, which may be fragmented. The server has to allow fragmented ClientHellos with `wolfSSL_dtls13_allow_ch_frag()`; in builds with ML-KEM this is the default. A DTLS 1.3 server with cookies disabled can also process a fragmented first ClientHello, but only while `wolfSSL_dtls13_allow_ch_frag()` is on.
 
 ## Post Quantum Algorithm Variant Names
 
@@ -494,7 +494,7 @@ The public key is 60 bytes for the SHA-256/256 and SHAKE256/256 parameter sets a
 
 #### LMS/HSS Build Instructions
 
-Configure wolfSSL with `--enable-lms`; no external library is needed. `--enable-all-quantum-crypto` enables LMS/HSS as well. `--enable-lms` takes a comma separated list of sub-options:
+Configure wolfSSL with [`--enable-lms`](chapter02.md#--enable-lms); no external library is needed. `--enable-all-quantum-crypto` enables LMS/HSS as well. `--enable-lms` takes a comma separated list of sub-options:
 
 - `verify-only`: only signature verification is compiled in (`WOLFSSL_LMS_VERIFY_ONLY`).
 - `small`: smaller code with slower signing, for when memory is limited (`WOLFSSL_WC_LMS_SMALL`).
@@ -680,7 +680,7 @@ L4_H5_W8      | 5340           | 35.179 / 188.079 | 35.460 / 187.302 | 0.417 / 2
 
 ### XMSS/XMSS^MT signatures
 
-wolfCrypt includes a native implementation of the XMSS and XMSS^MT stateful hash-based signature schemes from RFC 8391 (https://www.rfc-editor.org/rfc/rfc8391.html) and NIST SP 800-208. Configure wolfSSL with `--enable-xmss`; no external library is needed. `--enable-all-quantum-crypto` enables XMSS/XMSS^MT as well. `--enable-xmss` takes these sub-options:
+wolfCrypt includes a native implementation of the XMSS and XMSS^MT stateful hash-based signature schemes from RFC 8391 (https://www.rfc-editor.org/rfc/rfc8391.html) and NIST SP 800-208. Configure wolfSSL with [`--enable-xmss`](chapter02.md#--enable-xmss); no external library is needed. `--enable-all-quantum-crypto` enables XMSS/XMSS^MT as well. `--enable-xmss` takes these sub-options:
 
 - `verify-only`: only signature verification is compiled in (`WOLFSSL_XMSS_VERIFY_ONLY`).
 - `small`: smaller code and a much smaller private key (`WOLFSSL_WC_XMSS_SMALL`). The private key then holds no tree traversal state, so signing is much slower.
