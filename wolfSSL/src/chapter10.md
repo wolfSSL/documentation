@@ -306,7 +306,7 @@ wc_AesFree(&dec);
 
 wolfCrypt also supports CTR (Counter), GCM (Galois/Counter), and CCM (Counter with CBC-MAC) modes of operation for AES.  When using these modes, like CBC, include the `wolfssl/wolfcrypt/aes.h` header.
 
-GCM mode is available for both encryption and decryption through the [`wc_AesGcmSetKey()`](group__AES.md#function-wc_aesgcmsetkey), [`wc_AesGcmEncrypt()`](group__AES.md#function-wc_aesgcmencrypt), and [`wc_AesGcmDecrypt()`](group__AES.md#function-wc_aesgcmdecrypt) functions; see [AES-GCM](#aes-gcm) below for an example.  For more usage examples, see the `aesgcm_test()` function in `<wolfssl_root>/wolfcrypt/test/test.c`.
+GCM mode is available for both encryption and decryption through the [`wc_AesGcmSetKey()`](group__AES.md#function-wc_aesgcmsetkey), [`wc_AesGcmEncrypt()`](group__AES.md#function-wc_aesgcmencrypt), and [`wc_AesGcmDecrypt()`](group__AES.md#function-wc_aesgcmdecrypt) functions; see the AES-GCM example below.  For more usage examples, see the `aesgcm_test()` function in `<wolfssl_root>/wolfcrypt/test/test.c`.
 
 CCM mode is supported for both encryption and decryption through the [`wc_AesCcmSetKey()`](group__AES.md#function-wc_aesccmsetkey), [`wc_AesCcmEncrypt()`](group__AES.md#function-wc_aesccmencrypt), and [`wc_AesCcmDecrypt()`](group__AES.md#function-wc_aesccmdecrypt) functions. Authentication tag sizes of 4, 6, 8, 10, 12, 14 or 16 bytes are accepted, so CCM-8 (an 8 byte tag) is one option. CCM requires [`--enable-aesccm`](chapter02.md#--enable-aesccm).  For a usage example, see the `aesccm_test()` function in `<wolfssl_root>/wolfcrypt/test/test.c`.
 

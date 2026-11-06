@@ -2216,7 +2216,7 @@ Enables the ability to override maximum signature algorithms.
 
 #### WOLFSSL_STATIC_EPHEMERAL
 
-Lets a fixed ("static") ephemeral (EC)DH key be loaded with [`wolfSSL_CTX_set_ephemeral_key()`](group__SSL.md#function-wolfssl_ctx_set_ephemeral_key) or `wolfSSL_set_ephemeral_key()`, so the sniffer can decrypt traffic that uses ephemeral key exchange. Reusing one ephemeral key across connections gives up forward secrecy; use it only for testing, inspection or debugging. Set automatically by `--enable-sniffer`.
+Lets a fixed ("static") ephemeral (EC)DH key be loaded with [`wolfSSL_CTX_set_ephemeral_key()`](ssl_8h.md#function-wolfssl_ctx_set_ephemeral_key) or `wolfSSL_set_ephemeral_key()`, so the sniffer can decrypt traffic that uses ephemeral key exchange. Reusing one ephemeral key across connections gives up forward secrecy; use it only for testing, inspection or debugging. Set automatically by `--enable-sniffer`.
 
 #### SSL_SNIFFER_EXPORTS
 
