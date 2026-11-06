@@ -5,11 +5,19 @@
 wolfSSL (formerly CyaSSL) has an extension that allows a HandShake Callback to be set for connect or accept. This can be useful in embedded systems for debugging support when another debugger isn’t available and sniffing is impractical. To use wolfSSL HandShake Callbacks, use the extended functions, [`wolfSSL_connect_ex()`](ssl_8h.md#function-wolfssl_connect_ex) and [`wolfSSL_accept_ex()`](ssl_8h.md#function-wolfssl_accept_ex):
 
 ```c
-int wolfSSL_connect_ex(WOLFSSL*, HandShakeCallBack, TimeoutCallBack,
-                       Timeval)
-int wolfSSL_accept_ex(WOLFSSL*, HandShakeCallBack, TimeoutCallBack,
-                      Timeval)
+int wolfSSL_connect_ex(WOLFSSL* ssl, HandShakeCallBack hsCb,
+                       TimeoutCallBack toCb, WOLFSSL_TIMEVAL timeout);
+int wolfSSL_accept_ex(WOLFSSL* ssl, HandShakeCallBack hsCb,
+                      TimeoutCallBack toCb, WOLFSSL_TIMEVAL timeout);
 ```
+
+These functions, and `wolfssl/callbacks.h`, are only available when wolfSSL is built with [`WOLFSSL_CALLBACKS`](chapter02.md#wolfssl_callbacks) defined. There is no configure option for it, so add it through `CFLAGS`:
+
+```sh
+./configure CFLAGS="-DWOLFSSL_CALLBACKS"
+```
+
+Defining `WOLFSSL_CALLBACKS` also forces `LARGE_STATIC_BUFFERS` on. The timeout uses the POSIX `setitimer()` and `SIGALRM` interfaces, see [Timeout Callback](#timeout-callback).
 
 `HandShakeCallBack` is defined as:
 
@@ -21,19 +29,20 @@ typedef int (*HandShakeCallBack)(HandShakeInfo*);
 
 ```c
 typedef struct handShakeInfo_st {
-    char   cipherName[MAX_CIPHERNAME_SZ + 1];  /*negotiated name */
-    char   packetNames[MAX_PACKETS_HANDSHAKE][MAX_PACKETNAME_SZ+1];
-                                          /* SSL packet names */
-    int    numberPackets;                 /*actual # of packets  */
-    int    negotiationError;              /*cipher/parameter err */
+    struct WOLFSSL* ssl;
+    char   cipherName[MAX_CIPHERNAME_SZ + 1];    /* negotiated cipher */
+    char   packetNames[MAX_PACKETS_HANDSHAKE][MAX_PACKETNAME_SZ + 1];
+                                                 /* SSL packet names  */
+    int    numberPackets;                        /* actual # of packets */
+    int    negotiationError;                     /* cipher/parameter err */
 } HandShakeInfo;
 ```
 
-No dynamic memory is used since the maximum number of SSL packets in a handshake exchange is known. Packet names can be accessed through `packetNames[idx]` up to `numberPackets`. The callback will be called whether or not a handshake error occurred.  Example usage is also in the client example.
+The `ssl` member points to the connection the callback was issued for. No dynamic memory is used since the maximum number of SSL packets in a handshake exchange is known. Packet names can be accessed through `packetNames[idx]` up to `numberPackets`. The callback will be called whether or not a handshake error occurred.  Example usage is also in the client example.
 
 ## Timeout Callback
 
-The same extensions used with wolfSSL Handshake Callbacks can be used for wolfSSL Timeout Callbacks as well. These extensions can be called with either, both, or neither callbacks (Handshake and/or Timeout). `TimeoutCallback` is defined as:
+The same extensions used with wolfSSL Handshake Callbacks can be used for wolfSSL Timeout Callbacks as well. These extensions can be called with either, both, or neither callbacks (Handshake and/or Timeout). `TimeoutCallBack` is defined as:
 
 ```c
 typedef int (*TimeoutCallBack)(TimeoutInfo*);
@@ -43,25 +52,25 @@ Where `TimeoutInfo` looks like:
 
 ```c
 typedef struct timeoutInfo_st {
-    char       timeoutName[MAX_TIMEOUT_NAME_SZ +1]; /*timeout Name*/
-    int        flags;                            /* for future use*/
-    int        numberPackets;               /*actual # of packets */
-    PacketInfo packets[MAX_PACKETS_HANDSHAKE];  /*list of packets */
-    Timeval    timeoutValue;               /*timer that caused it */
+    char       timeoutName[MAX_TIMEOUT_NAME_SZ + 1]; /* timeout Name */
+    int        flags;                              /* for future use */
+    int        numberPackets;                      /* actual # of packets */
+    PacketInfo packets[MAX_PACKETS_HANDSHAKE];     /* list of all packets  */
+    WOLFSSL_TIMEVAL timeoutValue;                  /* timer that caused it */
 } TimeoutInfo;
 ```
 
-Again, no dynamic memory is used for this structure since a maximum number of SSL packets is known for a handshake. `Timeval` is just a typedef for struct timeval.
+Again, no dynamic memory is used for this structure since a maximum number of SSL packets is known for a handshake. `WOLFSSL_TIMEVAL` is a typedef for `struct timeval` when `<sys/time.h>` is available (`HAVE_SYS_TIME_H`), and an equivalent structure with `tv_sec` and `tv_usec` members otherwise. The older name `Timeval` is kept as a macro alias for `WOLFSSL_TIMEVAL` unless `NO_OLD_TIMEVAL_NAME` is defined.
 
 `PacketInfo` is defined like this:
 
 ```c
 typedef struct packetInfo_st {
-    char           packetName[MAX_PACKETNAME_SZ + 1]; /* SSL name */
-    Timeval        timestamp;                  /* when it occurred */
-    unsigned char  value[MAX_VALUE_SZ];     /* if fits, it's here */
-    unsigned char* bufferValue;         /* otherwise here (non 0) */
-    int            valueSz;              /* sz of value or buffer */
+    char           packetName[MAX_PACKETNAME_SZ + 1]; /* SSL packet name */
+    WOLFSSL_TIMEVAL timestamp;                       /* when it occurred    */
+    unsigned char  value[MAX_VALUE_SZ];             /* if fits, it's here */
+    unsigned char* bufferValue;                     /* otherwise here (non 0) */
+    int            valueSz;                         /* sz of value or buffer */
 } PacketInfo;
 ```
 
@@ -99,7 +108,24 @@ The user needs to write and register these functions per wolfSSL context (`WOLFS
 
 The user can set a context per WOLFSSL object (session) with [`wolfSSL_SetMacEncryptCtx()`](ssl_8h.md#function-wolfssl_setmacencryptctx) and [`wolfSSL_SetDecryptVerifyCtx()`](ssl_8h.md#function-wolfssl_setdecryptverifyctx).  This context may be a pointer to any user-specified context, which will then in turn be passed back to the MAC/encrypt and decrypt/verify callbacks through the `void* ctx` parameter.
 
-1. Example callbacks can be found in `wolfssl/test.h`, under `myMacEncryptCb()` and `myDecryptVerifyCb()`.  Usage can be seen in the wolfSSL example client (`examples/client/client.c`), when using the `-U` command line option.
+Example callbacks can be found in `wolfssl/test.h`, under `myMacEncryptCb()` and `myDecryptVerifyCb()`.  Usage can be seen in the wolfSSL example client (`examples/client/client.c`), when using the `-U` command line option.
+
+### Encrypt-Then-MAC Callbacks
+
+When the Encrypt-Then-MAC extension (RFC 7366) is negotiated for a block cipher suite, wolfSSL calls a second pair of callbacks instead, which encrypt before computing the MAC and verify the MAC before decrypting. They are prototyped by `CallbackEncryptMac` and `CallbackVerifyDecrypt` in `ssl.h`:
+
+```c
+typedef int (*CallbackEncryptMac)(WOLFSSL* ssl, unsigned char* macOut,
+       int content, int macVerify, unsigned char* encOut,
+       const unsigned char* encIn, unsigned int encSz, void* ctx);
+
+typedef int (*CallbackVerifyDecrypt)(WOLFSSL* ssl,
+       unsigned char* decOut, const unsigned char* decIn,
+       unsigned int decSz, int content, int verify, unsigned int* padSz,
+       void* ctx);
+```
+
+Register them with `wolfSSL_CTX_SetEncryptMacCb()` and `wolfSSL_CTX_SetVerifyDecryptCb()`. The per-object context setters are `wolfSSL_SetEncryptMacCtx()` and `wolfSSL_SetVerifyDecryptCtx()`, but wolfSSL currently passes these callbacks the contexts set with `wolfSSL_SetMacEncryptCtx()` and `wolfSSL_SetDecryptVerifyCtx()`, so the example in `wolfssl/test.h` uses the same contexts for both pairs. The verify/decrypt callback is only used when a decrypt/verify callback is also registered. If you register a decrypt/verify callback and Encrypt-Then-MAC may be negotiated, register the verify/decrypt callback too, or disable the extension with `wolfSSL_CTX_AllowEncryptThenMac(ctx, 0)`. Example callbacks can be found in `wolfssl/test.h`, under `myEncryptMacCb()` and `myVerifyDecryptCb()`. Encrypt-Then-MAC support is enabled by default and controlled with the `--enable-enc-then-mac` configure option (`HAVE_ENCRYPT_THEN_MAC`).
 
 To use Atomic Record Layer callbacks, wolfSSL needs to be compiled using the `--enable-atomicuser` configure option, or by defining the `ATOMIC_USER` preprocessor flag.
 
@@ -303,14 +329,13 @@ To use X448 callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` and
 
 wolfSSL provides RSA PSS callbacks for users who wish to have more control over RSA PSS sign/verify operations during the SSL/TLS connection.
 
-The user can optionally define 4 functions:
+The user can optionally define 3 functions:
 
 1. RSA PSS sign callback
 2. RSA PSS verify callback
 3. RSA PSS sign check callback
-4. RSA PSS verify check callback
 
-These functions are prototyped by `CallbackRsaPssSign`, `CallbackRsaPssVerify`, and `CallbackRsaPssSignCheck` in `ssl.h`:
+These functions are prototyped by `CallbackRsaPssSign` and `CallbackRsaPssVerify` in `ssl.h`. The sign check callback uses the `CallbackRsaPssVerify` prototype:
 
 ```c
 typedef int (*CallbackRsaPssSign)(WOLFSSL* ssl,
@@ -326,27 +351,20 @@ typedef int (*CallbackRsaPssVerify)(WOLFSSL* ssl,
        int hash, int mgf,
        const unsigned char* keyDer, unsigned int keySz,
        void* ctx);
-
-typedef int (*CallbackRsaPssSignCheck)(WOLFSSL* ssl,
-       unsigned char* sig, unsigned int sigSz,
-       unsigned char** out,
-       const unsigned char* keyDer, unsigned int keySz,
-       void* ctx);
 ```
 
 The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
 
 * `wolfSSL_CTX_SetRsaPssSignCb()`
 * `wolfSSL_CTX_SetRsaPssVerifyCb()`
-* `wolfSSL_CTX_SetRsaSignCheckCb()`
 * `wolfSSL_CTX_SetRsaPssSignCheckCb()`
 
 The user can set a context per WOLFSSL object (session) with:
 
 * `wolfSSL_SetRsaPssSignCtx()`
 * `wolfSSL_SetRsaPssVerifyCtx()`
-* `wolfSSL_SetRsaSignCheckCtx()`
-* `wolfSSL_SetRsaPssSignCheckCtx()`
+
+The sign check callback is called after wolfSSL has created an RSA PSS signature, to verify that signature and detect signing faults. It has no context setter of its own and receives the context set with `wolfSSL_SetRsaPssSignCtx()`. It returns the length of the data recovered into `out`, which wolfSSL then checks against the data that was signed, or 0 to skip the check (for example when the hardware already checks its signatures).
 
 Example callbacks can be found in `wolfssl/test.h`, under `myRsaPssSign()`, `myRsaPssVerify()`, and `myRsaPssSignCheck()`. Usage can be seen in the wolfSSL example client.
 
@@ -354,23 +372,26 @@ To use RSA PSS callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` 
 
 ### ECC Callbacks
 
-The user can optionally define 7 functions:
+wolfSSL provides ECC callbacks for users who wish to have more control over ECC key generation, ECDSA sign/verify and ECDH shared secret operations during the SSL/TLS connection.
 
-1. ECC sign callback
-2. ECC verify callback
-3. ECC shared secret callback
-4. RSA sign callback
-5. RSA verify callback
-6. RSA encrypt callback
-7. RSA decrypt callback
+The user can optionally define 4 functions:
 
-These two functions are prototyped by `CallbackEccSign`, `CallbackEccVerify`, `CallbackEccSharedSecret`, `CallbackRsaSign`, `CallbackRsaVerify`, `CallbackRsaEnc`, and `CallbackRsaDec` in `ssl.h`:
+1. ECC key generation callback
+2. ECC sign callback
+3. ECC verify callback
+4. ECC shared secret callback
+
+These functions are prototyped by `CallbackEccKeyGen`, `CallbackEccSign`, `CallbackEccVerify` and `CallbackEccSharedSecret` in `ssl.h`:
 
 ```c
-typedef int (*CallbackEccSign)(WOLFSSL* ssl, const unsigned
-        char* in, unsigned int inSz, unsigned char* out,
-        unsigned int* outSz, const unsigned char* keyDer,
-        unsigned int keySz, void* ctx);
+typedef int (*CallbackEccKeyGen)(WOLFSSL* ssl, struct ecc_key* key,
+    unsigned int keySz, int ecc_curve, void* ctx);
+
+typedef int (*CallbackEccSign)(WOLFSSL* ssl,
+    const unsigned char* in, unsigned int inSz,
+    unsigned char* out, word32* outSz,
+    const unsigned char* keyDer, unsigned int keySz,
+    void* ctx);
 
 typedef int (*CallbackEccVerify)(WOLFSSL* ssl,
     const unsigned char* sig, unsigned int sigSz,
@@ -379,14 +400,50 @@ typedef int (*CallbackEccVerify)(WOLFSSL* ssl,
     int* result, void* ctx);
 
 typedef int (*CallbackEccSharedSecret)(WOLFSSL* ssl,
-        struct ecc_key* otherKey,
-    unsigned char* pubKeyDer, unsigned int* pubKeySz,
-    unsigned char* out, unsigned int* outlen,
+    struct ecc_key* otherKey,
+    unsigned char* pubKeyDer, word32* pubKeySz,
+    unsigned char* out, word32* outlen,
     int side, void* ctx);
+```
 
+The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
+
+* `wolfSSL_CTX_SetEccKeyGenCb()`
+* [`wolfSSL_CTX_SetEccSignCb()`](ssl_8h.md#function-wolfssl_ctx_seteccsigncb)
+* [`wolfSSL_CTX_SetEccVerifyCb()`](ssl_8h.md#function-wolfssl_ctx_seteccverifycb)
+* `wolfSSL_CTX_SetEccSharedSecretCb()`
+
+The user can set a context per `WOLFSSL` object (session) with:
+
+* `wolfSSL_SetEccKeyGenCtx()`
+* [`wolfSSL_SetEccSignCtx()`](ssl_8h.md#function-wolfssl_seteccsignctx)
+* [`wolfSSL_SetEccVerifyCtx()`](ssl_8h.md#function-wolfssl_seteccverifyctx)
+* `wolfSSL_SetEccSharedSecretCtx()`
+
+These contexts may be pointers to any user-specified context, which will then in turn be passed back to the respective public key callback through the `void* ctx` parameter.
+
+Example callbacks can be found in `wolfssl/test.h`, under `myEccKeyGen()`, `myEccSign()`, `myEccVerify()` and `myEccSharedSecret()`.
+
+To use ECC callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` and `HAVE_ECC` defined.
+
+### RSA Callbacks
+
+wolfSSL provides RSA callbacks for users who wish to have more control over RSA sign/verify and encrypt/decrypt operations during the SSL/TLS connection.
+
+The user can optionally define 5 functions:
+
+1. RSA sign callback
+2. RSA verify callback
+3. RSA sign check callback
+4. RSA encrypt callback
+5. RSA decrypt callback
+
+These functions are prototyped by `CallbackRsaSign`, `CallbackRsaVerify`, `CallbackRsaEnc` and `CallbackRsaDec` in `ssl.h`. The sign check callback uses the `CallbackRsaVerify` prototype:
+
+```c
 typedef int (*CallbackRsaSign)(WOLFSSL* ssl,
     const unsigned char* in, unsigned int inSz,
-    unsigned char* out, unsigned int* outSz,
+    unsigned char* out, word32* outSz,
     const unsigned char* keyDer, unsigned int keySz,
     void* ctx);
 
@@ -397,7 +454,7 @@ typedef int (*CallbackRsaVerify)(WOLFSSL* ssl,
 
 typedef int (*CallbackRsaEnc)(WOLFSSL* ssl,
     const unsigned char* in, unsigned int inSz,
-    unsigned char* out, unsigned int* outSz,
+    unsigned char* out, word32* outSz,
     const unsigned char* keyDer,
     unsigned int keySz, void* ctx);
 
@@ -409,29 +466,52 @@ typedef int (*CallbackRsaDec)(WOLFSSL* ssl, unsigned char* in,
 
 The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with:
 
-* [`wolfSSL_CTX_SetEccSignCb()`](ssl_8h.md#function-wolfssl_ctx_seteccsigncb)
-* [`wolfSSL_CTX_SetEccVerifyCb()`](ssl_8h.md#function-wolfssl_ctx_seteccverifycb)
-* `wolfSSL_CTX_SetEccSharedSecretCb()`
 * [`wolfSSL_CTX_SetRsaSignCb()`](ssl_8h.md#function-wolfssl_ctx_setrsasigncb)
 * [`wolfSSL_CTX_SetRsaVerifyCb()`](ssl_8h.md#function-wolfssl_ctx_setrsaverifycb)
+* `wolfSSL_CTX_SetRsaSignCheckCb()`
 * [`wolfSSL_CTX_SetRsaEncCb()`](ssl_8h.md#function-wolfssl_ctx_setrsaenccb)
 * [`wolfSSL_CTX_SetRsaDecCb()`](ssl_8h.md#function-wolfssl_ctx_setrsadeccb)
 
 The user can set a context per `WOLFSSL` object (session) with:
 
-* [`wolfSSL_SetEccSignCtx()`](ssl_8h.md#function-wolfssl_seteccsignctx)
-* [`wolfSSL_SetEccVerifyCtx()`](ssl_8h.md#function-wolfssl_seteccverifyctx)
-* `wolfSSL_SetEccSharedSecretCtx()`
 * [`wolfSSL_SetRsaSignCtx()`](ssl_8h.md#function-wolfssl_setrsasignctx)
 * [`wolfSSL_SetRsaVerifyCtx()`](ssl_8h.md#function-wolfssl_setrsaverifyctx)
 * [`wolfSSL_SetRsaEncCtx()`](ssl_8h.md#function-wolfssl_setrsaencctx)
 * [`wolfSSL_SetRsaDecCtx()`](ssl_8h.md#function-wolfssl_setrsadecctx)
 
-These contexts may be pointers to any user-specified context, which will then in turn be passed back to the respective public key callback through the `void* ctx` parameter.
+The sign check callback is called after wolfSSL has created an RSA PKCS #1 v1.5 signature, to verify that signature and detect signing faults. It has no context setter of its own and receives the context set with `wolfSSL_SetRsaSignCtx()`. It returns the length of the data recovered into `out`, which wolfSSL then compares with the data that was signed, or 0 to skip the check (for example when the hardware already checks its signatures).
 
-Example callbacks can be found in `wolfssl/test.h`, under `myEccSign()`, `myEccVerify()`, `myEccSharedSecret()`, `myRsaSign()`, `myRsaVerify()`, `myRsaEnc()`, and `myRsaDec()`.  Usage can be seen in the wolfSSL example client (`examples/client/client.c`), when using the `-P` command line option.
+Example callbacks can be found in `wolfssl/test.h`, under `myRsaSign()`, `myRsaVerify()`, `myRsaSignCheck()`, `myRsaEnc()`, and `myRsaDec()`.
 
-To use Atomic Record Layer callbacks, wolfSSL needs to be compiled using the [`--enable-pkcallbacks`](chapter02.md#--enable-pkcallbacks) configure option, or by defining the `HAVE_PK_CALLBACKS` preprocessor flag.
+To use RSA callbacks, wolfSSL needs to be compiled with `HAVE_PK_CALLBACKS` defined and RSA enabled (`NO_RSA` not defined).
+
+### Protocol Callbacks
+
+`HAVE_PK_CALLBACKS` also enables callbacks for TLS protocol-level operations, which allow key derivation and record processing to be done by hardware (for example a secure element that holds the session keys). They are prototyped in `ssl.h`:
+
+| Callback type | Register with | Operation |
+| --- | --- | --- |
+| `CallbackGenMasterSecret` | `wolfSSL_CTX_SetGenMasterSecretCb()` | Generate the TLS 1.2 master secret |
+| `CallbackGenExtMasterSecret` | `wolfSSL_CTX_SetGenExtMasterSecretCb()` | Generate the extended master secret (RFC 7627) |
+| `CallbackGenPreMaster` | `wolfSSL_CTX_SetGenPreMasterCb()` | Generate the pre-master secret for RSA key exchange |
+| `CallbackGenSessionKey` | `wolfSSL_CTX_SetGenSessionKeyCb()` | Derive the session keys |
+| `CallbackEncryptKeys` | `wolfSSL_CTX_SetEncryptKeysCb()` | Set up the record encryption keys |
+| `CallbackTlsFinished` | `wolfSSL_CTX_SetTlsFinishedCb()` | Compute the TLS Finished message hash |
+| `CallbackVerifyMac` | `wolfSSL_CTX_SetVerifyMacCb()` | Verify the MAC of a received block cipher record, TLS 1.2 and earlier (not in `WOLFSSL_AEAD_ONLY` builds) |
+| `CallbackHKDFExtract` | `wolfSSL_CTX_SetHKDFExtractCb()` | TLS 1.3 HKDF-Extract (requires `HAVE_HKDF`) |
+| `CallbackHKDFExpandLabel` | `wolfSSL_CTX_SetHKDFExpandLabelCb()` | TLS 1.3 HKDF-Expand-Label |
+| `CallbackProcessServerSigKex` | `wolfSSL_CTX_SetProcessServerSigKexCb()` | Verify the ECDSA signature on a TLS 1.2 ServerKeyExchange |
+| `CallbackPerformTlsRecordProcessing` | `wolfSSL_CTX_SetPerformTlsRecordProcessingCb()` | Encrypt or decrypt a TLS 1.2 AES-GCM or AES-CCM record |
+
+Each of the first eight has a matching per-object context setter, for example `wolfSSL_SetGenMasterSecretCtx()` and `wolfSSL_SetHKDFExtractCtx()`. The last three take no context argument.
+
+A callback can let wolfSSL perform the operation itself: the first seven return `PROTOCOLCB_UNAVAILABLE` for this, and `CallbackHKDFExpandLabel`, `CallbackProcessServerSigKex` and `CallbackPerformTlsRecordProcessing` return `NOT_COMPILED_IN`. When a `CallbackHKDFExtract` is registered, its result is always used.
+
+Example callbacks can be found in `wolfssl/test.h`, under `myGenMaster()`, `myGenExtMaster()`, `myGenPreMaster()`, `myGenSessionKey()`, `mySetEncryptKeys()`, `myTlsFinished()`, `myVerifyMac()` and `myHkdfExtract()`. These examples, except `myHkdfExtract()`, return `PROTOCOLCB_UNAVAILABLE` so that wolfSSL falls back to its own implementation.
+
+Usage of the public key and protocol callbacks can be seen in the wolfSSL example client (`examples/client/client.c`), when using the `-P` command line option.
+
+To use Public Key callbacks, wolfSSL needs to be compiled using the [`--enable-pkcallbacks`](chapter02.md#--enable-pkcallbacks) configure option, or by defining the `HAVE_PK_CALLBACKS` preprocessor flag.
 
 
 ## Crypto Callbacks (cryptocb)
@@ -440,7 +520,7 @@ The Crypto callback framework in wolfSSL/wolfCrypt enables users to override the
 
 ### Using Crypto callbacks
 
-The high level steps use crypto callbacks are:
+The high level steps to use crypto callbacks are:
 
 1. Compile wolfSSL with crypto callback support
 2. Register a callback and unique device ID (`devId`) with wolfCrypt
@@ -471,7 +551,7 @@ Note: A registered `devId` can be any value other than `-2`, which is reserved f
 
 For wolfCrypt API’s, use the init functions that accept `devId` such as:
 
-```
+```text
 wc_InitRsaKey_ex
 wc_ecc_init_ex
 wc_AesInit
@@ -582,19 +662,19 @@ int myCryptoCallback(int devId, wc_CryptoInfo* info, void* ctx)
 ### Handling the request
 
 The data structure for each type of request generally contains a pointer and associated size for input and output data. Depending on the request it may include additional data including cryptographic keys, nonces, or further configuration. The crypto callback should operate on the input data and write relevant output data back to the appropriate variant of the algo type union. Writing data to a union variant that does not correspond to the algorithm type in question (e.g. using `info->cipher`
-when `info->algo_type == WC_ALGO_TYPE_RNG` is a memory error and can result in undefined behavior.
+when `info->algo_type == WC_ALGO_TYPE_RNG`) is a memory error and can result in undefined behavior.
 
 ### Asynchronous Crypto Callbacks
 
-A crypto callback may return `WC_PENDING_E` to indicate that the operation was started on a device and has not completed. The application then drives the operation to completion with `wolfSSL_AsyncPoll()`. wolfSSL 5.9.4 extended the TLS 1.3 handshake to support this for the HKDF key schedule, transcript HMAC, AES-GCM record encrypt and decrypt, RNG, ECC and X25519 key shares, and ECDSA and Ed25519 sign and verify. For the TLS record ciphers specifically, define `WOLF_CRYPTO_CB_ASYNC_POLL` to use a poll-to-complete model; without it a pending bulk cipher returns `ASYNC_OP_E` rather than corrupting the record. `WOLFSSL_ASYNC_CERT_YIELD` additionally returns `WC_PENDING_E` after each certificate in a peer chain is verified so a cooperative scheduler can run.
+A crypto callback may return `WC_PENDING_E` to indicate that the operation was started on a device and has not completed. The application then drives the operation to completion with `wolfSSL_AsyncPoll()`. This requires asynchronous crypto support, enabled with the [`--enable-asynccrypt`](chapter02.md#--enable-asynccrypt) configure option (`WOLFSSL_ASYNC_CRYPT`), since `wolfSSL_AsyncPoll()` is only declared then. wolfSSL 5.9.4 extended the TLS 1.3 handshake to support this for the HKDF key schedule, transcript HMAC, AES-GCM record encrypt and decrypt, RNG, ECC and X25519 key shares, and ECDSA and Ed25519 sign and verify. For the TLS record ciphers specifically, define `WOLF_CRYPTO_CB_ASYNC_POLL` to use a poll-to-complete model; without it a pending bulk cipher returns `ASYNC_OP_E` rather than corrupting the record. `WOLFSSL_ASYNC_CERT_YIELD` additionally returns `WC_PENDING_E` after each certificate in a peer chain is verified so a cooperative scheduler can run.
 
 ### Device Registration
 
-`wc_CryptoCb_RegisterDevice()` rejects a device ID that is already registered with `ALREADY_E`, and `wc_CryptoCb_IsDeviceRegistered()` reports whether an ID is in use. If a device's register command registers further devices itself, it is not left holding a half-filled slot. `wc_CryptoCb_UnRegisterDevice()` removes a registration.
+`wc_CryptoCb_RegisterDevice()` rejects a device ID that is already registered with `ALREADY_E`, returns `BAD_FUNC_ARG` for `devId == INVALID_DEVID`, and returns `BUFFER_E` when the device table is full. The table holds `MAX_CRYPTO_DEVID_CALLBACKS` entries (8 by default). `wc_CryptoCb_IsDeviceRegistered()` reports whether an ID is in use. If a device's register command registers further devices itself, it is not left holding a half-filled slot. `wc_CryptoCb_UnRegisterDevice()` removes a registration.
 
 ### Crypto-Callback-Only Builds
 
-If a device always services an algorithm, you can compile its software implementation out. The `WOLF_CRYPTO_CB_ONLY_*` macros do this per algorithm (RSA, ECC, Ed25519, Curve25519, Curve448 and SLH-DSA), and `--enable-cryptocb=only` does it for all of them at once. See [`--enable-cryptocb`](chapter02.md#--enable-cryptocb).
+If a device always services an algorithm, you can compile its software implementation out. The `WOLF_CRYPTO_CB_ONLY_*` macros do this per algorithm: `WOLF_CRYPTO_CB_ONLY_SHA256`, `_SHA512`, `_AES`, `_RSA`, `_ECC`, `_ED25519`, `_CURVE25519`, `_CURVE448`, `_FALCON`, `_SLHDSA`, `_MLKEM`, `_MLDSA`, `_LMS`, `_XMSS` and `_FRODOKEM`. `--enable-cryptocb=only` sets all of them at once, for each of those algorithms that is enabled in the build. See [`--enable-cryptocb`](chapter02.md#--enable-cryptocb).
 
 ### Troubleshooting
 
@@ -609,5 +689,23 @@ Full examples of crypto callbacks can be found in the following locations
 * [STSAFE-A100 ECC Crypto Callbacks](https://github.com/wolfSSL/wolfssl/blob/master/wolfcrypt/src/port/st/stsafe.c)
 * [TPM 2.0 wolfTPM Crypto Callbacks](https://github.com/wolfSSL/wolfTPM/blob/master/src/tpm2_cryptocb.c)
 * [Generic wolfCrypt tests](https://github.com/wolfSSL/wolfssl/blob/master/wolfcrypt/test/test.c)
+
+## Other Callbacks
+
+wolfSSL provides several other callbacks that are set on a `WOLFSSL_CTX` or `WOLFSSL` object. The certificate verification callback (`wolfSSL_CTX_set_verify()`) is described in [Client Authentication](chapter04.md#client-authentication), and the PSK callbacks (`wolfSSL_CTX_set_psk_client_callback()` and `wolfSSL_CTX_set_psk_server_callback()`) in [Pre-Shared Keys](chapter04.md#pre-shared-keys). The table below lists the others. See `wolfssl/ssl.h` for their prototypes.
+
+| Callback | Register with | Requires |
+| --- | --- | --- |
+| Session ticket encryption (server) | `wolfSSL_CTX_set_TicketEncCb()` | `HAVE_SESSION_TICKET` (`--enable-session-ticket`) |
+| Session ticket received (client) | `wolfSSL_set_SessionTicket_cb()` | `HAVE_SESSION_TICKET` (`--enable-session-ticket`) |
+| SNI received (server) | `wolfSSL_CTX_set_servername_callback()` | `HAVE_SNI` (`--enable-sni`) |
+| ALPN protocol selection (server) | `wolfSSL_CTX_set_alpn_select_cb()` | `HAVE_ALPN` (`--enable-alpn`) and one of `OPENSSL_ALL`, `WOLFSSL_NGINX`, `WOLFSSL_HAPROXY`, `HAVE_LIGHTY` or `WOLFSSL_QUIC` |
+| Certificate selection during the handshake | `wolfSSL_CTX_set_cert_cb()` | `WOLFSSL_CERT_SETUP_CB` (`--enable-cert-setup-cb`, or `OPENSSL_EXTRA`) |
+| CA certificate added to the CA cache | `wolfSSL_CTX_SetCACb()` | Certificate support (`NO_CERTS` not defined) |
+| CRL missing for a certificate | `wolfSSL_CTX_SetCRL_Cb()` | `HAVE_CRL` (`--enable-crl`) |
+| CRL retrieval I/O | `wolfSSL_CTX_SetCRL_IOCb()` | `HAVE_CRL_IO` (`--enable-crl=io`) |
+| OCSP request I/O | `wolfSSL_CTX_SetOCSP_Cb()` | `HAVE_OCSP` (`--enable-ocsp`) |
+| TLS key logging (NSS key log format) | `wolfSSL_CTX_set_keylog_callback()` | `OPENSSL_EXTRA` and `HAVE_SECRET_CALLBACK` |
+| New session established | `wolfSSL_CTX_sess_set_new_cb()` | Session cache enabled and `OPENSSL_EXTRA` or `HAVE_EXT_CACHE` |
 
 
