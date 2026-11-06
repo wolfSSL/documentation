@@ -375,7 +375,7 @@ The testsuite program does just that, but hashes the input and output files to m
 
 Many users are curious about how the wolfSSL embedded SSL library will perform on a specific hardware device or in a specific environment. Because of the wide variety of different platforms and compilers used today in embedded, enterprise, and cloud-based environments, it is hard to give generic performance calculations across the board.
 
-To help wolfSSL users and customers in determining SSL performance for wolfSSL / wolfCrypt, a benchmark application is provided which is bundled with wolfSSL. wolfSSL uses the wolfCrypt cryptography library for all crypto operations by default. Because the underlying crypto is a very performance-critical aspect of SSL/TLS, our benchmark application runs performance tests on wolfCrypt’s algorithms.
+To help wolfSSL users and customers in determining SSL performance for wolfSSL / wolfCrypt, a benchmark application is provided which is bundled with wolfSSL. wolfSSL uses the wolfCrypt cryptography library for all crypto operations by default. Because the underlying crypto is a very performance-critical aspect of SSL/TLS, our benchmark application runs performance tests on wolfCrypt's algorithms.
 
 The benchmark utility located in wolfcrypt/benchmark (`./wolfcrypt/benchmark/benchmark`) may be used to benchmark the cryptographic functionality of wolfCrypt. Typical output may look like the following (wolfSSL 5.9.4, default `./configure` build on an Apple M5 running macOS 27.2; the algorithms listed depend on the build options):
 

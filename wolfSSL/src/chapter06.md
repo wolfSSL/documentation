@@ -2,7 +2,7 @@
 
 ## HandShake Callback
 
-wolfSSL (formerly CyaSSL) has an extension that allows a HandShake Callback to be set for connect or accept. This can be useful in embedded systems for debugging support when another debugger isn’t available and sniffing is impractical. To use wolfSSL HandShake Callbacks, use the extended functions, [`wolfSSL_connect_ex()`](ssl_8h.md#function-wolfssl_connect_ex) and [`wolfSSL_accept_ex()`](ssl_8h.md#function-wolfssl_accept_ex):
+wolfSSL (formerly CyaSSL) has an extension that allows a HandShake Callback to be set for connect or accept. This can be useful in embedded systems for debugging support when another debugger isn't available and sniffing is impractical. To use wolfSSL HandShake Callbacks, use the extended functions, [`wolfSSL_connect_ex()`](ssl_8h.md#function-wolfssl_connect_ex) and [`wolfSSL_accept_ex()`](ssl_8h.md#function-wolfssl_accept_ex):
 
 ```c
 int wolfSSL_connect_ex(WOLFSSL* ssl, HandShakeCallBack hsCb,
@@ -104,7 +104,7 @@ typedef int (*CallbackDecryptVerify)(WOLFSSL* ssl,
     unsigned int* padSz, void* ctx);
 ```
 
-The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with [`wolfSSL_CTX_SetMacEncryptCb()`](ssl_8h.md#function-wolfssl_ctx_setmacencryptcb) and [`wolfSSL_CTX_SetDecryptVerifyCb()`](ssl_8h.md#function-wolfssl_ctx_setdecryptverifycb().
+The user needs to write and register these functions per wolfSSL context (`WOLFSSL_CTX`) with [`wolfSSL_CTX_SetMacEncryptCb()`](ssl_8h.md#function-wolfssl_ctx_setmacencryptcb) and [`wolfSSL_CTX_SetDecryptVerifyCb()`](ssl_8h.md#function-wolfssl_ctx_setdecryptverifycb).
 
 The user can set a context per WOLFSSL object (session) with [`wolfSSL_SetMacEncryptCtx()`](ssl_8h.md#function-wolfssl_setmacencryptctx) and [`wolfSSL_SetDecryptVerifyCtx()`](ssl_8h.md#function-wolfssl_setdecryptverifyctx).  This context may be a pointer to any user-specified context, which will then in turn be passed back to the MAC/encrypt and decrypt/verify callbacks through the `void* ctx` parameter.
 
@@ -529,7 +529,7 @@ The high level steps to use crypto callbacks are:
 
 
 #### 1. Compile wolfSSL with crypto callback support
-Support for crypto callbacks is enabled in wolfSSL via the `–-enable-cryptocb` configure option, or `#define WOLF_CRYPTO_CB`.
+Support for crypto callbacks is enabled in wolfSSL via the `--enable-cryptocb` configure option, or `#define WOLF_CRYPTO_CB`.
 
 #### 2. Register your callback and unique devID with wolfCrypt
 
@@ -549,7 +549,7 @@ Note: A registered `devId` can be any value other than `-2`, which is reserved f
 
 #### 3. Pass the `devId` as an argument to a wolfCrypt API function
 
-For wolfCrypt API’s, use the init functions that accept `devId` such as:
+For wolfCrypt API's, use the init functions that accept `devId` such as:
 
 ```text
 wc_InitRsaKey_ex

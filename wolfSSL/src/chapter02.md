@@ -1,8 +1,8 @@
 # Building wolfSSL
 
-wolfSSL was written with portability in mind and should generally be easy to build on most systems. If you have difficulty building wolfSSL, please don’t hesitate to seek support through our support forums (<https://www.wolfssl.com/forums>) or contact us directly at [support@wolfssl.com](mailto:support@wolfssl.com).
+wolfSSL was written with portability in mind and should generally be easy to build on most systems. If you have difficulty building wolfSSL, please don't hesitate to seek support through our support forums (<https://www.wolfssl.com/forums>) or contact us directly at [support@wolfssl.com](mailto:support@wolfssl.com).
 
-This chapter explains how to build wolfSSL on Unix and Windows, and provides guidance for building wolfSSL in a non-standard environment. You will find the “getting started” guide in [Chapter 3](chapter03.md#getting-started) and an SSL tutorial in [Chapter 11](chapter11.md#ssl-tutorial).
+This chapter explains how to build wolfSSL on Unix and Windows, and provides guidance for building wolfSSL in a non-standard environment. You will find the "getting started" guide in [Chapter 3](chapter03.md#getting-started) and an SSL tutorial in [Chapter 11](chapter11.md#ssl-tutorial).
 
 When using the autoconf / automake system to build wolfSSL, wolfSSL uses a single Makefile to build all parts and examples of the library, which is both simpler and faster than using Makefiles recursively.
 
@@ -15,7 +15,7 @@ The most recent version of wolfSSL can be downloaded from the wolfSSL website as
 After downloading the ZIP file, unzip the file using the `unzip` command. To use native line endings, enable the `-a` modifier when using unzip. From the unzip man page, the `-a` modifier functionality is described:
 
 > [...] The -a option causes files identified by zip as text files (those with
-> the ‘t’ label in zipinfo listings, rather than ‘b’) to be automatically
+> the 't' label in zipinfo listings, rather than 'b') to be automatically
 > extracted as such, converting line endings, end-of-file characters
 > and the character set itself as necessary. [...]
 
@@ -236,7 +236,7 @@ While not officially supported, we try to help users wishing to build wolfSSL in
 3. wolfSSL defaults to a little endian system unless the configure process detects big endian. Since users building in a non-standard environment aren't using the configure process, `BIG_ENDIAN_ORDER` will need to be defined if using a big endian system.
 4. wolfSSL benefits speed-wise from having a 64-bit type available. The configure process determines if long or long long is 64 bits and if so sets up a define. So if `sizeof(long)` is 8 bytes on your system, define `SIZEOF_LONG 8`. If it isn't but `sizeof(long long)` is 8 bytes, then define `SIZEOF_LONG_LONG 8`. If neither is defined, `wolfssl/wolfcrypt/types.h` tries to detect them: from `limits.h` when `HAVE_LIMITS_H` or `_WIN32` is defined, otherwise from common 64-bit compiler macros (such as `__x86_64__` or `__aarch64__`). A manual define is only needed when this detection fails.
 5. Try to build the library, and let us know if you run into any problems. If you need help, contact us at [facts@wolfssl.com](mailto:facts@wolfssl.com).
-6. Some defines that can modify the build are listed in [Features Defined as C Pre-processor Macro](#features-defined-as-c-pre-processor-macro). For more verbose descriptions of many options, please see [Build Options](#build-options).
+6. Some defines that can modify the build are listed in [Features Defined as C Pre-processor Macro](#features-defined-as-c-pre-processor-macros). For more verbose descriptions of many options, please see [Build Options](#build-options).
 
 ### Building into Yocto Linux
 
@@ -2833,7 +2833,7 @@ Is used if stdio isn't available to load certificates and key files. This enable
 
 #### NO_INLINE
 
-Disables the automatic inlining of small, heavily used functions. Turning this on will slow down wolfSSL and actually make it bigger since these are small functions, usually much smaller than function call setup/return. You’ll also need to add `wolfcrypt/src/misc.c` to the list of compiled files if you’re not using autoconf.
+Disables the automatic inlining of small, heavily used functions. Turning this on will slow down wolfSSL and actually make it bigger since these are small functions, usually much smaller than function call setup/return. You'll also need to add `wolfcrypt/src/misc.c` to the list of compiled files if you're not using autoconf.
 
 #### NO_DEV_RANDOM
 
@@ -3138,7 +3138,7 @@ Use one of these defines when building for the appropriate STM32 device family (
 
 #### WOLFSSL_STM32_CUBEMX
 
-When using the CubeMX tool to generate Hardware Abstraction Layer (HAL) API’s use this setting to add appropriate support in wolfSSL.
+When using the CubeMX tool to generate Hardware Abstraction Layer (HAL) API's use this setting to add appropriate support in wolfSSL.
 
 #### WOLFSSL_MX2_CONF_INCLUDE
 
@@ -3345,7 +3345,7 @@ If using fast math and RSA/DH you can define this to reduce your ECC memory cons
 
 #### ECC_SHAMIR
 
-Uses variation of ECC math that is slightly faster, but doubles heap usage. Enabled by default by configure ([`--enable-eccshamir`](#--enable-eccshamir)). To reduce memory, disable it with `--disable-eccshamir`, or leave it undefined in `user_settings.h`.
+Uses variation of ECC math that is slightly faster, but doubles heap usage. Enabled by default by configure ([`--enable-eccshamir`](#--disable-eccshamir)). To reduce memory, disable it with `--disable-eccshamir`, or leave it undefined in `user_settings.h`.
 
 #### RSA_LOW_MEM
 
@@ -3652,11 +3652,11 @@ Espressif ESP32 only. Counts hardware operations and software fallbacks for SHA,
 
 #### HAVE_INTEL_RDSEED
 
-Enable Intel’s RDSEED for DRBG seed source.
+Enable Intel's RDSEED for DRBG seed source.
 
 #### HAVE_INTEL_RDRAND
 
-Enable Intel’s RDRAND instruction for wolfSSL’s random source.
+Enable Intel's RDRAND instruction for wolfSSL's random source.
 
 #### FP_ECC
 
@@ -4029,7 +4029,7 @@ Can be defined when building for use with the ThreadX RTOS (<https://www.rtos.co
 
 #### MICRIUM
 
-Can be defined when building wolfSSL to enable support for Micrium’s µC/OS-III RTOS (<https://www.micrium.com>).
+Can be defined when building wolfSSL to enable support for Micrium's uC/OS-III RTOS (<https://www.micrium.com>).
 
 #### MBED
 
@@ -4037,7 +4037,7 @@ Can be defined when building for the mbed prototyping platform (<https://www.mbe
 
 #### MICROCHIP_PIC32
 
-Can be defined when building for Microchip’s PIC32 platform (<https://www.microchip.com>).
+Can be defined when building for Microchip's PIC32 platform (<https://www.microchip.com>).
 
 #### MICROCHIP_TCPIP_V5
 
@@ -5519,7 +5519,7 @@ Suppresses the binary jitter (timestamps and other non-functional metadata) to a
 
 Enabled by default (defines `WOLFSSL_SYS_CA_CERTS`); `--disable-sys-ca-certs` turns it off. It is turned off automatically when no certificate support is built, or, outside macOS and Windows, when the filesystem is disabled.
 
-Allows wolfSSL to use trusted system CA certificates for verification when [`wolfSSL_CTX_load_system_CA_certs()`](group__CertsKeys.html#function-wolfssl_ctx_load_system_ca_certs) is called, either by loading them into wolfSSL certificate manager, or by invoking system authentication APIs. See [`wolfSSL_CTX_load_system_CA_certs()`](group__CertsKeys.html#function-wolfssl_ctx_load_system_ca_certs) for more details.
+Allows wolfSSL to use trusted system CA certificates for verification when [`wolfSSL_CTX_load_system_CA_certs()`](group__CertsKeys.md#function-wolfssl_ctx_load_system_ca_certs) is called, either by loading them into wolfSSL certificate manager, or by invoking system authentication APIs. See [`wolfSSL_CTX_load_system_CA_certs()`](group__CertsKeys.md#function-wolfssl_ctx_load_system_ca_certs) for more details.
 
 ### `--enable-argon2`
 
@@ -6011,7 +6011,7 @@ Turns off the SP assembly code, for example `--enable-sp-math --enable-sp=yes,no
 
 Many users on embedded platforms cross compile wolfSSL for their environment. The easiest way to cross compile the library is to use the `./configure` system. It will generate a Makefile which can then be used to build wolfSSL.
 
-When cross compiling, you’ll need to specify the host to `./configure`, such as:
+When cross compiling, you'll need to specify the host to `./configure`, such as:
 
 ```sh
 ./configure --host=arm-linux
@@ -6221,7 +6221,7 @@ PORT Lists:
 - After creating 2 keystores the attempt to create a 3rd will fail. To reset the keystores do rm -rf /etc/seco_hsm and power cycle the device.
 
 #### Intro
-On i.MX8 devices there is a SECO hardware module available for heightened security. This module handles AES operations and key storage, limited ECC operations and key storage, and provides a RNG. wolfSSL has been expanded to make use of the SECO where possible. For some algorithms the CAAM on i.MX8 supports them but the SECO module does not yet. In these cases wolfSSL will make calls through /dev/crypto down to a Linux CAAM driver that creates jobs for the CAAM directly. There are some algorithms supported by default with the NXP Linux CAAM driver but not all algorithms that the CAAM supports. wolfSSL has expanded the Linux CAAM driver to add support for additional algorithms. To use both avenues of accessing the CAAM from the same application the “devId” associated with the different code paths can be set, either WOLFSSL_CAAM_DEVID or WOLFSSL_SECO_DEVID. These IDs are used when first initializing a structure to set which code path will be used throughout the lifetime of the structure. If using software only then the default INVALID_DEVID should be set. The exception to this is SECO items that do not use the key store; TRNG, and Hashing.
+On i.MX8 devices there is a SECO hardware module available for heightened security. This module handles AES operations and key storage, limited ECC operations and key storage, and provides a RNG. wolfSSL has been expanded to make use of the SECO where possible. For some algorithms the CAAM on i.MX8 supports them but the SECO module does not yet. In these cases wolfSSL will make calls through /dev/crypto down to a Linux CAAM driver that creates jobs for the CAAM directly. There are some algorithms supported by default with the NXP Linux CAAM driver but not all algorithms that the CAAM supports. wolfSSL has expanded the Linux CAAM driver to add support for additional algorithms. To use both avenues of accessing the CAAM from the same application the "devId" associated with the different code paths can be set, either WOLFSSL_CAAM_DEVID or WOLFSSL_SECO_DEVID. These IDs are used when first initializing a structure to set which code path will be used throughout the lifetime of the structure. If using software only then the default INVALID_DEVID should be set. The exception to this is SECO items that do not use the key store; TRNG, and Hashing.
 
 
 Versions of software used:
@@ -6245,7 +6245,7 @@ Supported algorithms, modes, and operations include:
 
 
 #### Building Image
-##### “repo” Setup
+##### "repo" Setup
 Setting up the NXP "repo" command tool was done on Ubuntu 18.04 LTS
 
 ```
@@ -6268,7 +6268,7 @@ git config --global user.email "Your Email"
 ```
 
 
-As of Jan 11, 2022 GitHub is no longer allowing unauthenticated git connections. NXP’s repo tool has not yet taken this into account at the time that this document was created (March, 2022). To work around this redirect git://github.com/ to https://github.com/ with the following command:
+As of Jan 11, 2022 GitHub is no longer allowing unauthenticated git connections. NXP's repo tool has not yet taken this into account at the time that this document was created (March, 2022). To work around this redirect git://github.com/ to https://github.com/ with the following command:
 
 
 ```
@@ -6334,7 +6334,7 @@ IMAGE_INSTALL_append = " cryptodev-module cryptodev-linux eckey "
 ```
 
 
-In this build, we had added debugging tools and an SSH server, which are not necessary if looking to trim down on size. The important items to add are “cryptodev-module and cryptodev-linux”. “eckey” is a demo tool from NXP for encapsulating and decapsulating blobs.
+In this build, we had added debugging tools and an SSH server, which are not necessary if looking to trim down on size. The important items to add are "cryptodev-module and cryptodev-linux". "eckey" is a demo tool from NXP for encapsulating and decapsulating blobs.
 
 [Optional]
 To add the auto loading of cryptodev module add the following line to conf/local.conf.
@@ -6345,7 +6345,7 @@ KERNEL_MODULE_AUTOLOAD += "cryptodev"
 ```
 
 
-Otherwise the module will need to be loaded after each power cycle using “modprobe cryptodev”.
+Otherwise the module will need to be loaded after each power cycle using "modprobe cryptodev".
 
 
 ##### Build and Deploy
@@ -6426,7 +6426,7 @@ For use with building wolfssl/examples later export the install directory using 
 export HSM_DIR=`pwd`/export/usr/
 ```
 
-Make install places the results in the subdirectory “export” by default.
+Make install places the results in the subdirectory "export" by default.
 
 
 #### Building wolfSSL
@@ -6638,7 +6638,7 @@ Similar to wc_SECO_AesSetKeyID but for Cmac structures.
 - int wc_SECO_CMACGetKeyID(Cmac* cmac);
 Getter function for the SECO key ID set in the Cmac structure.
 - int wc_SECO_OpenHSM(word32 keyStoreId, word32 nonce, word16 maxUpdates, byte flag);
-This function should be called before doing any operations that require the keystore. Such as ECC or AES operations. The first argument is the keystore ID, “nonce” is the specific 32bit sequence used when creating and unlocking an already existing keystore, “maxUpdates” sets the max number of times the key store can be updated, “flag” is used for optional flags and takes in whether or not the key store is being created. To create the HSM keystore the flag should be CAAM_KEYSTORE_CREATE otherwise to open an existing keystore or update it the flag should be CAAM_KEYSTORE_UPDATE.
+This function should be called before doing any operations that require the keystore. Such as ECC or AES operations. The first argument is the keystore ID, "nonce" is the specific 32bit sequence used when creating and unlocking an already existing keystore, "maxUpdates" sets the max number of times the key store can be updated, "flag" is used for optional flags and takes in whether or not the key store is being created. To create the HSM keystore the flag should be CAAM_KEYSTORE_CREATE otherwise to open an existing keystore or update it the flag should be CAAM_KEYSTORE_UPDATE.
 - int wc_SECO_CloseHSM(void);
 This function must be called when done with the keystore and before calling wolfCrypt_Cleanup/wolfSSL_Cleanup. It closes down the currently open keystore.
 - int wc_SECO_GenerateKey(int flags, int group, byte* out, int outSz, int keyType, int keyInfo, unsigned int* keyIdOut);
@@ -6673,7 +6673,7 @@ Alternatively to generate AES ECB/CBC keys, if the Aes structure has been initia
 - ECB encrypt would be done with wc_AesEcbEncrypt, decrypt with wc_AesEcbDecrypt.
 
 
-Once finished with the Aes structure it must be free’d using wc_AesFree(Aes); .
+Once finished with the Aes structure it must be free'd using wc_AesFree(Aes); .
 
 ###### ***AES-GCM***
 
@@ -6684,7 +6684,7 @@ The AES-GCM encrypt function takes in the Aes structure, output buffer, input bu
 
 For AES-GCM decrypt the function takes in the Aes structure, plain text output buffer, cipher text input buffer, input buffer size, nonce, nonce size (12 bytes), previously created tag from encryption call, tag buffer size, additional data, additional data size. On decryption the tag buffer is checked to verify the message's integrity.
 
-Once finished with the Aes structure it must be free’d using wc_AesFree(Aes); .
+Once finished with the Aes structure it must be free'd using wc_AesFree(Aes); .
 
 ###### ***AES-CCM***
 
@@ -6754,7 +6754,7 @@ wc_InitSha256_ex(sha256, heap-hint, WOLFSSL_SECO_DEVID);
 wc_InitSha384_ex(sha384, heap-hint, WOLFSSL_SECO_DEVID);
 ```
 
-Because the NXP HSM library supports a single shot operation for hashing, each call to “update” will store the buffer until a “final” function is called and then pass the whole buffer on to the hardware for creating the hash digest.
+Because the NXP HSM library supports a single shot operation for hashing, each call to "update" will store the buffer until a "final" function is called and then pass the whole buffer on to the hardware for creating the hash digest.
 
 Where HMAC makes use of the cryptodev-linux the Hmac structure should be initialized using the dev ID WOLFSSL_CAAM_DEVID.
 

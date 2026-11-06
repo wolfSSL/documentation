@@ -38,7 +38,7 @@ wc_Md4Final(&md4, md4sum);
 
 **NOTE**:  MD5 is outdated and considered insecure. Please consider using a different hashing function if possible.
 
-MD5 has been disabled by default since wolfSSL 5.8.2; enable it with `--enable-md5`. To use MD5 include the MD5 header `wolfssl/wolfcrypt/md5.h`. The structure to use is `wc_Md5`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitMd5()`](group__MD5.md#function-wc_initmd5) call. Use [`wc_Md5Update()`](group__MD5.md#function-wc_md5update) to update the hash, [`wc_Md5Final()`](group__MD5.md#function-wc_md5final) to retrieve the final hash, and [`wc_Md5Free()`](group__MD5.md#function-wc_md5free) to release the context:
+MD5 has been disabled by default since wolfSSL 5.8.2; enable it with [`--enable-md5`](chapter02.md#--enable-md5). To use MD5 include the MD5 header `wolfssl/wolfcrypt/md5.h`. The structure to use is `wc_Md5`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitMd5()`](group__MD5.md#function-wc_initmd5) call. Use [`wc_Md5Update()`](group__MD5.md#function-wc_md5update) to update the hash, [`wc_Md5Final()`](group__MD5.md#function-wc_md5final) to retrieve the final hash, and [`wc_Md5Free()`](group__MD5.md#function-wc_md5free) to release the context:
 
 ```c
 byte md5sum[WC_MD5_DIGEST_SIZE];
@@ -127,7 +127,7 @@ wc_Shake256_Free(&shake);
 
 ### BLAKE2b
 
-BLAKE2b is disabled by default; enable it with [`--enable-blake2`](chapter02.md#--enable-blake2). To use BLAKE2b (a SHA-3 finalist) include the BLAKE2b header `wolfssl/wolfcrypt/blake2.h`. The structure to use is `Blake2b`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitBlake2b()`](group__BLAKE2.md#function-wc_initblake2b) call. Use [`wc_Blake2bUpdate()`](group__BLAKE2.md#function-wc_blake2bupdate) to update the hash and [`wc_Blake2bFinal()`](group__BLAKE2.md#function-wc_blake2bfinal) to retrieve the final hash:
+BLAKE2b is disabled by default; enable it with [`--enable-blake2`](chapter02.md#--enable-blake2b). To use BLAKE2b (a SHA-3 finalist) include the BLAKE2b header `wolfssl/wolfcrypt/blake2.h`. The structure to use is `Blake2b`, which is a typedef. Before using, the hash initialization must be done with the [`wc_InitBlake2b()`](group__BLAKE2.md#function-wc_initblake2b) call. Use [`wc_Blake2bUpdate()`](group__BLAKE2.md#function-wc_blake2bupdate) to update the hash and [`wc_Blake2bFinal()`](group__BLAKE2.md#function-wc_blake2bfinal) to retrieve the final hash:
 
 ```c
 byte digest[64];
@@ -265,7 +265,7 @@ If an application derives many tags with the same parameters, the context API (`
 
 ### AES
 
-wolfCrypt provides support for AES with key sizes of 16 bytes (128 bits), 24 bytes (192 bits), or 32 bytes (256 bits). Supported AES modes include CBC, CTR, GCM (GCM-Streaming), GCM-SIV, OFB, CFB(1, 8, 128), SIV, EAX, CTS, XTS (XTS-Streaming), GMAC, CMAC, ECB, KW (KeyWrap), and CCM. CBC and GCM are enabled by default; most other modes have their own configure option, for example [`--enable-aesctr`](chapter02.md#--enable-aesctr), [`--enable-aesccm`](chapter02.md#--enable-aesccm), `--enable-aesgcm-stream`, `--enable-aeseax` and `--enable-aescts`.
+wolfCrypt provides support for AES with key sizes of 16 bytes (128 bits), 24 bytes (192 bits), or 32 bytes (256 bits). Supported AES modes include CBC, CTR, GCM (GCM-Streaming), GCM-SIV, OFB, CFB(1, 8, 128), SIV, EAX, CTS, XTS (XTS-Streaming), GMAC, CMAC, ECB, KW (KeyWrap), and CCM. CBC and GCM are enabled by default; most other modes have their own configure option, for example [`--enable-aesctr`](chapter02.md#--enable-aesctr), [`--enable-aesccm`](chapter02.md#--enable-aesccm), [`--enable-aesgcm-stream`](chapter02.md#--enable-aesgcm-stream), [`--enable-aeseax`](chapter02.md#--enable-aeseax) and [`--enable-aescts`](chapter02.md#--enable-aescts).
 
 **NOTE**: [`wc_AesInit()`](group__AES.md#function-wc_aesinit) should always be called first to initialize the `Aes` structure, before calling other `Aes` API functions such as [`wc_AesSetKey()`](group__AES.md#function-wc_aessetkey), and [`wc_AesGcmSetKey()`](group__AES.md#function-wc_aesgcmsetkey).
 
@@ -363,7 +363,7 @@ Decryption uses [`wc_AesGcmDecryptInit()`](group__AES.md#function-wc_aesgcmdecry
 
 ### DES and 3DES
 
-DES and 3DES are disabled by default; enable them with `--enable-des3`. wolfCrypt provides support for DES and 3DES (Des3 since 3 is an invalid leading C identifier). To use these include the header `wolfssl/wolfcrypt/des3.h`. The structures you can use are `Des` and `Des3`. Initialization is done through [`wc_Des_SetKey()`](group__DES.md#function-wc_des_setkey) or [`wc_Des3_SetKey()`](group__DES.md#function-wc_des3_setkey). CBC encryption/decryption is provided through [`wc_Des_CbcEncrypt()`](group__DES.md#function-wc_des_cbcencrypt) / [`wc_Des_CbcDecrypt()`](group__DES.md#function-wc_des_cbcdecrypt) and [`wc_Des3_CbcEncrypt()`](group__DES.md#function-wc_des3_cbcencrypt) / [`wc_Des3_CbcDecrypt()`](group__DES.md#function-wc_des3_cbcdecrypt). Des has a key size of 8 bytes (24 for 3DES) and the block size is 8 bytes, so only pass increments of 8 bytes to encrypt/decrypt functions. If your data isn't in a block size increment you'll need to add padding to make sure it is. Each `SetKey()` also takes an IV, which is one block (8 bytes) for both DES and 3DES. Usage is usually like the following:
+DES and 3DES are disabled by default; enable them with [`--enable-des3`](chapter02.md#--enable-des3). wolfCrypt provides support for DES and 3DES (Des3 since 3 is an invalid leading C identifier). To use these include the header `wolfssl/wolfcrypt/des3.h`. The structures you can use are `Des` and `Des3`. Initialization is done through [`wc_Des_SetKey()`](group__DES.md#function-wc_des_setkey) or [`wc_Des3_SetKey()`](group__DES.md#function-wc_des3_setkey). CBC encryption/decryption is provided through [`wc_Des_CbcEncrypt()`](group__DES.md#function-wc_des_cbcencrypt) / [`wc_Des_CbcDecrypt()`](group__DES.md#function-wc_des_cbcdecrypt) and [`wc_Des3_CbcEncrypt()`](group__DES.md#function-wc_des3_cbcencrypt) / [`wc_Des3_CbcDecrypt()`](group__DES.md#function-wc_des3_cbcdecrypt). Des has a key size of 8 bytes (24 for 3DES) and the block size is 8 bytes, so only pass increments of 8 bytes to encrypt/decrypt functions. If your data isn't in a block size increment you'll need to add padding to make sure it is. Each `SetKey()` also takes an IV, which is one block (8 bytes) for both DES and 3DES. Usage is usually like the following:
 
 ```c
 Des3 enc;
@@ -462,7 +462,7 @@ wc_Chacha_Process(&dec, plain, cipher, sizeof(cipher));
 
 [`wc_Chacha_SetKey`](group__ChaCha.md#function-wc_chacha_setkey) only needs to be set once but for each packet of information sent [`wc_Chacha_SetIV()`](group__ChaCha.md#function-wc_chacha_setiv) must be called with a new iv (nonce). Counter is set as an argument to allow for partially decrypting/encrypting information by starting at a different block when performing the encrypt/decrypt process, but in most cases is set to 0. **ChaCha should not be used without a mac algorithm (e.g. Poly1305, hmac).** The combined ChaCha20-Poly1305 AEAD described below does this for you.
 
-XChaCha20, a variant with a 24 byte nonce, is available with `--enable-xchacha`; its key and nonce are set together with [`wc_XChacha_SetKey()`](group__ChaCha.md#function-wc_xchacha_setkey).
+XChaCha20, a variant with a 24 byte nonce, is available with [`--enable-xchacha`](chapter02.md#--enable-xchacha); its key and nonce are set together with [`wc_XChacha_SetKey()`](group__ChaCha.md#function-wc_xchacha_setkey).
 
 ### ChaCha20-Poly1305
 
@@ -823,7 +823,7 @@ wolfCrypt has its own implementations of the NIST post-quantum algorithms. This 
 
 ### ML-KEM
 
-ML-KEM (FIPS 203) is a key encapsulation mechanism and is enabled by default (`--enable-mlkem`). It is declared in `wolfssl/wolfcrypt/wc_mlkem.h` and uses the `MlKemKey` structure. The parameter set is chosen when the key is initialized with [`wc_MlKemKey_Init()`](group__ML__KEM.md#function-wc_mlkemkey_init): `WC_ML_KEM_512`, `WC_ML_KEM_768` or `WC_ML_KEM_1024`.
+ML-KEM (FIPS 203) is a key encapsulation mechanism and is enabled by default ([`--enable-mlkem`](chapter02.md#--disable-mlkem)). It is declared in `wolfssl/wolfcrypt/wc_mlkem.h` and uses the `MlKemKey` structure. The parameter set is chosen when the key is initialized with [`wc_MlKemKey_Init()`](group__ML__KEM.md#function-wc_mlkemkey_init): `WC_ML_KEM_512`, `WC_ML_KEM_768` or `WC_ML_KEM_1024`.
 
 The receiving side generates a key pair with [`wc_MlKemKey_MakeKey()`](group__ML__KEM.md#function-wc_mlkemkey_makekey) and sends its public key to the other side. The sending side calls [`wc_MlKemKey_Encapsulate()`](group__ML__KEM.md#function-wc_mlkemkey_encapsulate) with that public key, which produces a ciphertext and a 32 byte shared secret (`WC_ML_KEM_SS_SZ`), and sends the ciphertext back. The receiving side recovers the same shared secret from the ciphertext with [`wc_MlKemKey_Decapsulate()`](group__ML__KEM.md#function-wc_mlkemkey_decapsulate). In the following example a single key plays both roles:
 

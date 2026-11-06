@@ -15,7 +15,7 @@ This tutorial assumes that the reader is comfortable with editing and compiling 
 
 ## Quick Summary of SSL/TLS
 
-**TLS** (Transport Layer Security) and **SSL** (Secure Sockets Layer) are cryptographic protocols that allow for secure communication across a number of different transport protocols.  The primary transport protocol used is TCP/IP. The most recent version of SSL/TLS is TLS 1.3. wolfSSL supports TLS 1.2 and 1.3 and DTLS 1.2 and 1.3 (DTLS is enabled with [`--enable-dtls`](chapter02.md#--enable-dtls), plus `--enable-dtls13` for DTLS 1.3). The deprecated SSL 3.0, TLS 1.0, TLS 1.1 and DTLS 1.0 are disabled by default and can be enabled with [`--enable-sslv3`](chapter02.md#--enable-sslv3), [`--enable-tlsv10`](chapter02.md#--enable-tlsv10) or `--enable-oldtls`.
+**TLS** (Transport Layer Security) and **SSL** (Secure Sockets Layer) are cryptographic protocols that allow for secure communication across a number of different transport protocols.  The primary transport protocol used is TCP/IP. The most recent version of SSL/TLS is TLS 1.3. wolfSSL supports TLS 1.2 and 1.3 and DTLS 1.2 and 1.3 (DTLS is enabled with [`--enable-dtls`](chapter02.md#--enable-dtls), plus [`--enable-dtls13`](chapter02.md#--enable-dtls13) for DTLS 1.3). The deprecated SSL 3.0, TLS 1.0, TLS 1.1 and DTLS 1.0 are disabled by default and can be enabled with [`--enable-sslv3`](chapter02.md#--enable-sslv3), [`--enable-tlsv10`](chapter02.md#--enable-tlsv10) or [`--enable-oldtls`](chapter02.md#--enable-oldtls).
 
 SSL and TLS sit between the Transport and Application layers of the OSI model, where any number of protocols (including TCP/IP, Bluetooth, etc.) may act as the underlying transport medium. Application protocols are layered on top of SSL and can include protocols such as HTTP, FTP, and SMTP. A diagram of how SSL fits into the OSI model, as well as a simple diagram of the SSL handshake process can be found in Appendix D, [SSL/TLS Overview](appendix04.md).
 
@@ -60,7 +60,7 @@ The following is a list of modifications that were made to the original echoserv
             ntohs(cliaddr.sin_port));
     ```
 
-* Added a call to `setsockopt()` after creating the listening socket to eliminate the “Address already in use” bind error.
+* Added a call to `setsockopt()` after creating the listening socket to eliminate the "Address already in use" bind error.
 * Minor adjustments to clean up newer compiler warnings
 
 ### Modifications to the echoclient (tcpcli01.c)
@@ -76,13 +76,13 @@ Please note that in these source code examples, certain functions will be capita
 
 ## Building and Installing wolfSSL
 
-Before we begin, download the example code (`echoserver` and `echoclient`) from the [Getting the Source Code](chapter03.md#getting-the-source-code) section, above. This section will explain how to download, configure, and install the wolfSSL embedded SSL/TLS library on your system.
+Before we begin, download the example code (`echoserver` and `echoclient`) from the [Getting the Source Code](#getting-the-source-code) section, above. This section will explain how to download, configure, and install the wolfSSL embedded SSL/TLS library on your system.
 
 You will need to download and install the most recent version of wolfSSL from the wolfSSL [download page](https://www.wolfssl.com/download/).
 
 For a full list of available build options, see the [Building wolfSSL](https://www.wolfssl.com/documentation/manuals/wolfssl/chapter02.html) guide. wolfSSL was written with portability in mind, and should generally be easy to build on most systems. If you have difficulty building wolfSSL, please feel free to ask for support on the wolfSSL [product support forums](https://www.wolfssl.com/forums).
 
-When building wolfSSL on Linux, *BSD, OS X, Solaris, or other *nix like systems, you can use the autoconf system. For Windows-specific instructions, please refer to the [Building wolfSSL](chapter02.md#building-wolfssl) section of the wolfSSL Manual. To configure and build wolfSSL, run the following two commands from the terminal. Any desired build options may be appended to `./configure` (ex: `./configure -–enable-opensslextra`):
+When building wolfSSL on Linux, *BSD, OS X, Solaris, or other *nix like systems, you can use the autoconf system. For Windows-specific instructions, please refer to the [Building wolfSSL](chapter02.md#building-wolfssl) section of the wolfSSL Manual. To configure and build wolfSSL, run the following two commands from the terminal. Any desired build options may be appended to `./configure` (ex: `./configure --enable-opensslextra`):
 
 ```sh
 ./configure
@@ -200,13 +200,13 @@ This will compile the example code and produce an executable named either echose
 gcc -o echoserver ../lib/*.c tcpserv04.c -I ../include
 ```
 
-This will compile the current example into an executable, creating either an “echoserver” or “echoclient” application. To run one of the examples after it has been compiled, change your current directory to the desired example directory and start the application. For example, to start the echoserver use:
+This will compile the current example into an executable, creating either an "echoserver" or "echoclient" application. To run one of the examples after it has been compiled, change your current directory to the desired example directory and start the application. For example, to start the echoserver use:
 
 ```sh
 ./echoserver
 ```
 
-You may open a second terminal window to test the echoclient on your local host and you will need to supply the IP address of the server when starting the application, which in our case will be 127.0.0.1. Change your current directory to the “echoclient” directory and run the following command. Note that the echoserver must already be running:
+You may open a second terminal window to test the echoclient on your local host and you will need to supply the IP address of the server when starting the application, which in our case will be 127.0.0.1. Change your current directory to the "echoclient" directory and run the following command. Note that the echoserver must already be running:
 
 ```sh
 ./echoclient 127.0.0.1
@@ -542,7 +542,7 @@ void sig_handler(const int sig)
 }
 ```
 
-That’s it - the echoclient and echoserver are now enabled with TLSv1.2!!
+That's it - the echoclient and echoserver are now enabled with TLSv1.2!!
 
 What we did:
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This guide provides a reference for developers and engineers porting the wolfSSL lightweight SSL/TLS library to new embedded platforms, operating systems, or transport mediums (TCP/IP, bluetooth, etc.).  It calls out areas in the wolfSSL codebase which typically require modification when porting wolfSSL.  It should be considered a “guide” and as such, it is an evolving work.  If there is something you find missing, please let us know and we’ll be happy to add instructions or clarification to the document.
+This guide provides a reference for developers and engineers porting the wolfSSL lightweight SSL/TLS library to new embedded platforms, operating systems, or transport mediums (TCP/IP, bluetooth, etc.).  It calls out areas in the wolfSSL codebase which typically require modification when porting wolfSSL.  It should be considered a "guide" and as such, it is an evolving work.  If there is something you find missing, please let us know and we'll be happy to add instructions or clarification to the document.
 
 
 ## Audience
@@ -61,13 +61,13 @@ There are two additional data types used by wolfSSL and wolfCrypt, called `word3
 ```
 
 
-`word32` should be mapped to the compiler’s 32-bit type, and `word16` to the compiler’s 16-bit type.  If these default mappings are incorrect for your platform, you should define `WOLFSSL_TYPES` in `settings.h` or `user_settings.h` and assign your own custom typedefs for word32 and word16.
+`word32` should be mapped to the compiler's 32-bit type, and `word16` to the compiler's 16-bit type.  If these default mappings are incorrect for your platform, you should define `WOLFSSL_TYPES` in `settings.h` or `user_settings.h` and assign your own custom typedefs for word32 and word16.
 
 The default math library, SP math (`./wolfcrypt/src/sp_int.c`, `WOLFSSL_SP_MATH_ALL`), uses the `sp_int_digit` and `sp_int_word` types. Their size is selected with `SP_WORD_SIZE`, which is determined from the target and can be set to 32 or 64 in `user_settings.h` if needed.
 
 If you use the legacy fastmath back end (`USE_FAST_MATH`), it uses the `fp_digit` and `fp_word` types, which are mapped in `<wolfssl/wolfcrypt/tfm.h>`; the legacy heap math back end (`USE_INTEGER_HEAP_MATH`) uses `mp_digit` and `mp_word` from `<wolfssl/wolfcrypt/integer.h>`.  The word type should be twice the size of the digit type.  If the default cases do not hold true for your platform, you should define `WOLFSSL_BIGINT_TYPES` in `settings.h` or `user_settings.h` and assign your own custom typedefs for these types.
 
-wolfSSL does use a 64-bit type when available for some operations.  The wolfSSL build tries to detect and set up the correct underlying data type for `word64` based on what `SIZEOF_LONG` and `SIZEOF_LONG_LONG` have been set to.  On some platforms that don’t have a true 64-bit type, where two 32-bit types are used in conjunction, performance can be slow.  To compile out the use of 64-bit types, define `NO_64BIT`.
+wolfSSL does use a 64-bit type when available for some operations.  The wolfSSL build tries to detect and set up the correct underlying data type for `word64` based on what `SIZEOF_LONG` and `SIZEOF_LONG_LONG` have been set to.  On some platforms that don't have a true 64-bit type, where two 32-bit types are used in conjunction, performance can be slow.  To compile out the use of 64-bit types, define `NO_64BIT`.
 
 
 ### Endianness
@@ -95,7 +95,7 @@ Is your platform big endian or little endian?  wolfSSL defaults to a little endi
 
 A:  `<sys/uio.h>` is not available.
 
-By default, the wolfSSL API makes available `wolfSSL_writev()` to applications, which simulates `writev()` semantics.  On systems that don’t have the `<sys/uio.h>` header available, define `NO_WRITEV` to exclude this feature.
+By default, the wolfSSL API makes available `wolfSSL_writev()` to applications, which simulates `writev()` semantics.  On systems that don't have the `<sys/uio.h>` header available, define `NO_WRITEV` to exclude this feature.
 
 
 ### Input / Output
@@ -198,7 +198,7 @@ For examples of how `wc_GenerateSeed()` can be written, reference wolfSSL's exis
 
 **Q:  When do I need to read this section?**
 
-A:  When you don’t have standard memory functions available or are interested in memory usage differences between optional math libraries.
+A:  When you don't have standard memory functions available or are interested in memory usage differences between optional math libraries.
 
 wolfSSL proper uses both `malloc()` and `free()` by default.  When using the legacy heap math library (`USE_INTEGER_HEAP_MATH`), wolfCrypt will also use `realloc()`.
 
@@ -221,14 +221,14 @@ By default, wolfSSL uses `time()`, `gmtime()`, and `wc_ValidateDate()`.  These a
 
 wolfSSL uses `time(0)` by default for the clock tick function.  This is located in `./src/internal.c` inside of the `LowResTimer()` function.
 
-Defining `USER_TICKS` allows the user to define their own clock tick function if `time(0)` is not wanted. The custom function needs second accuracy, but doesn’t have to be correlated to EPOCH.  See `LowResTimer()` function in `./src/internal.c` for reference.
+Defining `USER_TICKS` allows the user to define their own clock tick function if `time(0)` is not wanted. The custom function needs second accuracy, but doesn't have to be correlated to EPOCH.  See `LowResTimer()` function in `./src/internal.c` for reference.
 
 
 ### C Standard Library
 
 **Q:  When do I need to read this section?**
 
-A:  When you don’t have a C standard library available, or have a custom one.
+A:  When you don't have a C standard library available, or have a custom one.
 
 wolfSSL can be built without the C standard library to provide a higher level of portability and flexibility to developers.  When doing so, the user needs to map functions they wish to use instead of the C standard ones.
 
@@ -241,7 +241,7 @@ Please read [Section 5.1](chapter05.md) for details.
 
 **Q:  When do I need to read this section?**
 
-A:  You want to enable debug messages but don’t have stderr available.
+A:  You want to enable debug messages but don't have stderr available.
 
 By default, wolfSSL provides debug output through stderr.  In order for debug messages to be enabled, wolfSSL must be compiled with `DEBUG_WOLFSSL` defined, and `wolfSSL_Debugging_ON()` must be called from the application code.  `wolfSSL_Debugging_OFF()` may be used by the application layer to turn off wolfSSL debug messages.
 
@@ -313,14 +313,14 @@ After getting wolfSSL proper to build on the target platform, a good next step i
 
 If this step is skipped, and you instead proceed directly to establishing an SSL connection, it can be more difficult to debug problems caused by underlying crypto operations failing.
 
-The wolfCrypt test application is located in `./wolfcrypt/test/test.c`.  If an embedded application has its own `main()` function, then `NO_MAIN_DRIVER` must be defined when compiling `./wolfcrypt/test/test.c`.  This will allow the application’s `main()` to call each cipher/algorithm test individually on its own.
+The wolfCrypt test application is located in `./wolfcrypt/test/test.c`.  If an embedded application has its own `main()` function, then `NO_MAIN_DRIVER` must be defined when compiling `./wolfcrypt/test/test.c`.  This will allow the application's `main()` to call each cipher/algorithm test individually on its own.
 
 If an embedded device does not have enough resources to run the entire wolfCrypt test application, individual tests can be broken out of `test.c` and compiled individually.  Please ensure that correct header files needed for the specific test case are included in the build when extracting isolated crypto tests from `test.c`.
 
 
 ## Support
 
-General support questions may be sent directly to wolfSSL either through email, support forums, or wolfSSL’s Zendesk ticket tracking system.
+General support questions may be sent directly to wolfSSL either through email, support forums, or wolfSSL's Zendesk ticket tracking system.
 
 Website:	   [https://www.wolfssl.com](https://www.wolfssl.com)
 

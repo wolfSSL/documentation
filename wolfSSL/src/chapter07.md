@@ -6,9 +6,9 @@ This chapter covers the key and certificate formats wolfSSL supports, how certif
 
 wolfSSL (formerly CyaSSL) has support for **PEM**, and **DER** formats for certificates and keys, as well as PKCS#8 private keys (with PKCS#5 or PKCS#12 encryption).
 
-**PEM**, or “Privacy Enhanced Mail” is the most common format that certificates are issued in by certificate authorities. PEM files are Base64 encoded ASCII files which can include multiple server certificates, intermediate certificates, and private keys, and usually have a `.pem`, `.crt`, `.cer`, or `.key` file extension. Certificates inside PEM files are wrapped in the “`-----BEGIN CERTIFICATE-----`” and “`-----END CERTIFICATE-----`” statements.
+**PEM**, or "Privacy Enhanced Mail" is the most common format that certificates are issued in by certificate authorities. PEM files are Base64 encoded ASCII files which can include multiple server certificates, intermediate certificates, and private keys, and usually have a `.pem`, `.crt`, `.cer`, or `.key` file extension. Certificates inside PEM files are wrapped in the "`-----BEGIN CERTIFICATE-----`" and "`-----END CERTIFICATE-----`" statements.
 
-**DER**, or “Distinguished Encoding Rules”, is a binary format of a certificate. DER file extensions can include `.der` and `.cer`, and cannot be viewed with a text editor.
+**DER**, or "Distinguished Encoding Rules", is a binary format of a certificate. DER file extensions can include `.der` and `.cer`, and cannot be viewed with a text editor.
 
 An X.509 certificate is encoded using ASN.1 format. The DER format is the ASN.1 encoding. The PEM format is Base64 encoded and wrapped with a human readable header and footer. TLS sends certificates in DER format.
 
@@ -158,7 +158,7 @@ CA loading can also parse multiple CA certificates per file using the above func
 
 ### Loading Client or Server Certificates
 
-Loading single client or server certificates can be done with the [`wolfSSL_CTX_use_certificate_file()`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_file) function.  If this function is used with a certificate chain, only the actual, or “bottom” certificate will be sent.
+Loading single client or server certificates can be done with the [`wolfSSL_CTX_use_certificate_file()`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_file) function.  If this function is used with a certificate chain, only the actual, or "bottom" certificate will be sent.
 
 ```c
 int wolfSSL_CTX_use_certificate_file(WOLFSSL_CTX* ctx,
@@ -179,7 +179,7 @@ int wolfSSL_CTX_use_certificate_chain_file(WOLFSSL_CTX *ctx,
 
 ### Loading Private Keys
 
-Server private keys can be loaded using the [`wolfSSL_CTX_use_PrivateKey_file()`](group__CertsKeys.md#function-wolfssl_ctx_use_PrivateKey_file) function.
+Server private keys can be loaded using the [`wolfSSL_CTX_use_PrivateKey_file()`](group__CertsKeys.md#function-wolfssl_ctx_use_privatekey_file) function.
 
 ```c
 int wolfSSL_CTX_use_PrivateKey_file(WOLFSSL_CTX *ctx,
@@ -226,7 +226,7 @@ int wolfSSL_CTX_trust_peer_cert(WOLFSSL_CTX *ctx,
 
 ### Loading System CA Certificates
 
-The CA certificates trusted by the operating system can be loaded with `wolfSSL_CTX_load_system_CA_certs()`, which is available when wolfSSL is built with [`--enable-sys-ca-certs`](chapter02.md#--enable-sys-ca-certs) (enabled by default).
+The CA certificates trusted by the operating system can be loaded with `wolfSSL_CTX_load_system_CA_certs()`, which is available when wolfSSL is built with [`--enable-sys-ca-certs`](chapter02.md#--disable-sys-ca-certs) (enabled by default).
 
 ```c
 int wolfSSL_CTX_load_system_CA_certs(WOLFSSL_CTX* ctx);
@@ -245,7 +245,7 @@ int wc_CertPemToDer(const unsigned char* pem, int pemSz,
 
 ## Certificate Chain Verification
 
-wolfSSL requires only the top or “root” certificate in a chain to be loaded as a trusted certificate in order to verify a certificate chain. This means that if you have a certificate chain (A -\> B -\> C), where C is signed by B, and B is signed by A, wolfSSL only requires that certificate A be loaded as a trusted certificate in order to verify the entire chain (A-\>B-\>C).
+wolfSSL requires only the top or "root" certificate in a chain to be loaded as a trusted certificate in order to verify a certificate chain. This means that if you have a certificate chain (A -\> B -\> C), where C is signed by B, and B is signed by A, wolfSSL only requires that certificate A be loaded as a trusted certificate in order to verify the entire chain (A-\>B-\>C).
 
 For example, if a server certificate chain looks like:
 
@@ -267,7 +267,7 @@ Normally a file system is used to load private keys, certificates, and CAs. Sinc
 
 * [`int wolfSSL_CTX_load_verify_buffer(WOLFSSL_CTX* ctx, const unsigned char* in,long sz, int format);`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_buffer)
 * [`int wolfSSL_CTX_use_certificate_buffer(WOLFSSL_CTX* ctx, const unsigned char* in, long sz, int format);`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_buffer)
-* [`int wolfSSL_CTX_use_PrivateKey_buffer(WOLFSSL_CTX* ctx, const unsigned char* in, long sz, int format);`](group__CertsKeys.md#function-wolfssl_ctx_use_PrivateKey_buffer)
+* [`int wolfSSL_CTX_use_PrivateKey_buffer(WOLFSSL_CTX* ctx, const unsigned char* in, long sz, int format);`](group__CertsKeys.md#function-wolfssl_ctx_use_privatekey_buffer)
 * [`int wolfSSL_CTX_use_certificate_chain_buffer(WOLFSSL_CTX* ctx, const unsigned char* in,long sz);`](group__CertsKeys.md#function-wolfssl_ctx_use_certificate_chain_buffer)
 * [`int wolfSSL_CTX_trust_peer_buffer(WOLFSSL_CTX* ctx, const unsigned char* in, long sz, int format);`](group__Setup.md#function-wolfssl_ctx_trust_peer_buffer)
 
@@ -538,7 +538,7 @@ if (ret < 0)
 
 Without a filesystem, use `wc_SetIssuerBuffer()`, which takes the CA certificate as a DER buffer.
 
-Then you’ll need to perform the two-step process of creating the certificate and then signing it (`wc_MakeSelfCert()` does these both in one step). You’ll need the private keys from both the issuer (`caKey`) and the subject (`key`). Please see the example in `test.c` for complete usage.
+Then you'll need to perform the two-step process of creating the certificate and then signing it (`wc_MakeSelfCert()` does these both in one step). You'll need the private keys from both the issuer (`caKey`) and the subject (`key`). Please see the example in `test.c` for complete usage.
 
 ```c
 byte derCert[4096];

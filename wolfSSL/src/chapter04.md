@@ -80,7 +80,7 @@ Further information on IPv6 can be found here:
 
 ### DTLS
 
-wolfSSL has support for DTLS (“Datagram” TLS) for both client and server.  The current supported versions are DTLS 1.0, 1.2, and 1.3.
+wolfSSL has support for DTLS ("Datagram" TLS) for both client and server.  The current supported versions are DTLS 1.0, 1.2, and 1.3.
 
 The TLS protocol was designed to provide a secure transport channel across a **reliable** medium (such as TCP).  As application layer protocols began to be developed using UDP transport (such as SIP and various electronic gaming protocols), a need arose for a way to provide communications security for applications which are delay sensitive. This need led to the creation of the DTLS protocol.
 
@@ -183,11 +183,11 @@ There can be many methods of grading the strength of a cipher suite - the specif
 
 **NIST** (National Institute of Standards and Technology) makes recommendations on choosing an acceptable cipher suite by providing comparable algorithm strengths for varying key sizes of each.  The NIST Special Publication, [SP800-57](https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-5/final), states how two algorithms can be compared:
 
-> Two algorithms are considered to be of comparable strength for the given key sizes (X and Y) if the amount of work needed to “break the algorithms” or determine the keys (with the given key sizes) is approximately the same using a given resource. The security strength of an algorithm for a given key size is traditionally described in terms of the amount of work it takes to try all keys for a symmetric algorithm with a key size of “X” that has no shortcut attacks (i.e., the most efficient attack is to try all possible keys).
+> Two algorithms are considered to be of comparable strength for the given key sizes (X and Y) if the amount of work needed to "break the algorithms" or determine the keys (with the given key sizes) is approximately the same using a given resource. The security strength of an algorithm for a given key size is traditionally described in terms of the amount of work it takes to try all keys for a symmetric algorithm with a key size of "X" that has no shortcut attacks (i.e., the most efficient attack is to try all possible keys).
 
 The following table is based on both Table 2 (pg. 56) and Table 4 (pg. 59) from [NIST SP800-57](https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-5/final), and shows comparable security strength between algorithms as well as a strength measurement (based off of NIST's suggested algorithm security lifetimes using bits of security).
 
-**Note**:  In the following table “L” is the size of the public key for finite field cryptography (FFC), “N” is the size of the private key for FFC, “k” is considered the key size for integer factorization cryptography (IFC), and “f” is considered the key size for elliptic curve cryptography.
+**Note**:  In the following table "L" is the size of the public key for finite field cryptography (FFC), "N" is the size of the private key for FFC, "k" is considered the key size for integer factorization cryptography (IFC), and "f" is considered the key size for elliptic curve cryptography.
 
 | Bits of Security | Symmetric Key Algorithms | **FFC** Key Size (DSA, DH, etc.) | **IFC** Key Size (RSA, etc.) | **ECC** Key Size (ECDSA, etc.) | Description |
 | ---------------- | ------------------------ | -------------------------------- | ---------------------------- | ------------------------------ | ----------- |
@@ -203,11 +203,11 @@ Using this table as a guide, to begin to classify a cipher suite, we categorize 
 * **MEDIUM** - bits of security equal to 128 bits
 * **HIGH** - bits of security larger than 128 bits
 
-Outside of the symmetric encryption algorithm strength, the strength of a cipher suite will depend greatly on the key sizes of the key exchange and authentication algorithm keys.  The strength is only as good as the cipher suite’s weakest link.
+Outside of the symmetric encryption algorithm strength, the strength of a cipher suite will depend greatly on the key sizes of the key exchange and authentication algorithm keys.  The strength is only as good as the cipher suite's weakest link.
 
 Following the above grading methodology (and only basing it on symmetric encryption algorithm strength), the cipher suites listed below can each be graded as LOW, MEDIUM or HIGH.  The strength classification could change depending on the chosen key sizes of the other algorithms involved. For a reference on hash function security strength, see Table 3 (pg. 56) of [NIST SP800-57](https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-5/final).
 
-In some cases, you will see ciphers referenced as “**EXPORT**” ciphers.  These ciphers originated from the time period in US history (as late as 1992) when it was illegal to export software with strong encryption from the United States.  Strong encryption was classified as “Munitions” by the US Government (under the same category as Nuclear Weapons, Tanks, and Ballistic Missiles). Because of this restriction, software being exported included “weakened” ciphers (mostly in smaller key sizes).  In the current day, this restriction has been lifted, and as such, EXPORT ciphers are no longer a mandated necessity.
+In some cases, you will see ciphers referenced as "**EXPORT**" ciphers.  These ciphers originated from the time period in US history (as late as 1992) when it was illegal to export software with strong encryption from the United States.  Strong encryption was classified as "Munitions" by the US Government (under the same category as Nuclear Weapons, Tanks, and Ballistic Missiles). Because of this restriction, software being exported included "weakened" ciphers (mostly in smaller key sizes).  In the current day, this restriction has been lifted, and as such, EXPORT ciphers are no longer a mandated necessity.
 
 ### Supported Cipher Suites
 
@@ -393,7 +393,7 @@ RC4 is prohibited in TLS (RFC 7465). It is disabled by default (`--enable-arc4` 
 
 To see a comparison of cipher performance, visit the wolfSSL Benchmark web page, located here: <https://www.wolfssl.com/docs/benchmarks>.
 
-#### What’s the Difference?
+#### What's the Difference?
 
 A block cipher has to be encrypted in chunks that are the block size for the cipher. For example, AES has a block size of 16 bytes. So if you're encrypting a bunch of small, 2 or 3 byte chunks back and forth, over 80% of the data is useless padding, decreasing the speed of the encryption/decryption process and needlessly wasting network bandwidth to boot. Basically, block ciphers are designed for large chunks of data, have block sizes requiring padding, and use a fixed, unvarying transformation.
 
@@ -433,9 +433,9 @@ wolfSSL 5.9.4 also supports TLS 1.3 builds that use only post-quantum algorithms
 
 wolfSSL has support for Elliptic Curve Cryptography (ECC) including but not limited to: ECDH-ECDSA, ECDHE-ECDSA, ECDH-RSA, ECDHE-PSK and ECDHE-RSA.
 
-wolfSSL’s ECC implementation can be found in the `<wolfssl_root>/wolfssl/wolfcrypt/ecc.h` header file and the `<wolfssl_root>/wolfcrypt/src/ecc.c` source file.
+wolfSSL's ECC implementation can be found in the `<wolfssl_root>/wolfssl/wolfcrypt/ecc.h` header file and the `<wolfssl_root>/wolfcrypt/src/ecc.c` source file.
 
-Supported cipher suites are shown in the table above.  ECC is enabled by default on all platforms. It can be disabled with [`--disable-ecc`](chapter02.md#--enable-ecc), and is enabled in builds that do not use autoconf with the `HAVE_ECC` define. When using the autoconf system:
+Supported cipher suites are shown in the table above.  ECC is enabled by default on all platforms. It can be disabled with [`--disable-ecc`](chapter02.md#--disable-ecc), and is enabled in builds that do not use autoconf with the `HAVE_ECC` define. When using the autoconf system:
 
 ```sh
 ./configure --enable-ecc
@@ -659,17 +659,17 @@ All post-quantum algorithms in wolfSSL (ML-KEM, ML-DSA, SLH-DSA, Falcon, FrodoKE
 
 ## Hardware Accelerated Crypto
 
-wolfSSL is able to take advantage of several hardware accelerated (or “assisted”) crypto functionalities in various processors and chips.  The following sections explain which technologies wolfSSL supports out-of-the-box.
+wolfSSL is able to take advantage of several hardware accelerated (or "assisted") crypto functionalities in various processors and chips.  The following sections explain which technologies wolfSSL supports out-of-the-box.
 
 ### AES-NI
 
 AES is a key encryption standard used by governments worldwide, which wolfSSL has always supported. Intel's AES-NI instruction set, available since 2010, is a faster way to implement AES, and wolfSSL supports it for production environments.
 
-Essentially, Intel and AMD have added AES instructions at the chip level that perform the computationally-intensive parts of the AES algorithm, boosting performance.  For a list of Intel’s chips that currently have support for AES-NI, you can look here:
+Essentially, Intel and AMD have added AES instructions at the chip level that perform the computationally-intensive parts of the AES algorithm, boosting performance.  For a list of Intel's chips that currently have support for AES-NI, you can look here:
 
 [https://ark.intel.com/search/advanced/?s=t&AESTech=true](https://ark.intel.com/search/advanced/?s=t&AESTech=true)
 
-We have added the functionality to wolfSSL to allow it to call  the instructions directly from the chip, instead of running the algorithm in software. This means that when you’re running wolfSSL on a chipset that supports AES-NI, you can run your AES crypto 5-10 times faster!
+We have added the functionality to wolfSSL to allow it to call  the instructions directly from the chip, instead of running the algorithm in software. This means that when you're running wolfSSL on a chipset that supports AES-NI, you can run your AES crypto 5-10 times faster!
 
 If you are running on an AES-NI supported chipset, enable AES-NI with the [`--enable-aesni` build option](chapter02.md#--enable-aesni). The [`--enable-intelasm`](chapter02.md#--enable-intelasm) option enables AES-NI together with the AVX1/AVX2 accelerated code paths for other algorithms.  To build wolfSSL with AES-NI, GCC 4.4.3 or later is required to make use of the assembly code.  wolfSSL supports the ASM instructions on AMD processors using the same build options.
 
@@ -757,7 +757,7 @@ More details of the support can be found in the README.md at wolfcrypt/src/port/
 
 ## SSL Inspection (Sniffer)
 
-Beginning with the wolfSSL 1.5.0 release, wolfSSL has included a build option allowing it to be built with SSL Sniffer (SSL Inspection) functionality. This means that you can collect SSL traffic packets and with the correct key file, are able to decrypt them as well. The ability to “inspect” SSL traffic can be useful for several reasons, some of which include:
+Beginning with the wolfSSL 1.5.0 release, wolfSSL has included a build option allowing it to be built with SSL Sniffer (SSL Inspection) functionality. This means that you can collect SSL traffic packets and with the correct key file, are able to decrypt them as well. The ability to "inspect" SSL traffic can be useful for several reasons, some of which include:
 
 * Analyzing Network Problems
 * Detecting network misuse by internal and external users
@@ -781,7 +781,7 @@ Keep in mind that because the encryption keys are setup in the SSL Handshake, th
 
 The sniffer can decode streams encrypted with the following algorithms: AES-CBC, AES-GCM, AES-CCM, ChaCha20-Poly1305, ARIA-GCM, Camellia-CBC, DES3-CBC, ARC4 and the NULL cipher (each one only if it is enabled in the build). With a server private key loaded, the sniffer can decode RSA and static ECDH key exchanges. Ephemeral (EC)DHE key exchanges, including TLS 1.3, can be decoded when the server uses a static ephemeral key that is also loaded into the sniffer with `ssl_SetEphemeralKey()` (`WOLFSSL_STATIC_EPHEMERAL`, which `--enable-sniffer` turns on), or by loading the session secrets from an NSS keylog file with `ssl_LoadSecretsFromKeyLogFile()` (build with `WOLFSSL_SNIFFER_KEYLOGFILE`; TLS 1.2 and TLS 1.3). See `sslSniffer/README.md` in the wolfSSL source tree for details.
 
-Watch callbacks with wolfSSL sniffer can be turned on with `WOLFSSL_SNIFFER_WATCH`. With the sniffer watch feature compiled in, the function `ssl_SetWatchKeyCallback()` can be used to set a custom callback. The callback is then used to inspect the certificate chain, error value, and digest of the certificate sent from the peer. If a non 0 value is returned from the callback then an error state is set when processing the peer’s certificate. Additional supporting functions for the watch callbacks are:
+Watch callbacks with wolfSSL sniffer can be turned on with `WOLFSSL_SNIFFER_WATCH`. With the sniffer watch feature compiled in, the function `ssl_SetWatchKeyCallback()` can be used to set a custom callback. The callback is then used to inspect the certificate chain, error value, and digest of the certificate sent from the peer. If a non 0 value is returned from the callback then an error state is set when processing the peer's certificate. Additional supporting functions for the watch callbacks are:
 
 * `ssl_SetWatchKeyCtx`: Sets a custom user context that gets passed to the watch callback.
 * `ssl_SetWatchKey_buffer`: Loads a new DER format key into server session.
@@ -814,7 +814,7 @@ By default, wolfSSL assumes that the execution environment provides dynamic memo
 
 ### Basic Operation of Static Buffer Allocation
 
-“Dynamic memory allocation” is a management method that dynamically finds/allocates and provides a buffer of a “specified size (variable length)”. Buffer usage efficiency is high, but processing is relatively complicated. On the other hand, the “static buffer allocation” provided by wolfSSL is a memory management model that searches for a buffer close to the requested size from among several types of buffers prepared in advance (statically) and provides it back to the caller. A memory block larger than the requested size may be allocated and returned to the requester of the buffer (thus reducing the efficiency of use). Although not as precise in memory management, it is simple and simulates dynamic memory allocation that dynamically allocates a memory block of any size.
+"Dynamic memory allocation" is a management method that dynamically finds/allocates and provides a buffer of a "specified size (variable length)". Buffer usage efficiency is high, but processing is relatively complicated. On the other hand, the "static buffer allocation" provided by wolfSSL is a memory management model that searches for a buffer close to the requested size from among several types of buffers prepared in advance (statically) and provides it back to the caller. A memory block larger than the requested size may be allocated and returned to the requester of the buffer (thus reducing the efficiency of use). Although not as precise in memory management, it is simple and simulates dynamic memory allocation that dynamically allocates a memory block of any size.
 
 Using static-buffer-allocation is equivalent in API to using dynamic memory with wolfSSL. This functional equivalency is achieved in wolfSSL by abstracting memory allocation/free into XMALLOC/XFREE function calls. Once static-buffer-allocation is set, wolfSSL will use it from then on to allocate buffers and other structures used internally. Since this feature is set for WOLFSSL_CTX, it will continue to work for the lifetime of the context object.
 
@@ -822,7 +822,7 @@ The static-buffer-allocation set in a WOLFSSL_CTX is thread-safe. Even if the sa
 
 ![Alt text](CTX_structure.png)
 
-In comparison to a memory pool functionality offered by an RTOS implementation, memory functionality in an RTOS will commonly suspend a thread (task) if an unused memory block cannot be found when requested until a free block becomes available. wolfSSL’s static memory functionality has no such synchronization capability.
+In comparison to a memory pool functionality offered by an RTOS implementation, memory functionality in an RTOS will commonly suspend a thread (task) if an unused memory block cannot be found when requested until a free block becomes available. wolfSSL's static memory functionality has no such synchronization capability.
 
 ### Specifying Static Buffer Use
 
@@ -1303,7 +1303,7 @@ All TLS extensions can also be enabled with:
 
 ## Timing-Resistance in wolfSSL
 
-wolfSSL provides the function “ConstantCompare” which guarantees constant time when doing comparison operations that could potentially leak timing information. This API is used at both the TLS and crypto level in wolfSSL to deter against timing based, side-channel attacks.
+wolfSSL provides the function "ConstantCompare" which guarantees constant time when doing comparison operations that could potentially leak timing information. This API is used at both the TLS and crypto level in wolfSSL to deter against timing based, side-channel attacks.
 
 The wolfSSL ECC implementation has the define `ECC_TIMING_RESISTANT` to enable timing-resistance in the ECC algorithm. Similarly the define `TFM_TIMING_RESISTANT` is provided in the fast math libraries for RSA algorithm timing-resistance. The function exptmod uses the timing resistant Montgomery ladder. The default SP math library (`sp_int.c`) is timing and cache resistant unless `WC_NO_HARDEN` or `WC_NO_CACHE_RESISTANT` is defined, which is what `--disable-harden` does.
 

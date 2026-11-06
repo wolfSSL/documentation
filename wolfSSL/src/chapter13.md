@@ -4,7 +4,7 @@
 
 wolfSSL (formerly CyaSSL) provides an OpenSSL compatibility header, `wolfssl/openssl/ssl.h`, in addition to the wolfSSL native API, to ease the transition into using wolfSSL or to aid in porting an existing OpenSSL application over to wolfSSL.  For an overview of the OpenSSL Compatibility Layer, please continue reading below.  To view the complete set of OpenSSL functions supported by wolfSSL, please see the `wolfssl/openssl/ssl.h` file.
 
-The OpenSSL Compatibility Layer maps a subset of the most commonly-used OpenSSL commands to wolfSSL’s native API functions.  This should allow for an easy replacement of OpenSSL by wolfSSL in your application or project without changing much code.
+The OpenSSL Compatibility Layer maps a subset of the most commonly-used OpenSSL commands to wolfSSL's native API functions.  This should allow for an easy replacement of OpenSSL by wolfSSL in your application or project without changing much code.
 
 wolfSSL's OpenSSL compatibility layer is tested by building many open source projects against it, for example stunnel, lighttpd, nginx, HAProxy, curl and OpenSSH (see the [wolfSSL OSP repository](https://github.com/wolfSSL/osp)).
 
@@ -23,16 +23,16 @@ Building wolfSSL With Compatibility Layer:
 
 ## Differences Between wolfSSL and OpenSSL
 
-Many people are curious how wolfSSL compares to OpenSSL and what benefits there are to using an SSL/TLS library that has been optimized to run on embedded platforms.  Obviously, OpenSSL is free and presents no initial costs to begin using, but we believe that wolfSSL will provide you with more flexibility, an easier integration of SSL/TLS into your existing platform, current standards support, and much more – all provided under a very easy-to-use license model.
+Many people are curious how wolfSSL compares to OpenSSL and what benefits there are to using an SSL/TLS library that has been optimized to run on embedded platforms.  Obviously, OpenSSL is free and presents no initial costs to begin using, but we believe that wolfSSL will provide you with more flexibility, an easier integration of SSL/TLS into your existing platform, current standards support, and much more - all provided under a very easy-to-use license model.
 
 The points below outline several of the main differences between wolfSSL and OpenSSL.
 
-1. With a 20-100 kB build size, wolfSSL is up to 20 times smaller than OpenSSL.  wolfSSL is a better choice for resource constrained environments – where every byte matters.
+1. With a 20-100 kB build size, wolfSSL is up to 20 times smaller than OpenSSL.  wolfSSL is a better choice for resource constrained environments - where every byte matters.
 2. wolfSSL is up to date with the most current standards, TLS 1.3 and DTLS 1.3.  The wolfSSL team is dedicated to continually keeping wolfSSL up-to-date with current standards.
 3. wolfSSL offers the best current ciphers and standards available today, including ciphers for streaming media support.  In addition, with wolfCrypt's native implementations of ML-KEM, ML-DSA, SLH-DSA, Falcon, LMS and XMSS, deploying post-quantum cryptography is something you can do today.
 4. wolfSSL is dual licensed under both the GPLv3 as well as a commercial license, where OpenSSL (3.0 and later) is available under the Apache License 2.0.
 5. wolfSSL is backed by an outstanding company who cares about its users and about their security, and is always willing to help. The team actively works to improve and expand wolfSSL.  The wolfSSL team is based primarily out of Bozeman, MT, Portland, OR, and Seattle, WA, along with other team members located around the globe.
-6. wolfSSL is the leading SSL/TLS library for real time, mobile, and embedded systems by virtue of its breadth of platform support and successful implementations on embedded environments.  Chances are we’ve already been ported to your environment.  If not, let us know and we’ll be glad to help.
+6. wolfSSL is the leading SSL/TLS library for real time, mobile, and embedded systems by virtue of its breadth of platform support and successful implementations on embedded environments.  Chances are we've already been ported to your environment.  If not, let us know and we'll be glad to help.
 7. wolfSSL offers several abstraction layers to make integrating SSL into your environment and platform as easy as possible.  With an OS layer, a custom I/O layer, and a C Standard Library abstraction layer, integration has never been so easy.
 8. wolfSSL offers several support packages for wolfSSL.  Available directly through phone, email or the wolfSSL product support forums, your questions are answered quickly and accurately to help you make progress on your project as quickly as possible.
 

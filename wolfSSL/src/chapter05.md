@@ -98,7 +98,7 @@ The default `Send()` and `Receive()` functions, `EmbedSend()` and `EmbedReceive(
 
 ### Operating System Abstraction Layer
 
-The wolfSSL OS abstraction layer helps facilitate easier porting of wolfSSL to a user’s operating system.  The `wolfssl/wolfcrypt/settings.h` file contains settings which end up triggering the OS layer.
+The wolfSSL OS abstraction layer helps facilitate easier porting of wolfSSL to a user's operating system.  The `wolfssl/wolfcrypt/settings.h` file contains settings which end up triggering the OS layer.
 
 OS-specific threading, mutex, filesystem and time abstractions are located in `wolfssl/wolfcrypt/wc_port.h` and `wolfcrypt/src/wc_port.c`. Memory and string macros are located in `wolfssl/wolfcrypt/types.h`. For a step-by-step guide to porting wolfSSL to a new platform, see [wolfSSL Porting Guide](appendix10.md).
 
@@ -127,8 +127,8 @@ One factor which defines wolfSSL is its ability to be easily ported to new platf
 * QNX
 * MontaVista
 * NonStop
-* TRON/ITRON/µITRON
-* Micrium's µC/OS-III
+* TRON/ITRON/uITRON
+* Micrium's uC/OS-III
 * FreeRTOS
 * SafeRTOS
 * NXP/Freescale MQX
@@ -142,7 +142,7 @@ One factor which defines wolfSSL is its ability to be easily ported to new platf
 * embOS
 * INtime
 * Mbed
-* µT-Kernel
+* uT-Kernel
 * RIOT
 * CMSIS-RTOS
 * FROSTED
@@ -170,7 +170,7 @@ wolfSSL has support for chipsets including ARM, Intel, Motorola, mbed, Freescale
 
 ## C# Wrapper
 
-wolfSSL has limited support for use in C#. A Visual Studio project containing the port can be found in the directory `root_wolfSSL/wrapper/CSharp/`. After opening the Visual Studio project set the “Active solution configuration” and “Active solution platform” by clicking on BUILD-\>Configuration Manager… The supported “Active solution configuration”s are DLL Debug and DLL Release. The supported platforms are Win32 and x64.
+wolfSSL has limited support for use in C#. A Visual Studio project containing the port can be found in the directory `root_wolfSSL/wrapper/CSharp/`. After opening the Visual Studio project set the "Active solution configuration" and "Active solution platform" by clicking on BUILD-\>Configuration Manager... The supported "Active solution configuration"s are DLL Debug and DLL Release. The supported platforms are Win32 and x64.
 
 The solution `wrapper/CSharp/wolfSSL_CSharp.sln` builds wolfSSL using `wrapper/CSharp/user_settings.h` (the project defines `WOLFSSL_USER_SETTINGS`), so no additional preprocessor flags need to be added.
 
