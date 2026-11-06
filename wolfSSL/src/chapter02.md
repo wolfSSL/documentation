@@ -438,7 +438,7 @@ Likewise removes calls specific to the server side.
 
 #### NO_DES3
 
-Removes 3DES (Triple-DES) support. 3DES is disabled by default when building with `./configure` (enable it with `--enable-des3`) or CMake (`WOLFSSL_DES3` defaults to `no`). When building with user_settings.h it is compiled in unless `NO_DES3` is defined. Defining `NO_DES3` also defines [`NO_DES3_TLS_SUITES`](#no_des3_tls_suites).
+Removes 3DES (Triple-DES) support. 3DES is disabled by default when building with `./configure` (enable it with [`--enable-des3`](#--enable-des3)) or CMake (`WOLFSSL_DES3` defaults to `no`). When building with user_settings.h it is compiled in unless `NO_DES3` is defined. Defining `NO_DES3` also defines [`NO_DES3_TLS_SUITES`](#no_des3_tls_suites).
 
 #### NO_DES3_TLS_SUITES
 
@@ -513,6 +513,10 @@ Removes the ARC4 (RC4) stream cipher. RC4 is deprecated (RFC 7465), so `NO_RC4` 
 #### NO_SESSION_CACHE
 
 Can be defined when a session cache is not needed. This removes the session cache and the client session cache, which by default hold 33 sessions and take about 13 kB and 17 kB of memory respectively (estimates from the comments in `wolfssl/ssl_sess.h`; the exact size depends on the build options).
+
+#### NO_CLIENT_CACHE
+
+Removes the client session cache, which a client uses to find a previous session for a server by its ID with `wolfSSL_SetServerID()`. The main session cache is not affected.
 
 #### NO_TLS
 
@@ -589,6 +593,10 @@ Disables time checking for ASN. Note: This should be used with caution because a
 #### NO_BIO
 
 Disables the BIO (Basic I/O) abstraction layer. Reduces code size when BIO functionality such as `BIO_new()`, `BIO_read()`, `BIO_write()` is not needed.
+
+#### WOLFSSL_NO_OPENSSL_RAND_CB
+
+With `OPENSSL_EXTRA`, removes the OpenSSL RAND method callback support (`wolfSSL_RAND_set_rand_method()`) to reduce code size. Defined automatically with `OPENSSL_EXTRA_X509_SMALL`.
 
 #### NO_VERIFY_OID
 
@@ -752,13 +760,21 @@ Removes support for ASN formatted certificate processing.
 
 Removes Base64 and Base16 encoding and decoding (`--disable-coding`). This also removes PEM support, because [`WOLFSSL_PEM_TO_DER`](#wolfssl_pem_to_der) is not defined without it.
 
+#### NO_CERTS
+
+Disables all certificate processing in wolfSSL. Use for PSK-only configurations where no certificate handling is needed, significantly reducing code size.
+
 #### WOLFSSL_NO_PEM
 
 Removes PEM support: [`WOLFSSL_PEM_TO_DER`](#wolfssl_pem_to_der) is not defined, so the PEM to DER conversion functions are not built and certificates and keys can only be loaded in DER format (`WOLFSSL_FILETYPE_ASN1`). There is no configure option for it; define it in user_settings.h or in `CFLAGS`.
 
+#### NO_SIG_WRAPPER
+
+Removes the signature wrapper API in `wolfcrypt/src/signature.c` (`wc_SignatureGetSize()`, `wc_SignatureGenerate()`, `wc_SignatureVerify()` and their `Hash` and `_ex` variants). Defined automatically when RSA is disabled and ECC signing and verification are not available, by [`--enable-rsavfy`](#--enable-rsavfy), and by the `WOLFSSL_TINY_TLS13` profile.
+
 #### NO_OLD_TLS
 
-Removes support for SSLv3, TLSv1.0 and TLSv1.1. `./configure` and CMake define this macro by default; it is only left undefined when old TLS support is explicitly requested (for example with `--enable-oldtls`, `--enable-tlsv10` or `--enable-sslv3`). With user_settings.h it is not defined automatically, so define `NO_OLD_TLS` yourself. In a build without `NO_OLD_TLS`, TLS 1.0 and SSL 3.0 additionally need `WOLFSSL_ALLOW_TLSV10` and `WOLFSSL_ALLOW_SSLV3`.
+Removes support for SSLv3, TLSv1.0 and TLSv1.1. `./configure` and CMake define this macro by default; it is only left undefined when old TLS support is explicitly requested (for example with [`--enable-oldtls`](#--enable-oldtls), `--enable-tlsv10` or `--enable-sslv3`). With user_settings.h it is not defined automatically, so define `NO_OLD_TLS` yourself. In a build without `NO_OLD_TLS`, TLS 1.0 and SSL 3.0 additionally need `WOLFSSL_ALLOW_TLSV10` and `WOLFSSL_ALLOW_SSLV3`.
 
 **Warning:** Leaving `NO_OLD_TLS` undefined produces a build that is **not conformant** with RFC 9846, RFC 8996 or RFC 9325. RFC 8996 deprecates TLS 1.0 and TLS 1.1, and RFC 9846 states that SSL 2.0, SSL 3.0, TLS 1.0 and TLS 1.1 "MUST NOT be negotiated for any reason". Only build without `NO_OLD_TLS` when legacy interoperability requires it, and do not claim conformance with those RFCs for such a build.
 
@@ -1114,6 +1130,22 @@ Internal flag used only inside `wolfcrypt/src/asn.c`; it makes the certificate p
 
 Stores pointers to issuer name components, their lengths and encodings for efficient access.
 
+#### WOLFSSL_VERIFY_CB_ALL_CERTS
+
+Calls the certificate verify callback for all certificates in the chain, not just the peer certificate.
+
+#### WOLFSSL_LOCAL_X509_STORE
+
+Uses a local X509 certificate store per SSL context instead of a global one. Provides better isolation between contexts.
+
+#### WOLFSSL_COPY_CERT
+
+Copies the certificate buffer when loading into an SSL object instead of referencing it, ensuring the SSL object owns its own copy of the data.
+
+#### WOLFSSL_COPY_KEY
+
+Copies the private key buffer when loading into an SSL object instead of referencing it, ensuring the SSL object owns its own copy of the data.
+
 ### OCSP Options
 
 The following options adjust OCSP support.
@@ -1205,6 +1237,10 @@ Enables debug logging for certificate processing operations including parsing, v
 #### WOLFSSL_ASN_TEMPLATE_TYPE_CHECK
 
 Use ASN functions to better test compiler type issues for testing. Only relevant when used with `WOLFSSL_ASN_TEMPLATE`.
+
+#### WOLFSSL_DEBUG_DTLS
+
+Debugging aid for DTLS: stops wolfSSL from forcing the ChangeCipherSpec message into the same datagram as the Finished message, so the records can be observed separately. It adds no logging.
 
 ### Enabling Features macros (on by default)
 
@@ -1374,15 +1410,6 @@ Enables wolf event-driven processing support for async operations. Provides an e
 
 Enables `wolfSSL_write_dup()`, which makes a second, write-only `WOLFSSL` object from an established connection, so one thread can read on the original while another writes on the duplicate. Set by `--enable-writedup`.
 
-#### NO_CERTS
-
-Disables all certificate processing in wolfSSL. Use for PSK-only configurations where no certificate handling is needed, significantly reducing code size.
-
-
-#### NO_CLIENT_CACHE
-
-Disables the client-side session cache. Only the server session cache will be used for session resumption.
-
 #### WOLFSSL_HAVE_PRF
 
 Enables access to the TLS Pseudo-Random Function (PRF). Allows applications to derive additional keying material using the TLS PRF. Exposes `wc_PRF()`, `wc_PRF_TLS()` and `wc_PRF_TLSv1()`. Defined automatically by settings.h unless `NO_KDF` or `NO_HMAC` is set.
@@ -1441,7 +1468,7 @@ Keeps the "Finished" messages after a TLS handshake for use as the "tls-unique" 
 
 #### WOLFSSL_ENCRYPTED_KEYS
 
-Enables loading and writing password-encrypted PEM private keys: traditional encrypted PEM (`Proc-Type` / `DEK-Info` headers), and encrypted PKCS#8 PEM through the password callback. The PKCS#8 encrypt/decrypt API itself (`wc_EncryptPKCS8Key()`) comes from [`HAVE_PKCS8`](#have_pkcs8). Set by `--enable-enckeys`, and automatically with `OPENSSL_EXTRA`, `OPENSSL_EXTRA_X509_SMALL` or `HAVE_WEBSERVER`. Here is a link to RFC PKCS8 documentation (https://datatracker.ietf.org/doc/html/rfc5208).
+Enables loading and writing password-encrypted PEM private keys: traditional encrypted PEM (`Proc-Type` / `DEK-Info` headers), and encrypted PKCS#8 PEM through the password callback. The PKCS#8 encrypt/decrypt API itself (`wc_EncryptPKCS8Key()`) comes from [`HAVE_PKCS8`](#have_pkcs8). Set by [`--enable-enckeys`](#--enable-enckeys), and automatically with `OPENSSL_EXTRA`, `OPENSSL_EXTRA_X509_SMALL` or `HAVE_WEBSERVER`. Here is a link to RFC PKCS8 documentation (https://datatracker.ietf.org/doc/html/rfc5208).
 
 #### WOLFSSL_CUSTOM_OID
 
@@ -1830,7 +1857,7 @@ Turns on use of the ed25519 algorithm.
 
 #### HAVE_ED448
 
-Enables Ed448 signatures. Enabled with `--enable-ed448`.
+Enables Ed448 signatures. Enabled with [`--enable-ed448`](#--enable-ed448).
 
 #### WOLFSSL_DH_CONST
 
@@ -1919,6 +1946,22 @@ Enables testing mode for Apple native certificate validation. Used for unit test
 #### WOLFSSL_CUSTOM_CURVES
 
 Allow non-standard curves. Includes the curve "a" variable in calculation. Additional curve types can be enabled using [`HAVE_ECC_SECPR2`](#have_ecc_secpr2), [`HAVE_ECC_SECPR3`](#have_ecc_secpr3), [`HAVE_ECC_BRAINPOOL`](#have_ecc_brainpool) and [`HAVE_ECC_KOBLITZ`](#have_ecc_koblitz).
+
+#### HAVE_ECC_SECPR2
+
+Enables the additional prime curves secp160r2, prime192v2 and prime239v2. Set by `--enable-ecccustcurves=all` (also by `--enable-all` and `--enable-distro`).
+
+#### HAVE_ECC_SECPR3
+
+Enables the additional prime curves prime192v3 and prime239v3. Set by `--enable-ecccustcurves=all` (also by `--enable-all` and `--enable-distro`).
+
+#### HAVE_ECC_BRAINPOOL
+
+Enables the Brainpool curves brainpoolP160r1 to brainpoolP512r1. Requires `WOLFSSL_CUSTOM_CURVES` (the build stops with an error otherwise). Set by [`--enable-brainpool`](#--enable-brainpool), which is on by default whenever [`--enable-ecccustcurves`](#--enable-ecccustcurves) is used.
+
+#### HAVE_ECC_KOBLITZ
+
+Enables the Koblitz curves secp160k1, secp192k1, secp224k1 and secp256k1. Requires `WOLFSSL_CUSTOM_CURVES` (the build stops with an error otherwise). Set by `--enable-ecccustcurves=all` (also by `--enable-all` and `--enable-distro`).
 
 #### HAVE_COMP_KEY
 
@@ -2023,7 +2066,7 @@ Placeholder for DANE (RFC 6698) support. No code references it, so defining it c
 
 #### WOLFSSL_HAVE_MLKEM
 
-Enables ML-KEM (FIPS 203) key encapsulation in wolfCrypt, and the ML-KEM and hybrid key exchange groups for TLS 1.3. Enabled by default in `./configure` builds (it turns on SHA-3 and SHAKE), unless SHA-3 or SHAKE is explicitly disabled or the build is FIPS older than v7; disable with `--disable-mlkem` (`--enable-kyber` is an alias for `--enable-mlkem`).
+Enables ML-KEM (FIPS 203) key encapsulation in wolfCrypt, and the ML-KEM and hybrid key exchange groups for TLS 1.3. Enabled by default in `./configure` builds (it turns on SHA-3 and SHAKE), unless SHA-3 or SHAKE is explicitly disabled or the build is FIPS older than v7; disable with [`--disable-mlkem`](#--disable-mlkem) (`--enable-kyber` is an alias for [`--enable-mlkem`](#--disable-mlkem)).
 
 #### WOLFSSL_HAVE_MLDSA
 
@@ -2043,11 +2086,11 @@ Uses the ML-DSA verification path with the smallest memory usage, aimed at very 
 
 #### WOLFSSL_HAVE_LMS
 
-Enables the LMS/HSS stateful hash-based signature scheme (RFC 8554) in wolfCrypt. Set by `--enable-lms`, which also accepts `verify-only` (`WOLFSSL_LMS_VERIFY_ONLY`) and `small` (`WOLFSSL_WC_LMS_SMALL`). The private key changes with every signature, so signing needs the key state callbacks set with `wc_LmsKey_SetWriteCb()` and `wc_LmsKey_SetReadCb()`.
+Enables the LMS/HSS stateful hash-based signature scheme (RFC 8554) in wolfCrypt. Set by [`--enable-lms`](#--enable-lms), which also accepts `verify-only` (`WOLFSSL_LMS_VERIFY_ONLY`) and `small` (`WOLFSSL_WC_LMS_SMALL`). The private key changes with every signature, so signing needs the key state callbacks set with `wc_LmsKey_SetWriteCb()` and `wc_LmsKey_SetReadCb()`.
 
 #### WOLFSSL_HAVE_XMSS
 
-Enables the XMSS/XMSS^MT stateful hash-based signature scheme (RFC 8391) in wolfCrypt. Set by `--enable-xmss`, which also accepts `verify-only` (`WOLFSSL_XMSS_VERIFY_ONLY`) and `small` (`WOLFSSL_WC_XMSS_SMALL`). The private key changes with every signature, so signing needs the key state callbacks set with `wc_XmssKey_SetWriteCb()` and `wc_XmssKey_SetReadCb()`.
+Enables the XMSS/XMSS^MT stateful hash-based signature scheme (RFC 8391) in wolfCrypt. Set by [`--enable-xmss`](#--enable-xmss), which also accepts `verify-only` (`WOLFSSL_XMSS_VERIFY_ONLY`) and `small` (`WOLFSSL_WC_XMSS_SMALL`). The private key changes with every signature, so signing needs the key state callbacks set with `wc_XmssKey_SetWriteCb()` and `wc_XmssKey_SetReadCb()`.
 
 
 #### HAVE_DH_DEFAULT_PARAMS
@@ -2690,6 +2733,14 @@ Makes the static input and output record buffers in each SSL object big enough f
 This is the wolfSSL version string populated for release bundles or when `./configure` is run. There is also a 32-bit HEX version of this in `LIBWOLFSSL_VERSION_HEX`. These come from wolfssl/version.h.
 
 
+#### WOLFSSL_HAVE_ERROR_QUEUE
+
+Internal macro, set automatically by `wolfssl/wolfcrypt/logging.h` when `OPENSSL_EXTRA` (on non-Windows builds), `DEBUG_WOLFSSL_VERBOSE` or `HAVE_MEMCACHED` is defined. It enables the OpenSSL-compatible error queue used by `wolfSSL_ERR_get_error()` and related functions. Do not define it directly; define `NO_ERROR_QUEUE` to turn the queue off in an `OPENSSL_EXTRA` build.
+
+#### WOLFSSL_HAVE_CERT_SERVICE
+
+Set by [`--enable-certservice`](#--enable-certservice) (which also turns on `WOLFSSL_CERT_GEN`, ECC and `OPENSSL_EXTRA`) for the wolfSSL certificate service product. It only adds the marker function `wolfSSL_cert_service()`, which that product's configure script checks for; it adds no handshake callbacks.
+
 ### Customizing or Porting wolfSSL
 
 #### WOLFSSL_USER_SETTINGS
@@ -2771,22 +2822,6 @@ Optional asynchronous TLS chain processing. Requires [`WOLFSSL_ASYNC_CRYPT`](#wo
 #### WOLFSSL_DYN_CERT
 
 Allow allocation of subjectCN and publicKey fields when parsing certificates even with WOLFSSL_NO_MALLOC set. If using the WOLFSSL_NO_MALLOC option with RSA certificates the public key needs to be retained for CA's for validate certificates on the peer's certificate. This appears as a ConfirmSignature error -173 BAD_FUNC_ARG, since the ca->publicKey is NULL.
-
-#### WOLFSSL_VERIFY_CB_ALL_CERTS
-
-Calls the certificate verify callback for all certificates in the chain, not just the peer certificate.
-
-#### WOLFSSL_LOCAL_X509_STORE
-
-Uses a local X509 certificate store per SSL context instead of a global one. Provides better isolation between contexts.
-
-#### WOLFSSL_COPY_CERT
-
-Copies the certificate buffer when loading into an SSL object instead of referencing it, ensuring the SSL object owns its own copy of the data.
-
-#### WOLFSSL_COPY_KEY
-
-Copies the private key buffer when loading into an SSL object instead of referencing it, ensuring the SSL object owns its own copy of the data.
 
 #### WOLFSSL_USER_IO
 
@@ -3155,6 +3190,14 @@ Port setting for INtime RTOS.
 
 Used when porting to SGX.
 
+
+#### WOLFSSL_HEAP_TEST
+
+Internal test macro for the static memory heap hint code. A heap hint equal to `(void*)WOLFSSL_HEAP_TEST` makes allocations fall back to the native `malloc()`. Not for production use.
+
+#### WOLFSSL_NO_REALLOC
+
+Disables use of `realloc()` (`XREALLOC` is undefined). Code that resizes buffers uses `XMALLOC()`, a copy and `XFREE()` instead.
 
 ### Reducing Memory or Code Usage
 
@@ -3554,6 +3597,10 @@ By default, when AES-NI, AF_ALG or Xilinx AES gets a misaligned input or output 
 #### WC_ASYNC_ENABLE_AES
 
 Enables asynchronous AES operations. Allows AES encrypt/decrypt to be offloaded to hardware accelerators using the wolfSSL async crypto framework.
+
+#### WOLFSSL_DEVCRYPTO
+
+Enables the Linux `/dev/crypto` (cryptodev-linux) interface in `wolfcrypt/src/port/devcrypto/`. The algorithms to offload are selected with `WOLFSSL_DEVCRYPTO_AES`, `WOLFSSL_DEVCRYPTO_CBC`, `WOLFSSL_DEVCRYPTO_HASH` and related macros. Set by [`--enable-devcrypto`](#--enable-devcrypto), which takes `all`, `aes`, `cbc` or `hash`.
 
 #### WOLFSSL_DEVCRYPTO_AES
 
