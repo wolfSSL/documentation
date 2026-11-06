@@ -2,9 +2,9 @@
 
 ## General Architecture
 
-The wolfSSL (formerly CyaSSL) embedded SSL library implements SSL 3.0, TLS 1.0, TLS 1.1, TLS 1.2, and TLS 1.3 protocols. TLS 1.3 is currently the most secure and up to date version of the standard. wolfSSL does not support SSL 2.0 due to the fact that it has been insecure for several years.
+The wolfSSL (formerly CyaSSL) embedded SSL library implements SSL 3.0, TLS 1.0, TLS 1.1, TLS 1.2, and TLS 1.3 protocols, as well as DTLS 1.0, DTLS 1.2 and DTLS 1.3. TLS 1.3 is currently the most secure and up to date version of the standard. SSL 3.0 (RFC 7568), TLS 1.0 and TLS 1.1 (RFC 8996) are deprecated, so wolfSSL builds them out by default; they are only compiled in when explicitly enabled with `--enable-sslv3`, `--enable-tlsv10` or `--enable-oldtls`. wolfSSL does not support SSL 2.0 due to the fact that it has been insecure for several years.
 
-The TLS protocol in wolfSSL is implemented as defined in [RFC 5246 (https://tools.ietf.org/html/rfc5246).](https://tools.ietf.org/html/rfc5246) Two record layer protocols exist within SSL - the message layer and the handshake layer. Handshake messages are used to negotiate a common cipher suite, create secrets, and enable a secure connection. The message layer encapsulates the handshake layer while also supporting alert processing and application data transfer.
+TLS 1.2 is implemented in wolfSSL as defined in [RFC 5246](https://tools.ietf.org/html/rfc5246) and TLS 1.3 as defined in [RFC 8446](https://tools.ietf.org/html/rfc8446). DTLS 1.2 follows [RFC 6347](https://tools.ietf.org/html/rfc6347) and DTLS 1.3 follows [RFC 9147](https://tools.ietf.org/html/rfc9147). TLS is a layered protocol. The lower layer is the record protocol, which fragments, protects (encrypts and authenticates) and transmits the data of the higher-level protocols: the handshake protocol, the alert protocol, the change cipher spec protocol (TLS 1.2 and earlier only) and application data. Handshake messages are used to negotiate a common cipher suite, create secrets, and enable a secure connection. Alert messages report errors and the closure of the connection.
 
 A general diagram of how the SSL protocol fits into existing protocols can be seen in **Figure 1**. SSL sits in between the Transport and Application layers of the OSI model, where any number of protocols (including TCP/IP, Bluetooth, etc.) may act as the transport medium.  Application protocols are layered on top of SSL (such as HTTP, FTP, and SMTP).
 
@@ -16,9 +16,38 @@ The SSL handshake involves several steps, some of which are optional depending o
 
 ![SSL Handshake Diagram](sslhandshake.png "SSL Handshake Diagram")
 
+**Figure 2** shows the full handshake of TLS 1.2 and earlier versions. In the actual message order, a client that is asked for a certificate sends its Certificate message before the ClientKeyExchange message, and its CertificateVerify message after the ClientKeyExchange message.
+
+### TLS 1.3 Handshake
+
+TLS 1.3 uses a different, shorter handshake. The key exchange takes place in the hello messages (`key_share` extension), so the full handshake needs only one round trip before the client can send application data. There are no ServerKeyExchange, ServerHelloDone or ClientKeyExchange messages, ChangeCipherSpec is only sent as a dummy message in middlebox compatibility mode, and everything the server sends after the ServerHello is encrypted:
+
+```text
+Client                                      Server
+
+ClientHello (key_share, supported_versions)
+                          -------->
+                                ServerHello (key_share)
+                                  {EncryptedExtensions}
+                                 {CertificateRequest} *
+                                          {Certificate}
+                                    {CertificateVerify}
+                                             {Finished}
+                          <--------
+{Certificate} *
+{CertificateVerify} *
+{Finished}
+                          -------->
+[Application Data]        <------->  [Application Data]
+
+*  sent only when the server requests client authentication
+{} encrypted with the handshake traffic keys
+[] encrypted with the application traffic keys
+```
+
 ## Differences between SSL and TLS Protocol Versions
 
-SSL (Secure Sockets Layer) and TLS (Transport Security Layer) are both cryptographic protocols which provide secure communication over networks. These two protocols (and the several versions of each) are in widespread use today in applications ranging from web browsing to e-mail to instant messaging and VoIP. Each protocol, and the underlying versions of each, are slightly different from the other.
+SSL (Secure Sockets Layer) and TLS (Transport Layer Security) are both cryptographic protocols which provide secure communication over networks. These two protocols (and the several versions of each) are in widespread use today in applications ranging from web browsing to e-mail to instant messaging and VoIP. Each protocol, and the underlying versions of each, are slightly different from the other.
 
 Below you will find both an explanation of, and the major differences between the different SSL and TLS protocol versions. For specific details about each protocol, please reference the RFC specification mentioned.
 
@@ -48,7 +77,7 @@ This protocol was first defined in RFC 2246 in January of 1999. This was an upgr
 This protocol was defined in RFC 4346 in April of 2006, and is an update to TLS 1.0.  The major changes are:
 
 * The Implicit Initialization Vector (IV) is replaced with an explicit IV to protect against Cipher block chaining (CBC) attacks.
-* Handling of padded errors is changed to use the `bad_record_ma`c alert rather than the `decryption_failed` alert to protect against CBC attacks.
+* Handling of padding errors is changed to use the `bad_record_mac` alert rather than the `decryption_failed` alert to protect against CBC attacks.
 * IANA registries are defined for protocol parameters
 * Premature closes no longer cause a session to be non-resumable.
 
@@ -64,7 +93,7 @@ This protocol was defined in RFC 5246 in August of 2008.  Based on TLS 1.1, TLS 
 * Tighter checking of EncryptedPreMasterSecret version numbers.
 * Many of the requirements were tightened
 * `Verify_data` length depends on the cipher suite
-* Description of Bleichenbacher/Dlima attack defenses cleaned up.
+* Description of Bleichenbacher/Klima attack defenses cleaned up.
 
 ### TLS 1.3
 
@@ -76,6 +105,11 @@ This protocol was defined in RFC 8446 in August of 2018. TLS 1.3 contains improv
 * Key derivation functions have been re-designed, with the HMAC-based Extract-and-Expand Key Derivation Function (HKDF) being used as a primitive.
 * The handshake state machine has been restructured to be more consistent and remove superfluous messages.
 * ECC is now in the base spec  and includes new signature algorithms. Point format negotiation has been removed in favor of single point format for each curve.
-* Compression, custom DHE groups, and DSA have been removed, RSA padding now uses PSS.
+* Compression, custom DHE groups, and DSA have been removed, RSA signatures now use PSS padding.
+* Static RSA and static Diffie-Hellman cipher suites have been removed; all public-key based key exchange mechanisms now provide forward secrecy.
 * TLS 1.2 version negotiation verification mechanism was deprecated in favor of a version list in an extension.
 * Session resumption with and without server-side state and the PSK-based ciphersuites of earlier versions of TLS have been replaced by a single new PSK exchange.
+
+### DTLS
+
+DTLS (Datagram Transport Layer Security) adapts TLS to datagram transports such as UDP. It adds explicit record sequence numbers and epochs, retransmission of lost handshake messages, and a cookie exchange that protects servers against denial of service attacks. DTLS 1.0 (RFC 4347) is based on TLS 1.1, DTLS 1.2 (RFC 6347) on TLS 1.2, and DTLS 1.3 (RFC 9147) on TLS 1.3; there is no DTLS 1.1. DTLS is disabled by default in wolfSSL. Use `--enable-dtls` for DTLS 1.2 and `--enable-dtls13` for DTLS 1.3; DTLS 1.0 also requires `--enable-oldtls`.
