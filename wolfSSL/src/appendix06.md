@@ -16,7 +16,7 @@ wolfSSL (formerly CyaSSL) error codes can be found in `wolfssl/ssl.h`. These are
 | `WOLFSSL_ERROR_WANT_CONNECT` (`SSL_ERROR_WANT_CONNECT`) | 7 | Underlying protocol connection not started yet, call this API again |
 | `WOLFSSL_ERROR_WANT_ACCEPT` (`SSL_ERROR_WANT_ACCEPT`) | 8 | Underlying protocol connection not started yet, call this API again |
 
-`wolfSSL_get_error()` reports the internal codes `WANT_READ`, `WANT_WRITE` and `ZERO_RETURN` as `SSL_ERROR_WANT_READ`, `SSL_ERROR_WANT_WRITE` and `SSL_ERROR_ZERO_RETURN`. For any other failure it returns one of the negative wolfSSL or wolfCrypt error codes listed below. [`wolfSSL_ERR_error_string()`](group__Debug.md#function-wolfssl_err_error_string) returns a text description for any wolfSSL or wolfCrypt error code.
+`wolfSSL_get_error()` reports the internal codes `WANT_READ`, `WANT_WRITE` and `ZERO_RETURN` as `SSL_ERROR_WANT_READ`, `SSL_ERROR_WANT_WRITE` and `SSL_ERROR_ZERO_RETURN`. In `OPENSSL_EXTRA` builds it also reports `MATCH_SUITE_ERROR` and `SOCKET_PEER_CLOSED_E` as `SSL_ERROR_SYSCALL` (5), and with `WOLFSSL_ASYNC_CRYPT` it reports `MP_WOULDBLOCK` as `WC_PENDING_E`. For any other failure it returns one of the negative wolfSSL or wolfCrypt error codes listed below. [`wolfSSL_ERR_error_string()`](group__Debug.md#function-wolfssl_err_error_string) returns a text description for any wolfSSL or wolfCrypt error code.
 
 Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`. The native TLS error codes use the range -301 (`WOLFSSL_FIRST_E`) to -525 (`WOLFSSL_LAST_E`). The header also defines `WOLFSSL_FATAL_ERROR` (-1) and negative counterparts (-2 to -8) of the `WOLFSSL_ERROR_*` values.
 

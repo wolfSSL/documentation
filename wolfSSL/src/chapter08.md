@@ -24,7 +24,7 @@ When no logging callback is registered, the output can be redirected at compile 
 
 `wolfSSL_SetLoggingPrefix()` sets a prefix string that is printed, in brackets, before each message written by the default `WOLFSSL_DEBUG_PRINTF_FN` output (it is not passed to a logging callback). The prefix is stored per thread where the compiler supports thread-local storage, which is useful to tell apart, for example, a client and a server running in one process.
 
-Certificate-related debug messages are a subset of the debug output. They are on by default with `DEBUG_WOLFSSL` and can be turned off with `NO_WOLFSSL_DEBUG_CERTS`. Defining [`WOLFSSL_DEBUG_CERTS`](chapter02.md#wolfssl_debug_certs) without `DEBUG_WOLFSSL` logs only the certificate messages.
+Certificate-related debug messages are a subset of the debug output. They are on by default with `DEBUG_WOLFSSL` and can be turned off with `NO_WOLFSSL_DEBUG_CERTS`. Defining [`WOLFSSL_DEBUG_CERTS`](chapter02.md#wolfssl_debug_certs) without `DEBUG_WOLFSSL` compiles in only the certificate messages. They are off at run time until `wolfSSL_CertDebugging_ON()` is called (`wolfSSL_Debugging_ON()` returns `NOT_COMPILED_IN` in such a build), or define `WOLFSSL_CERT_LOG_ENABLED_DEFAULT` to 1 to have them on from the start. `wolfSSL_CertDebugging_OFF()` turns them off again.
 
 Two configure options add more detail to the debug output:
 

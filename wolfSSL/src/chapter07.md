@@ -568,9 +568,10 @@ Before filling in the subject information an initialization function needs to be
 ```c
 Cert req;
 wc_InitCert(&req);
+req.version = 0; /* PKCS #10 CSRs are version 0 */
 ```
 
-`wc_InitCert()` sets the same defaults as described in [Certificate Generation](#certificate-generation) above, and the same signature types are supported.
+`wc_InitCert()` sets the same defaults as described in [Certificate Generation](#certificate-generation) above, and the same signature types are supported. Its default `version` of 2 is the X.509 v3 certificate version; a CSR must be version 0 (PKCS #10, RFC 2986), and `wc_MakeCertReq()` encodes the `version` field as set, so set it to 0 as shown.
 
 Now the user can initialize the subject information like this example from <https://github.com/wolfSSL/wolfssl-examples/blob/master/certgen/csr_example.c>:
 

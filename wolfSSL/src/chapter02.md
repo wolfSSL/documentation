@@ -1232,7 +1232,7 @@ Enables debugging output when using ASN.1 templates. Only relevant when used wit
 
 #### WOLFSSL_DEBUG_CERTS
 
-Enables debug logging for certificate processing operations including parsing, validation, and chain building. It is turned on automatically with [`DEBUG_WOLFSSL`](#debug_wolfssl) unless `WOLFSSL_NO_DEBUG_CERTS` is defined.
+Enables debug logging for certificate processing operations including parsing, validation, and chain building. It is turned on automatically with [`DEBUG_WOLFSSL`](#debug_wolfssl) unless `WOLFSSL_NO_DEBUG_CERTS` is defined. When it is defined without `DEBUG_WOLFSSL`, the certificate messages are off at run time until `wolfSSL_CertDebugging_ON()` is called, or `WOLFSSL_CERT_LOG_ENABLED_DEFAULT` is defined to 1.
 
 #### WOLFSSL_ASN_TEMPLATE_TYPE_CHECK
 
