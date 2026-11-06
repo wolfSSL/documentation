@@ -2,7 +2,7 @@ site_name: wolfSSL Manual
 site_url: https://wolfssl.com/
 docs_dir: build/html/
 site_dir: html/
-copyright: Copyright © 2025 wolfSSL Inc.
+copyright: Copyright © 2026 wolfSSL Inc.
 nav:
     - "1. Introduction": index.md
     - "2. Building wolfSSL": chapter02.md
@@ -42,11 +42,15 @@ nav:
       - "Logging": group__Logging.md
       - "Math API": group__Math.md
       - "Random Number Generation": group__Random.md
+      - "Entropy Source - wolfEntropy (MemUse)": group__wolfEntropy.md
       - "Signature API": group__Signature.md
+      - "STM32 Hardware Crypto Port": group__STM32.md
+      - "Time-Stamp Protocol (RFC 3161)": group__TSP.md
       - "wolfCrypt Init and Cleanup": group__wolfCrypt.md
       - "Algorithms - 3DES": group__DES.md
       - "Algorithms - AES": group__AES.md
       - "Algorithms - ARC4": group__ARC4.md
+      - "Algorithms - Argon2": group__ARGON2.md
       - "Algorithms - BLAKE2": group__BLAKE2.md
       - "Algorithms - Camellia": group__Camellia.md
       - "Algorithms - ChaCha": group__ChaCha.md
@@ -69,7 +73,10 @@ nav:
         - "Setup SAKKE Key": group__SAKKE__Setup.md
         - "Operations on/with SAKKE RSK": group__SAKKE__RSK.md
         - "Operations using SAKKE Key": group__SAKKE__Operations.md
+      - "Algorithms - Falcon": group__Falcon.md
+      - "Algorithms - FrodoKEM": group__FRODO__KEM.md
       - "Algorithms - HMAC": group__HMAC.md
+      - "Algorithms - HPKE (RFC 9180)": group__HPKE.md
       - "Algorithms - LMS / HSS (RFC 8554)": group__LMS.md
       - "Algorithms - MD2": group__MD2.md
       - "Algorithms - MD4": group__MD4.md
@@ -95,6 +102,7 @@ nav:
     - "C. API Header Files":
       - aes_8h.md
       - arc4_8h.md
+      - argon2_8h.md
       - ascon_8h.md
       - asn_8h.md
       - asn__public_8h.md
@@ -120,8 +128,10 @@ nav:
       - ed448_8h.md
       - error-crypt_8h.md
       - evp_8h.md
+      - falcon_8h.md
       - hash_8h.md
       - hmac_8h.md
+      - hpke_8h.md
       - iotsafe_8h.md
       - kdf_8h.md
       - logging_8h.md
@@ -141,6 +151,8 @@ nav:
       - quic_8h.md
       - random_8h.md
       - ripemd_8h.md
+      - rng__bank_8h.md
+      - rng__noisesrc_8h.md
       - rsa_8h.md
       - sakke_8h.md
       - sha256_8h.md
@@ -151,9 +163,13 @@ nav:
       - siphash_8h.md
       - srp_8h.md
       - ssl_8h.md
+      - stm32_8h.md
       - tfm_8h.md
+      - tsp_8h.md
       - types_8h.md
       - wc__encrypt_8h.md
+      - wc__frodokem_8h.md
+      - wc__keystore_8h.md
       - wc__lms_8h.md
       - wc__mldsa_8h.md
       - wc__mlkem_8h.md
@@ -161,6 +177,7 @@ nav:
       - wc__she_8h.md
       - wc__slhdsa_8h.md
       - wc__xmss_8h.md
+      - wolfentropy_8h.md
       - wolfio_8h.md
     - "D. SSL/TLS Overview": appendix04.md
     - "E. RFCs, Specifications, and Reference": appendix05.md

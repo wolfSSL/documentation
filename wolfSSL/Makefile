@@ -32,10 +32,20 @@ APPENDIX= appendix01.md \
 		  appendix10.md \
 		  appendix11.md
 
+# API reference pages that only the English Doxygen input (header_files)
+# generates. header_files-ja does not document these yet, so the Japanese PDF
+# leaves them out (see the cat commands in pdf-prep).
+API_EN_ONLY_PAGES = group__ARGON2.md group__Falcon.md group__FRODO__KEM.md \
+	group__HPKE.md group__STM32.md group__TSP.md group__wolfEntropy.md \
+	argon2_8h.md falcon_8h.md hpke_8h.md rng__bank_8h.md rng__noisesrc_8h.md \
+	stm32_8h.md tsp_8h.md wc__frodokem_8h.md wc__keystore_8h.md \
+	wolfentropy_8h.md
+
 ifeq ($(DOC_LANG),JA)
     PDF  = wolfSSL-Manual-jp.pdf
 	HEADER_FILES = header_files-ja
 	DOXYFILE = Doxyfile-ja
+    PDF_API_SKIP = $(addprefix build/pdf/,$(API_EN_ONLY_PAGES))
 else
     PDF  = wolfSSL-Manual.pdf
 	HEADER_FILES = header_files
@@ -66,9 +76,10 @@ html-prep: api
 	$(Q)cp -a api/md/group* build/html/
 	$(Q)cp -a api/md/*8h* build/html/
 	$(Q)rm -f build/html/appendix01.md build/html/appendix02.md build/html/appendix03.md
-	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
+	$(Q)perl -i -pe "s/md\#(?:function|typedef|variable)-\K([^)]*)(?=\))/\$$1=~s#-#_#gr/ge" build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/\/group_/group_/g" build/html/group* build/html/*8h*
 	$(Q)perl -i -pe 's#\]\(/#](#g' build/html/group* build/html/*8h*
+	$(Q)perl -i -pe 's#(_8h\.md)\#file-[^)]*#$$1#g' build/html/group* build/html/*8h*
 	$(Q)perl -i -pe "s/dox_comments\/$(HEADER_FILES)\///" build/html/*8h*
 
 # Set input format to gfm to fix issues with converted API docs
@@ -86,25 +97,27 @@ html-prep: api
 # NOTE: The `cat` commands below assemble the wolfSSL (A), wolfCrypt (B), and
 # API Header File (C) references for the PDF from hardcoded lists. They mirror
 # the API Reference nav sections in mkdocs.yml (which drive the HTML build); the
-# PDF build does not read that nav. Keep both locations in sync.
+# PDF build does not read that nav. Keep both locations in sync. Pages listed in
+# API_EN_ONLY_PAGES are filtered out of the Japanese build.
 .PHONY: pdf-prep
 pdf-prep: api
 	$(Q)cp src/*.png build/pdf/
 	$(Q)cp -a api/md/group* build/pdf/
 	$(Q)cp -a api/md/*8h* build/pdf/
 	$(Q)perl -i -pe "s/^(#+ )/#\$$1/g" build/pdf/group* build/pdf/*8h*
-	$(Q)perl -i -pe "s/(?<=md\#function\-)(.*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/group* build/pdf/*8h*
+	$(Q)perl -i -pe "s/md\#(?:function|typedef|variable)-\K([^)]*)(?=\))/\$$1=~s#-#_#gr/ge" build/pdf/group* build/pdf/*8h*
+	$(Q)perl -i -pe 's#/([A-Za-z0-9_-]+)_8h\.md\#file-[^)]*#"\#".($$1=~s/__/_/gr).".h"#ge' build/pdf/group* build/pdf/*8h*
 	$(Q)perl -i -pe "s/\/group_.*?\.md//g" build/pdf/group* build/pdf/*8h*
-	$(Q)perl -i -pe "s/\/(ssl|wolfio|cryptocb|types|hash)_8h.md//g" build/pdf/group* build/pdf/*8h*
+	$(Q)perl -i -pe "s/\/[A-Za-z0-9_-]+_8h\.md//g" build/pdf/group* build/pdf/*8h*
 	$(Q)perl -i -pe "s/^-(-)+$$//" build/pdf/group* build/pdf/*8h*
 	$(Q)perl -i -pe "s/^title:.*//" build/pdf/group* build/pdf/*8h*
 	$(Q)perl -i -pe "s/^Updated on.*//" build/pdf/group* build/pdf/*8h*
 	$(Q)perl -i -pe "s/dox_comments\/$(HEADER_FILES)\///" build/pdf/*8h*
 	$(Q)perl -i -pe "s/^\\\\//" build/pdf/group* build/pdf/*8h*
 	$(Q)perl -i -pe "s/\\\\par/par/g" build/pdf/group* build/pdf/*8h*
-	$(Q)perl -i -pe "s/group__.*?\.md//g" build/pdf/*8h* build/pdf/chapter*
-	$(Q)perl -i -pe "s/(ssl|wolfio|cryptocb|types|hash)_8h.md//g" build/pdf/chapter*
+	$(Q)perl -i -pe "s/group__.*?\.md//g" build/pdf/*8h* build/pdf/chapter* build/pdf/appendix*
+	$(Q)perl -i -pe "s/[A-Za-z0-9_-]+_8h\.md//g" build/pdf/chapter* build/pdf/appendix*
 	$(Q)cat build/pdf/group__CertManager.md build/pdf/group__Memory.md build/pdf/group__openSSL.md build/pdf/group__CertsKeys.md build/pdf/group__IO.md build/pdf/group__Setup.md build/pdf/group__Debug.md build/pdf/group__TLS.md >> build/pdf/appendix01.md
-	$(Q)cat build/pdf/group__ASN.md build/pdf/group__Base__Encoding.md build/pdf/group__Compression.md build/pdf/group__Error.md build/pdf/group__IoTSafe.md build/pdf/group__Logging.md build/pdf/group__Math.md build/pdf/group__Random.md build/pdf/group__Signature.md build/pdf/group__wolfCrypt.md build/pdf/group__DES.md build/pdf/group__AES.md build/pdf/group__ARC4.md build/pdf/group__BLAKE2.md build/pdf/group__Camellia.md build/pdf/group__ChaCha.md build/pdf/group__ChaCha20Poly1305.md build/pdf/group__CMAC.md build/pdf/group__Crypto.md build/pdf/group__Curve25519.md build/pdf/group__Curve448.md build/pdf/group__DSA.md build/pdf/group__Diffie-Hellman.md build/pdf/group__ECC.md build/pdf/group__ED25519.md build/pdf/group__ED448.md build/pdf/group__ECCSI__Overview.md build/pdf/group__ECCSI__Setup.md build/pdf/group__ECCSI__Operations.md build/pdf/group__SAKKE__Overview.md build/pdf/group__SAKKE__Setup.md build/pdf/group__SAKKE__RSK.md build/pdf/group__SAKKE__Operations.md build/pdf/group__HMAC.md build/pdf/group__LMS.md build/pdf/group__MD2.md build/pdf/group__MD4.md build/pdf/group__MD5.md build/pdf/group__ML__DSA.md build/pdf/group__ML__KEM.md build/pdf/group__Password.md build/pdf/group__PKCS7.md build/pdf/group__PKCS11.md build/pdf/group__PKCS12.md build/pdf/group__Poly1305.md build/pdf/group__PSA.md build/pdf/group__PUF.md build/pdf/group__RIPEMD.md build/pdf/group__RSA.md build/pdf/group__SHA.md build/pdf/group__SHE.md build/pdf/group__SipHash.md build/pdf/group__SLH__DSA.md build/pdf/group__SrtpKdf.md build/pdf/group__SRP.md build/pdf/group__XMSS.md >> build/pdf/appendix02.md
-	$(Q)cat build/pdf/aes_8h.md build/pdf/arc4_8h.md build/pdf/ascon_8h.md build/pdf/asn_8h.md build/pdf/asn__public_8h.md build/pdf/blake2_8h.md build/pdf/bn_8h.md build/pdf/camellia_8h.md build/pdf/chacha20__poly1305_8h.md build/pdf/chacha_8h.md build/pdf/cmac_8h.md build/pdf/coding_8h.md build/pdf/compress_8h.md build/pdf/cryptocb_8h.md build/pdf/curve25519_8h.md build/pdf/curve448_8h.md build/pdf/des3_8h.md build/pdf/dh_8h.md build/pdf/doxygen__groups_8h.md build/pdf/doxygen__pages_8h.md build/pdf/dsa_8h.md build/pdf/ecc_8h.md build/pdf/eccsi_8h.md build/pdf/ed25519_8h.md build/pdf/ed448_8h.md build/pdf/error-crypt_8h.md build/pdf/evp_8h.md build/pdf/hash_8h.md build/pdf/hmac_8h.md build/pdf/iotsafe_8h.md build/pdf/kdf_8h.md build/pdf/logging_8h.md build/pdf/md2_8h.md build/pdf/md4_8h.md build/pdf/md5_8h.md build/pdf/memory_8h.md build/pdf/ocsp_8h.md build/pdf/pem_8h.md build/pdf/pkcs11_8h.md build/pdf/pkcs12_8h.md build/pdf/pkcs7_8h.md build/pdf/poly1305_8h.md build/pdf/psa_8h.md build/pdf/puf_8h.md build/pdf/pwdbased_8h.md build/pdf/quic_8h.md build/pdf/random_8h.md build/pdf/ripemd_8h.md build/pdf/rsa_8h.md build/pdf/sakke_8h.md build/pdf/sha256_8h.md build/pdf/sha3_8h.md build/pdf/sha512_8h.md build/pdf/sha_8h.md build/pdf/signature_8h.md build/pdf/siphash_8h.md build/pdf/srp_8h.md build/pdf/ssl_8h.md build/pdf/tfm_8h.md build/pdf/types_8h.md build/pdf/wc__encrypt_8h.md build/pdf/wc__lms_8h.md build/pdf/wc__mldsa_8h.md build/pdf/wc__mlkem_8h.md build/pdf/wc__port_8h.md build/pdf/wc__she_8h.md build/pdf/wc__slhdsa_8h.md build/pdf/wc__xmss_8h.md build/pdf/wolfio_8h.md >> build/pdf/appendix03.md
+	$(Q)cat $(filter-out $(PDF_API_SKIP),build/pdf/group__ASN.md build/pdf/group__Base__Encoding.md build/pdf/group__Compression.md build/pdf/group__Error.md build/pdf/group__IoTSafe.md build/pdf/group__Logging.md build/pdf/group__Math.md build/pdf/group__Random.md build/pdf/group__wolfEntropy.md build/pdf/group__Signature.md build/pdf/group__STM32.md build/pdf/group__TSP.md build/pdf/group__wolfCrypt.md build/pdf/group__DES.md build/pdf/group__AES.md build/pdf/group__ARC4.md build/pdf/group__ARGON2.md build/pdf/group__BLAKE2.md build/pdf/group__Camellia.md build/pdf/group__ChaCha.md build/pdf/group__ChaCha20Poly1305.md build/pdf/group__CMAC.md build/pdf/group__Crypto.md build/pdf/group__Curve25519.md build/pdf/group__Curve448.md build/pdf/group__DSA.md build/pdf/group__Diffie-Hellman.md build/pdf/group__ECC.md build/pdf/group__ED25519.md build/pdf/group__ED448.md build/pdf/group__ECCSI__Overview.md build/pdf/group__ECCSI__Setup.md build/pdf/group__ECCSI__Operations.md build/pdf/group__SAKKE__Overview.md build/pdf/group__SAKKE__Setup.md build/pdf/group__SAKKE__RSK.md build/pdf/group__SAKKE__Operations.md build/pdf/group__Falcon.md build/pdf/group__FRODO__KEM.md build/pdf/group__HMAC.md build/pdf/group__HPKE.md build/pdf/group__LMS.md build/pdf/group__MD2.md build/pdf/group__MD4.md build/pdf/group__MD5.md build/pdf/group__ML__DSA.md build/pdf/group__ML__KEM.md build/pdf/group__Password.md build/pdf/group__PKCS7.md build/pdf/group__PKCS11.md build/pdf/group__PKCS12.md build/pdf/group__Poly1305.md build/pdf/group__PSA.md build/pdf/group__PUF.md build/pdf/group__RIPEMD.md build/pdf/group__RSA.md build/pdf/group__SHA.md build/pdf/group__SHE.md build/pdf/group__SipHash.md build/pdf/group__SLH__DSA.md build/pdf/group__SrtpKdf.md build/pdf/group__SRP.md build/pdf/group__XMSS.md) >> build/pdf/appendix02.md
+	$(Q)cat $(filter-out $(PDF_API_SKIP),build/pdf/aes_8h.md build/pdf/arc4_8h.md build/pdf/argon2_8h.md build/pdf/ascon_8h.md build/pdf/asn_8h.md build/pdf/asn__public_8h.md build/pdf/blake2_8h.md build/pdf/bn_8h.md build/pdf/camellia_8h.md build/pdf/chacha20__poly1305_8h.md build/pdf/chacha_8h.md build/pdf/cmac_8h.md build/pdf/coding_8h.md build/pdf/compress_8h.md build/pdf/cryptocb_8h.md build/pdf/curve25519_8h.md build/pdf/curve448_8h.md build/pdf/des3_8h.md build/pdf/dh_8h.md build/pdf/doxygen__groups_8h.md build/pdf/doxygen__pages_8h.md build/pdf/dsa_8h.md build/pdf/ecc_8h.md build/pdf/eccsi_8h.md build/pdf/ed25519_8h.md build/pdf/ed448_8h.md build/pdf/error-crypt_8h.md build/pdf/evp_8h.md build/pdf/falcon_8h.md build/pdf/hash_8h.md build/pdf/hmac_8h.md build/pdf/hpke_8h.md build/pdf/iotsafe_8h.md build/pdf/kdf_8h.md build/pdf/logging_8h.md build/pdf/md2_8h.md build/pdf/md4_8h.md build/pdf/md5_8h.md build/pdf/memory_8h.md build/pdf/ocsp_8h.md build/pdf/pem_8h.md build/pdf/pkcs11_8h.md build/pdf/pkcs12_8h.md build/pdf/pkcs7_8h.md build/pdf/poly1305_8h.md build/pdf/psa_8h.md build/pdf/puf_8h.md build/pdf/pwdbased_8h.md build/pdf/quic_8h.md build/pdf/random_8h.md build/pdf/ripemd_8h.md build/pdf/rng__bank_8h.md build/pdf/rng__noisesrc_8h.md build/pdf/rsa_8h.md build/pdf/sakke_8h.md build/pdf/sha256_8h.md build/pdf/sha3_8h.md build/pdf/sha512_8h.md build/pdf/sha_8h.md build/pdf/signature_8h.md build/pdf/siphash_8h.md build/pdf/srp_8h.md build/pdf/ssl_8h.md build/pdf/stm32_8h.md build/pdf/tfm_8h.md build/pdf/tsp_8h.md build/pdf/types_8h.md build/pdf/wc__encrypt_8h.md build/pdf/wc__frodokem_8h.md build/pdf/wc__keystore_8h.md build/pdf/wc__lms_8h.md build/pdf/wc__mldsa_8h.md build/pdf/wc__mlkem_8h.md build/pdf/wc__port_8h.md build/pdf/wc__she_8h.md build/pdf/wc__slhdsa_8h.md build/pdf/wc__xmss_8h.md build/pdf/wolfentropy_8h.md build/pdf/wolfio_8h.md) >> build/pdf/appendix03.md
 
