@@ -10,8 +10,10 @@ You can find the PDF version of this document [here](https://www.wolfssl.com/doc
 
 There are many reasons to choose wolfSSL as your embedded SSL solution. Some of
 the top reasons include size (typical footprint sizes range from 20-100 kB), support for
-the newest standards (SSL 3.0, TLS 1.0, TLS 1.1, TLS 1.2, TLS 1.3, DTLS 1.0, DTLS 1.2,
-and DTLS 1.3), current and progressive cipher support (including stream ciphers), multi-
-platform, royalty free, and an OpenSSL compatibility API to ease porting into existing
-applications which have previously used the OpenSSL package. For a complete feature
+current standards (TLS 1.2, TLS 1.3, DTLS 1.2 and DTLS 1.3, with the legacy SSL 3.0,
+TLS 1.0, TLS 1.1 and DTLS 1.0 available as build options), current and progressive
+cipher support (including stream ciphers and post-quantum algorithms such as ML-KEM,
+which is enabled by default), multi-platform, royalty free, and an OpenSSL compatibility
+API to ease porting into existing applications which have previously used the OpenSSL
+package. For a complete feature
 list, see [Features Overview](chapter04.md#features-overview).

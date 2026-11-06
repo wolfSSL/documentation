@@ -36,5 +36,6 @@ jobs:
           #   Incomming     - verbatim lwIP echoserver example output
           #   psuedo        - verbatim wolfSSH client --help output
           #   fpr           - assembly instruction reference
-          ignore_words_list: TE,Thi,inter-operability,regist,Writen,Challener,cant,mot,callin,Incomming,psuedo,fpr
+          #   sme           - Arm Scalable Matrix Extension (--enable-frodokem-sme)
+          ignore_words_list: TE,Thi,inter-operability,regist,Writen,Challener,cant,mot,callin,Incomming,psuedo,fpr,sme
           skip: '.git'
