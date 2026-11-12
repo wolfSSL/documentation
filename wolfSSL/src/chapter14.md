@@ -2,9 +2,9 @@
 
 ## Open Source
 
-wolfSSL, wolfCrypt, wolfMQTT, wolfTPM, wolfBoot, and wolfSentry are free software downloads and may be modified to the needs of the user as long as the user adheres to version three of the GPL License. The GPLv3 license can be found on the gnu.org website <https://www.gnu.org/licenses/gpl.html>.
+wolfSSL, wolfCrypt, wolfSSH, wolfMQTT, wolfTPM, wolfBoot, and wolfSentry are free software downloads and may be modified to the needs of the user as long as the user adheres to version three of the GPL License. The GPLv3 license can be found on the gnu.org website <https://www.gnu.org/licenses/gpl.html>.
 
-wolfSSH software is a free software download and may be modified to the needs of the user as long as the user adheres to version three of the GPL license. The GPLv3 license can be found on the gnu.org website (<https://www.gnu.org/licenses/gpl.html>).
+When wolfSSL is combined with certain listed projects (for example MariaDB, OpenVPN, Fetchmail, or U-Boot from Cisco Systems), it may instead be used under version two of the GPL. The full list is in the `LICENSING` file in the wolfSSL source.
 
 ## Commercial Licensing
 
@@ -12,7 +12,7 @@ Businesses and enterprises who wish to incorporate wolfSSL products into proprie
 
 Commercial licenses are also available for wolfMQTT, wolfSSH, wolfTPM, wolfBoot, and wolfSentry. Please contact [licensing@wolfssl.com](mailto:licensing@wolfssl.com) with inquiries.
 
-## FIPS 140-2/3 Validation
+## FIPS 140-3 Validation
 
 wolfSSL is currently the leader in embedded FIPS certificates. For details on currently-active FIPS certificates and validation options, please see the [wolfCrypt FIPS FAQ](https://www.wolfssl.com/license/fips/) or contact [fips@wolfssl.com](mailto:fips@wolfssl.com).
 

@@ -4,13 +4,13 @@
 
 wolfSSL (formerly CyaSSL) provides an OpenSSL compatibility header, `wolfssl/openssl/ssl.h`, in addition to the wolfSSL native API, to ease the transition into using wolfSSL or to aid in porting an existing OpenSSL application over to wolfSSL.  For an overview of the OpenSSL Compatibility Layer, please continue reading below.  To view the complete set of OpenSSL functions supported by wolfSSL, please see the `wolfssl/openssl/ssl.h` file.
 
-The OpenSSL Compatibility Layer maps a subset of the most commonly-used OpenSSL commands to wolfSSL’s native API functions.  This should allow for an easy replacement of OpenSSL by wolfSSL in your application or project without changing much code.
+The OpenSSL Compatibility Layer maps a subset of the most commonly-used OpenSSL commands to wolfSSL's native API functions.  This should allow for an easy replacement of OpenSSL by wolfSSL in your application or project without changing much code.
 
-Our test beds for OpenSSL compatibility are stunnel and Lighttpd, which means that we build both of them with wolfSSL as a way to test our OpenSSL compatibility API.
+wolfSSL's OpenSSL compatibility layer is tested by building many open source projects against it, for example stunnel, lighttpd, nginx, HAProxy, curl and OpenSSH (see the [wolfSSL OSP repository](https://github.com/wolfSSL/osp)).
 
 Building wolfSSL With Compatibility Layer:
 
-1. Enable with ([`--enable-opensslextra`](chapter02.md#--enable-opensslextra)) or by defining the macro `OPENSSL_EXTRA`.
+1. Enable with ([`--enable-opensslextra`](chapter02.md#--enable-opensslextra)) or by defining the macro `OPENSSL_EXTRA`. Use [`--enable-opensslall`](chapter02.md#--enable-opensslall) (`OPENSSL_ALL`) for the full compatibility API surface.
 
     ```sh
     ./configure --enable-opensslextra
@@ -23,16 +23,16 @@ Building wolfSSL With Compatibility Layer:
 
 ## Differences Between wolfSSL and OpenSSL
 
-Many people are curious how wolfSSL compares to OpenSSL and what benefits there are to using an SSL/TLS library that has been optimized to run on embedded platforms.  Obviously, OpenSSL is free and presents no initial costs to begin using, but we believe that wolfSSL will provide you with more flexibility, an easier integration of SSL/TLS into your existing platform, current standards support, and much more – all provided under a very easy-to-use license model.
+Many people are curious how wolfSSL compares to OpenSSL and what benefits there are to using an SSL/TLS library that has been optimized to run on embedded platforms.  Obviously, OpenSSL is free and presents no initial costs to begin using, but we believe that wolfSSL will provide you with more flexibility, an easier integration of SSL/TLS into your existing platform, current standards support, and much more - all provided under a very easy-to-use license model.
 
 The points below outline several of the main differences between wolfSSL and OpenSSL.
 
-1. With a 20-100 kB build size, wolfSSL is up to 20 times smaller than OpenSSL.  wolfSSL is a better choice for resource constrained environments – where every byte matters.
-2. wolfSSL is up to date with the most current standards of TLS 1.3 with DTLS.  The wolfSSL team is dedicated to continually keeping wolfSSL up-to-date with current standards.
+1. With a 20-100 kB build size, wolfSSL is up to 20 times smaller than OpenSSL.  wolfSSL is a better choice for resource constrained environments - where every byte matters.
+2. wolfSSL is up to date with the most current standards, TLS 1.3 and DTLS 1.3.  The wolfSSL team is dedicated to continually keeping wolfSSL up-to-date with current standards.
 3. wolfSSL offers the best current ciphers and standards available today, including ciphers for streaming media support.  In addition, with wolfCrypt's native implementations of ML-KEM, ML-DSA, SLH-DSA, Falcon, LMS and XMSS, deploying post-quantum cryptography is something you can do today.
-4. wolfSSL is dual licensed under both the GPLv3 as well as a commercial license, where OpenSSL is available only under their unique license from multiple sources.
+4. wolfSSL is dual licensed under both the GPLv3 as well as a commercial license, where OpenSSL (3.0 and later) is available under the Apache License 2.0.
 5. wolfSSL is backed by an outstanding company who cares about its users and about their security, and is always willing to help. The team actively works to improve and expand wolfSSL.  The wolfSSL team is based primarily out of Bozeman, MT, Portland, OR, and Seattle, WA, along with other team members located around the globe.
-6. wolfSSL is the leading SSL/TLS library for real time, mobile, and embedded systems by virtue of its breadth of platform support and successful implementations on embedded environments.  Chances are we’ve already been ported to your environment.  If not, let us know and we’ll be glad to help.
+6. wolfSSL is the leading SSL/TLS library for real time, mobile, and embedded systems by virtue of its breadth of platform support and successful implementations on embedded environments.  Chances are we've already been ported to your environment.  If not, let us know and we'll be glad to help.
 7. wolfSSL offers several abstraction layers to make integrating SSL into your environment and platform as easy as possible.  With an OS layer, a custom I/O layer, and a C Standard Library abstraction layer, integration has never been so easy.
 8. wolfSSL offers several support packages for wolfSSL.  Available directly through phone, email or the wolfSSL product support forums, your questions are answered quickly and accurately to help you make progress on your project as quickly as possible.
 
@@ -47,28 +47,28 @@ The points below outline several of the main differences between wolfSSL and Ope
 The three structures shown above are usually initialized in the following way:
 
 ```c
-SSL_METHOD* method = SSLv3_client_method();
+SSL_METHOD* method = TLS_client_method();
 SSL_CTX* ctx = SSL_CTX_new(method);
 SSL* ssl = SSL_new(ctx);
 ```
 
-This establishes a client side SSL version 3 method, creates a context based on the method, and initializes the SSL session with the context. A server side program is no different except that the `SSL_METHOD` is created using `SSLv3_server_method()`, or one of the available functions.  For a list of supported functions, please see the [Protocol Support](chapter04.md#protocol-support) section.  When using the OpenSSL Compatibility layer, the functions in this section should be modified by removing the “wolf” prefix.  For example, the native wolfSSL API function:
+This establishes a client side method that negotiates the highest supported TLS version, creates a context based on the method, and initializes the SSL session with the context. A server side program is no different except that the `SSL_METHOD` is created using `TLS_server_method()`, or one of the available functions.  For a list of supported functions, please see the [Protocol Support](chapter04.md#protocol-support) section.  When using the OpenSSL Compatibility layer, the functions in this section should be modified by removing the "wolf" prefix.  For example, the native wolfSSL API function:
 
 ```c
-wolfTLSv1_client_method()
+wolfTLSv1_2_client_method()
 ```
 
 Becomes:
 
 ```c
-TLSv1_client_method()
+TLSv1_2_client_method()
 ```
 
 When an SSL connection is no longer needed the following calls free the structures created during initialization.
 
 ```c
-SSL_CTX_free(ctx);
 SSL_free(ssl);
+SSL_CTX_free(ctx);
 ```
 
 `SSL_CTX_free()` has the additional responsibility of freeing the associated `SSL_METHOD`. Failing to use the `XXX_free()` functions will result in a resource leak. Using the system's `free()` instead of the SSL ones results in undefined behavior.
@@ -84,23 +84,25 @@ Before the `SSL_connect()` can be issued, the user must supply wolfSSL with a va
 
 ```c
 int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-sockaddr_in servaddr;
+struct sockaddr_in servaddr;
 memset(&servaddr, 0, sizeof(servaddr));
 servaddr.sin_family = AF_INET;
 servaddr.sin_port = htons(11111);
 servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-connect(sockfd, (const sockaddr*)&servaddr, sizeof(servaddr));
+connect(sockfd, (const struct sockaddr*)&servaddr, sizeof(servaddr));
 ```
 
-Once a connection is established, the client may read and write to the server. Instead of using the TCP functions `send()` and `receive()`, wolfSSL and yaSSL use the SSL functions `SSL_write()` and `SSL_read()`. Here is a simple example from the client demo:
+Once a connection is established, the client may read and write to the server. Instead of using the TCP functions `send()` and `recv()`, wolfSSL uses the SSL functions `SSL_write()` and `SSL_read()`. Here is a simple example from the client demo:
 
 ```c
 char msg[] = "hello wolfssl!";
 int wrote = SSL_write(ssl, msg, sizeof(msg));
 char reply[1024];
-int read = SSL_read(ssl, reply, sizeof(reply));
-reply[read] = 0;
-printf("Server response: %s\n", reply);
+int ret = SSL_read(ssl, reply, sizeof(reply) - 1);
+if (ret > 0) {
+    reply[ret] = 0;
+    printf("Server response: %s\n", reply);
+}
 ```
 
 The server connects in the same way, except that it uses `SSL_accept()` instead of `SSL_connect()`, analogous to the TCP API. See the server example for a complete server demo program.
@@ -112,9 +114,9 @@ Both the server and client can provide wolfSSL with certificates in either **PEM
 Typical usage is like this:
 
 ```c
-SSL_CTX_use_certificate_file(ctx, "certs/cert.pem",
+SSL_CTX_use_certificate_file(ctx, "certs/server-cert.pem",
 SSL_FILETYPE_PEM);
-SSL_CTX_use_PrivateKey_file(ctx, "certs/key.der",
+SSL_CTX_use_PrivateKey_file(ctx, "certs/server-key.der",
 SSL_FILETYPE_ASN1);
 ```
 

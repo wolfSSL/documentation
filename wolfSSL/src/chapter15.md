@@ -4,23 +4,28 @@
 
 For general product support, wolfSSL (formerly CyaSSL) maintains an online forum for the wolfSSL product family. Please post to the forums or contact wolfSSL directly with any questions.
 
-* wolfSSL (yaSSL) Forums: <https://www.wolfssl.com/forums>
+* wolfSSL Forums: <https://www.wolfssl.com/forums>
 
 * Email Support: [support@wolfssl.com](mailto:support@wolfssl.com)
 
 For information regarding wolfSSL products, questions regarding licensing, or general comments, please contact wolfSSL by emailing [facts@wolfssl.com](mailto:facts@wolfssl.com).  For support packages, please see [Licensing](chapter14.md#licensing).
 
-### Bugs Reports and Support Issues
+### Bug Reports and Support Issues
 
-If you are submitting a bug report or asking about a problem, please include the following information with your submission:
+Bugs that are not security vulnerabilities can also be reported as GitHub issues at <https://github.com/wolfssl/wolfssl/issues>. If you are submitting a bug report or asking about a problem, please include the following information with your submission:
 
 1. wolfSSL version number
 2. Operating System version
 3. Compiler version
-4. The exact error you are seeing
-5. A description of how we can reproduce or try to replicate this problem
+4. The configure options or `user_settings.h` used to build wolfSSL
+5. The exact error you are seeing
+6. A description of how we can reproduce or try to replicate this problem
 
 With the above information, we will do our best to resolve your problems. Without this information, it is very hard to pinpoint the source of the problem. wolfSSL values your feedback and makes it a top priority to get back to you as soon as possible.
+
+### Reporting Security Vulnerabilities
+
+GitHub issues are publicly viewable and are not appropriate for vulnerability reports, so please keep a vulnerability private until a fix has been released. Send the report to [support@wolfssl.com](mailto:support@wolfssl.com) using the vulnerability report template, `SECURITY-REPORT-TEMPLATE.md`, from the wolfSSL source. It may also be sent to [secure@wolfssl.com](mailto:secure@wolfssl.com), encrypted with the wolfSSL PGP key given in `.github/SECURITY.md`. Use of the template, with every required field completed, is mandatory for CVE consideration. The full process, including what is and is not treated as a vulnerability and how disclosure is coordinated, is described in `SECURITY-POLICY.md` in the wolfSSL source. Published advisories are listed at <https://www.wolfssl.com/docs/security-vulnerabilities/>.
 
 ## Consulting
 

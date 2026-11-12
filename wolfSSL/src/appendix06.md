@@ -2,23 +2,34 @@
 
 ## wolfSSL Error Codes
 
-wolfSSL (formerly CyaSSL) error codes can be found in `wolfssl/ssl.h`.  For detailed descriptions of the following errors, see the OpenSSL man page for `SSL_get_error` (`man SSL_get_error`).
+wolfSSL (formerly CyaSSL) error codes can be found in `wolfssl/ssl.h`. These are the values returned by [`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error), and they match the OpenSSL values of the same name. For detailed descriptions of the following errors, see the OpenSSL man page for `SSL_get_error` (`man SSL_get_error`). The `SSL_ERROR_*` names are aliases for the `WOLFSSL_ERROR_*` names (they are not defined when `NO_OLD_SSL_NAMES` is set).
 
 | Error Code Enum | Error Code | Error Description |
 | --------------- | ---------- | ----------------- |
-| `SSL_ERROR_WANT_READ` | 2 | |
-| `SSL_ERROR_WANT_WRITE` | 3 | |
-| `SSL_ERROR_WANT_CONNECT` | 7 | |
-| `SSL_ERROR_WANT_ACCEPT` | 8 | |
-| `SSL_ERROR_SYSCALL` | 5 | |
-| `SSL_ERROR_WANT_X509_LOOKUP` | 83 | |
-| `SSL_ERROR_ZERO_RETURN` | 6 | |
-| `SSL_ERROR_SSL` | 85 | |
+| `WOLFSSL_ERROR_NONE` (`SSL_ERROR_NONE`) | 0 | No error |
+| `WOLFSSL_ERROR_SSL` (`SSL_ERROR_SSL`) | 1 | Defined for OpenSSL compatibility; not currently returned by wolfSSL |
+| `WOLFSSL_ERROR_WANT_READ` (`SSL_ERROR_WANT_READ`) | 2 | Operation did not complete; call this API again |
+| `WOLFSSL_ERROR_WANT_WRITE` (`SSL_ERROR_WANT_WRITE`) | 3 | Operation did not complete; call this API again |
+| `WOLFSSL_ERROR_WANT_X509_LOOKUP` (`SSL_ERROR_WANT_X509_LOOKUP`) | 4 | Operation did not complete; callback needs this API to be called again |
+| `WOLFSSL_ERROR_SYSCALL` (`SSL_ERROR_SYSCALL`) | 5 | Some sort of system I/O error happened |
+| `WOLFSSL_ERROR_ZERO_RETURN` (`SSL_ERROR_ZERO_RETURN`) | 6 | The connection has been closed with a closure alert |
+| `WOLFSSL_ERROR_WANT_CONNECT` (`SSL_ERROR_WANT_CONNECT`) | 7 | Underlying protocol connection not started yet, call this API again |
+| `WOLFSSL_ERROR_WANT_ACCEPT` (`SSL_ERROR_WANT_ACCEPT`) | 8 | Underlying protocol connection not started yet, call this API again |
 
-Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
+`wolfSSL_get_error()` reports the internal codes `WANT_READ`, `WANT_WRITE` and `ZERO_RETURN` as `SSL_ERROR_WANT_READ`, `SSL_ERROR_WANT_WRITE` and `SSL_ERROR_ZERO_RETURN`. In `OPENSSL_EXTRA` builds it also reports `MATCH_SUITE_ERROR` and `SOCKET_PEER_CLOSED_E` as `SSL_ERROR_SYSCALL` (5), and with `WOLFSSL_ASYNC_CRYPT` it reports `MP_WOULDBLOCK` as `WC_PENDING_E`. For any other failure it returns one of the negative wolfSSL or wolfCrypt error codes listed below. [`wolfSSL_ERR_error_string()`](group__Debug.md#function-wolfssl_err_error_string) returns a text description for any wolfSSL or wolfCrypt error code.
+
+Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`. The native TLS error codes use the range -301 (`WOLFSSL_FIRST_E`) to -525 (`WOLFSSL_LAST_E`). The header also defines `WOLFSSL_FATAL_ERROR` (-1) and negative counterparts (-2 to -8) of the `WOLFSSL_ERROR_*` values.
 
 | Error Code Enum | Error Code | Error Description |
 | --------------- | ---------- | ----------------- |
+| `WOLFSSL_FATAL_ERROR` | -1 | Generic fatal error. Most APIs (for example `wolfSSL_connect()` and `wolfSSL_read()`) return this on failure; call `wolfSSL_get_error()` for the reason |
+| `WOLFSSL_ERROR_WANT_READ_E` | -2 | Negative counterpart of `WOLFSSL_ERROR_WANT_READ` |
+| `WOLFSSL_ERROR_WANT_WRITE_E` | -3 | Negative counterpart of `WOLFSSL_ERROR_WANT_WRITE` |
+| `WOLFSSL_ERROR_WANT_X509_LOOKUP_E` | -4 | Negative counterpart of `WOLFSSL_ERROR_WANT_X509_LOOKUP` |
+| `WOLFSSL_ERROR_SYSCALL_E` | -5 | Negative counterpart of `WOLFSSL_ERROR_SYSCALL` |
+| `WOLFSSL_ERROR_ZERO_RETURN_E` | -6 | Negative counterpart of `WOLFSSL_ERROR_ZERO_RETURN` |
+| `WOLFSSL_ERROR_WANT_CONNECT_E` | -7 | Negative counterpart of `WOLFSSL_ERROR_WANT_CONNECT` |
+| `WOLFSSL_ERROR_WANT_ACCEPT_E` | -8 | Negative counterpart of `WOLFSSL_ERROR_WANT_ACCEPT` |
 | `INPUT_CASE_ERROR` | -301 | process input state error |
 | `PREFIX_ERROR` | -302 | bad index to key rounds |
 | `MEMORY_ERROR` | -303 | out of memory |
@@ -31,7 +42,7 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `INCOMPLETE_DATA` | -310 | don't have enough data to complete task |
 | `UNKNOWN_RECORD_TYPE` | -311 | unknown type in record hdr |
 | `DECRYPT_ERROR` | -312 | error during decryption |
-| `FATAL_ERROR` | -313 | revcd alert fatal error |
+| `FATAL_ERROR` | -313 | recvd alert fatal error |
 | `ENCRYPT_ERROR` | -314 | error during encryption |
 | `FREAD_ERROR` | -315 | fread problem |
 | `NO_PEER_KEY` | -316 | need peer's key |
@@ -43,6 +54,7 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `DOMAIN_NAME_MISMATCH` | -322 | peer subject name mismatch |
 | `WANT_READ` | -323 | want read, call again |
 | `NOT_READY_ERROR` | -324 | handshake layer not ready |
+| `IPADDR_MISMATCH` | -325 | peer ip address mismatch |
 | `VERSION_ERROR` | -326 | record layer version error |
 | `WANT_WRITE` | -327 | want write, call again |
 | `BUFFER_ERROR` | -328 | malformed buffer input |
@@ -51,12 +63,14 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `CLIENT_ID_ERROR` | -331 | psk client identity error |
 | `SERVER_HINT_ERROR` | -332 | psk server hint error |
 | `PSK_KEY_ERROR` | -333 | psk key error |
+| `DUPE_ENTRY_E` | -334 | duplicate entry error |
+| `PSK_MISSING_ERROR` | -335 | psk missing |
 | `GETTIME_ERROR` | -337 | gettimeofday failed ??? |
 | `GETITIMER_ERROR` | -338 | getitimer failed ??? |
 | `SIGACT_ERROR` | -339 | sigaction failed ??? |
 | `SETITIMER_ERROR` | -340 | setitimer failed ??? |
 | `LENGTH_ERROR` | -341 | record layer length error |
-| `PEER_KEY_ERROR` | -342 | cant decode peer key |
+| `PEER_KEY_ERROR` | -342 | can't decode peer key |
 | `ZERO_RETURN` | -343 | peer sent close notify |
 | `SIDE_ERROR` | -344 | wrong client/server type |
 | `NO_PEER_CERT` | -345 | peer didn't send key |
@@ -66,7 +80,7 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `ECC_MAKEKEY_ERROR` | -353 | Bad Make ECC Key |
 | `ECC_EXPORT_ERROR` | -354 | Bad ECC Export Key |
 | `ECC_SHARED_ERROR` | -355 | Bad ECC Shared Secret |
-| `NOT_CA_ERROR` | -357 | Not CA cert error |
+| `NOT_CA_ERROR` | -357 | Not a CA cert error |
 | `BAD_CERT_MANAGER_ERROR` | -359 | Bad Cert Manager |
 | `OCSP_CERT_REVOKED` | -360 | OCSP Certificate revoked |
 | `CRL_CERT_REVOKED` | -361 | CRL Certificate revoked |
@@ -74,20 +88,21 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `MONITOR_SETUP_E` | -363 | CRL Monitor setup error |
 | `THREAD_CREATE_E` | -364 | Thread Create Error |
 | `OCSP_NEED_URL` | -365 | OCSP need an URL for lookup |
-| `OCSP_CERT_UNKNOWN` | -366 | OCSP responder doesn’t know |
+| `OCSP_CERT_UNKNOWN` | -366 | OCSP responder doesn't know |
 | `OCSP_LOOKUP_FAIL` | -367 | OCSP lookup not successful |
 | `MAX_CHAIN_ERROR` | -368 | max chain depth exceeded |
 | `COOKIE_ERROR` | -369 | dtls cookie error |
 | `SEQUENCE_ERROR` | -370 | dtls sequence error |
 | `SUITES_ERROR` | -371 | suites pointer error |
+| `MAX_CERT_EXTENSIONS_ERR` | -372 | max cert extension exceeded |
 | `OUT_OF_ORDER_E` | -373 | out of order message |
 | `BAD_KEA_TYPE_E` | -374 | bad KEA type found |
 | `SANITY_CIPHER_E` | -375 | sanity check on cipher error |
-| `RECV_OVERFLOW_E` | -376 | RXCB returned more than rqed |
+| `RECV_OVERFLOW_E` | -376 | RXCB returned more than read |
 | `GEN_COOKIE_E` | -377 | Generate Cookie Error |
 | `NO_PEER_VERIFY` | -378 | Need peer cert verify Error |
 | `FWRITE_ERROR` | -379 | fwrite problem |
-| `CACHE_MATCH_ERROR` | -380 | cache hrd match error |
+| `CACHE_MATCH_ERROR` | -380 | Cache hdr match error |
 | `UNKNOWN_SNI_HOST_NAME_E` | -381 | Unrecognized host name Error |
 | `UNKNOWN_MAX_FRAG_LEN_E` | -382 | Unrecognized max frag len Error |
 | `KEYUSE_SIGNATURE_E` | -383 | KeyUse digSignature error |
@@ -101,10 +116,10 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `SESSION_SECRET_CB_E` | -392 | Session secret CB fcn failure |
 | `NO_CHANGE_CIPHER_E` | -393 | Finished before change cipher |
 | `SANITY_MSG_E` | -394 | Sanity check on msg order error |
-| `DUPLICATE_MST_E` | -395 | Duplicate message error |
+| `DUPLICATE_MSG_E` | -395 | Duplicate message error |
 | `SNI_UNSUPPORTED` | -396 | SSL 3.0 does not support SNI |
 | `SOCKET_PEER_CLOSED_E` | -397 | Underlying transport closed |
-| `BAD_TICKET_KEY_CB_SZ` | -398 |  Bad session ticket key cb size |
+| `BAD_TICKET_KEY_CB_SZ` | -398 | Bad session ticket key cb size |
 | `BAD_TICKET_MSG_SZ` | -399 | Bad session ticket msg size |
 | `BAD_TICKET_ENCRYPT` | -400 | Bad user ticket encrypt |
 | `DH_KEY_SIZE_E` | -401 | DH key too small |
@@ -114,18 +129,18 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `UNKNOWN_ALPN_PROTOCOL_NAME_E` | -405 | Unrecognized protocol name error |
 | `BAD_CERTIFICATE_STATUS_ERROR` | -406 | Bad certificate status message |
 | `OCSP_INVALID_STATUS` | -407 | Invalid OCSP status |
-| `OCSP_WANT_READ` | -408 | OCSP callback response |
+| `OCSP_WANT_READ` | -408 | OCSP I/O callback returned `WOLFSSL_CBIO_ERR_WANT_READ`, call again |
 | `RSA_KEY_SIZE_E` | -409 | RSA key too small |
 | `ECC_KEY_SIZE_E` | -410 | ECC key too small |
 | `DTLS_EXPORT_VER_E` | -411 | Export version error |
 | `INPUT_SIZE_E` | -412 | Input size too big error |
 | `CTX_INIT_MUTEX_E` | -413 | Initialize ctx mutex error |
-| `EXT_MASTER_SECRET_NEEDED_E` | -414 | Need EMS enabled to resume |
+| `EXT_MASTER_SECRET_NEEDED_E` | -414 | EMS required but not negotiated |
 | `DTLS_POOL_SZ_E` | -415 | Exceeded DTLS pool size |
 | `DECODE_E` | -416 | Decode handshake message error |
 | `HTTP_TIMEOUT` | -417 | HTTP timeout for OCSP or CRL req |
-| `WRITE_DUP_READ_E` | -418 | Write dup write side can’t read |
-| `WRITE_DUP_WRITE_E` | -419 | Write dup read side can’t write |
+| `WRITE_DUP_READ_E` | -418 | Write dup write side can't read |
+| `WRITE_DUP_WRITE_E` | -419 | Write dup read side can't write |
 | `INVALID_CERT_CTX_E` | -420 | TLS cert ctx not matching |
 | `BAD_KEY_SHARE_DATA` | -421 | Key share data invalid |
 | `MISSING_HANDSHAKE_DATA` | -422 | Handshake message missing data |
@@ -141,32 +156,109 @@ Additional wolfSSL error codes can be found in `wolfssl/error-ssl.h`
 | `DH_PARAMS_NOT_FFDHE_E` | -432 | DH params from server not FFDHE |
 | `TCA_INVALID_ID_TYPE` | -433 | TLSX TCA ID type invalid |
 | `TCA_ABSENT_ERROR` | -434 | TLSX TCA ID no response |
-| `TOO_MUCH_EARLY_DATA` | -442 | Too much early data, the AEAD key usage limit was hit before the handshake finished |
-| `OCSP_NO_URL` | -522 | The certificate does not advertise an OCSP responder URL |
+| `TSIP_MAC_DIGSZ_E` | -435 | Invalid MAC size for TSIP |
+| `CLIENT_CERT_CB_ERROR` | -436 | Client cert callback error |
+| `SSL_SHUTDOWN_ALREADY_DONE_E` | -437 | Shutdown called redundantly |
+| `TLS13_SECRET_CB_E` | -438 | TLS1.3 secret Cb fcn failure |
+| `DTLS_SIZE_ERROR` | -439 | Trying to send too much data |
+| `NO_CERT_ERROR` | -440 | TLS1.3 - no cert set error |
+| `APP_DATA_READY` | -441 | Application data ready for read |
+| `TOO_MUCH_EARLY_DATA` | -442 | Too much early data: more than max_early_data_size was sent or received, or the AEAD key usage limit was reached while sending early data |
+| `SOCKET_FILTERED_E` | -443 | Session stopped by network filter |
+| `HTTP_RECV_ERR` | -444 | HTTP Receive error |
+| `HTTP_HEADER_ERR` | -445 | HTTP Header error |
+| `HTTP_PROTO_ERR` | -446 | HTTP Protocol error |
+| `HTTP_STATUS_ERR` | -447 | HTTP Status error |
+| `HTTP_VERSION_ERR` | -448 | HTTP Version error |
+| `HTTP_APPSTR_ERR` | -449 | HTTP Application string error |
+| `UNSUPPORTED_PROTO_VERSION` | -450 | bad/unsupported protocol version |
+| `FALCON_KEY_SIZE_E` | -451 | Wrong key size for Falcon |
+| `QUIC_TP_MISSING_E` | -452 | QUIC transport parameter missing |
+| `MLDSA_KEY_SIZE_E` | -453 | Wrong key size for ML-DSA (legacy alias `DILITHIUM_KEY_SIZE_E`) |
+| `DTLS_CID_ERROR` | -454 | Wrong or missing CID |
+| `DTLS_TOO_MANY_FRAGMENTS_E` | -455 | Received too many fragments |
+| `DTLS_PARTIAL_RECORD_READ` | -455 | Received a partial record in a datagram (shares the value -455 with `DTLS_TOO_MANY_FRAGMENTS_E`) |
+| `QUIC_WRONG_ENC_LEVEL` | -456 | QUIC data received on wrong encryption level |
+| `DUPLICATE_TLS_EXT_E` | -457 | Duplicate TLS extension in msg |
+| `WOLFSSL_ALPN_NOT_FOUND` | -458 | TLS extension not found |
+| `WOLFSSL_BAD_CERTTYPE` | -459 | Certificate type not supported |
+| `WOLFSSL_BAD_STAT` | -460 | not used |
+| `WOLFSSL_BAD_PATH` | -461 | No certificates found at designated path |
+| `WOLFSSL_BAD_FILETYPE` | -462 | Data format not supported |
+| `WOLFSSL_BAD_FILE` | -463 | Input/output error on file |
+| `WOLFSSL_NOT_IMPLEMENTED` | -464 | Function not implemented |
+| `WOLFSSL_UNKNOWN` | -465 | Unknown algorithm (EVP) |
 
-Negotiation Parameter Errors
+### Negotiation Parameter Errors
 
 | Error Code Enum | Error Code | Error Description |
 | --------------- | ---------- | ----------------- |
 | `UNSUPPORTED_SUITE` | -500 | Unsupported cipher suite |
-| `MATCH_SUITE_ERROR` | -501 | Can’t match cipher suite |
+| `MATCH_SUITE_ERROR` | -501 | Can't match cipher suite |
 | `COMPRESSION_ERROR` | -502 | Compression mismatch |
 | `KEY_SHARE_ERROR` | -503 | Key share mismatch |
-| `POST_HAND_AUTH_ERROR` | -504 | Client won’t do post-hand auth |
+| `POST_HAND_AUTH_ERROR` | -504 | Client won't do post-hand auth |
 | `HRR_COOKIE_ERROR` | -505 | HRR msg cookie mismatch |
+| `UNSUPPORTED_CERTIFICATE` | -506 | unsupported certificate type |
 
-## wolfCrypt Error Codes
-
-wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error.h`.
+### PEM, EVP and Other TLS Errors
 
 | Error Code Enum | Error Code | Error Description |
 | --------------- | ---------- | ----------------- |
+| `WOLFSSL_PEM_R_NO_START_LINE_E` | -507 | No more matching objects found (PEM) |
+| `WOLFSSL_PEM_R_PROBLEMS_GETTING_PASSWORD_E` | -508 | Error getting password (PEM) |
+| `WOLFSSL_PEM_R_BAD_PASSWORD_READ_E` | -509 | Bad password (PEM) |
+| `WOLFSSL_PEM_R_BAD_DECRYPT_E` | -510 | Decryption failed (PEM) |
+| `WOLFSSL_ASN1_R_HEADER_TOO_LONG_E` | -511 | ASN header too long (compat) |
+| `WOLFSSL_EVP_R_BAD_DECRYPT_E` | -512 | Decryption failed (EVP) |
+| `WOLFSSL_EVP_R_BN_DECODE_ERROR` | -513 | Bignum decode error (EVP) |
+| `WOLFSSL_EVP_R_DECODE_ERROR` | -514 | Decode error (EVP) |
+| `WOLFSSL_EVP_R_PRIVATE_KEY_DECODE_ERROR` | -515 | Private key decode error (EVP) |
+| `CRYPTO_POLICY_FORBIDDEN` | -516 | operation forbidden by system crypto-policy |
+| `SESSION_TICKET_NONCE_OVERFLOW` | -517 | Session ticket nonce overflow |
+| `EMPTY_RECORD_LIMIT_E` | -518 | Too many empty records received |
+| `ECH_REQUIRED_E` | -519 | ECH offered but rejected by server |
+| `SEQUENCE_NUMBER_E` | -520 | Record sequence number would wrap |
+| `RPK_UNTRUSTED_E` | -521 | RFC 7250 Raw Public Key not trusted out of band |
+| `OCSP_NO_URL` | -522 | Cert advertises no OCSP responder and no override URL is set |
+| `CHAIN_VERIFY_WANT_E` | -523 | Chain verify callback has not reached a verdict yet |
+| `CHAIN_VERIFY_CB_E` | -524 | Chain verify callback rejected the peer's certificates |
+| `CHAIN_VERIFY_UNSUPPORTED_E` | -525 | Chain verify callback used with DTLS, RPK or OCSP stapling |
+
+### I/O Callback Return Codes
+
+The I/O callbacks (the built-in socket callbacks, or your own callbacks registered with `wolfSSL_CTX_SetIORecv()` and `wolfSSL_CTX_SetIOSend()`) return the number of bytes received or sent, or one of the following codes (`enum IOerrors` in `wolfssl/error-ssl.h`). wolfSSL converts them into the error codes above; for example, `WOLFSSL_CBIO_ERR_WANT_READ` returned by the receive callback becomes `WANT_READ`.
+
+| Error Code Enum | Error Code | Error Description |
+| --------------- | ---------- | ----------------- |
+| `WOLFSSL_CBIO_ERR_GENERAL` | -1 | general unexpected err |
+| `WOLFSSL_CBIO_ERR_WANT_READ` | -2 | need to call read again |
+| `WOLFSSL_CBIO_ERR_WANT_WRITE` | -2 | need to call write again |
+| `WOLFSSL_CBIO_ERR_CONN_RST` | -3 | connection reset |
+| `WOLFSSL_CBIO_ERR_ISR` | -4 | interrupt |
+| `WOLFSSL_CBIO_ERR_CONN_CLOSE` | -5 | connection closed or epipe |
+| `WOLFSSL_CBIO_ERR_TIMEOUT` | -6 | socket timeout |
+
+## wolfCrypt Error Codes
+
+wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error-crypt.h`. They use two ranges: -97 (`WC_SPAN1_FIRST_E`) to -300 (`WC_SPAN1_MIN_CODE_E`), and -1000 (`WC_SPAN2_FIRST_E`) to -1999 (`WC_SPAN2_MIN_CODE_E`). `MAX_CODE_E` (-96) and `MIN_CODE_E` (-1999) mark the outer limits of the wolfCrypt codes, and `WC_LAST_E` (-1042) is the last code currently allocated. `WC_FAILURE` (-1) is a generic failure code outside these ranges. [`wc_GetErrorString()`](group__Error.md#function-wc_geterrorstring) returns a text description for a wolfCrypt error code.
+
+| Error Code Enum | Error Code | Error Description |
+| --------------- | ---------- | ----------------- |
+| `WC_FAILURE` | -1 | wolfCrypt generic failure |
+| `MP_MEM` | -97 | MP dynamic memory allocation failed |
+| `MP_VAL` | -98 | MP value passed is not able to be used |
+| `MP_WOULDBLOCK` | -99 | MP non-blocking operation is returning after partial completion |
+| `MP_NOT_INF` | -100 | MP point not at infinity |
 | `OPEN_RAN_E` | -101 | opening random device error |
 | `READ_RAN_E` | -102 | reading random device error |
 | `WINCRYPT_E` | -103 | windows crypt init error |
 | `CRYPTGEN_E` | -104 | windows crypt generation error |
 | `RAN_BLOCK_E` | -105 | reading random device would block |
 | `BAD_MUTEX_E` | -106 | Bad mutex operation |
+| `WC_TIMEOUT_E` | -107 | timeout error |
+| `WC_PENDING_E` | -108 | wolfCrypt operation pending (would block) |
+| `WC_NO_PENDING_E` | -109 | no asynchronous operation pending |
 | `MP_INIT_E` | -110 | mp_init error state |
 | `MP_READ_E` | -111 | mp_read error state |
 | `MP_EXPTMOD_E` | -112 | mp_exptmod error state |
@@ -179,7 +271,14 @@ wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error.h`.
 | `MP_INVMOD_E` | -119 | mp_invmod error state, can't inv mod |
 | `MP_CMP_E` | -120 | mp_cmp error state |
 | `MP_ZERO_E` | -121 | got a mp zero result, not expected |
+| `AES_EAX_AUTH_E` | -122 | AES-EAX Authentication check failure |
+| `KEY_EXHAUSTED_E` | -123 | No longer usable for operation |
+| `ML_KEM_KAT_FIPS_E` | -124 | ML-KEM KAT failure |
 | `MEMORY_E` | -125 | out of memory error |
+| `VAR_STATE_CHANGE_E` | -126 | var state modified by different thread |
+| `FIPS_DEGRADED_E` | -127 | FIPS Module in degraded mode |
+| `FIPS_CODE_SZ_E` | -128 | Module CODE too big |
+| `FIPS_DATA_SZ_E` | -129 | Module DATA too big |
 | `RSA_WRONG_TYPE_E` | -130 | RSA wrong block type for RSA function |
 | `RSA_BUFFER_E` | -131 | RSA buffer error, output too small or input too large |
 | `BUFFER_E` | -132 | output buffer too small or input too large |
@@ -209,7 +308,17 @@ wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error.h`.
 | `ASN_SIG_HASH_E` | -156 | ASN sig error, unsupported hash type |
 | `ASN_SIG_KEY_E` | -157 | ASN sig error, unsupported key type |
 | `ASN_DH_KEY_E` | -158 | ASN key init error, invalid input |
+| `KDF_SRTP_KAT_FIPS_E` | -159 | SRTP-KDF Known Answer Test Failure |
 | `ASN_CRIT_EXT_E` | -160 | ASN unsupported critical extension |
+| `ASN_ALT_NAME_E` | -161 | ASN alternate name error |
+| `ASN_NO_PEM_HEADER` | -162 | ASN no PEM header found |
+| `ED25519_KAT_FIPS_E` | -163 | Ed25519 Known answer test failure |
+| `ED448_KAT_FIPS_E` | -164 | Ed448 Known answer test failure |
+| `PBKDF2_KAT_FIPS_E` | -165 | PBKDF2 Known answer test failure |
+| `WC_KEY_MISMATCH_E` | -166 | Error for private/public key mismatch |
+| `ML_DSA_KAT_FIPS_E` | -167 | ML-DSA KAT failure |
+| `LMS_KAT_FIPS_E` | -168 | LMS KAT failure |
+| `XMSS_KAT_FIPS_E` | -169 | XMSS KAT failure |
 | `ECC_BAD_ARG_E` | -170 | ECC input argument of wrong type |
 | `ASN_ECC_KEY_E` | -171 | ASN ECC bad input |
 | `ECC_CURVE_OID_E` | -172 | Unsupported ECC OID curve type |
@@ -218,19 +327,21 @@ wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error.h`.
 | `UNICODE_SIZE_E` | -175 | Unicode password too big |
 | `NO_PASSWORD` | -176 | no password provided by user |
 | `ALT_NAME_E` | -177 | alt name size problem, too big |
+| `BAD_OCSP_RESPONDER` | -178 | Invalid OCSP Responder, missing specific key usage extensions |
+| `CRL_CERT_DATE_ERR` | -179 | CRL date error |
 | `AES_GCM_AUTH_E` | -180 | AES-GCM Authentication check failure |
 | `AES_CCM_AUTH_E` | -181 | AES-CCM Authentication check failure |
-| `CAVIUM_INIT_E` | -182 | Cavium Init type error |
+| `ASYNC_INIT_E` | -182 | Async Init type error |
 | `COMPRESS_INIT_E` | -183 | Compress init error |
 | `COMPRESS_E` | -184 | Compress error |
 | `DECOMPRESS_INIT_E` | -185 | DeCompress init error |
 | `DECOMPRESS_E` | -186 | DeCompress error |
 | `BAD_ALIGN_E` | -187 | Bad alignment for operation, no alloc |
 | `ASN_NO_SIGNER_E` | -188 | ASN sig error, no CA signer to verify certificate |
-| `ASN_CRL_CONFIRM_E` | -189 | ASN CRL no signer to confirm failure |
+| `ASN_CRL_CONFIRM_E` | -189 | ASN CRL signature confirm failure |
 | `ASN_CRL_NO_SIGNER_E` | -190 | ASN CRL no signer to confirm failure |
 | `ASN_OCSP_CONFIRM_E` | -191 | ASN OCSP signature confirm failure |
-| `BAD_ENC_STATE_E` | -192 | Bad ecc enc state operation |
+| `BAD_STATE_E` | -192 | Bad state operation |
 | `BAD_PADDING_E` | -193 | Bad padding, msg not correct length |
 | `REQ_ATTRIBUTE_E` | -194 | Setting cert request attributes error |
 | `PKCS7_OID_E` | -195 | PKCS#7, mismatched OID error |
@@ -255,11 +366,12 @@ wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error.h`.
 | `IS_POINT_E` | -214 | ECC is point on curve failed |
 | `ECC_INF_E` | -215 | ECC point infinity error |
 | `ECC_PRIV_KEY_E` | -216 | ECC private key not valid error |
-| `SRP_CALL_ORDER_E` | -217 | SRP function called in the wrong order |
-| `SRP_VERIFY_E` | -218 | SRP proof verification failed |
-| `SRP_BAD_KEY_E` | -219 | SRP bad ephemeral values |
-| `ASN_NO_SKID` | -220 | ASN no Subject Key Identifier found |
-| `ASN_NO_AKID` | -221 | ASN no Authority Key Identifier found |
+| `ECC_OUT_OF_RANGE_E` | -217 | ECC key component out of range |
+| `SRP_CALL_ORDER_E` | -218 | SRP function called in the wrong order |
+| `SRP_VERIFY_E` | -219 | SRP proof verification failed |
+| `SRP_BAD_KEY_E` | -220 | SRP bad ephemeral values |
+| `ASN_NO_SKID` | -221 | ASN no Subject Key Identifier found |
+| `ASN_NO_AKID` | -222 | ASN no Authority Key Identifier found |
 | `ASN_NO_KEYUSAGE` | -223 | ASN no Key Usage found |
 | `SKID_E` | -224 | Setting Subject Key Identifier error |
 | `AKID_E` | -225 | Setting Authority Key Identifier error |
@@ -267,9 +379,10 @@ wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error.h`.
 | `CERTPOLICIES_E` | -227 | Setting Certificate Policies error |
 | `WC_INIT_E` | -228 | wolfCrypt failed to initialize |
 | `SIG_VERIFY_E` | -229 | wolfCrypt signature verify error |
-| `BAD_PKCS7_SIGNEEDS_CHECKCOND_E` | -230 | Bad condition variable operation |
+| `BAD_COND_E` | -230 | Bad condition variable operation |
 | `SIG_TYPE_E` | -231 | Signature Type not enabled/available |
 | `HASH_TYPE_E` | -232 | Hash Type not enabled/available |
+| `FIPS_INVALID_VER_E` | -233 | Invalid FIPS Version defined |
 | `WC_KEY_SIZE_E` | -234 | Key size error, either too small or large |
 | `ASN_COUNTRY_SIZE_E` | -235 | ASN Cert Gen, invalid country code size |
 | `MISSING_RNG_E` | -236 | RNG required but not provided |
@@ -299,7 +412,7 @@ wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error.h`.
 | `AES_GCM_OVERFLOW_E` | -260 | AES-GCM invocation counter overflow |
 | `AES_CCM_OVERFLOW_E` | -261 | AES-CCM invocation counter overflow |
 | `RSA_KEY_PAIR_E` | -262 | RSA Key Pair-Wise consistency check fail |
-| `DH_CHECK_PRIVE_E` | -263 | DH check private key error |
+| `DH_CHECK_PRIV_E` | -263 | DH Check Priv Key error |
 | `WC_AFALG_SOCK_E` | -264 | AF_ALG socket error |
 | `WC_DEVCRYPTO_E` | -265 | /dev/crypto error |
 | `ZLIB_INIT_ERROR` | -266 | Zlib init error |
@@ -309,13 +422,81 @@ wolfCrypt error codes can be found in `wolfssl/wolfcrypt/error.h`.
 | `WC_PKCS7_WANT_READ_E` | -270 | PKCS7 stream operation wants more input |
 | `CRYPTOCB_UNAVAILABLE` | -271 | Crypto callback unavailable |
 | `PKCS7_SIGNEEDS_CHECK` | -272 | Signature needs verified by caller |
+| `PSS_SALTLEN_RECOVER_E` | -273 | PSS salt length not recoverable |
+| `CHACHA_POLY_OVERFLOW` | -274 | ChaCha20Poly1305 limit overflow |
 | `ASN_SELF_SIGNED_E` | -275 | ASN self-signed certificate error |
+| `SAKKE_VERIFY_FAIL_E` | -276 | SAKKE derivation verification error |
+| `MISSING_IV` | -277 | IV was not set |
 | `MISSING_KEY` | -278 | Key was not set |
-| `MIN_CODE_E` | -300 | errors -101 -  -299 |
+| `BAD_LENGTH_E` | -279 | Value of length parameter is invalid |
+| `ECDSA_KAT_FIPS_E` | -280 | ECDSA KAT failure |
+| `RSA_PAT_FIPS_E` | -281 | RSA Pairwise failure |
+| `KDF_TLS12_KAT_FIPS_E` | -282 | TLS12 KDF KAT failure |
+| `KDF_TLS13_KAT_FIPS_E` | -283 | TLS13 KDF KAT failure |
+| `KDF_SSH_KAT_FIPS_E` | -284 | SSH KDF KAT failure |
+| `DHE_PCT_E` | -285 | DHE Pairwise Consistency Test failure |
+| `ECC_PCT_E` | -286 | ECDHE Pairwise Consistency Test failure |
+| `FIPS_PRIVATE_KEY_LOCKED_E` | -287 | Cannot export private key |
+| `PROTOCOLCB_UNAVAILABLE` | -288 | Protocol callback unavailable |
+| `AES_SIV_AUTH_E` | -289 | AES-SIV authentication failed |
+| `NO_VALID_DEVID` | -290 | no valid device ID |
+| `IO_FAILED_E` | -291 | Input/output failure |
+| `SYSLIB_FAILED_E` | -292 | System/library call failed |
+| `USE_HW_PSK` | -293 | Callback return to indicate HW has PSK |
+| `ENTROPY_RT_E` | -294 | Entropy Repetition Test failed |
+| `ENTROPY_APT_E` | -295 | Entropy Adaptive Proportion Test failed |
+| `ASN_DEPTH_E` | -296 | Invalid ASN.1 - depth check |
+| `ASN_LEN_E` | -297 | ASN.1 length invalid |
+| `SM4_GCM_AUTH_E` | -298 | SM4-GCM Authentication check failure |
+| `SM4_CCM_AUTH_E` | -299 | SM4-CCM Authentication check failure |
+
+Error codes in the second range (-1000 to -1999):
+
+| Error Code Enum | Error Code | Error Description |
+| --------------- | ---------- | ----------------- |
+| `DEADLOCK_AVERTED_E` | -1000 | Deadlock averted -- retry the call |
+| `ASCON_AUTH_E` | -1001 | ASCON Authentication check failure |
+| `WC_ACCEL_INHIBIT_E` | -1002 | Crypto acceleration is currently inhibited |
+| `BAD_INDEX_E` | -1003 | Bad index |
+| `INTERRUPTED_E` | -1004 | Process interrupted |
+| `MLKEM_PUB_HASH_E` | -1005 | Encoded public key in decapsulation key does not match stored hash |
+| `BUSY_E` | -1006 | Object is busy |
 | `ALREADY_E` | -1007 | The operation was already done, e.g. registering the same crypto callback device ID twice |
+| `SEQ_OVERFLOW_E` | -1008 | Sequence counter would overflow |
+| `PUF_INIT_E` | -1009 | PUF initialization failed (reserved) |
 | `PUF_READ_E` | -1010 | PUF SRAM readout failed the startup health check |
+| `PUF_ENROLL_E` | -1011 | PUF enrollment failed |
+| `PUF_RECONSTRUCT_E` | -1012 | PUF reconstruction failed |
+| `PUF_DERIVE_KEY_E` | -1013 | PUF key derivation failed |
+| `PUF_IDENTITY_E` | -1014 | PUF identity retrieval failed |
+| `ML_KEM_PCT_E` | -1015 | ML-KEM Pairwise Consistency Test failure |
+| `ML_DSA_PCT_E` | -1016 | ML-DSA Pairwise Consistency Test failure |
+| `DRBG_SHA512_KAT_FIPS_E` | -1017 | SHA-512 DRBG KAT failure |
+| `SLH_DSA_KAT_FIPS_E` | -1018 | SLH-DSA CAST KAT failure |
+| `TSP_VERIFY_E` | -1019 | TSP token invalid or response doesn't match request |
+| `SLH_DSA_PCT_E` | -1020 | SLH-DSA Pairwise Consistency Test failure |
+| `CMAC_KAT_FIPS_E` | -1021 | AES-CMAC KAT failure |
+| `SHAKE_KAT_FIPS_E` | -1022 | SHAKE KAT failure |
+| `DH_PCT_E` | -1023 | DH Pairwise Consistency Test failure (retired in FIPS v7+) |
+| `AES_KW_KAT_FIPS_E` | -1024 | AES Key Wrap KAT failure |
+| `FIPS_WRONG_API_E` | -1025 | Requested API is not allowed in FIPS mode |
+| `KMAC_MIN_KEYLEN_E` | -1026 | FIPS Mode KMAC Minimum Key Length error |
 | `FIPS_BAD_VALUE_E` | -1027 | The value given is not allowed by FIPS policy |
 | `FIPS_UNAPPROVED_E` | -1028 | The operation ran, but the parameters are not FIPS approved |
+| `NO_DEFAULT_FOUND_E` | -1029 | No default object registered for request type |
+| `NOT_READY_E` | -1030 | Resource not yet ready (retry) |
+| `OBJECT_NOT_LOCKED_E` | -1031 | Required lock on object is not held |
+| `WRONG_TYPE_OBJECT_E` | -1032 | Object is wrong type for requested operation |
+| `NEEDS_RECOVERY_E` | -1033 | Object needs recovery before use |
+| `UNEXPECTED_STATE_E` | -1034 | Object has unexpected state |
+| `STILL_REFERENCED_E` | -1035 | Object is still referenced (unsafe to deallocate) |
+| `OBJECT_ORPHANED_E` | -1036 | Object orphaned (can be adopted) |
+| `HWPUF_INIT_E` | -1037 | HWPUF initialization failed |
+| `HWPUF_ENROLL_E` | -1038 | HWPUF enrollment failed |
+| `HWPUF_START_E` | -1039 | HWPUF start failed |
+| `HWPUF_GENERATE_KEY_E` | -1040 | HWPUF generate key failed |
+| `HWPUF_GET_KEY_E` | -1041 | HWPUF get key failed |
+| `HWPUF_ZEROIZE_E` | -1042 | HWPUF zeroize failed |
 
 ## Common Error Codes and their Solution
 
@@ -329,8 +510,8 @@ This error occurs when using a certificate and the signing CA certificate was no
 ./examples/client/client -g -h www.google.com -p 443
 ```
 
-This fails with error -188 because Google’s CA certificate wasn’t loaded with the “`-A`” command line option.
+This fails with error -188 because Google's CA certificate wasn't loaded with the "`-A`" command line option.
 
 ### `WANT_READ` (-323)
 
-The `WANT_READ` error happens often when using non-blocking sockets, and isn’t actually an error when using non-blocking sockets, but it is passed up to the caller as an error. When a call to receive data from the I/O callback would block as there isn’t data currently available to receive, the I/O callback returns `WANT_READ`. The caller should wait and try receiving again later. This is usually seen from calls to [`wolfSSL_read()`](group__IO.md#function-wolfssl_read), [`wolfSSL_negotiate()`](group__IO.md#function-wolfssl_negotiate), [`wolfSSL_accept()`](group__IO.md#function-wolfssl_accept), and [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect). The example client and server will indicate the `WANT_READ` incidents when debugging is enabled.
+The `WANT_READ` error happens often when using non-blocking sockets, and isn't actually an error when using non-blocking sockets, but it is passed up to the caller as an error. When a call to receive data from the I/O callback would block as there isn't data currently available to receive, the I/O callback returns `WOLFSSL_CBIO_ERR_WANT_READ` (-2). wolfSSL records this internally as `WANT_READ` (-323), the API call returns `WOLFSSL_FATAL_ERROR` (-1), and [`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error) returns `SSL_ERROR_WANT_READ` (2). Applications should compare the value returned by `wolfSSL_get_error()` with `SSL_ERROR_WANT_READ` (not with -323), then wait and try receiving again later. This is usually seen from calls to [`wolfSSL_read()`](group__IO.md#function-wolfssl_read), [`wolfSSL_negotiate()`](group__IO.md#function-wolfssl_negotiate), [`wolfSSL_accept()`](group__IO.md#function-wolfssl_accept), and [`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect). The example client and server will indicate the `WANT_READ` incidents when debugging is enabled.
