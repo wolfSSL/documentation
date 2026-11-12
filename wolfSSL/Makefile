@@ -90,6 +90,10 @@ html-prep: api
 # 4. Three regexes to remove metadata which outputs in the PDF text
 # 5. Fix titles of the header files Markdown
 # 6. Two regexes to handle bad Doxygen that didn't convert and the LaTeX processor thinks is LaTeX commands
+# 7. Escape any other backslash followed by a letter in the API text, for
+#    example "\xHH" in a comment (pdf-escape-backslashes.pl; code and existing
+#    Markdown escapes are left alone). pandoc otherwise passes it through as a
+#    raw LaTeX command and xelatex fails with "Undefined control sequence".
 # Cat:
 # A. wolfSSL API Reference
 # B. wolfCrypt API Reference -> Utilities / basic items, then Algorithms
@@ -115,6 +119,7 @@ pdf-prep: api
 	$(Q)perl -i -pe "s/dox_comments\/$(HEADER_FILES)\///" build/pdf/*8h*
 	$(Q)perl -i -pe "s/^\\\\//" build/pdf/group* build/pdf/*8h*
 	$(Q)perl -i -pe "s/\\\\par/par/g" build/pdf/group* build/pdf/*8h*
+	$(Q)perl pdf-escape-backslashes.pl build/pdf/group* build/pdf/*8h*
 	$(Q)perl -i -pe "s/group__.*?\.md//g" build/pdf/*8h* build/pdf/chapter* build/pdf/appendix*
 	$(Q)perl -i -pe "s/[A-Za-z0-9_-]+_8h\.md//g" build/pdf/chapter* build/pdf/appendix*
 	$(Q)cat build/pdf/group__CertManager.md build/pdf/group__Memory.md build/pdf/group__openSSL.md build/pdf/group__CertsKeys.md build/pdf/group__IO.md build/pdf/group__Setup.md build/pdf/group__Debug.md build/pdf/group__TLS.md >> build/pdf/appendix01.md
