@@ -298,7 +298,7 @@ wolfCryptのエラーコードは、`wolfssl/wolfcrypt/error.h`に記載して�
 | `AES_GCM_OVERFLOW_E` | -260 | AES-GCM呼び出しカウンターオーバーフロー |
 | `AES_CCM_OVERFLOW_E` | -261 | AES-CCM呼び出しカウンターオーバーフロー |
 | `RSA_KEY_PAIR_E` | -262 | RSA鍵ペアーワイズ整合性チェック失敗 |
-| `DH_CHECK_PRIVE_E` | -263 | DH秘密鍵チェックエラー |
+| `DH_CHECK_PRIV_E` | -263 | DH秘密鍵チェックエラー |
 | `WC_AFALG_SOCK_E` | -264 | AF_ALGソケットエラー |
 | `WC_DEVCRYPTO_E` | -265 | /dev/cryptoエラー |
 | `ZLIB_INIT_ERROR` | -266 | Zlib初期化エラー |

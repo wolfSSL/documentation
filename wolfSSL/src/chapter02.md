@@ -864,7 +864,7 @@ Enables time-based non-blocking RSA operations. Allows RSA operations to yield a
 
 #### WOLFSSL_MP_INVMOD_CONSTANT_TIME
 
-Declares that the math library's `mp_invmod()` is constant time, so wolfCrypt calls it directly instead of using a side-channel-safe workaround: in RSA key generation `u = q^-1 mod p` is computed with `mp_invmod()` instead of as `q^(p-2) mod p`, and DSA signing skips the extra blinding of the inverse. Only define it when the `mp_invmod()` of the math backend really is constant time.
+Removed after wolfSSL 5.9.4. RSA key generation always computes `u = q^-1 mod p` as `q^(p-2) mod p` and DSA signing always blinds the inverse, so defining this macro has no effect.
 
 #### FP_MAX_BITS
 
@@ -1994,7 +1994,7 @@ Enables debug logging for the OpenSSL compatibility layer functions. Helps trace
 
 #### WOLFSSL_VERBOSE_LOGGING
 
-Lets the highest-volume trace messages (`WOLFSSL_MSG_VERBOSE()`, `WOLFSSL_ENTER_VERBOSE()`, `WOLFSSL_LEAVE_VERBOSE()`) into a `DEBUG_WOLFSSL` build. Traces on this tier can be emitted thousands of times by a single API call, so they are compiled out of a normal debug build, which keeps the debug output volume down by roughly 62%. Defined alone it does nothing; `DEBUG_WOLFSSL` is still required. See [Verbose Logging](chapter08.md#verbose-logging).
+Lets the highest-volume trace messages (`WOLFSSL_MSG_VERBOSE()` and `WOLFSSL_ENTER_VERBOSE()`) into a `DEBUG_WOLFSSL` build. Traces on this tier can be emitted thousands of times by a single API call, so they are compiled out of a normal debug build, which keeps the debug output volume down by roughly 62%. Defined alone it does nothing; `DEBUG_WOLFSSL` is still required. See [Verbose Logging](chapter08.md#verbose-logging).
 
 #### HAVE_BLAKE2B
 
