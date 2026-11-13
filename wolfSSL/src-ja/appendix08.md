@@ -58,12 +58,14 @@
 #define WOLFSSL_SP_ARM64_ASM         /* AArch64 */
 #define WOLFSSL_SP_ARM_CORTEX_M_ASM  /* Cortex-M */
 
-#define WOLFSSL_SP_2048  /* RSA-2048 */
-#define WOLFSSL_SP_3072  /* RSA-3072 */
 #define WOLFSSL_SP_4096  /* RSA-4096 */
-#define WOLFSSL_SP_256   /* ECC P-256 */
 #define WOLFSSL_SP_384   /* ECC P-384 */
 #define WOLFSSL_SP_521   /* ECC P-521 */
+
+/* 不要なデフォルトサイズを除外 */
+/* #define WOLFSSL_SP_NO_2048 */  /* RSA-2048 */
+/* #define WOLFSSL_SP_NO_3072 */  /* RSA-3072 */
+/* #define WOLFSSL_SP_NO_256 */   /* ECC P-256 */
 ```
 
 ## C. マイコン/SoC チップ別ハードウェアアクセラレータ
@@ -74,7 +76,7 @@
 | STM32F2/F4/F7/H7 (CRYP) | AES-ECB/CBC/CTR/GCM | `STM32_CRYPTO` | HAL 自動検出 | port/st/stm32.c |
 | STM32L4/L5/WB55 | AES, SHA（部分） | `STM32_CRYPTO` | HAL 自動検出 | port/st/stm32.c |
 | STM32U5 (DHUK) | 鍵ラップ付き AES | `WOLFSSL_STM32U5_DHUK` | 自動検出 | port/st/stm32.c |
-| STM32MP1/MP13/MP25 | AES, SHA, RSA, ECC | `WOLFSSL_STM32_CRYPT` | 自動検出 | port/st/stm32.c |
+| STM32MP13 (ベアメタル) | AES, SHA, RNG, ECC (PKA) | `WOLFSSL_STM32MP13` (`STM32_CRYPTO`を設定) | user_settings.h | port/st/stm32.c |
 | **NXP** | | | | |
 | i.MX RT (DCP) | AES-ECB/CBC/CTR/GCM, SHA | `WOLFSSL_IMXRT_DCP` | 自動検出 | port/nxp/dcp_port.c |
 | i.MX 6/8 (CAAM) | AES, SHA, RSA, ECC, DH, HMAC | `WOLFSSL_IMX6_CAAM` / `WOLFSSL_SECO_CAAM` | `--enable-caam` | port/caam/* |
@@ -97,7 +99,7 @@
 | MAXQ10XX | AES, SHA, RSA, ECC, RNG | `WOLFSSL_MAXQ10XX_CRYPTO` | `--with-maxq10xx=PART` | port/maxim/maxq10xx.c |
 | **Microchip** | | | | |
 | PIC32MZ | AES, SHA, RNG | `WOLFSSL_PIC32MZ_CRYPT` | 自動検出 | port/pic32/ |
-| ATECC508A / 608A | AES, SHA, ECC (ECDH/ECDSA) | `WOLFSSL_ATECC` | 自動検出 | port/atmel/atmel.c |
+| ATECC508A / 608A | AES, SHA, ECC (ECDH/ECDSA) | `WOLFSSL_ATECC508A` / `WOLFSSL_ATECC608A` | `--enable-microchip=508` / `--enable-microchip=608` | port/atmel/atmel.c |
 | **Xilinx** | | | | |
 | Zynq / Zynq-7000 | AES, SHA, RSA, ECC | `WOLFSSL_XILINX_CRYPT` | `--enable-xilinx` | port/xilinx/xil-*.c |
 | Versal | AES-GCM, SHA-3, RNG | `WOLFSSL_XILINX_CRYPT_VERSAL` | `--enable-xilinx` | port/xilinx/xil-versal-*.c |
@@ -113,7 +115,7 @@
 | Intel QAT（同期） | 同上 | `ENABLED_INTEL_QA_SYNC` | `--with-intelqa-sync=PATH` |
 | Cavium NITROX | AES, RSA, DH, ECC, SHA | `HAVE_CAVIUM` | `--with-cavium=PATH` |
 | Cavium NITROX V | 同上 | `HAVE_CAVIUM_V` | `--with-cavium=PATH` |
-| Cavium Octeon (MIPS) | AES, RSA, ECC, SHA | `HAVE_CAVIUM_OCTEON` | `--with-octeon-sync=PATH` |
+| Cavium Octeon (MIPS) | AES, RSA, ECC, SHA | `HAVE_CAVIUM_OCTEON_SYNC` | `--with-octeon-sync=PATH` |
 | NXP CAAM | AES, SHA, RSA, ECC, HMAC, DH | `WOLFSSL_CAAM` | `--enable-caam` |
 
 ## E. OS カーネル経由ハードウェアオフロード

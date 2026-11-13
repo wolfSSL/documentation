@@ -33,7 +33,7 @@ Two configure options add more detail to the debug output:
 
 ### Verbose Logging
 
-wolfSSL 5.9.4 moved the highest-volume trace messages into a separate tier: `WOLFSSL_MSG_VERBOSE()`, `WOLFSSL_ENTER_VERBOSE()` and `WOLFSSL_LEAVE_VERBOSE()`. These are the container helpers, name entry handling and similar code that a single API call can hit thousands of times. They are compiled out of a normal `DEBUG_WOLFSSL` build, which cuts the volume of debug output considerably (about 62% for the unit test suite). To see them, define `WOLFSSL_VERBOSE_LOGGING` in addition to `DEBUG_WOLFSSL`:
+wolfSSL 5.9.4 moved the highest-volume trace messages into a separate tier: `WOLFSSL_MSG_VERBOSE()` and `WOLFSSL_ENTER_VERBOSE()`. These are the container helpers, name entry handling and similar code that a single API call can hit thousands of times. They are compiled out of a normal `DEBUG_WOLFSSL` build, which cuts the volume of debug output considerably (about 62% for the unit test suite). To see them, define `WOLFSSL_VERBOSE_LOGGING` in addition to `DEBUG_WOLFSSL`:
 
 ```sh
 ./configure --enable-debug CPPFLAGS=-DWOLFSSL_VERBOSE_LOGGING

@@ -345,7 +345,7 @@
 | `--enable-supportedcurves` | `HAVE_SUPPORTED_CURVES` + `HAVE_TLS_EXTENSIONS` | デフォルト有効 |
 | `--enable-aesccm` | `HAVE_AESCCM` | |
 | `--enable-dh` | `HAVE_DH` | |
-| `--enable-psk` | `HAVE_PSK` | |
+| `--enable-psk` | `NO_PSK`を削除 | |
 | `--enable-rsapss` | `WC_RSA_PSS` | TLS 1.3時自動 |
 | `--enable-curve25519` | `HAVE_CURVE25519` | |
 | `--enable-curve448` | `HAVE_CURVE448` | |
@@ -365,4 +365,3 @@
 | `--enable-mlkem` | `WOLFSSL_HAVE_MLKEM` + `HAVE_PQC` | |
 | `--enable-pqc-hybrids` | `WOLFSSL_PQC_HYBRIDS` | mlkem有効時デフォルト有効 |
 | `--enable-mldsa` | `HAVE_DILITHIUM` | |
-| `--enable-staticecdh` | `WOLFSSL_STATIC_ECDH` | PFS無し, 非推奨 |

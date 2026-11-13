@@ -588,11 +588,6 @@ TSIP TLSリンク共通鍵暗号化方式のみを無効します。
 
 **注意**：これはルネサスRX TSIP固有の定義です。
 
-#### NO_WOLFSSL_SHA256
-
-これはTLS 1.3にのみ適用されます。
-SHA2-256をwolfCryptから有効にして使用できるようにしますが、TLS 1.3からは除外します。
-
 #### WOLFSSL_BLIND_PRIVATE_KEY
 
 秘密鍵をブラインドするためのマスクとして使用されます。
@@ -1185,7 +1180,7 @@ SHA3使用のビルドをオンにします。
 詳細は`wolfSSL_CTX_load_system_CA_certs()`を参照してください。
 このプリプロセッサマクロは、`--enable-sys-ca-certs`構成オプションによって自動的に設定されます。
 
-#### WOLFSSL_APPLE_NATIVE_CERT_VERIFICATION
+#### WOLFSSL_APPLE_NATIVE_CERT_VALIDATION
 
 TLSピア証明書を認証する際にAppleのネイティブトラストAPIの使用を有効にします。
 [WOLFSSL_SYS_CA_CERTS](#WOLFSSL_SYS_CA_CERTS)が定義されている必要があります。
@@ -1456,8 +1451,7 @@ NULL暗号のサポートをオンにします。
 
 #### HAVE_LIBOQS
 
-OpenQuantumSafeチームのLiboQS統合のサポートをオンにします。
-詳細は[付録G ポスト量子暗号の実験](appendix07.md)を参照してください。
+wolfSSL 5.9.4で削除されました。ポスト量子アルゴリズムはすべてwolfCryptにネイティブ実装されており、このマクロを定義しても効果はありません。
 
 #### WOLFSSL_SP_4096
 
@@ -1780,11 +1774,6 @@ ECDHEサーバーサイズはデフォルトで256ビットであり、これは
 
 認証に実装される暗号化番号として使用されます。
 これは擬似乱数であり、整合性のみの暗号スイートです。
-
-#### WOLFSSL_USE_POPEN_HOST
-
-wolfio.cソケットオープンコードでホストとポストでソケットを作成するためにpopenを使用します。
-CRLとOCSPで使用されます。
 
 #### CloseSocket
 
@@ -4567,7 +4556,7 @@ SECOで使用する場合 (NXP HSMライブラリを使用)、`ecc_key`構造体
 `ecc_key`構造体の初期化後の関数呼び出しの例は次のようになります。
 
 ```lang-c
-wc_ecc_make_key(&rng, ECC_P256_KEYSIZE, key);
+wc_ecc_make_key(&rng, 32, key); /* 32バイトの鍵サイズ: P-256 */
 wc_ecc_sign_hash(hash, hashSz, sigOut, sigOutSz, &rng, key);
 wc_ecc_verify_hash(sig, sigSz, hash, hashSz, &result, key);
 ```
