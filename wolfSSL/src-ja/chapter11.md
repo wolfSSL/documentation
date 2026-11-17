@@ -9,10 +9,10 @@ wolfSSLの最小ビルドサイズは、選択されたビルドオプション�
 このチュートリアルの目的は、シンプルなアプリケーションへのSSLとTLSの統合を案内することです。
 このチュートリアルを通じて、SSL/TLSについての理解も深まることを期待しています。
 これからechoserverとechoclientという簡単な実装例を使用して、wolfSSLによりできるだけシンプルにアプリケーションにSSL/TLSサポートを追加する手順を示します。
-echoserverとechoclientの実装例は、Richard Stevens、Bill Fenner、Andrew Rudoffによる書籍[UNIXネットワークプログラミング、第1版、第3版](http://www.unpbook.com/)を参考にしています。
+echoserverとechoclientの実装例は、Richard Stevens、Bill Fenner、Andrew Rudoffによる書籍[UNIXネットワークプログラミング、第1巻、第3版](http://www.unpbook.com/)を参考にしています。
 
 このチュートリアルは、読者がGNU GCCコンパイラを使用したCコードの編集とコンパイルに慣れており、公開鍵暗号化の概念に精通していることを前提としています。
-書籍「UNIXネットワークプログラミング」へのアクセスは必要ではありません。
+このチュートリアルを進めるにあたって、書籍「UNIXネットワークプログラミング」へのアクセスは必要ではありません。
 
 ### このチュートリアルで使用される例
 
@@ -24,7 +24,9 @@ echoserverとechoclientの実装例は、Richard Stevens、Bill Fenner、Andrew 
 **TLS**（Transport Layer Security）と**SSL**（Secure Sockets Layer）は、さまざまなトランスポートプロトコル間で安全な通信を可能にする暗号プロトコルです。
 主に使用されるトランスポートプロトコルはTCP/IPです。
 SSL/TLSの最新バージョンはTLS 1.3です。
-wolfSSLはSSL 3.0、TLS 1.0、1.1、1.2、1.3に加えてDTLS 1.0、1.2、1.3をサポートしています。
+wolfSSLはTLS 1.2と1.3、およびDTLS 1.2と1.3をサポートしています（DTLSは[`--enable-dtls`](chapter02.md#--enable-dtls)で有効になり、DTLS 1.3にはさらに[`--enable-dtls13`](chapter02.md#--enable-dtls13)が必要です）。
+非推奨のSSL 3.0、TLS 1.0、TLS 1.1、DTLS 1.0はデフォルトで無効です。
+これらは[`--enable-sslv3`](chapter02.md#--enable-sslv3)、[`--enable-tlsv10`](chapter02.md#--enable-tlsv10)、または[`--enable-oldtls`](chapter02.md#--enable-oldtls)で有効にできます。
 
 SSLとTLSはOSI参照モデルのトランスポート層とアプリケーション層の間に位置し、任意のプロトコル（TCP/IP、Bluetoothなど）が下層のトランスポート媒体として機能します。
 HTTPやFTP、SMTPなどのアプリケーションプロトコルは、SSLの上の層で構成されます。
@@ -32,11 +34,13 @@ SSL/TLSがOSIモデルにどのように適合するかの図と、SSL/TLSハン
 
 ## ソースコードの入手
 
-このチュートリアルで使用されるすべてのソースコードは、wolfSSLのウェブサイトからダウンロードできます。
-このZIPファイルには、このチュートリアルで使用するechoserverとechoclientの両方のオリジナルコードと、完成されたソースコードが含まれています。
+このチュートリアルで使用されるすべてのソースコードは、wolfSSLのウェブサイトの以下の場所からダウンロードできます。
+このダウンロードには、このチュートリアルで使用するechoserverとechoclientの両方のオリジナルコードと、完成されたソースコードが含まれています。
+具体的な内容はリンクの下に示します。
 
 <https://www.wolfssl.com/documentation/ssl-tutorial-2.5.zip>
 
+ダウンロードしたZIPファイルの構成は次のとおりです。
 
 ```text
 /finished_src
@@ -65,13 +69,15 @@ README
 ### echoserver (tcpserv04.c) への修正
 
 * `fork()`関数の呼び出しを削除しました。これは`fork()`がWindowsでサポートされていないためです。その結果、echoserverは同時に1つのクライアントのみを受け入れます。この削除に伴い、シグナル処理も削除しました。
-* `str_echo()`関数を`str_echo.c`ファイルから`tcpserv04.c`ファイルに移動しました
+* `str_echo()`関数を`str_echo.c`ファイルから`tcpserv04.c`ファイルに移動しました。
 * クライアントのアドレスと接続ポートを表示するためにprintf文を追加しました。
-    ```c
+
+    ```text
     printf("Connection from %s, port %d\n",
             inet_ntop(AF_INET, &cliaddr.sin_addr, buff, sizeof(buff)),
             ntohs(cliaddr.sin_port));
     ```
+
 * リスニングソケットの作成後に「Address already in use」バインドエラーを排除するために、`setsockopt()`への呼び出しを追加しました。
 * 新しいコンパイラの警告をクリーンアップするための軽微な調整を行いました。
 
@@ -87,7 +93,7 @@ README
 これらのソースコード例では、特定の関数が大文字になっていることに注意してください。
 例えば、`Fputs()`や`Writen()`などです。
 Unixネットワークプログラミングの著者たちは、エラーチェックを明確に処理するために、通常の関数のためのカスタムラッパー関数を書いています。
-これについての詳細な説明は、_Unixネットワークプログラミング_の**セクション1.4**（11ページ）をご参照ください。
+これについての詳細な説明は、*Unixネットワークプログラミング*の**セクション1.4**（11ページ）をご参照ください。
 
 ## wolfSSLのビルドとインストール
 
@@ -98,14 +104,12 @@ wolfSSLの最新バージョンをwolfSSLの[ダウンロードページ](https:
 
 利用可能なビルドオプションの完全なリストについては、[第2章 wolfSSLのビルド](chapter02.md)をご参照ください。
 wolfSSLは移植性を念頭に置いて書かれており、ほとんどのシステムで簡単にビルドできるはずです。
-wolfSSLのビルドに問題がある場合は、wolfSSLの[製品サポートフォーラム](https://www.wolfssl.com/forums)でサポートを求めるか、[info@wolfssl.jp](mailto:info@wolfssl.jp)までお問い合わせください。。
+wolfSSLのビルドに問題がある場合は、wolfSSLの[製品サポートフォーラム](https://www.wolfssl.com/forums)でサポートを求めるか、[info@wolfssl.jp](mailto:info@wolfssl.jp)までお問い合わせください。
 
 Linux、\*BSD、OS X、Solaris、またはその他の \*nixライクなシステムでwolfSSLをビルドする場合、autoconfシステムを使用できます。
-Windowsでの特定の指示については、wolfSSLマニュアルの[第2章 wolfSSLのビルド](chapter02.md)セクションをご参照ください。
+Windowsでの特定の指示については、wolfSSLマニュアルの[第2章 wolfSSLのビルド](chapter02.md)をご参照ください。
 wolfSSLを設定してビルドするには、ターミナルから次の2つのコマンドを実行します。
-任意のビルドオプションを`./configure`に追加することもできます。
-
-（例：`./configure -–enable-opensslextra`）
+任意のビルドオプションを`./configure`に追加することもできます（例：`./configure --enable-opensslextra`）。
 
 ```sh
 ./configure
@@ -130,14 +134,15 @@ wolfCryptとwolfSSLに対して一連のテストが実行され、正しくイ�
 
 ```text
 ------------------------------------------------------------------------------
- wolfSSL version 5.7.0
+ wolfSSL version 5.9.4
 ------------------------------------------------------------------------------
+macro    test passed!
 error    test passed!
+WCFLAGS  test passed!
 MEMORY   test passed!
+octets   test passed!
 base64   test passed!
 asn      test passed!
-RANDOM   test passed!
-MD5      test passed!
 SHA      test passed!
 SHA-224  test passed!
 SHA-256  test passed!
@@ -146,8 +151,14 @@ SHA-512  test passed!
 SHA-512/224  test passed!
 SHA-512/256  test passed!
 SHA-3    test passed!
+RANDOM   test passed!
+RNGTHRD  test passed!
+RNGSVC   test passed!
+RNGEPOCH test passed!
+RNGLIFE  test passed!
+SHAKE128 test passed!
+SHAKE256 test passed!
 Hash     test passed!
-HMAC-MD5 test passed!
 HMAC-SHA test passed!
 HMAC-SHA224 test passed!
 HMAC-SHA256 test passed!
@@ -164,22 +175,29 @@ ChaCha20-Poly1305 AEAD test passed!
 AES      test passed!
 AES192   test passed!
 AES256   test passed!
+AES-CBC  test passed!
 AES-GCM  test passed!
 RSA      test passed!
 DH       test passed!
 PWDBASED test passed!
 ECC      test passed!
+MLKEM    test passed!
 logging  test passed!
 time     test passed!
 mutex    test passed!
 memcb    test passed!
 Test complete
+listening on port 58396
+connecting to 127.0.0.1:58396
+listening on port 58401
+connecting to 127.0.0.1:58401
+connecting to 127.0.0.1:58401
 
 Running simple test
 SSL version is TLSv1.2
-SSL version is TLSv1.2
 SSL cipher suite is TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 SSL curve name is SECP256R1
+SSL version is TLSv1.2
 SSL cipher suite is TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 SSL curve name is SECP256R1
 Client message: hello wolfssl!
@@ -190,7 +208,7 @@ sending server shutdown command: quit!
 client sent quit command: shutting down!
 ciphers = TLS13-AES128-GCM-SHA256:TLS13-AES256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305-OLD:ECDHE-ECDSA-CHACHA20-POLY1305-OLD:DHE-RSA-CHACHA20-POLY1305-OLD
 33bc1a4570f4f1abccd5c48aace529b01a42ab51293954a297796e90d20970f0  input
-33bc1a4570f4f1abccd5c48aace529b01a42ab51293954a297796e90d20970f0  /var/folders/dy/888x7r7d6dgcqw4840l32tpw0000gp/T//testsuite-output-9Ymbuv
+33bc1a4570f4f1abccd5c48aace529b01a42ab51293954a297796e90d20970f0  /tmp/testsuite-output-07sDcT
 
 All tests passed!
 ```
@@ -226,7 +244,7 @@ gcc -o echoserver ../lib/*.c tcpserv04.c -I ../include
 ローカルホストでechoclientをテストするために、2つ目のターミナルウィンドウを開きます。
 アプリケーションを起動する際にはサーバーのIPアドレスを指定する必要があります。
 今回の場合では、`127.0.0.1`を指定します。
-現在のディレクトリを「echoclient」ディレクトリに変更(`cd`)し、次のコマンドを実行します。
+現在のディレクトリを「echoclient」ディレクトリに変更（`cd`）し、次のコマンドを実行します。
 なお、echoserverはすでに実行されている必要があります。
 
 ```sh
@@ -234,7 +252,7 @@ gcc -o echoserver ../lib/*.c tcpserv04.c -I ../include
 ```
 
 echoserverとechoclientの両方が実行されている場合、echoserverはechoclientから受け取った入力をエコーバックするはずです。
-echoserverまたはechoclientを終了するには、_Ctrl + C_を使用します。
+echoserverまたはechoclientを終了するには、*Ctrl + C*を使用します。
 現在、これらの2つの実装例の間で行き来しているエコーデータは平文で送信されています。
 わずかなスキルさえ持っていれば、誰でも簡単にクライアントとサーバーの間に介入して通信を傍受できてしまいます。
 
@@ -249,7 +267,7 @@ echoserverまたはechoclientを終了するには、_Ctrl + C_を使用しま�
 ```
 
 私たちが最初に行う必要があるのは、wolfSSLライブラリを私たちの実装例のアプリケーションにリンクすることです。
-GCCコマンドを修正（echoserverを例として使用）して、次の新しいコマンドを参照してください。
+GCCコマンドを修正すると（echoserverを例として使用）、次の新しいコマンドになります。
 wolfSSLはヘッダーファイルとライブラリを標準的な場所にインストールするため、コンパイラは明示的な指示（`-l`または`-L`を使用）なしにそれらを見つけることができるはずです。
 `-lwolfssl`を使用することにより、コンパイラは自動的に正しいタイプのライブラリ（静的または共有）を選択します。
 
@@ -281,34 +299,40 @@ wolfSSLは[`wolfSSL_Init()`](group__TLS.md#function-wolfssl_init)を呼び出す
 新しい`WOLFSSL_CTX`を作成するには、[`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new)を使用します。
 この関数は、クライアントまたはサーバーが使用するSSL/TLSプロトコルを定義する引数を必要とします。
 目的のプロトコルを選択するためのいくつかのオプションがあります。
-wolfSSLは現在、SSL 3.0、TLS 1.0、TLS 1.1、TLS 1.2、TLS 1.3、DTLS 1.0、DTLS 1.2、DTLS 1.3をサポートしています。
+wolfSSLは現在、TLS 1.2、TLS 1.3、DTLS 1.2、DTLS 1.3をサポートしており、ビルド時に有効にした場合は非推奨のSSL 3.0、TLS 1.0、TLS 1.1、DTLS 1.0もサポートします。
 これらの各プロトコルには、[`wolfSSL_CTX_new()`](group__Setup.md#function-wolfssl_ctx_new)の引数として使用できる対応する関数があります。
 使用可能なクライアントとサーバーのプロトコルオプションを以下に示します。
-SSL 2.0は数年間不安定であるため、wolfSSLではサポートしていません。
+SSL 3.0のメソッドは[`--enable-sslv3`](chapter02.md#--enable-sslv3)を指定した場合のみ、TLS 1.0のメソッドは[`--enable-tlsv10`](chapter02.md#--enable-tlsv10)を指定した場合のみ、TLS 1.1とDTLS 1.0のメソッドは`--enable-oldtls`を指定した場合のみ使用できます。
+また、DTLSのメソッドには[`--enable-dtls`](chapter02.md#--enable-dtls)（DTLS 1.3の場合はさらに`--enable-dtls13`）も必要です。
+SSL 2.0は数年前から安全ではないため、wolfSSLではサポートしていません。
 
 EchoClient:
 
-* [`wolfSSLv3_client_method();`](group__Setup.md#function-wolfsslv3_client_method) - SSL 3.0
-* [`wolfTLSv1_client_method();`](group__Setup.md#function-wolftlsv1_client_method) - TLS 1.0
-* [`wolfTLSv1_1_client_method();`](group__Setup.md#function-wolftlsv1_1_client_method) - TLS 1.1
+* [`wolfSSLv3_client_method();`](group__Setup.md#function-wolfsslv3_client_method) - SSL 3.0（`--enable-sslv3`）
+* [`wolfTLSv1_client_method();`](group__Setup.md#function-wolftlsv1_client_method) - TLS 1.0（`--enable-tlsv10`）
+* [`wolfTLSv1_1_client_method();`](group__Setup.md#function-wolftlsv1_1_client_method) - TLS 1.1（`--enable-oldtls`）
 * [`wolfTLSv1_2_client_method();`](group__Setup.md#function-wolftlsv1_2_client_method) - TLS 1.2
 * [`wolfTLSv1_3_client_method();`](group__Setup.md#function-wolftlsv1_3_client_method) - TLS 1.3
-* [`wolfSSLv23_client_method();`](group__Setup.md#function-wolfsslv23_client_method) - SSL 3.0からTLS 1.3までの最高バージョンを使用
-* [`wolfDTLSv1_client_method();`](group__Setup.md#function-wolfdtlsv1_client_method) - DTLS 1.0
-* [`wolfDTLSv1_2_client_method_ex();`](ssl_8h.md#function-wolfdtlsv1_2_client_method_ex) - DTLS 1.2
-* [`wolfDTLSv1_3_client_method_ex();`](ssl_8h.md#function-wolfdtlsv1_3_client_method_ex) - DTLS 1.3
+* [`wolfSSLv23_client_method();`](group__Setup.md#function-wolfsslv23_client_method) - 双方がサポートする最高バージョンをネゴシエート（デフォルトのビルドではTLS 1.3またはTLS 1.2）
+* `wolfTLS_client_method();` - `wolfSSLv23_client_method()`と同じ
+* [`wolfDTLSv1_client_method();`](group__Setup.md#function-wolfdtlsv1_client_method) - DTLS 1.0（`--enable-oldtls`）
+* `wolfDTLSv1_2_client_method();` - DTLS 1.2
+* [`wolfDTLSv1_3_client_method();`](group__Setup.md#function-wolfdtlsv1_3_client_method) - DTLS 1.3
+* [`wolfDTLS_client_method();`](group__Setup.md#function-wolfdtls_client_method) - 双方がサポートする最高バージョンのDTLSをネゴシエート
 
 EchoServer:
 
-* [`wolfSSLv3_server_method();`](group__Setup.md#function-wolfsslv3_server_method) - SSL 3.0
-* [`wolfTLSv1_server_method();`](group__Setup.md#function-wolftlsv1_server_method) - TLS 1.0
-* [`wolfTLSv1_1_server_method();`](group__Setup.md#function-wolftlsv1_1_server_method) - TLS 1.1
+* [`wolfSSLv3_server_method();`](group__Setup.md#function-wolfsslv3_server_method) - SSL 3.0（`--enable-sslv3`）
+* [`wolfTLSv1_server_method();`](group__Setup.md#function-wolftlsv1_server_method) - TLS 1.0（`--enable-tlsv10`）
+* [`wolfTLSv1_1_server_method();`](group__Setup.md#function-wolftlsv1_1_server_method) - TLS 1.1（`--enable-oldtls`）
 * [`wolfTLSv1_2_server_method();`](group__Setup.md#function-wolftlsv1_2_server_method) - TLS 1.2
 * [`wolfTLSv1_3_server_method();`](group__Setup.md#function-wolftlsv1_3_server_method) - TLS 1.3
-* [`wolfSSLv23_server_method();`](group__Setup.md#function-wolfsslv23_server_method) - クライアントがTLS 1.0+で接続するのを許可
-* [`wolfDTLSv1_server_method();`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS 1.0
+* [`wolfSSLv23_server_method();`](group__Setup.md#function-wolfsslv23_server_method) - 双方がサポートする最高バージョンで接続を受け入れ（デフォルトのビルドではTLS 1.3またはTLS 1.2）
+* `wolfTLS_server_method();` - `wolfSSLv23_server_method()`と同じ
+* [`wolfDTLSv1_server_method();`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS 1.0（`--enable-oldtls`）
 * [`wolfDTLSv1_2_server_method();`](ssl_8h.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
-* [`wolfDTLSv1_3_server_method();`](ssl_8h.md#function-wolfdtlsv1_3_server_method) - DTLS 1.3
+* [`wolfDTLSv1_3_server_method();`](group__Setup.md#function-wolfdtlsv1_3_server_method) - DTLS 1.3
+* [`wolfDTLS_server_method();`](group__Setup.md#function-wolfdtls_server_method) - 双方がサポートする最高バージョンのDTLSで接続を受け入れ
 
 echoclientがechoserverに接続するとき、サーバーの識別情報を確認できるように、CA（認証局）証明書を`WOLFSSL_CTX`にロードする必要があります。
 `WOLFSSL_CTX`にCA証明書をロードするには、[`wolfSSL_CTX_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)を使用します。
@@ -317,7 +341,7 @@ echoclientがechoserverに接続するとき、サーバーの識別情報を確
 証明書を検索するとき、wolfSSLはパスの場所を見る前に証明書ファイルの値を調べます。
 この場合、1つのCAファイルを指定するためパスを指定する必要はありません。
 したがって、パス引数には`NULL`を使用します。
-[`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)関数は`SSL_SUCCESS`または`SSL_FAILURE`のいずれかを返します。
+[`wolfSSL_CTX_load_verify_locations`](group__CertsKeys.md#function-wolfssl_ctx_load_verify_locations)関数は、成功した場合は`WOLFSSL_SUCCESS`を返し、失敗した場合は負のエラーコードを返します（wolfSSLを`WOLFSSL_ERROR_CODE_OPENSSL`付きでビルドした場合、失敗時は0を返します）。
 
 ```c
 wolfSSL_CTX_load_verify_locations(WOLFSSL_CTX* ctx, const char* file, const char* path)
@@ -329,26 +353,26 @@ wolfSSL_CTX_load_verify_locations(WOLFSSL_CTX* ctx, const char* file, const char
 EchoClient:
 
 ```c
-WOLFSSL_CTX* ctx;
+    WOLFSSL_CTX* ctx;
 
-wolfSSL_Init();/* Initialize wolfSSL */
+    wolfSSL_Init();/* Initialize wolfSSL */
 
-/* Create the WOLFSSL_CTX */
-if ( (ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method())) == NULL) {
-    fprintf(stderr, "wolfSSL_CTX_new error.\n");
-    exit(EXIT_FAILURE);
-}
+    /* Create the WOLFSSL_CTX */
+    if ( (ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method())) == NULL) {
+        fprintf(stderr, "wolfSSL_CTX_new error.\n");
+        exit(EXIT_FAILURE);
+    }
 
-/* Load CA certificates into WOLFSSL_CTX */
-if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", NULL) !=
-    SSL_SUCCESS) {
-    fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
-        "please check the file.\n");
-    exit(EXIT_FAILURE);
-}
+    /* Load CA certificates into WOLFSSL_CTX */
+    if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", NULL) !=
+        WOLFSSL_SUCCESS) {
+        fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
+            "please check the file.\n");
+        exit(EXIT_FAILURE);
+    }
 ```
 
-上記のコードを`tcpcli01.c`の`main()`内の、「ユーザーが引数としてIPアドレスを渡してクライアントを起動したかのチェック」の後に追加します。
+上記のコードを`tcpcli01.c`の`main()`内の、変数定義と「ユーザーが引数としてIPアドレスを渡してクライアントを起動したかのチェック」の後に追加します。
 
 EchoServer:
 
@@ -368,7 +392,7 @@ if ( (ctx = wolfSSL_CTX_new(wolfTLSv1_2_server_method())) == NULL) {
 
 /* Load CA certificates into WOLFSSL_CTX */
 if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", NULL) !=
-         SSL_SUCCESS) {
+         WOLFSSL_SUCCESS) {
     fprintf(stderr, "Error loading ../certs/ca-cert.pem, "
         "please check the file.\n");
     exit(EXIT_FAILURE);
@@ -376,16 +400,16 @@ if (wolfSSL_CTX_load_verify_locations(ctx, "../certs/ca-cert.pem", NULL) !=
 
 /* Load server certificates into WOLFSSL_CTX */
 if (wolfSSL_CTX_use_certificate_file(ctx, "../certs/server-cert.pem",
-        SSL_FILETYPE_PEM) != SSL_SUCCESS) {
-    fprintf(stderr, "Error loading ../certs/server-cert.pem, please"
+        WOLFSSL_FILETYPE_PEM) != WOLFSSL_SUCCESS) {
+    fprintf(stderr, "Error loading ../certs/server-cert.pem, please "
         "check the file.\n");
     exit(EXIT_FAILURE);
 }
 
 /* Load keys */
 if (wolfSSL_CTX_use_PrivateKey_file(ctx, "../certs/server-key.pem",
-        SSL_FILETYPE_PEM) != SSL_SUCCESS) {
-    fprintf(stderr, "Error loading ../certs/server-key.pem, please check"
+        WOLFSSL_FILETYPE_PEM) != WOLFSSL_SUCCESS) {
+    fprintf(stderr, "Error loading ../certs/server-key.pem, please check "
         "the file.\n");
     exit(EXIT_FAILURE);
 }
@@ -407,7 +431,7 @@ wolfSSL_Cleanup();
 
 ### EchoClient
 
-TCP接続の後に`WOLFSSL`オブジェクトを作成し、ソケットファイルディスクリプタをセッションに関連付ける必要があります。
+TCP接続のたびに`WOLFSSL`オブジェクトを作成し、ソケットファイルディスクリプタをセッションに関連付ける必要があります。
 echoclientの実装例では、以下に示す`connect()`の呼び出しの後にこれを行います。
 
 ```c
@@ -432,12 +456,12 @@ wolfSSL_set_fd(ssl, sockfd);
 ```
 
 ここで注目すべき点は、[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)関数を呼び出していないことです。
-[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)はサーバーとのSSL/TLSハンドシェイクを開始し、以前に呼び出されていなかった場合は[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)中に呼び出されます。
-今回、明示的に[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)を呼び出すのではなく、最初の[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)にそれを行わせています。
+[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)はサーバーとのSSL/TLSハンドシェイクを開始し、以前に呼び出されていなかった場合は[`wolfSSL_write()`](group__IO.md#function-wolfssl_write)または[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)の中で呼び出されます。
+今回、明示的に[`wolfSSL_connect()`](group__IO.md#function-wolfssl_connect)を呼び出すのではなく、最初の[`wolfSSL_write()`](group__IO.md#function-wolfssl_write)にそれを行わせています。
 
 ### EchoServer
 
-mainメソッドのforループの最後で`WOLFSSL`オブジェクトを挿入し、ソケットファイルディスクリプタ（`connfd`）を`WOLFSSL`オブジェクト（`ssl`）に関連付けます。
+mainメソッドのforループの最後で、クライアントと同様に`WOLFSSL`オブジェクトを挿入し、ソケットファイルディスクリプタ（`connfd`）を`WOLFSSL`オブジェクト（`ssl`）に関連付けます。
 
 ```c
 /* Create WOLFSSL object */
@@ -451,7 +475,7 @@ if ( (ssl = wolfSSL_new(ctx)) == NULL) {
 wolfSSL_set_fd(ssl, connfd);
 ```
 
-繰り返しになりますが、TCP接続の後に`WOLFSSL`オブジェクトを作成し、ソケットファイルディスクリプタをセッションに関連付ける必要があります。
+繰り返しになりますが、TCP接続のたびに`WOLFSSL`オブジェクトを作成し、ソケットファイルディスクリプタをセッションに関連付ける必要があります。
 
 ## データの送受信
 
@@ -459,7 +483,7 @@ wolfSSL_set_fd(ssl, connfd);
 
 次のステップは、データを安全に送信し始めることです。
 echoclientの例では、`main()`関数が送受信処理を`str_cli()`に渡していることに注意してください。
-`str_cli()`関数は、私たちの関数で置き換えるところです。
+関数の置き換えは`str_cli()`関数内で行います。
 まず、`str_cli()`関数で`WOLFSSL`オブジェクトにアクセスする必要があるため、引数を追加して`ssl`変数を`str_cli()`に渡します。
 `WOLFSSL`オブジェクトが`str_cli()`関数内で使用されるようになるため、`sockfd`パラメータを削除します。
 この修正を行った新しい`str_cli()`関数のプロトタイプを以下に示します。
@@ -475,12 +499,12 @@ str_cli(stdin, ssl);
 ```
 
 `str_cli()`関数内では、`Writen()`と`Readline()`を[`wolfSSL_write()`](group__IO.md#function-wolfssl_write)と[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)関数の呼び出しに置き換え、元のソケットファイルディスクリプタ（`sockfd`）の代わりに`WOLFSSL`オブジェクト（`ssl`）を使用します。
-
 新しい`str_cli()`関数を以下に示します。
 [`wolfSSL_write`](group__IO.md#function-wolfssl_write)と[`wolfSSL_read`](group__IO.md#function-wolfssl_read)の呼び出しが成功したかどうかを確認する必要があることに注意してください。
 
 Unixプログラミングの著者たちは、`Writen()`関数にエラーチェックを組み込んでいたため、それが置き換えられた後にその分を補う必要があります。
 新しいint変数`n`を追加して[`wolfSSL_read`](group__IO.md#function-wolfssl_read)の戻り値を監視し、バッファの内容`recvline`を出力する前に、読み込んだデータの末尾を`\0`でマークします。
+そのために`recvline`の1バイトを空けておくので、読み込むのは最大`MAXLINE - 1`バイトです。
 
 ```c
 void
@@ -496,7 +520,7 @@ str_cli(FILE *fp, WOLFSSL* ssl)
             err_sys("wolfSSL_write failed");
         }
 
-        if ((n = wolfSSL_read(ssl, recvline, MAXLINE)) <= 0)
+        if ((n = wolfSSL_read(ssl, recvline, MAXLINE - 1)) <= 0)
             err_quit("wolfSSL_read error");
 
         recvline[n] = '\0';
@@ -520,7 +544,7 @@ wolfSSL_Cleanup();      /* Free wolfSSL */
 
 エコーサーバーは読み取りと書き込みを処理するために`str_echo()`を呼び出します。
 （クライアントでは`str_cli()`を呼び出しました。）
-クライアントと同様に、sockfdパラメータを`WOLFSSL`オブジェクト（`ssl`）パラメータに置き換えて`str_echo()`を修正します。
+クライアントと同様に、関数シグネチャのsockfdパラメータを`WOLFSSL`オブジェクト（`ssl`）パラメータに置き換えて`str_echo()`を修正します。
 
 ```c
 void str_echo(WOLFSSL* ssl)
@@ -564,14 +588,16 @@ exitの呼び出しの前に、必ず`ctx`を解放してクリーンアップ�
 
 ## シグナル処理
 
-### Echoclient / Echoserver
+### Echoserver
 
-echoclientとechoserverでは、ユーザーが「Ctrl+C」を使用してアプリを閉じる場合のシグナルハンドラを追加する必要があります。
+echoserverでは、ユーザーが「Ctrl+C」を使用してアプリを閉じる場合のシグナルハンドラを追加する必要があります。
+echoclientにはシグナルハンドラは必要ありません。
+echoclientは入力の終わりに達するとループを抜けてオブジェクトを解放し、「Ctrl+C」を押した場合は単に終了します。
 エコーサーバーは継続的にループで実行されています。
 このため、ユーザーが「Ctrl+C」を押したときにそのループを中断する手段を実装する必要があります。
 これを行うにはまず、終了変数（`cleanup`）が`true`に設定されたときに終了するwhileループに変更する必要があります。
 
-`tcpserv04.c`の`#include`文の直後に、`cleanup`という新しいstatic int変数を定義します。
+まず、`tcpserv04.c`の`#include`文の直後に、`cleanup`という新しいstatic int変数を定義します。
 
 ```c
 static int cleanup;  /* To handle shutdown */
@@ -588,18 +614,14 @@ while(cleanup != 1)
 
 echoserverではハンドラが終了した後、シグナルが処理される前に実行していた呼び出しをOSが再開してしまわないようにする必要があります。
 これを無効にすることで、シグナルが処理された後、OSは`accept()`への呼び出しを再開しません。
-これを行わなければ、echoserverがリソースをクリーンアップして終了する前に、別のクライアントが接続してしまい、これを切断するのを待たなければならなくなってしまいます。
-シグナルハンドラを定義し`SA_RESTART`をオフにするには、まずechoserverの`main()`関数に`act`と`oact`の構造体を定義します。
-
-```c
-struct sigaction     act, oact;
-```
-
-変数宣言の後、main関数の[`wolfSSL_Init()`](group__TLS.md#function-wolfssl_init)の呼び出しの前に以下のコードを挿入します。
+これを行わなければ、echoserverがリソースをクリーンアップして終了するまでに、別のクライアントが接続して切断するのを待たなければならなくなってしまいます。
+シグナルハンドラを定義し`SA_RESTART`をオフにするために、echoserverの`main()`関数で`act`と`oact`の構造体を宣言して設定します。
+main関数の変数宣言の最後、[`wolfSSL_Init()`](group__TLS.md#function-wolfssl_init)の呼び出しの前に以下のコードを挿入します。
 
 ```c
 /* Signal handling code */
 struct sigaction act, oact;         /* Declare the sigaction structs    */
+
 act.sa_handler = sig_handler;       /* Tell act to use sig_handler      */
 sigemptyset(&act.sa_mask);          /* Tells act to exclude all sa_mask *
                                      * signals during execution of      *
@@ -610,7 +632,8 @@ sigaction(SIGINT, &act, &oact);     /* Tells the program to use (o)act  *
                                      * on a signal or interrupt         */
 ```
 
-echoserverの`sig_handler`関数を以下に示します。
+echoserverの`sig_handler()`関数を以下に示します。
+`main()`がこの関数を参照する前に宣言されているように、`tcpserv04.c`の`main()`より前にこの関数を定義してください（またはプロトタイプ宣言を追加してください）。
 
 ```c
 void sig_handler(const int sig)
@@ -631,10 +654,10 @@ void sig_handler(const int sig)
 * データの送受信に使用する`WOLFSSL`オブジェクトを作成
 * `Writen()`と`Readline()`の呼び出しを[`wolfSSL_write()`](group__IO.md#function-wolfssl_write)と[`wolfSSL_read()`](group__IO.md#function-wolfssl_read)に置き換え
 * `WOLFSSL`、`WOLFSSL_CTX`を解放
-* シグナルハンドラでクライアントとサーバーのシャットダウンを確実に処理
+* シグナルハンドラでサーバーを確実にシャットダウンし、クライアントは処理の終了時にオブジェクトを解放するように実装
 
 SSL接続の動作を設定および制御するための多くの側面とメソッドがあります。
-より詳細な情報については、wolfSSLドキュメントをご参照ください。
+より詳細な情報については、wolfSSLのその他のドキュメントやリソースをご参照ください。
 
 繰り返しになりますが、完成したソースコードはこのセクションの先頭でダウンロードしたZIPファイルにあります。
 
@@ -651,7 +674,7 @@ SSL接続の動作を設定および制御するための多くの側面とメ�
 この例はシンプルですが、ご自身のアプリケーションにSSL/TLSを追加するために同じ手順を適用できます。
 wolfSSL組み込みSSL/TLSライブラリは、サイズと速度の両方に最適化されたコンパクトで効率的なパッケージで、必要とするすべての機能を提供します。
 
-GPLv2と標準的な商用ライセンスのデュアルライセンスで提供しているため、ウェブサイトから直接wolfSSLのソースコードをダウンロードできます。
+GPLv3と標準的な商用ライセンスのデュアルライセンスで提供しているため、ウェブサイトから直接wolfSSLのソースコードをダウンロードできます。
 質問やコメントがあれば、サポートフォーラム（<https://www.wolfssl.com/forums>）に投稿してください。
 製品についての詳細情報が必要な場合は、[info@wolfssl.jp](mailto:info@wolfssl.jp)までお問い合わせください。
 
