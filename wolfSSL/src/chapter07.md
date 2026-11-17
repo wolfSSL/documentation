@@ -222,7 +222,7 @@ int wolfSSL_CTX_trust_peer_cert(WOLFSSL_CTX *ctx,
                  const char *trustCert, int type);
 ```
 
-`trustCert` is the certificate file to load, and `type` is the format of the certificate (i.e. `WOLFSSL_FILETYPE_PEM`). Trusted peer certificates require wolfSSL to be built with [`WOLFSSL_TRUST_PEER_CERT`](chapter02.md#wolfssl_trust_peer_cert) defined. There is no dedicated configure option for it, so add it through `CFLAGS` (for example `./configure CFLAGS="-DWOLFSSL_TRUST_PEER_CERT"`).
+`trustCert` is the certificate file to load, and `type` is the format of the certificate (e.g. `WOLFSSL_FILETYPE_PEM`). Trusted peer certificates require wolfSSL to be built with [`WOLFSSL_TRUST_PEER_CERT`](chapter02.md#wolfssl_trust_peer_cert) defined. There is no dedicated configure option for it, so add it through `CFLAGS` (for example `./configure CFLAGS="-DWOLFSSL_TRUST_PEER_CERT"`).
 
 ### Loading System CA Certificates
 
@@ -336,7 +336,7 @@ if (pemSz < 0)
     /* pemSz contains error */;
 ```
 
-The last argument of _DerToPem()_ takes a type parameter, usually either `PRIVATEKEY_TYPE` or `CERT_TYPE`. Now the buffer `pem` holds the PEM format of the key. Supported types are listed below. Some are only available when the matching feature is compiled in (for example `CERTREQ_TYPE` needs `WOLFSSL_CERT_REQ` and `ED448_TYPE` needs `HAVE_ED448`):
+The last argument of `wc_DerToPem()` takes a type parameter, usually either `PRIVATEKEY_TYPE` or `CERT_TYPE`. Now the buffer `pem` holds the PEM format of the key. Supported types are listed below. Some are only available when the matching feature is compiled in (for example `CERTREQ_TYPE` needs `WOLFSSL_CERT_REQ` and `ED448_TYPE` needs `HAVE_ED448`):
 
 * `CA_TYPE`
 * `TRUSTED_PEER_TYPE`

@@ -23,7 +23,7 @@ wolfSSL supports **SSL 3.0**, **TLS** (**1.0**, **1.1**, **1.2, 1.3**), and **DT
 ### Server Functions
 
 * [`wolfDTLSv1_server_method()`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS 1.0
-* [`wolfDTLSv1_2_server_method()`](ssl_8h.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
+* [`wolfDTLSv1_2_server_method()`](group__Setup.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
 * [`wolfDTLSv1_3_server_method()`](group__Setup.md#function-wolfdtlsv1_3_server_method) - DTLS 1.3
 * [`wolfDTLS_server_method()`](group__Setup.md#function-wolfdtls_server_method) - Use highest possible DTLS version enabled in the build
 * [`wolfSSLv3_server_method()`](group__Setup.md#function-wolfsslv3_server_method) - SSL 3.0
@@ -52,11 +52,11 @@ wolfSSL supports robust server downgrade with the [`wolfSSLv23_server_method()`]
 * [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) - Use the highest possible version, up to TLS 1.3 (downgrading to the lowest version enabled in the build)
 * `wolfTLS_client_method()` - Same as `wolfSSLv23_client_method()`
 
-Each method also has an `_ex` variant, for example [`wolfDTLSv1_2_client_method_ex()`](ssl_8h.md#function-wolfdtlsv1_2_client_method_ex), that takes a heap hint. The same build conditions apply as for the server functions.
+Each method also has an `_ex` variant, for example [`wolfDTLSv1_2_client_method_ex()`](group__Setup.md#function-wolfdtlsv1_2_client_method_ex), that takes a heap hint. The same build conditions apply as for the server functions.
 
 wolfSSL supports robust client downgrade with the [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) function. See [Robust Client and Server Downgrade](#robust-client-and-server-downgrade) for details.
 
-For details on how to use these functions, please see the [Getting Started](chapter03.md#getting-started) chapter. For a comparison between SSL, TLS, and DTLS, please see Appendix A.
+For details on how to use these functions, please see the [Getting Started](chapter03.md#getting-started) chapter. For a comparison between SSL, TLS, and DTLS, please see Appendix D, [SSL/TLS Overview](appendix04.md).
 
 ### Robust Client and Server Downgrade
 
@@ -435,7 +435,7 @@ wolfSSL has support for Elliptic Curve Cryptography (ECC) including but not limi
 
 wolfSSL's ECC implementation can be found in the `<wolfssl_root>/wolfssl/wolfcrypt/ecc.h` header file and the `<wolfssl_root>/wolfcrypt/src/ecc.c` source file.
 
-Supported cipher suites are shown in the table above.  ECC is enabled by default on all platforms. It can be disabled with [`--disable-ecc`](chapter02.md#--disable-ecc), and is enabled in builds that do not use autoconf with the `HAVE_ECC` define. When using the autoconf system:
+Supported cipher suites are listed in the Supported Cipher Suites section above.  ECC is enabled by default on all platforms. It can be disabled with [`--disable-ecc`](chapter02.md#--disable-ecc), and is enabled in builds that do not use autoconf with the `HAVE_ECC` define. When using the autoconf system:
 
 ```sh
 ./configure --enable-ecc

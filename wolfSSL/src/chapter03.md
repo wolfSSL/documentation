@@ -333,7 +333,7 @@ https://github.com/wolfSSL/wolfssl-examples/tree/master/tls
 The echoserver example sits in an endless loop waiting for an unlimited number of client connections. Whatever the client sends the echoserver echoes back. Client authentication isn't performed so the example client can be used against the echoserver in all 3 modes. Four special commands aren't echoed back and instruct the echoserver to take a different action.
 
 1. `quit` - If the echoserver receives the string "quit" it will shutdown.
-2. `break` If the echoserver receives the string "break" it will stop the current session but continue handling requests. This is particularly useful for DTLS testing.
+2. `break` - If the echoserver receives the string "break" it will stop the current session but continue handling requests. This is particularly useful for DTLS testing.
 3. `printstats` - If the echoserver receives the string "printstats" it will print out statistics for the session cache. This command is only available when wolfSSL is built with `PRINT_SESSION_STATS`.
 4. `GET` - If the echoserver receives the string "GET" it will handle it as an http get and send back a simple page with the message "greetings from wolfSSL". This allows testing of various TLS/SSL clients like Safari, IE, Firefox, gnutls, and the like against the echoserver example.
 

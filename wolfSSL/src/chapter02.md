@@ -2216,7 +2216,7 @@ Enables the ability to override maximum signature algorithms.
 
 #### WOLFSSL_STATIC_EPHEMERAL
 
-Lets a fixed ("static") ephemeral (EC)DH key be loaded with [`wolfSSL_CTX_set_ephemeral_key()`](ssl_8h.md#function-wolfssl_ctx_set_ephemeral_key) or `wolfSSL_set_ephemeral_key()`, so the sniffer can decrypt traffic that uses ephemeral key exchange. Reusing one ephemeral key across connections gives up forward secrecy; use it only for testing, inspection or debugging. Set automatically by `--enable-sniffer`.
+Lets a fixed ("static") ephemeral (EC)DH key be loaded with [`wolfSSL_CTX_set_ephemeral_key()`](group__CertsKeys.md#function-wolfssl_ctx_set_ephemeral_key) or `wolfSSL_set_ephemeral_key()`, so the sniffer can decrypt traffic that uses ephemeral key exchange. Reusing one ephemeral key across connections gives up forward secrecy; use it only for testing, inspection or debugging. Set automatically by `--enable-sniffer`.
 
 #### SSL_SNIFFER_EXPORTS
 
@@ -3260,7 +3260,7 @@ Enable per-algorithm hardware mutex locks for AES, hash, public-key, and RNG ope
 
 #### WOLFSSL_CRYPT_HW_MUTEX
 
-Master control for hardware crypto mutex initialization. When enabled, provides `wolfSSL_CryptHwMutexInit`, `Lock`, and `UnLock` functions.
+Master control for hardware crypto mutex initialization. When enabled, provides `wolfSSL_CryptHwMutexInit`, `wolfSSL_CryptHwMutexLock`, and `wolfSSL_CryptHwMutexUnLock` functions.
 
 #### USE_WOLFSSL_MEMORY
 
@@ -5488,7 +5488,7 @@ Enable export and import of sessions
 
 ### `--enable-aeskeywrap`
 
-Enable AES key wrap support (RFC 3394). To also build AES Key Wrap with Padding (RFC 5649), pass `--enable-aeskeywrap=padding`; it is provided by `wc_AesKeyWrap_Pad()` and `wc_AesKeyWrap_Pad_ex()` and supports crypto callbacks. New in wolfSSL 5.9.4.
+Enable AES key wrap support (RFC 3394). To also build AES Key Wrap with Padding (RFC 5649), pass `--enable-aeskeywrap=padding`; it is provided by `wc_AesKeyWrap_Pad()` and `wc_AesKeyWrap_Pad_ex()` and supports crypto callbacks. The padding variant is new in wolfSSL 5.9.4.
 
 ### `--enable-jobserver`
 
@@ -7049,7 +7049,7 @@ Example IDE Setup for use with IMXRT1170 can be found in the directory IDE/MCUEX
 - (note board files need to be recreated .... this can be done by creating a new project that has the same settings and copying over the generated board/* files)
 - Build the projects
 
-CSR and PKCS7 examples, and an example of building with CMake, are in the cmake directory of the wolfssl-examples repository (<https://github.com/wolfssl/wolfssl-examples>).
+CSR examples are in the certgen directory, PKCS7 examples in the pkcs7 directory, and an example of building with CMake in the cmake directory of the wolfssl-examples repository (<https://github.com/wolfssl/wolfssl-examples>).
 
 
 #### Expanding RT1170 CAAM Driver
