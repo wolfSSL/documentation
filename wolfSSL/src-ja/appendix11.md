@@ -1,6 +1,6 @@
 # wolfSM (ShangMi)
 
-この章では、wolfSSLにおける中国国家標準の暗号化アルゴリズムであるShangMi（SM）に関する情報を提供します。
+この付録では、wolfSSLにおける中国国家標準の暗号化アルゴリズムであるShangMi（SM）に関する情報を提供します。
 
 wolfSMは以下の要素をサポートしています。
 
@@ -9,6 +9,7 @@ wolfSMは以下の要素をサポートしています。
 * SM2 - ECDH鍵共有と指定された256ビット楕円曲線を使用した署名スキーム
 
 使用するためには、コードをwolfSSLにインストールする必要があります。
+
 ただし、テストとビルド設定コードはすでにwolfSSLに含まれています。
 
 ## wolfSMの取得とインストール
@@ -26,15 +27,15 @@ git clone https://github.com/wolfssl/wolfsm.git
 SMアルゴリズム実装をビルドしてテストするにはwolfSSLが必要です。
 wolfSMの隣にGitHubからwolfSSLリポジトリをチェックアウトします。
 
-```sh
+```text
 # ディレクトリ構造は次のようになります。
 # <install-dir>
-# ├── wolfsm
-# └── wolfssl
+# |-- wolfsm
+# `-- wolfssl
 ```
 
 ```sh
-cd .. # wolfsm を含むディレクトリに移動
+# wolfsmを含むディレクトリである<install-dir>から実行
 git clone https://github.com/wolfssl/wolfssl.git
 ```
 
@@ -64,6 +65,7 @@ configure時に必要なアルゴリズムをご選択ください。
 例えばSM3、SM4-GCM、SM2を含める場合、次のようにします。
 
 ```sh
+cd ../wolfssl
 ./autogen.sh
 ./configure --enable-sm3 --enable-sm4-gcm --enable-sm2
 make
@@ -74,8 +76,8 @@ sudo make install
 
 SM2の最適化された実装を使用するには、Cのみのコードを使用するか、より高速なアセンブリコードを備えたCコードを使用できます。
 
-- Cコードのみの場合： `--enable-sp`
-- Cとアセンブリコードの場合： `--enable-sp --enable-sp-asm`
+* Cコードのみの場合： `--enable-sp`
+* Cとアセンブリコードの場合： `--enable-sp --enable-sp-asm`
 
 最適化されたCコードは、32ビットおよび64ビットCPUで利用可能です。
 
@@ -86,6 +88,7 @@ SM2の最適化された実装を使用するには、Cのみのコードを使�
 * ARM 32-bit
 * ARM Thumb2
 * ARM Thumb
+* RISC-V 64-bit
 
 ## wolfSMのテスト
 
@@ -114,7 +117,8 @@ make test
 
 SM暗号はTLS 1.2およびTLS 1.3で使用できます。
 
-**注意**: SM暗号スイートを動作させるには、SM2、SM3、および少なくとも1つのSM4暗号をビルドする必要があります。すべてのアルゴリズムはSMである必要があります。
+**注意**: SM暗号スイートを動作させるには、SM2、SM3、および少なくとも1つのSM4暗号をビルドする必要があります。
+すべてのアルゴリズムはSMである必要があります。
 
 追加される暗号スイートは以下の通りです。
 
