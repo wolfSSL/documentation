@@ -11,6 +11,22 @@ typedef unsigned int  word32;
 
 When the library was built with `./configure`, include `<wolfssl/options.h>` before any other wolfSSL header so that the application is compiled with the same settings as the library.
 
+## Structure Alignment
+
+Some wolfCrypt structures declare members with 16-byte or larger alignment when `WOLFSSL_USE_ALIGN` is defined. `./configure` (`--enable-aligndata`) and CMake (`WOLFSSL_ALIGN_DATA`) define it by default, except with `--enable-usersettings` or `WOLFSSL_USER_SETTINGS`, where `user_settings.h` decides. wolfSSL also forces it for AES-NI (`WOLFSSL_AESNI`), Intel speedups (`USE_INTEL_SPEEDUP`), ARM assembly (`WOLFSSL_ARMASM`), Xilinx (`WOLFSSL_XILINX`, `WOLFSSL_AFALG_XILINX`) and 32-bit ARM targets without unaligned access.
+
+With `user_settings.h`, define `WOLFSSL_USER_SETTINGS` in the application and use the same `user_settings.h` as the library. A configuration mismatch changes the structure layout and alignment between the application and the library.
+
+Affected structures include:
+
+- `Aes`, `curve25519_key`, `ed25519_key`, `Rc2`, `LmsKey` and the OpenSSL compatibility contexts, on any CPU
+- `wc_Sha256` and `wc_Sha224` on 64-bit CPUs, unless a hardware port replaces the software hash state
+- structures that embed one of these, such as `Hmac`, `wc_HashAlg`, `XtsAes`, `Gmac` and `Cmac`
+- on Xilinx Versal, `Aes`, `ecc_key`, `RsaKey`, `wc_Sha3` and the structures that embed them, which need 64-byte alignment
+- `LmsState`, passed to `wc_hss_verify()`, on x86_64 builds with Intel speedups or the LMS SHAKE parameter sets, which needs 64-byte alignment
+
+The compiler may use aligned load and store instructions on these structures, so their memory must meet the alignment of the type. Standalone declared variables always do. Memory from `malloc()` on common 64-bit platforms is 16-byte aligned, which covers everything above except the 64-byte cases. On 32-bit platforms, `malloc()` may return only 8-byte aligned memory. `posix_memalign()` and `aligned_alloc()` provide stricter alignment where needed. A structure placed at an arbitrary offset inside a larger buffer, or inside a packed structure, may be misaligned, and can crash, for example on x86_64.
+
 ## Hash Functions
 
 ### MD4
