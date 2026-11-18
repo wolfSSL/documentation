@@ -84,3 +84,104 @@ jobs:
         echo "WOLFCOSE_REF=$ref" >> "$GITHUB_ENV"
     - name: wolfCOSE html and pdf
       run: cd wolfCOSE && make
+
+  # The Japanese (DOC_LANG=JA) manuals from each src-ja, in a separate job so
+  # they build in parallel with the English ones and from a clean checkout.
+  # wolfSentry is not built here yet: its Japanese PDF needs the pre-build
+  # step that only "make" (not "make pdf") runs.
+  build-ja:
+
+    runs-on: ubuntu-latest
+    container: pandoc/latex:latest-ubuntu
+
+    # Keep these setup steps in sync with the build job, plus fonts-noto-cjk
+    # and xecjk which the Japanese PDFs need
+    steps:
+    - name: Install Dependencies
+      run: |
+        apt-get update
+        DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+          git make patch unzip wget ca-certificates mkdocs doxygen \
+          fonts-noto-core fonts-noto-mono fonts-noto-cjk
+        git config --global --add safe.directory '*'
+    - name: Install LaTeX packages
+      run: |
+        tlmgr update --self
+        tlmgr install titlesec tocloft fvextra listings fancyhdr xecjk
+    - name: Install doxybook2
+      run: |
+        wget -q -O /tmp/doxybook2.zip https://github.com/matusnovak/doxybook2/releases/download/v1.5.0/doxybook2-linux-amd64-v1.5.0.zip
+        unzip -q /tmp/doxybook2.zip -d /tmp/doxybook2
+        cp /tmp/doxybook2/bin/doxybook2 /usr/local/bin/
+    - uses: actions/checkout@v4
+    - name: wolfssl html
+      run: cd wolfSSL && make html DOC_LANG=JA
+    - name: wolfssl pdf
+      run: cd wolfSSL && make pdf DOC_LANG=JA
+    - name: wolfssh html
+      run: cd wolfSSH && make html DOC_LANG=JA
+    - name: wolfssh pdf
+      run: cd wolfSSH && make pdf DOC_LANG=JA
+    - name: Pin wolfTPM source for this build
+      run: |
+        ref=$(git ls-remote https://github.com/wolfSSL/wolfTPM.git refs/heads/master | cut -f1)
+        test -n "$ref"
+        echo "WOLFTPM_REF=$ref" >> "$GITHUB_ENV"
+    - name: wolftpm html and pdf
+      run: cd wolfTPM && make DOC_LANG=JA
+    - name: wolfmqtt html
+      run: cd wolfMQTT && make html DOC_LANG=JA
+    - name: wolfmqtt pdf
+      run: cd wolfMQTT && make pdf DOC_LANG=JA
+    - name: wolfBoot html
+      run: cd wolfBoot && make html DOC_LANG=JA
+    - name: wolfBoot pdf
+      run: cd wolfBoot && make pdf DOC_LANG=JA
+    - name: wolfclu html
+      run: cd wolfCLU && make html DOC_LANG=JA
+    - name: wolfclu pdf
+      run: cd wolfCLU && make pdf DOC_LANG=JA
+    - name: wolfssl-jni html
+      run: cd wolfSSL-JNI && make html DOC_LANG=JA
+    - name: wolfssl-jni pdf
+      run: cd wolfSSL-JNI && make pdf DOC_LANG=JA
+    - name: wolfcrypt-jni html
+      run: cd wolfCrypt-JNI && make html DOC_LANG=JA
+    - name: wolfcrypt-jni pdf
+      run: cd wolfCrypt-JNI && make pdf DOC_LANG=JA
+    - name: wolfHSM html
+      run: cd wolfHSM && make html DOC_LANG=JA
+    - name: wolfHSM pdf
+      run: cd wolfHSM && make pdf DOC_LANG=JA
+    - name: wolfEngine html
+      run: cd wolfEngine && make html DOC_LANG=JA
+    - name: wolfEngine pdf
+      run: cd wolfEngine && make pdf DOC_LANG=JA
+    - name: wolfProvider html
+      run: cd wolfProvider && make html DOC_LANG=JA
+    - name: wolfProvider pdf
+      run: cd wolfProvider && make pdf DOC_LANG=JA
+    - name: wolfssl-fips-ready html
+      run: cd wolfSSL-FIPS-Ready && make html DOC_LANG=JA
+    - name: wolfssl-fips-ready pdf
+      run: cd wolfSSL-FIPS-Ready && make pdf DOC_LANG=JA
+    - name: wolfssl-tuning html
+      run: cd wolfSSL-Tuning && make html DOC_LANG=JA
+    - name: wolfssl-tuning pdf
+      run: cd wolfSSL-Tuning && make pdf DOC_LANG=JA
+    - name: wolfssl-porting html
+      run: cd wolfSSL-Porting && make html DOC_LANG=JA
+    - name: wolfssl-porting pdf
+      run: cd wolfSSL-Porting && make pdf DOC_LANG=JA
+    - name: wolfssl-faq html
+      run: cd wolfSSL-FAQ && make html DOC_LANG=JA
+    - name: wolfssl-faq pdf
+      run: cd wolfSSL-FAQ && make pdf DOC_LANG=JA
+    - name: wolfssl-fips-faq html
+      run: cd wolfSSL-FIPS-FAQ && make html DOC_LANG=JA
+    - name: wolfssl-fips-faq pdf
+      run: cd wolfSSL-FIPS-FAQ && make pdf DOC_LANG=JA
+    - name: mbedtls-migration html
+      run: cd MbedTLS-Migration && make html DOC_LANG=JA
+    - name: mbedtls-migration pdf
+      run: cd MbedTLS-Migration && make pdf DOC_LANG=JA
