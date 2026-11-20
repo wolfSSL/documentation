@@ -17,7 +17,10 @@ nav:
     - "11. Support and Consulting": chapter11.md
     - "12. wolfSSH Updates": chapter12.md
     - "13. API Reference": chapter13.md
-    - "14. wolfSSL SFTP API Reference": chapter14.md
+    - "14. SFTP API Reference": chapter14.md
+    - "15. SCP API Reference": chapter15.md
+    - "16. Additional API Reference": chapter16.md
+    - "17. Preprocessor Guard Macros": chapter17.md
 theme:
   name: null
   custom_dir: ../mkdocs-material/material

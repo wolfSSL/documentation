@@ -27,3 +27,17 @@ wolfSFTPライブラリヘッダファイルもwolfsshディレクトリに含�
 
 すべてのメインソースファイルは、ルートディレクトリにある **src** ディレクトリにありま
 す。
+
+**wolfssh** ディレクトリにある他のヘッダーは、オプション機能を宣言しています。SCP用の **wolfssh/wolfscp.h**、ssh-agentサポート用の **wolfssh/agent.h**、X.509証明書用の **wolfssh/certman.h**、鍵生成用の **wolfssh/keygen.h** です。
+
+##  アルゴリズムのネゴシエーション
+
+鍵交換の際、クライアントとサーバーはそれぞれアルゴリズムのリストを提示し、クライアントのリストの中でサーバーもサポートしている最初のアルゴリズムが使用されます。このリストは `wolfSSH_CTX_SetAlgoList*()` および `wolfSSH_SetAlgoList*()` 関数で変更できます。これらの関数は入力を検証し、未知のアルゴリズムを含むリストに対しては `WS_INVALID_ALGO_ID` を返します。暗号とMACは接続の方向ごとに個別にネゴシエーションされるため、2つの方向で異なるものが使用される場合があります。
+
+SHA-1を使用するアルゴリズムとAES-CBC暗号はコンパイルされますが、デフォルトでは提示されません。これらはアルゴリズムリストに追加し直すことができるほか、`WOLFSSH_NO_SHA1_SOFT_DISABLE` または `WOLFSSH_NO_AES_CBC_SOFT_DISABLE` を指定してビルドすることでデフォルトで提示されるようにもできます。"none" 暗号とMACは、`--enable-none-cipher` を指定したビルドでのみネゴシエーションできます。
+
+wolfSSHは厳格な鍵交換（Terrapin攻撃への対策）を実装しており、両方のピアが提示した場合に使用されます。これはデフォルトで有効になっており、`wolfSSH_CTX_SetStrictKex()` で無効にできます。
+
+##  鍵の再交換
+
+現在の鍵で送受信したバイト数がハイウォーターマーク（`wolfSSH_SetHighwater()`、デフォルトは `DEFAULT_HIGHWATER_MARK`）に達するか、送受信したパケット数がパケット数のハイウォーターマーク（`wolfSSH_SetMsgHighwater()`、デフォルトは `WOLFSSH_DEFAULT_MSG_HIGHWATER_MARK`）に達すると、wolfSSHはハイウォーターコールバックを呼び出します。デフォルトのコールバックは新しい鍵交換を開始します。別のコールバックは `wolfSSH_SetHighwaterCb()` で設定できます。アプリケーションは `wolfSSH_TriggerKeyExchange()` で鍵交換を開始することもできます。`wolfSSH_RekeyPending()` は鍵交換が進行中かどうかを報告します。
