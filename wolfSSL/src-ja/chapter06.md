@@ -139,7 +139,7 @@ typedef int (*CallbackDecryptVerify)(WOLFSSL* ssl,
 
 ブロック暗号を使用する暗号スイートでEncrypt-Then-MAC拡張（RFC 7366）がネゴシエートされた場合、wolfSSLは代わりにもう一組のコールバックを呼び出します。
 これらのコールバックは、MACを計算する前に暗号化を行い、復号する前にMACを検証します。
-これらは`ssl.h`の`CallbackEncryptMac`と`CallbackVerifyDecrypt`でプロトタイプ化されています。
+これらのコールバックの型は、`ssl.h`で`CallbackEncryptMac`と`CallbackVerifyDecrypt`として宣言されています。
 
 ```c
 typedef int (*CallbackEncryptMac)(WOLFSSL* ssl, unsigned char* macOut,
@@ -368,13 +368,13 @@ X448コールバックを使用するには、wolfSSLを`HAVE_PK_CALLBACKS`と`H
 
 wolfSSLは、SSL/TLS接続中にRSA PSS署名/検証操作をより詳細に制御したいユーザー向けにRSA PSSコールバックを提供します。
 
-ユーザーはオプションで3つの関数を定義できます。
+ユーザーは、必要に応じて次の3つの関数を定義できます。
 
 1. RSA PSS署名コールバック
 2. RSA PSS検証コールバック
 3. RSA PSS署名チェックコールバック
 
-これらの関数は`ssl.h`の`CallbackRsaPssSign`と`CallbackRsaPssVerify`でプロトタイプ化されています。
+これらの関数の型は、`ssl.h`で`CallbackRsaPssSign`と`CallbackRsaPssVerify`として宣言されています。
 署名チェックコールバックは`CallbackRsaPssVerify`のプロトタイプを使用します。
 
 ```c
@@ -418,14 +418,14 @@ RSA PSSコールバックを使用するには、wolfSSLを`HAVE_PK_CALLBACKS`�
 
 wolfSSLは、SSL/TLS接続中にECC鍵生成、ECDSA署名/検証、およびECDH共有秘密操作をより詳細に制御したいユーザー向けにECCコールバックを提供します。
 
-ユーザーはオプションで4つの関数を定義できます。
+ユーザーは、必要に応じて次の4つの関数を定義できます。
 
 1. ECC鍵生成コールバック
 2. ECC署名コールバック
 3. ECC検証コールバック
 4. ECC共有秘密コールバック
 
-これらの関数は`ssl.h`の`CallbackEccKeyGen`、`CallbackEccSign`、`CallbackEccVerify`、および`CallbackEccSharedSecret`でプロトタイプ化されています。
+これらの関数の型は、`ssl.h`で`CallbackEccKeyGen`、`CallbackEccSign`、`CallbackEccVerify`、および`CallbackEccSharedSecret`として宣言されています。
 
 ```c
 typedef int (*CallbackEccKeyGen)(WOLFSSL* ssl, struct ecc_key* key,
@@ -474,7 +474,7 @@ ECCコールバックを使用するには、wolfSSLを`HAVE_PK_CALLBACKS`と`HA
 
 wolfSSLは、SSL/TLS接続中にRSA署名/検証および暗号化/復号操作をより詳細に制御したいユーザー向けにRSAコールバックを提供します。
 
-ユーザーはオプションで5つの関数を定義できます。
+ユーザーは、必要に応じて次の5つの関数を定義できます。
 
 1. RSA署名コールバック
 2. RSA検証コールバック
@@ -482,7 +482,7 @@ wolfSSLは、SSL/TLS接続中にRSA署名/検証および暗号化/復号操作�
 4. RSA暗号化コールバック
 5. RSA復号コールバック
 
-これらの関数は`ssl.h`の`CallbackRsaSign`、`CallbackRsaVerify`、`CallbackRsaEnc`、および`CallbackRsaDec`でプロトタイプ化されています。
+これらの関数の型は、`ssl.h`で`CallbackRsaSign`、`CallbackRsaVerify`、`CallbackRsaEnc`、および`CallbackRsaDec`として宣言されています。
 署名チェックコールバックは`CallbackRsaVerify`のプロトタイプを使用します。
 
 ```c
@@ -537,7 +537,7 @@ RSAコールバックを使用するには、`HAVE_PK_CALLBACKS`を定義し、R
 
 `HAVE_PK_CALLBACKS`は、TLSプロトコルレベルの操作に対するコールバックも有効にします。
 これにより、鍵導出やレコード処理をハードウェア（例えば、セッション鍵を保持するセキュアエレメント）で実行できます。
-これらは`ssl.h`でプロトタイプ化されています。
+これらのコールバックの型は`ssl.h`で宣言されています。
 
 | コールバック型 | 登録関数 | 操作 |
 | --- | --- | --- |
@@ -686,7 +686,7 @@ int myCryptoCallback(int devId, wc_CryptoInfo* info, void* ctx)
 }
 ```
 
-wolfSSL 5.9.4では、コールバックが受け取るリクエストタイプとして`WC_ALGO_TYPE_KEYSTORE`が追加されました（`--enable-cryptocbutils=keystore`でビルドした場合）。
+wolfSSL 5.9.4では、コールバックが受け取るリクエストタイプとして`WC_ALGO_TYPE_KEYSTORE`を追加しました（`--enable-cryptocbutils=keystore`でビルドした場合）。
 これらのリクエストは、ハードウェアキーストアに保持された鍵のライフサイクル操作です。
 操作は7種類あり、平文形式とラップ形式それぞれでのインポートとエクスポート、導出、削除、および情報取得です。
 `wolfssl/wolfcrypt/wc_keystore.h`の`wc_KeyStore_*` APIは、デバイスが定義する不透明な参照によって鍵を指定します。
@@ -748,9 +748,9 @@ int myCryptoCallback(int devId, wc_CryptoInfo* info, void* ctx)
 暗号コールバックは、操作がデバイス上で開始されたもののまだ完了していないことを示すために、`WC_PENDING_E`を返すことができます。
 その場合、アプリケーションは`wolfSSL_AsyncPoll()`を使用して操作を完了まで進めます。
 `wolfSSL_AsyncPoll()`は非同期暗号サポートが有効な場合にのみ宣言されるため、[`--enable-asynccrypt`](chapter02.md#--enable-asynccrypt)設定オプション（`WOLFSSL_ASYNC_CRYPT`）で非同期暗号サポートを有効にする必要があります。
-wolfSSL 5.9.4では、TLS 1.3ハンドシェイクが拡張され、HKDF鍵スケジュール、トランスクリプトHMAC、AES-GCMレコードの暗号化と復号、乱数生成、ECCとX25519の鍵共有、ECDSAとEd25519の署名と検証でこれをサポートするようになりました。
+wolfSSL 5.9.4では、TLS 1.3ハンドシェイクのHKDF鍵スケジュール、トランスクリプトHMAC、AES-GCMレコードの暗号化と復号、乱数生成、ECCとX25519の鍵共有、ECDSAとEd25519の署名と検証でも、この非同期処理をサポートしました。
 特にTLSレコード暗号については、`WOLF_CRYPTO_CB_ASYNC_POLL`を定義すると、完了までポーリングするモデルを使用できます。
-これを定義しない場合、保留中のバルク暗号は、レコードを破損させる代わりに`ASYNC_OP_E`を返します。
+これを定義しない場合、保留中のバルク暗号は、レコードを破損させることなく`ASYNC_OP_E`を返します。
 さらに`WOLFSSL_ASYNC_CERT_YIELD`を定義すると、ピアの証明書チェーン内の各証明書を検証するたびに`WC_PENDING_E`を返すため、協調型スケジューラを実行できます。
 
 ### デバイス登録

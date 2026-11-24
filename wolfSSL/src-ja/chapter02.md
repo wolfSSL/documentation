@@ -96,7 +96,7 @@ make src/libwolfssl.la
 ## CMakeによるビルド
 
 wolfSSLは、CMake 3.16以降（3.22以降を推奨）を使用して構成およびビルドすることもできます。
-autoconfによるビルドが主要なビルドシステムです。
+主要なビルドシステムはautoconfです。
 CMakeによるビルドは一般的に使用されるオプションをサポートしていますが、`./configure`の全てのオプションをサポートしているわけではありません。
 
 CMakeではソースディレクトリ内でのビルドが許可されていないため、別のビルドディレクトリを作成します。
@@ -166,7 +166,7 @@ cd vcpkg
 
 Windowsでは、`./bootstrap-vcpkg.sh`の代わりに`bootstrap-vcpkg.bat`を実行します。
 
-## Windowsの上でのビルド
+## Windowsでのビルド
 
 以下の説明に加えて、Visual StudioでwolfSSLをビルドするための手順とヒントは[ここ](https://wolfssl.com/wolfSSL/Docs-wolfssl-visual-studio.html)でも提供しています。
 WindowsではCMakeを使用してwolfSSLをビルドすることもできます。
@@ -277,7 +277,7 @@ wolfSSLサイトからwolfSSLソースコード一式をダウンロード、解
 2. 一部のビルドシステムでは、wolfSSLヘッダーファイルの場所を明示的に知りたい場合があるため、それを指定する必要があるかもしれません。
    それらは`<wolfssl_root>/wolfssl`ディレクトリにあります。
    通常は、インクルードパスに`<wolfssl_root>`ディレクトリを追加することでヘッダーの問題を解決できます。
-3. wolfSSLは、configureプロセスがビッグエンディアンを検出しない限り、デフォルトでリトルエンディアンシステムとなります。
+3. wolfSSLは、configureプロセスがビッグエンディアンを検出しない限り、デフォルトでリトルエンディアンを前提とします。
    非標準環境でビルドするユーザーはconfigureプロセスを使用していないため、ビッグエンディアンシステムを使用している場合は`BIG_ENDIAN_ORDER`を定義する必要があります。
 4. wolfSSLは64ビット型を利用できると速度が向上します。
    configureプロセスはlongまたはlong longが64ビットかどうかを判断し、defineを設定します。
@@ -415,7 +415,7 @@ Segger embOS RTOSで使用するためのプロジェクトは`<wolfssl_root>/ID
 1. 「Project Navigator」でプロジェクトをクリックします。
 2. 「Build Settings」タブをクリックします。
 3. 「Apple Clang - Preprocessing」セクションまでスクロールします。
-4. 「Preprocessor Macros」の開示を開き、「+」と「-」ボタンを使用して変更します。
+4. 「Preprocessor Macros」の項目を展開し、「+」と「-」ボタンを使用して変更します。
    これをDebugとReleaseの両方に対して行ってください。
 
 このプロジェクトでは、デフォルト設定でwolfSSLとwolfCryptをビルドできるはずです。
@@ -540,7 +540,7 @@ DSAは、一般的な使用が段階的に廃止されています。
 #### NO_MD4
 
 ビルドからMD4を削除します。
-MD4は解読されているため、使用してはなりません。
+MD4は解読されているため、使用すべきではありません。
 
 #### NO_MD5
 
@@ -780,7 +780,7 @@ ED448のクライアント認証を無効にします。
 
 #### NO_MULTIBYTE_PRINT
 
-組み込みデバイスが問題を抱える可能性のある、マルチバイト文字をコンパイルアウトするために使用されます。
+組み込みデバイスが問題を抱える可能性のある、マルチバイト文字をビルドから除外するために使用されます。
 
 #### NO_OLD_SSL_NAMES
 
@@ -829,7 +829,7 @@ TSIP TLSリンク共通鍵暗号化方式のみを無効にします。
 #### WOLFSSL_DTLS13_NO_HRR_ON_RESUME
 
 これが定義されている場合、DTLSサーバーはクライアントの再開が成功した場合にクッキー交換を行いません。
-再開はより速く（1 RTT少なく）なり、帯域幅の消費が少なくなります（1つのClientHelloと、1つのHelloVerifyRequest/HelloRetryRequestが少なくなります）。
+再開はより速く（1 RTT少なく）なり、帯域幅の消費も減ります（ClientHelloとHelloVerifyRequest/HelloRetryRequestがそれぞれ1つずつ減ります）。
 一方、有効なSessionID/チケット/pskが収集された場合、偽造されたclientHelloメッセージはサーバー上のリソースを消費します。
 DTLS 1.3の場合、このオプションを使用すると、サーバーがEarly Data/0-RTT Dataを処理することもできます。
 これがなければ、サーバーはクッキーを持つ検証済みClientHelloを受信するまでステートフル処理に入らないため、Early Dataはドロップされます。
@@ -838,7 +838,7 @@ DTLS 1.2における同等の機能については、[`WOLFSSL_DTLS_NO_HVR_ON_RE
 クッキー交換なしでDTLS 1.3再開を許可するには、次のようにします。
 
 - `WOLFSSL_DTLS13_NO_HRR_ON_RESUME`を定義してwolfSSLをコンパイルする
-- `wolfSSL_dtls13_no_hrr_on_resume(ssl, 1)`をWOLFSSLオブジェクトに呼び出して、再開時のクッキー交換を無効にする
+- WOLFSSLオブジェクトに対して`wolfSSL_dtls13_no_hrr_on_resume(ssl, 1)`を呼び出して、再開時のクッキー交換を無効にする
 - 通常の接続と同様に続行する
 
 #### WOLFSSL_DTLS_NO_HVR_ON_RESUME
@@ -1136,7 +1136,7 @@ PKCS#7（Cryptographic Message Syntax）のサポートを有効にします。
 #### WOLFSSL_PKCS7_MAX_DECOMPRESSION
 
 PKCS#7 CompressedDataの最大展開率を設定します。
-展開後の出力は、圧縮された入力のサイズの最大でこの倍数までに制限されます。
+展開後のサイズは、圧縮された入力サイズのこの倍数までに制限されます。
 デフォルトは1031（zlibの最大圧縮率）です。
 悪意を持って細工された圧縮データによるメモリ枯渇を防止します。
 
@@ -1406,7 +1406,7 @@ wolfSSLが、OCSPレスポンスに署名して送信するOCSPレスポンダ�
 
 OCSPの堅牢化オプションです。
 Authority Information Access拡張から取得したレスポンダーのホストが内部のアドレス範囲（ループバック、リンクローカル、プライベートネットワーク）に解決される場合は、そのホストを拒否します。
-これにより、攻撃者が用意した証明書によってOCSPチェックが自身のサービスに向けられること（サーバーサイドリクエストフォージェリ、CWE-918）を防ぎます。
+これにより、攻撃者が用意した証明書によってOCSPチェックが内部ネットワーク上のサービスに向けられること（サーバーサイドリクエストフォージェリ、CWE-918）を防ぎます。
 
 #### WOLFSSL_OCSP_FAIL_IF_NOT_SUPPORTED
 
@@ -1415,9 +1415,9 @@ Authority Information Access拡張から取得したレスポンダーのホス�
 これを設定すると、OCSPレスポンダーを示していない証明書は、デフォルトのソフトフェイル動作ではなく、`OCSP_NEED_URL`で拒否されます。
 このオプションを設定しない場合、レスポンダーがなくても結果は`OCSP_NO_URL`になるだけで、有効になっているCRLチェックは引き続き実行されます。
 
-### ポスト量子暗号オプション
+### 耐量子暗号オプション
 
-以下の定義は、オプションのポスト量子アルゴリズムの機能を制御します。
+以下の定義は、オプションの耐量子アルゴリズムの機能を制御します。
 
 #### WOLFSSL_MLDSA_FIPS204_DRAFT
 
@@ -1512,13 +1512,13 @@ ASN.1テンプレートを使用する際のデバッグ出力を有効にしま
 
 #### WOLFSSL_ASN_TEMPLATE_TYPE_CHECK
 
-テスト用にコンパイラの型の問題をより適切にテストするためにASN関数を使用します。
+コンパイラの型に関する問題をより適切にテストするための、テスト用のASN関数を使用します。
 `WOLFSSL_ASN_TEMPLATE`と併用する場合にのみ関連します。
 
 #### WOLFSSL_DEBUG_DTLS
 
 DTLSのデバッグ支援です。
-wolfSSLがChangeCipherSpecメッセージをFinishedメッセージと同じデータグラムに強制的に入れないようにし、各レコードを個別に観察できるようにします。
+wolfSSLがChangeCipherSpecメッセージとFinishedメッセージを同じデータグラムにまとめないようにし、各レコードを個別に観察できるようにします。
 ログ出力は追加されません。
 
 ### 機能の有効化 (デフォルトで有効)
@@ -1570,7 +1570,7 @@ wolfSSLの証明書生成機能をオンにします。
 
 #### WOLFSSL_DER_LOAD
 
-[`wolfSSL_CTX_der_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_der_load_verify_locations)関数を使用して、wolfSSLコンテキスト(`WOLFSSL_CTX`)へのDERフォーマットされたCA証明書をロードできます。
+[`wolfSSL_CTX_der_load_verify_locations()`](group__CertsKeys.md#function-wolfssl_ctx_der_load_verify_locations)関数を使用して、DER形式のCA証明書をwolfSSLコンテキスト(`WOLFSSL_CTX`)にロードできます。
 
 #### WOLFSSL_DTLS
 
@@ -1789,7 +1789,7 @@ FIPS v5以前は暗号コールバックで`WOLF_PRIVATE_KEY_ID`をサポート�
 
 #### WOLFSSL_CERT_REQ
 
-証明書要求、鍵および証明書生成機能です。
+証明書署名要求、鍵および証明書生成機能です。
 
 #### WOLFSSL_SSLKEYLOGFILE
 
@@ -1859,7 +1859,7 @@ SHA-512サポートを有効にします。
 
 単一ブロックのAES API `wc_AesEncryptDirect()` / `wc_AesDecryptDirect()`を有効にします（複数ブロックのECB APIは[`HAVE_AES_ECB`](#have_aes_ecb)です）。
 それ自体ではECBモードは安全とは見なされません。
-AESキーラップ（したがってPKCS#7）、CMAC、CTR、CFB、OFB、XTSに必要です。
+AESキーラップ（ひいてはPKCS#7）、CMAC、CTR、CFB、OFB、XTSに必要です。
 CTR、CFB、OFB、XTSに対しては、settings.hが自動的にこのマクロをオンにします。
 **警告**：ほぼすべてのユースケースで、ECBモードは安全性が低いと考えられています。
 可能な限りECB APIを直接使用することは避けてください。
@@ -2048,8 +2048,8 @@ x86_64で[`USE_INTEL_SPEEDUP`](#use_intel_speedup)（`--enable-intelasm`）が�
 
 #### HAVE_CRL_IO
 
-CRL URLでインラインHTTPリクエストをブロックできるようにします。
-CRLを`WOLFSSL_CTX`にロードし、作成したすべてのwolfSSLオブジェクトに適用します。
+CRL URLに対するブロッキング方式のインラインHTTPリクエストを有効にします。
+CRLを`WOLFSSL_CTX`にロードし、そのコンテキストから作成したすべてのWOLFSSLオブジェクトに適用します。
 
 #### HAVE_ECC
 
@@ -2066,7 +2066,7 @@ CRLを`WOLFSSL_CTX`にロードし、作成したすべてのwolfSSLオブジェ
 #### OPENSSL_EXTRA
 
 ライブラリにさらに多くのOpenSSL互換性を組み込み、wolfSSL OpenSSL互換性レイヤーを有効にします。
-これにより、OpenSSLで動作するように設計された既存のアプリケーションへの移植を容易にします。
+これにより、OpenSSL向けに設計された既存のアプリケーションをwolfSSLへ移植しやすくなります。
 デフォルトでオフになっています。
 
 #### HAVE_EXT_CACHE
@@ -2116,7 +2116,7 @@ OpenSSL互換性API `wolfSSL_EVP_PKEY_cmp`は成功時に0、失敗時に-1を�
 #### WOLFSSL_HARDEN_TLS
 
 [RFC 9325](https://tex2e.github.io/rfc-translater/html/rfc9325)で指定された推奨事項を実装します。
-このマクロは、望ましいセキュリティビット数に定義する必要があります。
+このマクロには、目標とするセキュリティ強度のビット数を定義する必要があります。
 現在実装されている値は112ビットと128ビットです。
 `--enable-harden-tls[=112|128]`で有効になります（`yes`は`112`と同じです）。
 以下のマクロは特定のチェックを無効にします。
@@ -2316,7 +2316,7 @@ Ed448署名を有効にします。
 
 #### WOLFSSL_DH_CONST
 
-Diffie Hellman Operationsを実行するときにフローティングポイント値の使用をオフにし、`XPOW()`および`XLOG()`のテーブルを使用します。
+Diffie-Hellman演算で浮動小数点値を使用しないようにし、`XPOW()`と`XLOG()`にはテーブルを使用します。
 外部数学ライブラリへの依存関係を削除します。
 
 #### WOLFSSL_TRUST_PEER_CERT
@@ -2399,7 +2399,7 @@ x86_64およびaarch64では直接有効になり、その他のホストでは�
 
 #### USE_ECDSA_KEYSZ_HASH_ALGO
 
-エフェメラルECDHE鍵サイズまたは次に使用可能な次の最高値と一致するハッシュアルゴリズムを選択します。
+エフェメラルECDHE鍵サイズに一致するハッシュアルゴリズム、該当するものがなければその次に大きいものを選択します。
 この回避策は、SHA512でハッシュされたP-256鍵などのシナリオを正しくサポートしていないいくつかのピアに関する問題を解決します。
 
 #### WOLFSSL_ALT_CERT_CHAINS
@@ -2434,7 +2434,7 @@ Apple証明書検証との統合のユニットテストに使用されます。
 #### WOLFSSL_CUSTOM_CURVES
 
 標準以外の曲線を許可します。
-計算では、曲線"a"変数が含まれています。
+計算には曲線のパラメータ"a"が含まれます。
 [`HAVE_ECC_SECPR2`](#have_ecc_secpr2)、[`HAVE_ECC_SECPR3`](#have_ecc_secpr3)、[`HAVE_ECC_BRAINPOOL`](#have_ecc_brainpool)および[`HAVE_ECC_KOBLITZ`](#have_ecc_koblitz)を使用して、追加の曲線タイプを有効にできます。
 
 #### HAVE_ECC_SECPR2
@@ -2655,8 +2655,8 @@ SSL/CTX/X509オブジェクトに加えて、RSA鍵やECC鍵などのwolfCrypt�
 
 #### HAVE_FALCON
 
-Falconポスト量子署名スキーム（レベル1および5）を有効にします。
-wolfSSL 5.9.4では、従来のliboqsラッパーが、暗号コールバックとARM DSP / AArch64 NEONによる高速化をサポートするネイティブのwolfCrypt実装に置き換えられました。
+Falcon耐量子署名スキーム（レベル1および5）を有効にします。
+wolfSSL 5.9.4では、従来のliboqsラッパーを、暗号コールバックとARM DSP / AArch64 NEONによる高速化をサポートするネイティブのwolfCrypt実装に置き換えました。
 [`--enable-falcon`](#--enable-falcon)はこのスキームを有効にし、浮動小数点 / FFTのバックエンドとメモリプロファイルも選択します。
 Falconは標準化されていないため、`--enable-falcon`には`--enable-experimental`も必要です。
 
@@ -2706,7 +2706,7 @@ wolfCryptセキュアリモートパスワードサポートを有効にしま�
 #### WOLFSSL_MAX_STRENGTH
 
 最強のセキュリティ機能のみを有効にし、弱いまたは廃止予定の機能を無効にします。
-タイミングベースのサイドチャネル攻撃から保護するためのコンスタント実行により性能が劣化します。
+タイミングベースのサイドチャネル攻撃を防ぐ定数時間実行のため、性能は低下します。
 
 #### MAX_RECORD_SIZE
 
@@ -2724,7 +2724,7 @@ wolfCryptセキュアリモートパスワードサポートを有効にしま�
 
 #### MAX_CIPHER_NAME
 
-最大暗号名を定義します。
+暗号名の最大長を定義します。
 
 #### MAX_DATE_SIZE
 
@@ -2762,7 +2762,7 @@ maxq10xxに使用しているTLSバージョンを知らせます。
 
 #### WOLFSSL_STATIC_EPHEMERAL
 
-固定（「静的」）のエフェメラル(EC)DH鍵を、[`wolfSSL_CTX_set_ephemeral_key()`](ssl_8h.md#function-wolfssl_ctx_set_ephemeral_key)または`wolfSSL_set_ephemeral_key()`で読み込めるようにします。
+固定（「静的」）のエフェメラル(EC)DH鍵を、[`wolfSSL_CTX_set_ephemeral_key()`](group__CertsKeys.md#function-wolfssl_ctx_set_ephemeral_key)または`wolfSSL_set_ephemeral_key()`で読み込めるようにします。
 これにより、スニファーはエフェメラル鍵交換を使用するトラフィックを復号化できます。
 1つのエフェメラル鍵を複数の接続で再利用すると前方秘匿性が失われるため、テスト、検査、またはデバッグの目的にのみ使用してください。
 `--enable-sniffer`により自動的に設定されます。
@@ -2782,14 +2782,16 @@ wolfSSLは、スニファー機能とは別に、`--enable-keylog-export`構成�
 
 #### WOLFSSL_SNIFFER_STORE_DATA_CB
 
-Store Data Callbackオプションを使用すると、スニファーは再割り当てされたデータポインタではなくカスタムバッファにアプリケーションデータを保存する際に呼び出されるコールバックを取ることができます。
+Store Data Callbackオプションを使用すると、スニファーにコールバックを登録できます。
+このコールバックは、アプリケーションデータを再割り当てされたデータポインタではなく、カスタムバッファに保存する際に呼び出されます。
 コールバックはすべてのデータが消費されるまでループで呼び出されます。
 このオプションを有効にするには、`./configure --enable-sniffer CPPFLAGS=-DWOLFSSL_SNIFFER_STORE_DATA_CB`という構成コマンドラインを使用して、これまでと同様にビルドします。
 
 #### WOLFSSL_SNIFFER_WATCH
 
 Session Watchingオプションを使用すると、スニファーは初期設定なしで提供された任意のパケットを監視できます。
-すべてのTLSセッションのデコードを開始し、サーバーの証明書が検出されると、その証明書はユーザーが提供したコールバック関数に渡され、適切な秘密鍵を提供する必要があります。
+すべてのTLSセッションのデコードを開始し、サーバー証明書を検出すると、その証明書をユーザーが提供したコールバック関数に渡します。
+コールバックは対応する秘密鍵を返す必要があります。
 このオプションを有効にするには、`./configure --enable-sniffer CPPFLAGS=-DWOLFSSL_SNIFFER_WATCH`という構成コマンドラインを使用して、これまでと同様にビルドします。
 
 #### STATIC_BUFFER_LEN
@@ -2801,7 +2803,8 @@ Session Watchingオプションを使用すると、スニファーは初期設�
 
 #### STATIC_CHUNKS_ONLY
 
-ユーザーは、小さな静的バッファを使用している場合（デフォルト）に16K出力オプションをオフにするオプションがあり、SSL_writeが持っているレコードよりも大きなデータを書き込もうとすると、ユーザーが静的バッファチャンクでのみ書き込むように指示しない限り、動的に取得します。
+小さな静的バッファ（デフォルト）を使用している場合に、16 KBの出力オプションをオフにできます。
+通常、`SSL_write`が手元のレコードより大きなデータを書き込もうとするとバッファを動的に確保しますが、このマクロを定義すると静的バッファのチャンク単位でのみ書き込みます。
 
 #### WOLFSSL_DEF_PSK_CIPHER
 
@@ -2859,13 +2862,13 @@ TLSハンドシェイク中の署名処理において、利用可能な最も�
 #### HAVE_NULL_CIPHER
 
 NULL暗号のサポートをオンにします。
-このオプションはセキュリティの観点から強く非推奨ですが、稀に暗号化/復号化操作を実行するには小さすぎるシステムがあります。
-そのようなシステムでも、このマクロを有効化して少なくともメッセージやピアを認証し、メッセージの改ざんを防ぐことだけができます。
+このオプションはセキュリティの観点から強く非推奨ですが、暗号化/復号操作を実行するには小さすぎるシステムもあります。
+そのようなシステムでは、何もしないよりも、少なくともメッセージとピアを認証してメッセージの改ざんを防ぐ方が望ましいと言えます。
 
 #### HAVE_ANON
 
 匿名の暗号スイートのサポートをオンにします。
-推奨されませんが、インターネットから切り離された、またはプライベートネットワークに関連するいくつかの有効なユースケースがあります。
+決して推奨されませんが、インターネットから切り離されたクローズドなネットワークやプライベートネットワークでは、有効なユースケースもあります。
 
 #### HAVE_ATEXIT
 
@@ -2876,8 +2879,8 @@ NULL暗号のサポートをオンにします。
 
 wolfSSL 5.9.4で削除されました。
 liboqsはどのアルゴリズムにも使用されなくなりました。
-ポスト量子アルゴリズム（ML-KEM、ML-DSA、SLH-DSA、Falcon、FrodoKEM、LMS、XMSS）はすべてwolfCryptにネイティブ実装されており、このマクロを定義しても効果はありません。
-詳細については、本書の[付録I ポスト量子暗号の実験](appendix09.md)をご参照ください。
+耐量子アルゴリズム（ML-KEM、ML-DSA、SLH-DSA、Falcon、FrodoKEM、LMS、XMSS）はすべてwolfCryptにネイティブ実装されており、このマクロを定義しても効果はありません。
+詳細については、本書の[付録I 耐量子暗号の評価](appendix09.md)をご参照ください。
 
 #### HAVE_LIGHTY
 
@@ -2916,7 +2919,7 @@ SAKKEペアリングベース暗号の単精度(SP)サポートを有効にし�
 
 TLSで受け入れるDH鍵の最大ビットサイズです。
 8の倍数で、16384以下、かつ[`WOLFSSL_MIN_DHKEY_BITS`](#wolfssl_min_dhkey_bits)以上である必要があります。
-デフォルトは数学ライブラリによって異なり、SP mathでは`SP_INT_BITS`、fast mathでは（`FP_MAX_BITS`が16384以上の場合）`FP_MAX_BITS / 2`、それ以外の場合は4096です。
+デフォルトは数学ライブラリによって異なり、SP Mathでは`SP_INT_BITS`、fast mathでは（`FP_MAX_BITS`が16384以上の場合）`FP_MAX_BITS / 2`、それ以外の場合は4096です。
 
 #### WOLFSSL_MIN_DHKEY_BITS
 
@@ -2956,12 +2959,12 @@ RevokedCertsを保持するバッファの数を指定します。
 #### SESSION_INDEX
 
 キャッシュ内のセッションの場所を識別します。
-インデックスセッション/行シフトを指定します。
+インデックスは、キャッシュの行番号をビットシフトした値と、行内の位置を組み合わせたものです。
 
 #### SESSION_TICKET_HINT_DEFAULT
 
-チケットヒントのデフォルトは、デフォルトのヒント値を設定するために使用されます。
-チケットキーの寿命はチケットのライフヒントよりも長くなければなりません。
+チケットの有効期間ヒントのデフォルト値を設定します。
+チケット鍵の有効期間は、このヒントより長くなければなりません。
 
 #### WOLFSSL_DTLS13
 
@@ -3201,7 +3204,7 @@ SRTPをアクティブにするために使用されます。
 
 #### WOLFSSL_CIPHER_CHECK_SZ
 
-暗号化操作が機能したことを確認するために64ビットが必要な暗号チェックサイズとして定義されています。
+暗号化操作が正しく動作したことを確認するために使う暗号チェックのサイズとして定義されています（64ビットが必要です）。
 
 #### DTLS_CID_MAX_SIZE
 
@@ -3248,7 +3251,7 @@ DTLS通信中の最大データグラムサイズを制御するための、DTLS
 
 #### WOLFSSL_DTLS_MTU_ADDITIONAL_READ_BUFFER
 
-私たちとは少し異なるMTUを持つピアと連携できるように、追加のバイトを読み取る必要がある場合に使用します。
+自身とわずかに異なるMTUを持つピアと通信するために、追加のバイトを読み取る必要がある場合に使用します。
 
 #### WOLFSSL_DTLS_WINDOW_WORDS
 
@@ -3334,7 +3337,7 @@ wolfSSL 5.9.4で`WOLFSSL_SEND_HRR_COOKIE`から分離されました。
 
 #### WOLFSSL_SESSION_TIMEOUT
 
-秒単位のデフォルトセッション再開キャッシュタイムアウトは、タイムアウトを手動で定義するために使用されます。
+セッション再開キャッシュのデフォルトのタイムアウト（秒単位）を手動で定義します。
 
 #### WOLFSSL_SET_CIPHER_BYTES
 
@@ -3364,7 +3367,7 @@ wolfSSL証明書マネージャー署名者テーブルで使用されます。
 #### ECDHE_SIZE
 
 コンパイル時にこれをオーバーライドできるようにするために定義します。
-ECDHEサーバーサイズはデフォルトで256ビットであり、これは事前に決められたECDHE曲線サイズを設定できます。
+このマクロで、サーバーのECDHE鍵サイズ（事前に決めたECDHE曲線サイズ）を設定できます。
 デフォルトは32バイトです。
 
 #### CIPHER_NONCE
@@ -3403,7 +3406,7 @@ CRL、OCSP、BIOで使用されます。
 
 #### EXTERNAL_SERIAL_SIZE
 
-バッファに符号なしバイナリでX509シリアル番号を書き込む生のシリアル番号バイトです。
+X509シリアル番号を符号なしバイナリでバッファに書き込む際の、生のシリアル番号のバイト数です。
 すべての場合において、バッファは少なくとも`EXTERNAL_SERIAL_SIZE`（32）である必要があります。
 成功した場合、`WOLFSSL_SUCCESS`を返します。
 **注意**：これはユーザーが定義できない内部マクロです。
@@ -3708,7 +3711,7 @@ DRBG用のカスタムシードコールバック関数を有効にします。
 RNGバンク機能(`rng_bank`)を有効にします。
 この機能は乱数データを事前に生成しておき、以降の要求にはバッファから応答します。
 このマクロは以前は`WC_RNG_BANK_SUPPORT`という名前でした。
-wolfSSL 5.9.4で名前が変更され、機能もカーネルで用いられるSP 800-90のセマンティクスに対応しました。
+wolfSSL 5.9.4でこのマクロの名前を変更し、機能もカーネルで用いられるSP 800-90のセマンティクスに対応させました。
 具体的には、シードプール、次のシードの生成、RBG-C構成に加えて、ロックおよびデバッグ統計のオプションを備えています。
 
 #### WC_RNG_WANT_BANKREF_SUPPORT
@@ -3735,7 +3738,7 @@ configureおよびCMakeは、これをサポートするプラットフォーム
 SRAM PUFの誤り訂正強度です。
 BCH(127,k,t)プロファイルとして、t=7(k=78)、t=10(k=64、デフォルトであり、以前のリリースと互換)、t=13(k=50)、t=15(k=36)のいずれかを選択します。
 tを大きくすると、127ビットのコードワードあたりで訂正できるビット反転の数が増えますが、その分エントロピーが減少します。
-登録(エンロール)と再構成では同じ`WC_PUF_BCH_T`と`WC_PUF_NUM_CODEWORDS`を使用する必要があるため、`WC_PUF_PROFILE_ID`をヘルパーデータと一緒に保存してください。
+登録と再構成では同じ`WC_PUF_BCH_T`と`WC_PUF_NUM_CODEWORDS`を使用する必要があるため、`WC_PUF_PROFILE_ID`をヘルパーデータと一緒に保存してください。
 wolfSSL 5.9.4で追加されました。
 
 #### WC_PUF_NUM_CODEWORDS
@@ -4241,7 +4244,7 @@ Cypress/Infineon PSoC6のハードウェアによるSHA-3アクセラレーシ�
 #### WOLFSSL_SMALL_CERT_VERIFY
 
 DecodedCertを使用せずに証明書署名を確認します。
-一部のコードでは2倍になりますが、ピークヒープメモリの使用が小さくなります。
+一部のコードが重複しますが、ピークヒープメモリの使用量は小さくなります。
 [`WOLFSSL_NONBLOCK_OCSP`](#wolfssl_nonblock_ocsp)では使用できません。
 `--enable-lowresource`、`--enable-leantls`、および`--enable-tinytls13`の`cert`/`mutualauth`項目によって選択されます。
 wolfSSL 5.9.4では、後続の解析エラーよりも先に署名の検証失敗を報告します（CVE-2026-94418）。
@@ -4421,7 +4424,7 @@ SPコードでは常にスタックを使用し、ヒープの`XMALLOC()`/`XREAL
 
 #### WC_ASN_NAME_MAX
 
-X.509証明書フィールドの最大名前サポートのオーバーライドを許可します。
+X.509証明書フィールドでサポートする名前の最大長を上書きできるようにします。
 
 #### OPENSSL_EXTRA_X509_SMALL
 
@@ -4432,7 +4435,7 @@ X.509証明書フィールドの最大名前サポートのオーバーライド
 OpenSSL追加互換APIを有効にしますが、ASN1オブジェクト関数は除外します。
 ASN1の互換性が不要な場合に、コードサイズを削減するのに役立ちます。
 
-### パフォーマンスを向上させる
+### パフォーマンスの向上
 
 #### USE_INTEL_SPEEDUP
 
@@ -4590,7 +4593,7 @@ ECC固定点の事前計算に使用するルックアップテーブルのビ�
 #### FP_ECC_CONTROL
 
 デフォルトでは定義されていません。
-定義すると、SP数学ライブラリ（[`WOLFSSL_HAVE_SP_ECC`](#wolfssl_have_sp_ecc)および[`WOLFSSL_SP_SM2`](#wolfssl_sp_sm2)）を使用したSM2署名検証で、キャッシュを利用した固定点の処理パス（`sp_ecc_cache_verify_sm2_256()`）が使用されます。
+定義すると、SP Mathライブラリ（[`WOLFSSL_HAVE_SP_ECC`](#wolfssl_have_sp_ecc)および[`WOLFSSL_SP_SM2`](#wolfssl_sp_sm2)）を使用したSM2署名検証で、キャッシュを利用した固定点の処理パス（`sp_ecc_cache_verify_sm2_256()`）が使用されます。
 
 #### HAVE_ECC_CHECK_PUBKEY_ORDER
 
@@ -4661,10 +4664,10 @@ ECIES暗号化のIVを、KDFの出力から導出する代わりにランダム�
 
 #### WOLFSSL_ECIES_STATIC_GCM_NONCE
 
-wolfSSL 5.9.4では、HMACを併用するAES-CBC/CTRに加えて、AES-GCMがECIESのデータカプセル化メカニズム（DEM）として追加されました。
+wolfSSL 5.9.4では、HMACを併用するAES-CBC/CTRに加えて、AES-GCMをECIESのデータカプセル化メカニズム（DEM）として追加しました。
 この追加には、ECIESの暗号コールバックと`devId`の受け渡しも含まれます。
 このマクロは、GCMノンスが固定のオールゼロ値となるデフォルトのIVモードで、AES-GCM DEMの使用を許可します。
-これが安全なのは、ECIESがメッセージごとに新しいエフェメラル鍵から新しい鍵を導出するからに他なりません。
+これが安全なのは、ECIESがメッセージごとに新しいエフェメラル鍵から新しい鍵を導出するからです。
 このマクロを定義しない場合、デフォルトのIVモードでのAES-GCMは`NOT_COMPILED_IN`を返します。
 [`WOLFSSL_ECIES_GEN_IV`](#wolfssl_ecies_gen_iv)（ランダムなノンス）または[`WOLFSSL_ECIES_OLD`](#wolfssl_ecies_old)（KDFから導出されたノンス）を使用する場合は、このマクロは不要です。
 
@@ -4845,7 +4848,7 @@ ECCのみを使用する場合、これは最大ECC鍵サイズの2倍に減ら�
 そのような環境で、FastMathを使用した公開鍵操作中にスタック破壊が発生した場合は、スタック使用量に対応するためにスタックサイズを増やしてください。
 
 autoconfシステムを使用せずにFastMathを有効にする場合は、`USE_FAST_MATH`を定義し、`tfm.c`がコンパイルされるようにする必要があります。
-`integer.c`と`sp_int.c`は自身をガードしており、何も含まない状態でコンパイルされるため、ビルドから削除する必要はありません。
+`integer.c`と`sp_int.c`はファイル全体がマクロでガードされており、選択されていない場合は空のままコンパイルされるため、ビルドから削除する必要はありません。
 `ALT_ECC_SIZE`を定義すると、ECCポイントはスタックではなくヒープからのみ割り当てられます。
 
 ##### アーキテクチャ固有の最適化
@@ -4895,7 +4898,7 @@ ECC操作の性能を向上させるのに役立ちます。
 
 #### 独自の単精度(SP)数学ライブラリのサポート
 
-SP数学ライブラリは推奨されるデフォルトのオプションであり、DO-178C認定を受けています。
+SP Mathライブラリは推奨されるデフォルトのオプションであり、DO-178C認定を受けています。
 `sp_int.c`は汎用の多倍長整数演算コード（SP Math All）です。
 その他のファイルは固定サイズの実装で、一般的な特定の鍵サイズと曲線に対する公開鍵操作を高速化します。
 これらは[`--enable-sp`](#--enable-spopt)、または[`WOLFSSL_HAVE_SP_RSA`](#wolfssl_have_sp_rsa)、[`WOLFSSL_HAVE_SP_DH`](#wolfssl_have_sp_dh)、[`WOLFSSL_HAVE_SP_ECC`](#wolfssl_have_sp_ecc)で有効になります。
@@ -4917,7 +4920,7 @@ SP数学ライブラリは推奨されるデフォルトのオプションであ
 
 ##### WOLFSSL_SP_MATH
 
-SP数学とアルゴリズムのみを有効にします。
+SP Mathとアルゴリズムのみを有効にします。
 通常(`integer.c`)またはFAST(`tfm.c`)などの大きな整数演算コードを排除します。
 鍵サイズと曲線をSPでサポートされているものだけに制限します。
 
@@ -5257,7 +5260,7 @@ devkitPro用にビルドする場合に使用します。
 
 GameCubeおよびWiiのエミュレータであるDolphin向けにビルドする場合に使用します。
 この場合、`wc_GenerateSeed()`は、`time()`でシードされたCライブラリの`rand()`から乱数生成のシードを取得します。
-これは安全なエントロピー源ではないため、テスト目的でのみ使用してください。
+これは安全なエントロピーソースではないため、テスト目的でのみ使用してください。
 wolfCryptテストプログラムは、終了時に`main()`から戻るとエミュレータがパニックを起こすため、代わりにループで待機します。
 
 #### WOLFSSL_NDS
@@ -5265,7 +5268,7 @@ wolfCryptテストプログラムは、終了時に`main()`から戻るとエミ
 devkitProとlibndsを使用してNintendo DS向けにビルドする場合に使用します。
 wolfSSLソースの`IDE/NDS/README.md`を参照してください（同ファイルのconfigureの例では`WOLFSSL_USER_IO`も定義しています）。
 `SIZEOF_LONG_LONG`を8として定義し、`NO_WRITEV`と、不足しているソケットの型および定数を定義します。
-[`DOLPHIN_EMULATOR`](#dolphin_emulator)と同様に、乱数生成のシードは`time()`でシードされた`rand()`から取得されますが、これは安全なエントロピー源ではありません。
+[`DOLPHIN_EMULATOR`](#dolphin_emulator)と同様に、乱数生成のシードは`time()`でシードされた`rand()`から取得されますが、これは安全なエントロピーソースではありません。
 
 #### WOLFSSL_VXWORKS_6_x
 
@@ -5561,7 +5564,7 @@ DTLS Connection ID拡張を有効にします（`WOLFSSL_DTLS_CID`を定義し�
 
 ### `--enable-dtls-frag-ch`
 
-1つのデータグラムに収まらないClientHelloメッセージ（ポスト量子の鍵共有を含む場合など）に対応するため、DTLS 1.3 ClientHelloのフラグメント化を有効にします。
+1つのデータグラムに収まらないClientHelloメッセージ（耐量子の鍵共有を含む場合など）に対応するため、DTLS 1.3 ClientHelloのフラグメント化を有効にします。
 `--enable-dtls13`が必要です。
 デフォルトで無効ですが、ML-KEMとDTLS 1.3の両方が有効な場合は自動的に有効になります。
 
@@ -5828,18 +5831,18 @@ Cortex-M33上のPSK P-256クライアント（37,347バイト）について、�
    エンドポイント間で事前共有鍵を共有しており、証明書が不要な場合は`psk`を使用します。
    既知の認証局が発行したX.509証明書を検証する必要がある場合は`cert`を使用します。
 2. 必要な追加項目のみを追加します。
-   上の表に示すとおり、各追加項目によるサイズの増加は意図的なものであり、その増加量は計測されています。
+   上の表のとおり、各追加項目は、サイズの増加量を把握したうえで意図的に一段階ずつ加えるものです。
    サーバーとしてビルドする場合は`server`から始め、曲線や署名の追加項目は通信相手が必要とする場合にのみ追加してください。
 3. 鍵交換に使用する曲線を選択します。
    PSKの最小構成はX25519を、証明書プロファイルはP-256を使用します。
    PSKの最小構成でP-256を使用したい場合（ECDSA証明書のために既に取り込まれているP-256のコードを再利用する場合など）は、`p256`を追加します。
-   代わりにP-384やポスト量子ハイブリッドなど独自のグループを使用する場合は、その曲線を自分で選択し、プロファイルがデフォルトのX25519やP-256を強制しないように`WOLFSSL_TINY_TLS13_NO_DEFAULT_CURVE`を定義してください。
+   代わりにP-384や耐量子ハイブリッドなど独自のグループを使用する場合は、その曲線を自分で選択し、プロファイルがデフォルトのX25519やP-256を強制しないように`WOLFSSL_TINY_TLS13_NO_DEFAULT_CURVE`を定義してください。
 4. メモリモデルを選択します。
    デフォルトではシステムのアロケーターを使用します。
    `wolfSSL_CTX_load_static_memory()`で渡した固定のプールからTLSのメモリ割り当てを行うには、`staticmem`を追加します。
    ヒープを一切持たないターゲットでは、`WOLFSSL_NO_MALLOC`も定義してください。
 5. ベアメタル向けのプラットフォーム依存部分を用意します。
-   サンプルのテンプレートは`WOLFSSL_USER_IO`（送受信コールバックを自分で用意します）、`NO_FILESYSTEM`、`WOLFSSL_NO_SOCK`を有効にし、`CUSTOM_RAND_GENERATE_SEED`を通じてハードウェアのエントロピー源が提供されることを前提としています。
+   サンプルのテンプレートは`WOLFSSL_USER_IO`（送受信コールバックを用意する必要があります）、`NO_FILESYSTEM`、`WOLFSSL_NO_SOCK`を有効にし、`CUSTOM_RAND_GENERATE_SEED`を通じてハードウェアのエントロピーソースが提供されることを前提としています。
 6. サイズを優先してビルドします。
    未使用のコードが削除されるように、アプリケーションを`-Os -flto -ffunction-sections -fdata-sections -Wl,--gc-sections`でリンクしてください。
 
@@ -5868,7 +5871,7 @@ make
 | `WOLFSSL_TINY_TLS13_STATIC_MEM` | `staticmem` | 呼び出し側が提供する静的メモリプールからTLSのメモリ割り当てを行います。 |
 | `WOLFSSL_TINY_TLS13_ASM` | `asm` | 小型のCバックエンドの代わりに、アセンブリによる暗号実装を使用します。サイズは大きくなりますが高速です。 |
 | `WOLFSSL_TINY_TLS13_RSA_VERIFY` | `rsaverify` | RSA-PSSによる証明書検証を追加します。証明書プロファイルと組み合わせて使用します。 |
-| `WOLFSSL_TINY_TLS13_NO_DEFAULT_CURVE` | （なし） | デフォルト曲線の自動選択を抑止します。この場合、プロファイルはX25519もP-256も有効にしないため、独自のグループ（P-384やポスト量子ハイブリッドなど）を選択できます。 |
+| `WOLFSSL_TINY_TLS13_NO_DEFAULT_CURVE` | （なし） | デフォルト曲線の自動選択を抑止します。この場合、プロファイルはX25519もP-256も有効にしないため、独自のグループ（P-384や耐量子ハイブリッドなど）を選択できます。 |
 
 configureの項目`p256`、`sha384`、`mldsa`には専用のtinyマクロはなく、標準のwolfSSLマクロ（`ECC_USER_CURVES`と組み合わせた`HAVE_ECC`、`WOLFSSL_SHA384`、`WOLFSSL_MLDSA_VERIFY_ONLY`と組み合わせた`WOLFSSL_HAVE_MLDSA`）で選択します。
 具体的なブロックについては、`examples/configs/user_settings_tinytls13.h`を参照してください。
@@ -5882,8 +5885,8 @@ configureの項目`p256`、`sha384`、`mldsa`には専用のtinyマクロはな�
   その検証は意図的に簡略化されています（名前制約なし、ASN.1の緩和、CRLなし）。
 * 一般的なパブリックインターネットのPKIでは、`cert`プロファイルを使用しないでください。
 * `mldsa`と`rsaverify`は、`cert`プロファイルと組み合わせて使用してください。
-  これらは証明書検証用のアルゴリズムであるため、PSKの最小構成ではビルドがリンクできることを確認するだけになります。
-* ベアメタル環境では、`CUSTOM_RAND_GENERATE_SEED`を通じて実際のハードウェアのエントロピー源を提供してください。
+  これらは証明書検証用のアルゴリズムであるため、PSKの最小構成で追加しても、ビルドがリンクできることを確認するだけです。
+* ベアメタル環境では、`CUSTOM_RAND_GENERATE_SEED`を通じて実際のハードウェアのエントロピーソースを提供してください。
   `NO_FILESYSTEM`などを設定すると、デフォルトのシード源は存在しなくなります。
 * このプロファイルをFIPSビルドと組み合わせないでください。
   これは非FIPSのフットプリントプロファイルです。
@@ -5921,7 +5924,7 @@ configureの項目`p256`、`sha384`、`mldsa`には専用のtinyマクロはな�
 小さなセッションキャッシュを有効にします。
 
 小さなセッションキャッシュを有効にすると、wolfSSLは6セッションのみを保存します。
-これは、デフォルトのRAM使用量が大きすぎる組み込みクライアントやシステムに適しています。
+これは、デフォルトではRAM使用量が大きすぎる組み込みクライアントやシステムで役立つ場合があります。
 デフォルトのキャッシュ（33セッション）は、セッションキャッシュに約13KB、クライアントキャッシュに約17KBを使用しますが、小さなキャッシュではそれぞれ約2KBと約3KBです。
 
 ### `--enable-session-cache-ref`
@@ -6029,7 +6032,7 @@ AESの8バイト認証を備えたCounter with CBC-MACモード（CCM-8）も含
 ### `--disable-aescbc`
 
 AES-CBCはデフォルトで有効です。
-`--disable-aescbc`を指定すると、AES-CBCをコンパイルアウトします（`NO_AES_CBC`を定義します）。
+`--disable-aescbc`を指定すると、AES-CBCをビルドから除外します（`NO_AES_CBC`を定義します）。
 [`--enable-she`](#--enable-she)と`--enable-aescts`にはAES-CBCが必要です。
 
 ### `--enable-aescbc-length-checks`
@@ -6212,7 +6215,7 @@ SHA-512はすべてのターゲットでデフォルトで有効であり、[`--
 ### `--disable-hmac`
 
 HMACはデフォルトで有効です。
-`--disable-hmac`を指定すると、HMACをコンパイルアウトします（[`NO_HMAC`](#no_hmac)を定義します）。
+`--disable-hmac`を指定すると、HMACをビルドから除外します（[`NO_HMAC`](#no_hmac)を定義します）。
 TLSにはHMACが必要なため、このオプションは[`--enable-cryptonly`](#--enable-cryptonly)などのwolfCryptのみのビルドでのみ有用です。
 選択したオプションがHMACを必要とする場合（wolfSSH、wolfGuard、SLH-DSAのSHA-2バリアントなど）、configureは失敗します。
 
@@ -6244,13 +6247,13 @@ SHEは、ECUにおける安全な鍵管理のための車載セキュリティ�
 SHEは、依存する機能であるAES、AES-CBC、AESダイレクト、CMACを自動的に有効にします。
 `--disable-aescbc`も指定した場合、configureは失敗します。
 
-以下の定義を使用して、オプション機能をコンパイルアウトできます。
+以下の定義を使用して、オプション機能をビルドから除外できます。
 
-- `NO_WC_SHE_GETUID` - `wc_SHE_GetUID`コールバックをコンパイルアウトします
-- `NO_WC_SHE_GETCOUNTER` - `wc_SHE_GetCounter`コールバックをコンパイルアウトします
-- `NO_WC_SHE_IMPORT_M123` - `wc_SHE_ImportM1M2M3`をコンパイルアウトします
-- `NO_WC_SHE_EXPORTKEY` - `wc_SHE_ExportKey`コールバックをコンパイルアウトします
-- `NO_WC_SHE_LOADKEY` - `wc_SHE_LoadKey` / `wc_SHE_LoadKey_Verify`の簡易ラッパーをすべてコンパイルアウトします
+- `NO_WC_SHE_GETUID` - `wc_SHE_GetUID`コールバックをビルドから除外します
+- `NO_WC_SHE_GETCOUNTER` - `wc_SHE_GetCounter`コールバックをビルドから除外します
+- `NO_WC_SHE_IMPORT_M123` - `wc_SHE_ImportM1M2M3`をビルドから除外します
+- `NO_WC_SHE_EXPORTKEY` - `wc_SHE_ExportKey`コールバックをビルドから除外します
+- `NO_WC_SHE_LOADKEY` - `wc_SHE_LoadKey` / `wc_SHE_LoadKey_Verify`の簡易ラッパーをすべてビルドから除外します
 - `WC_SHE_SW_DEFAULT` - ハードウェアなしでテストするための、ソフトウェアのみによるデフォルトのUIDとカウンターを有効にします
 
 ### `--enable-sessioncerts`
@@ -6260,9 +6263,9 @@ SHEは、依存する機能であるAES、AES-CBC、AESダイレクト、CMACを
 ### `--enable-keygen`
 
 鍵生成機能を有効にします（`WOLFSSL_KEY_GEN`）。
-対象は、RSA鍵生成、DSA鍵生成、DHパラメーター生成、および`wc_RsaKeyToDer()`などの鍵をDERにエクスポートする関数です。
+対象は、RSA鍵生成、DSA鍵生成、DHパラメータ生成、および`wc_RsaKeyToDer()`などの鍵をDERにエクスポートする関数です。
 カンマ区切りのリストも指定できます。
-`all`、またはDH鍵生成を維持したままDHドメインパラメーターの生成を除外する`no-dh-params`（`WOLFSSL_NO_DH_GEN_PARAMS`を定義します）を指定できます。
+`all`、またはDH鍵生成を維持したままDHドメインパラメータの生成を除外する`no-dh-params`（`WOLFSSL_NO_DH_GEN_PARAMS`を定義します）を指定できます。
 
 ### `--enable-certgen`
 
@@ -6286,7 +6289,7 @@ SHEは、依存する機能であるAES、AES-CBC、AESダイレクト、CMACを
 
 ### `--enable-certreq`
 
-証明書リクエスト生成を有効にします。
+証明書署名要求の生成を有効にします。
 
 ### `--enable-sep`
 
@@ -6724,7 +6727,7 @@ FIPS v7ビルドではビルド時に無効にすることはできません。
 ### `--disable-optflags`
 
 GCC互換コンパイラを使用し、かつ[`--enable-debug`](#--enable-debug)と[`--enable-distro`](#--enable-distro)のいずれも使用しない場合、configureはデフォルトの最適化フラグを追加します。
-fast mathビルドおよびsmallではないSP mathビルドでは`-O2`、それ以外では`-Os`です。
+fast mathビルドおよびsmallではないSP Mathビルドでは`-O2`、それ以外では`-Os`です。
 `--disable-optflags`を指定するとこれらのフラグを追加しないため、最適化レベルはユーザー自身が指定した`CFLAGS`のみによって決まります。
 
 ### `--disable-aligndata`
@@ -6898,7 +6901,7 @@ wolfSSHオプションを有効にします。
 wolfSCEP（Simple Certificate Enrollment Protocol）を有効にします。
 
 IETFによって定義されているように、SCEPはHTTP上でPKCS#7とPKCS#10を活用するPKIです。
-CERTはSCEPが証明書要求を強力に認証しないことに注意しています。
+CERTはSCEPが証明書署名要求を強力に認証しないことに注意しています。
 
 ### `--enable-srp`
 
@@ -7048,7 +7051,7 @@ wolfSSL 5.9.4以降、このオプションは非推奨となり、無視され�
 liboqsのサポートは削除されました。
 liboqsを使用していた最後のアルゴリズムであるFalconには、wolfCryptのネイティブ実装があり、[`--enable-falcon`](#--enable-falcon)で有効にできます。
 このオプションを指定しても、configureの警告が表示されるだけです。
-詳細については、本ドキュメントの[付録I ポスト量子暗号の実験](appendix09.md)をご参照ください。
+詳細については、本ドキュメントの[付録I 耐量子暗号の評価](appendix09.md)をご参照ください。
 
 ### `--with-wnr=PATH`
 
@@ -7062,7 +7065,7 @@ configureは引き続きこのオプションを受け付けますが、指定�
 libzを有効にすると、libzライブラリからの圧縮サポートがwolfSSLで可能になります。
 このオプションを含めて[`wolfSSL_set_compression()`](group__Setup.md#function-wolfssl_set_compression)を呼び出すことについては、よくご検討ください。
 送信前にデータを圧縮すると、送受信されるメッセージの実際のサイズが減少します。
-しかし、圧縮されたデータはほとんどのネットワークにおいて、そのまま送信するよりも分析に時間がかかります。
+しかし、ごく低速なネットワークを除けば、通常は圧縮処理にかかる時間の方が、そのまま送信する時間よりも長くなります。
 
 ### `--with-cavium`
 
@@ -7112,7 +7115,7 @@ CPPFLAGSを使用して渡されたmcpuまたはmfpu設定を上書きしませ�
 
 ### `--with-arm-target=TARGET`
 
-32ビットARMホスト向けに、SP数学コードのARMバリアントを選択します。
+32ビットARMホスト向けに、SP MathコードのARMバリアントを選択します。
 `thumb`はThumbコード（`WOLFSSL_SP_ARM_THUMB`、または[`--enable-sp-asm`](#--enable-sp-asm)と併用した場合は`WOLFSSL_SP_ARM_THUMB_ASM`）を使用し、`-mthumb -march=armv6`を追加します。
 `cortex`はCortex-MのCコード（`WOLFSSL_SP_ARM_CORTEX_M`）を使用し、`-mcpu=cortex-r5`を追加します。
 デフォルトでは設定されていません。
@@ -7280,14 +7283,14 @@ wolfSSL 5.9.4では、同じデバイスIDを2回登録しようとすると`ALR
 また、`wc_CryptoCb_IsDeviceRegistered()`で、デバイスIDが登録済みかどうかを確認できます。
 旧名称の`--enable-cryptodev`は、非推奨のエイリアスです。
 
-`--enable-cryptocb`で次の定義を使用して、アルゴリズムのソフトウェアフォールバックをコンパイルアウトし、ソフトウェア実装が不要な場合のフットプリント削減のために最適化できます。
+`--enable-cryptocb`で次の定義を使用して、アルゴリズムのソフトウェアフォールバックをビルドから除外し、ソフトウェア実装が不要な場合のフットプリント削減のために最適化できます。
 
-* `WOLF_CRYPTO_CB_ONLY_RSA` - RSAソフトウェア暗号フォールバックをコンパイルアウトします。
-* `WOLF_CRYPTO_CB_ONLY_ECC` - ECCソフトウェア暗号フォールバックをコンパイルアウトします。
-* `WOLF_CRYPTO_CB_ONLY_ED25519`、`WOLF_CRYPTO_CB_ONLY_CURVE25519`、`WOLF_CRYPTO_CB_ONLY_CURVE448` - Ed25519 / Curve25519 / Curve448のソフトウェア実装をコンパイルアウトします。
-* `WOLF_CRYPTO_CB_ONLY_SHA256`、`WOLF_CRYPTO_CB_ONLY_SHA512`、`WOLF_CRYPTO_CB_ONLY_AES` - SHA-256 / SHA-512 / AESのソフトウェア実装をコンパイルアウトします。
-* `WOLF_CRYPTO_CB_ONLY_SLHDSA` - SLH-DSAのソフトウェア実装をコンパイルアウトします。
-* `WOLF_CRYPTO_CB_ONLY_MLKEM`、`WOLF_CRYPTO_CB_ONLY_MLDSA`、`WOLF_CRYPTO_CB_ONLY_FALCON`、`WOLF_CRYPTO_CB_ONLY_FRODOKEM`、`WOLF_CRYPTO_CB_ONLY_LMS`、`WOLF_CRYPTO_CB_ONLY_XMSS` - ML-KEM / ML-DSA / Falcon / FrodoKEM / LMS / XMSSのソフトウェア実装をコンパイルアウトします。
+* `WOLF_CRYPTO_CB_ONLY_RSA` - RSAソフトウェア暗号フォールバックをビルドから除外します。
+* `WOLF_CRYPTO_CB_ONLY_ECC` - ECCソフトウェア暗号フォールバックをビルドから除外します。
+* `WOLF_CRYPTO_CB_ONLY_ED25519`、`WOLF_CRYPTO_CB_ONLY_CURVE25519`、`WOLF_CRYPTO_CB_ONLY_CURVE448` - Ed25519 / Curve25519 / Curve448のソフトウェア実装をビルドから除外します。
+* `WOLF_CRYPTO_CB_ONLY_SHA256`、`WOLF_CRYPTO_CB_ONLY_SHA512`、`WOLF_CRYPTO_CB_ONLY_AES` - SHA-256 / SHA-512 / AESのソフトウェア実装をビルドから除外します。
+* `WOLF_CRYPTO_CB_ONLY_SLHDSA` - SLH-DSAのソフトウェア実装をビルドから除外します。
+* `WOLF_CRYPTO_CB_ONLY_MLKEM`、`WOLF_CRYPTO_CB_ONLY_MLDSA`、`WOLF_CRYPTO_CB_ONLY_FALCON`、`WOLF_CRYPTO_CB_ONLY_FRODOKEM`、`WOLF_CRYPTO_CB_ONLY_LMS`、`WOLF_CRYPTO_CB_ONLY_XMSS` - ML-KEM / ML-DSA / Falcon / FrodoKEM / LMS / XMSSのソフトウェア実装をビルドから除外します。
 
 `--enable-cryptocb=only`を指定すると、上記のうち有効になっているすべてのアルゴリズムの`WOLF_CRYPTO_CB_ONLY_*`フラグが有効になり、すべての暗号操作がオフロードされます。
 `--enable-cryptocb=no-default-devid`は、プラットフォーム固有のデフォルトデバイスIDなしでコールバックを有効にします。
@@ -7438,7 +7441,8 @@ CMakeで同等のオプションは`WOLFSSL_TLS13_SHA512`です。
 
 ### `--enable-wolfEntropy`
 
-SP 800-90B認証を取得できるように設計された、ソフトウェアジッター（メモリ使用）エントロピー源であるwolfEntropyを有効にします。
+wolfEntropyを有効にします。
+wolfEntropyは、メモリアクセスにかかる時間の揺らぎ（ジッター）を利用するソフトウェアのエントロピーソースで、SP 800-90B認証を取得できるように設計されています。
 `--enable-wolfentropy`と`--enable-entropy-memuse`はエイリアスです。
 デフォルトで無効ですが、RDRANDやRDSEEDを使用しないカーネルモジュールのビルドでは有効になります。
 
@@ -7459,7 +7463,7 @@ HKDFも併せて有効になります。
 
 非同期のソフトウェアベース暗号シミュレーションを有効にします。
 デフォルトで無効です。
-wolfSSL 5.9.4で、`--enable-all`と組み合わせたエンドツーエンドのサポートが追加されました。
+wolfSSL 5.9.4で、`--enable-all`と組み合わせたエンドツーエンドのサポートを追加しました。
 [`WOLFSSL_ASYNC_CRYPT_SW`](#wolfssl_async_crypt_sw)を定義します。
 
 ### `--disable-mlkem`
@@ -7514,9 +7518,9 @@ wolfSSL 5.9.4で追加されました。
 
 ### `--enable-falcon`
 
-wolfCryptネイティブのFalconポスト量子署名スキームを有効にします。
+wolfCryptネイティブのFalcon耐量子署名スキームを有効にします。
 デフォルトで無効で、`--enable-experimental`が必要です。
-wolfSSL 5.9.4で、liboqsのラッパーはネイティブ実装に置き換えられました。
+wolfSSL 5.9.4で、liboqsのラッパーをネイティブ実装に置き換えました。
 Falconは外部ライブラリを必要としなくなり、暗号コールバック、ARM DSPおよびAArch64 NEONによる高速化をサポートし、Linuxカーネル内でも動作します。
 [`HAVE_FALCON`](#have_falcon)を定義します。
 
@@ -7580,9 +7584,9 @@ configureが通常コンパイラのコマンドラインに追加する機能�
 
 ### `--enable-heapmath`
 
-デフォルトのSP数学ライブラリの代わりに、レガシーのヒープベースの`integer.c`数学ライブラリを使用します（`USE_INTEGER_HEAP_MATH`を定義します）。
+デフォルトのSP Mathライブラリの代わりに、レガシーのヒープベースの`integer.c`数学ライブラリを使用します（`USE_INTEGER_HEAP_MATH`を定義します）。
 デフォルトで無効です。
-SP数学は無効になります。
+SP Mathは無効になります。
 「特別な数学最適化フラグ」節を参照してください。
 
 ### カーネルモジュールのオプション
@@ -7637,7 +7641,7 @@ SP数学は無効になります。
 
 * `--enable-all-osp`: これらのビルドのうち、Tailscale、wolfGuard、Webサーバー、S/MIME、OpenSSH、lighttpd、nginx、OpenVPN、ASIO、libwebsockets、stunnel、curl、tcpdumpをまとめて有効にします（FIPSビルドや`--enable-sp-math`ビルドでは、一部が除外されます）。カーネルモジュールの設定とは併用できません。
 * サーバー、プロキシ、ネットワーク: `--enable-nginx`（nginx）、`--enable-openresty`（OpenResty。`--enable-nginx`も有効にします）、`--enable-haproxy`（HAProxy）、`--enable-hitch`（Hitch）、`--enable-memcached`（memcached）、`--enable-curl`（curl）、`--enable-libwebsockets`（libwebsockets）、`--enable-tcpdump`（tcpdump）、`--enable-rsyslog`（rsyslog）、`--enable-mosquitto`（Mosquitto）、`--enable-openldap`（OpenLDAP）。
-* セキュリティとVPN: `--enable-wpas`（wpa_supplicant）、`--enable-wpas-dpp`（DPP（Wi-Fi Device Provisioning Protocol）対応のwpa_supplicant。`--enable-wpas`を有効にし、PKCS#7、証明書要求、すべてのカスタムECC曲線を追加します）、`--enable-strongswan`（strongSwan）、`--enable-krb`（Kerberos 5）、`--enable-libssh2`（libssh2）、`--enable-libest`（libest）、`--enable-tailscale`（Tailscaleのビルド依存関係）、`--enable-wolfguard`（wolfGuardの依存関係）。
+* セキュリティとVPN: `--enable-wpas`（wpa_supplicant）、`--enable-wpas-dpp`（DPP（Wi-Fi Device Provisioning Protocol）対応のwpa_supplicant。`--enable-wpas`を有効にし、PKCS#7、証明書署名要求、すべてのカスタムECC曲線を追加します）、`--enable-strongswan`（strongSwan）、`--enable-krb`（Kerberos 5）、`--enable-libssh2`（libssh2）、`--enable-libest`（libest）、`--enable-tailscale`（Tailscaleのビルド依存関係）、`--enable-wolfguard`（wolfGuardの依存関係）。
 * 時刻、DNS、管理: `--enable-chrony`（chrony）、`--enable-ntp`（NTP）、`--enable-bind`（BIND DNS）、`--enable-net-snmp`（Net-SNMP）、`--enable-sblim-sfcb`（SBLIM SFCB（Small Footprint CIM Broker））。
 * その他のプロジェクト: `--enable-signal`（Signal）、`--enable-ffmpeg`（FFmpeg）、`--enable-wolfzfs`（wolfZFS。カーネルビルドには`=kernel`を指定します）。
 * AUTOSAR: `--enable-autosar`は、AES-CBCと乱数サービスを備えたAUTOSAR暗号スタックのシム（Csm、CryIf、Cryptoドライバー）をビルドします（`WOLFSSL_AUTOSAR`を定義します）。`--enable-autosar-cmac`は、AES-CMACのMAC生成および検証サービスを追加し、CMACを有効にします（`WOLFSSL_AUTOSAR_CMAC`を定義します）。`--enable-autosar`が必要です。wolfSSLソースの`wolfcrypt/src/port/autosar/README.md`を参照してください。
@@ -7662,7 +7666,7 @@ SP数学は無効になります。
 ### `make sbom` and `make bomsh`
 
 これらはconfigureオプションではなく、EUサイバーレジリエンス法（Cyber Resilience Act）への準拠のためにwolfSSL 5.9.4で追加されたMakefileターゲットです。
-`make sbom`は、SPDX 2.3およびCycloneDX 1.6形式のソフトウェア部品表（SBOM）を生成します。
+`make sbom`は、SPDX 2.3およびCycloneDX 1.6形式のSBOMを生成します。
 `make bomsh`は、OmniBORのビルド来歴（provenance）を生成します。
 
 ## 特別な数学最適化フラグ
@@ -7672,15 +7676,15 @@ SP数学は無効になります。
 レガシーなTom's Fast Mathバックエンド(`tfm.c`)を有効にします。
 デフォルトで無効です。
 `--enable-fastmath`を指定すると、デフォルトの`--enable-sp-math-all`が無効になります。
-`--enable-sp-math-all`または`--enable-sp-math`も明示的に指定した場合はSP数学が優先され、fastmathは使用されません。
+`--enable-sp-math-all`または`--enable-sp-math`も明示的に指定した場合はSP Mathが優先され、fastmathは使用されません。
 
 「Fast Math」節および「Big Integer数学ライブラリ」節を参照してください。
 
 ### `--enable-fasthugemath`
 
-レガシーなTom's Fast Mathバックエンド + 巨大なコードを有効にします。
+レガシーなTom's Fast Mathバックエンドと、コードサイズの大きい高速化コード（huge code）を有効にします。
 `--enable-fastmath`も有効になります。
-SP数学で同等の設定は`--enable-sp-math-all=huge`で、巨大なコード向けの最適化CFLAGSを追加し、`WOLFSSL_SP_INT_LARGE_COMBA`を定義します。
+SP Mathで同等の設定は`--enable-sp-math-all=huge`で、巨大なコード向けの最適化CFLAGSを追加し、`WOLFSSL_SP_INT_LARGE_COMBA`を定義します。
 
 FastHugeMathの有効化にはFastMathライブラリのサポートが含まれます。
 公開鍵に関する実装に一般的な鍵サイズのループを展開することで、コードサイズが大幅に増加します。
@@ -8713,7 +8717,7 @@ API `wc_AesSetKey`は、一意の`KEK`を使用して鍵を暗号化し、`SECO 
 
 - GCM暗号化は`wc_AesGcmEncrypt`で行われ、復号は`wc_AesGcmDecrypt`で行われます。
 
-AES-GCM暗号化関数は、`Aes`構造体、出力バッファ、入力バッファ、入力バッファサイズ、ノンス、ノンスサイズ(12バイト必要)、MACまたはタグとして知られる、タグサイズ(`16`バイトが必要)、追加データ、追加データサイズ（4バイト）を引数として取ります。
+AES-GCM暗号化関数は、`Aes`構造体、出力バッファ、入力バッファ、入力バッファサイズ、ノンス、ノンスサイズ(12バイト必須)、タグ(MACとも呼ばれます)、タグサイズ(`16`バイト必須)、追加データ、追加データサイズ（4バイト）を引数として取ります。
 暗号化の場合、入力バッファは暗号化され、タグバッファは作成された`MAC`で埋められます。
 
 AES-GCM復号の場合、関数は`Aes`構造体、プレーンテキスト出力バッファ、暗号テキスト入力バッファ、入力バッファサイズ、ノンス、ノンスサイズ(12バイト)、暗号化呼び出しで以前に作成されたタグ、タグバッファサイズ、追加データ、追加のデータサイズを引数として取ります。

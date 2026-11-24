@@ -161,12 +161,12 @@ wc_Sha3_256_Final(&sha3, sha3Sum);
 wc_Sha3_256_Free(&sha3);
 ```
 
-`sha3Sum`には、bufferのハッシュ化されたデータのダイジェストが含まれます。
+`sha3Sum`には、bufferのデータのダイジェストが格納されます。
 
 SHAKEは`wc_Shake`構造体を使用し、要求された任意の長さの出力を生成します。
 出力の長さは`Final`の呼び出しに渡します。
 SHAKE256の場合は、[`wc_InitShake256()`](group__SHA.md#function-wc_initshake256)、[`wc_Shake256_Update()`](group__SHA.md#function-wc_shake256_update)、[`wc_Shake256_Final()`](group__SHA.md#function-wc_shake256_final)、[`wc_Shake256_Free()`](group__SHA.md#function-wc_shake256_free)を使用します。
-SHAKE128の関数も同様に名付けられています。
+SHAKE128の関数名も同じ規則に従います。
 
 ```c
 byte out[64];       /*any output length*/
@@ -202,7 +202,7 @@ wc_Blake2bFinal(&b2b, digest, 64);
 ```
 
 [`wc_InitBlake2b()`](group__BLAKE2.md#function-wc_initblake2b)の2番目のパラメータは、最終的なダイジェストサイズです。
-`digest`には、`input`のハッシュ化されたデータのダイジェストが含まれます。
+`digest`には、`input`のデータのダイジェストが格納されます。
 
 使用例はwolfCryptテストアプリケーション（`wolfcrypt/test/test.c`）の`blake2b_test()`関数内にあります。
 
@@ -319,13 +319,13 @@ wc_Kmac256_Final(&kmac, tag, sizeof(tag));
 wc_Kmac256_Free(&kmac);
 ```
 
-`tag`には、bufferのデータに対するKMAC256認証タグが含まれます。
+`tag`には、bufferのデータに対するKMAC256認証タグが格納されます。
 ワンショット関数`wc_Kmac128Hash()`および`wc_Kmac256Hash()`は、1回の呼び出しでタグを計算します。
 
 cSHAKEも、`wc_Cshake`構造体を使用して同じパターンで使用します。
 `wc_InitCshake256()`は関数名文字列とカスタマイズ文字列（いずれも空でも構いません）を受け取り、その後に`wc_Cshake256_Update()`、`wc_Cshake256_Final()`（要求する出力長を受け取ります）、`wc_Cshake256_Free()`を続けて呼び出します。
 ワンショットの`wc_Cshake256()`は、これらすべてを1回の呼び出しで行います。
-cSHAKE128の関数も同様に名付けられています。
+cSHAKE128の関数名も同じ規則に従います。
 
 ## パスワードハッシュ
 
@@ -431,7 +431,9 @@ AESキーラップ（RFC 3394）は、[`--enable-aeskeywrap`](chapter02.md#--ena
 #### AES-GCM
 
 AES-GCMはAEAD（追加データ付き認証暗号）モードであり、デフォルトで有効です。
-AES-GCMは、鍵、同じ鍵で決して再利用してはならないノンス（IV）、および認証の対象となるが暗号化はされないオプションの追加認証データ（`aad`）を受け取り、平文と同じ長さの暗号文と認証タグを生成します。
+AES-GCMは、鍵、ノンス（IV）、省略可能な追加認証データ（`aad`）を受け取り、平文と同じ長さの暗号文と認証タグを生成します。
+ノンスは同じ鍵で決して再利用してはいけません。
+`aad`は認証の対象になりますが、暗号化はされません。
 12バイトのノンスと16バイトのタグを推奨します。
 
 ```c
@@ -652,7 +654,7 @@ ret = wc_ChaCha20Poly1305_Decrypt(key, iv, aad, sizeof(aad),
 
 wolfCryptの乱数ジェネレータは`wolfssl/wolfcrypt/random.h`で宣言されています。
 使用する構造体は`WC_RNG`です。
-デフォルトでは、オペレーティングシステムのエントロピーソースからシードが与えられるHash_DRBG（NIST SP 800-90A）です。
+デフォルトでは、オペレーティングシステムのエントロピーソースからシードを得るHash_DRBG（NIST SP 800-90A）として動作します。
 [`wc_InitRng()`](group__Random.md#function-wc_initrng)で一度だけ初期化し、[`wc_RNG_GenerateBlock()`](group__Random.md#function-wc_rng_generateblock)で乱数バイト列を取得するか（1回の呼び出しにつき最大`RNG_MAX_BLOCK_LEN`、すなわち64 KiB）、`wc_RNG_GenerateByte()`で1バイトを取得し、[`wc_FreeRng()`](group__Random.md#function-wc_freerng)で解放します。
 
 ```c
@@ -674,7 +676,7 @@ wc_FreeRng(&rng);
 
 wolfCryptはヘッダー`wolfssl/wolfcrypt/rsa.h`を通じてRSAをサポートしています。
 RSA鍵には、公開鍵と秘密鍵の2種類があります。
-公開鍵を使用すると、誰でも秘密鍵の保持者のみが復号できるように暗号化できます。
+公開鍵を使えば、誰でも、秘密鍵の保持者だけが復号できる形でデータを暗号化できます。
 また、秘密鍵の保持者が何かに署名することを可能にし、公開鍵を持つ誰もが、秘密鍵の保持者が署名したことを確認できます。
 使用方法は通常、次のとおりです。
 
@@ -706,7 +708,7 @@ if (outLen < 0) {
 この関数はPKCS #1 v1.5パディングを使用します。
 OAEPパディングは[`wc_RsaPublicEncrypt_ex()`](group__RSA.md#function-wc_rsapublicencrypt_ex)で利用できます。
 出力バッファが十分な大きさであることを確認するために、最初に[`wc_RsaEncryptSize()`](group__RSA.md#function-wc_rsaencryptsize)を呼び出すことができます。
-これにより、[`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt)の成功した呼び出しが書き込むバイト数が返されます。
+これにより、[`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt)が成功した場合に書き込むバイト数が返されます。
 
 エラーが発生した場合、[`wc_RsaPublicEncrypt()`](group__RSA.md#function-wc_rsapublicencrypt)または[`wc_RsaPublicKeyDecode()`](group__RSA.md#function-wc_rsapublickeydecode)から負の戻り値が返されます。
 その場合、[`wc_ErrorString()`](group__Error.md#function-wc_errorstring)を呼び出して、発生したエラーを説明する文字列を取得できます。
@@ -1037,11 +1039,11 @@ wc_FreeRng(&rng);
 
 公開鍵は、[`wc_ed25519_export_public()`](group__ED25519.md#function-wc_ed25519_export_public)で検証者向けにエクスポートし、`wc_ed25519_import_public()`で読み込むことができます。
 
-## ポスト量子暗号
+## 耐量子暗号
 
-wolfCryptは、NISTのポスト量子アルゴリズムを独自に実装しています。
+wolfCryptは、NISTの耐量子アルゴリズムを独自に実装しています。
 本節ではML-KEMとML-DSAについて説明します。
-SLH-DSA、Falcon、LMS/HSS、XMSS、およびTLS 1.3でのそれらの使用については、[付録I ポスト量子暗号の実験](appendix09.md)をご参照ください。
+SLH-DSA、Falcon、LMS/HSS、XMSS、およびTLS 1.3でのそれらの使用については、[付録I 耐量子暗号の評価](appendix09.md)をご参照ください。
 
 ### ML-KEM
 
@@ -1123,5 +1125,5 @@ wc_FreeRng(&rng);
 ```
 
 公開鍵は、[`wc_MlDsaKey_ExportPubRaw()`](group__ML__DSA.md#function-wc_mldsakey_exportpubraw)で検証者向けにエクスポートし、同じパラメータセットを持つ鍵に[`wc_MlDsaKey_ImportPubRaw()`](group__ML__DSA.md#function-wc_mldsakey_importpubraw)で読み込むことができます。
-`wolfssl/wolfcrypt/dilithium.h`の旧来の`wc_dilithium_*` APIは、`wc_MlDsaKey_*`関数の上に互換レイヤーとして残されています。
+`wolfssl/wolfcrypt/dilithium.h`の旧来の`wc_dilithium_*` APIは、`wc_MlDsaKey_*`関数をラップする互換レイヤーとして残されています。
 新しいコードでは`wc_MlDsaKey_*`の名前を使用してください。

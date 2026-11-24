@@ -86,7 +86,7 @@
 * PSK - [RFC4279](https://tools.ietf.org/html/rfc4279)
 * HPKE - [RFC9180](https://datatracker.ietf.org/doc/html/rfc9180)
 
-## ポスト量子暗号
+## 耐量子暗号
 
 * ML-KEM - [NIST FIPS 203](https://csrc.nist.gov/pubs/fips/203/final)
 * ML-DSA - [NIST FIPS 204](https://csrc.nist.gov/pubs/fips/204/final)

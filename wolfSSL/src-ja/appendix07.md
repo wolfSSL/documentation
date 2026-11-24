@@ -84,7 +84,7 @@ A-2、A-3、A-4の`_OLD_POLY1305`暗号スイートは、ChaCha20-Poly1305暗号
 ### A-5 TLS 1.2 RSA（静的鍵交換）
 
 静的RSA鍵交換は前方秘匿性を提供しないため、推奨されません。
-これらの暗号スイートは、`--enable-all`を指定した場合でも、デフォルトではビルドに含まれません。
+これらの暗号スイートは、デフォルトでは`--enable-all`を指定してもビルドに含まれません。
 これらには`WOLFSSL_STATIC_RSA`が必要ですが、対応するconfigureオプションはありません（`CPPFLAGS=-DWOLFSSL_STATIC_RSA`または`user_settings.h`を使用してください）。
 `WOLFSSL_SNIFFER`を定義すると、このマクロも自動的に定義されます。
 
@@ -292,7 +292,7 @@ Koblitz曲線（`HAVE_ECC_KOBLITZ`）には`--enable-ecccustcurves=all`（また
 | `P521_ML_KEM_1024_OLD` | 12105 | 無効 | 同上 + `-DWOLFSSL_ML_KEM_USE_OLD_IDS` |
 
 `_OLD`のIDは、NIST曲線ハイブリッドの以前のコードポイントです。
-`WOLFSSL_ML_KEM_USE_OLD_IDS`を定義すると、それぞれ対応する新しいID（12107から12109）と一緒に送信されます。
+`WOLFSSL_ML_KEM_USE_OLD_IDS`を定義すると、各`_OLD` IDは対応する新しいID（12107から12109）と一緒に送信されます。
 
 ### B-10 Kyber Round 3 レガシー
 

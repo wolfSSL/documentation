@@ -558,9 +558,7 @@ wc_InitCert(&myCert);
 * `CTC_XMSS`、`CTC_XMSSMT`
 * `CTC_SM3wSM2`
 
-次に、以下のようにしてサブジェクト情報を初期化します。
-ただし実際には、ユーザの環境に応じた値を入力します。
-詳細は`wolfcrypt/test/test.c`にも掲載しています。
+続いて、`wolfcrypt/test/test.c`にある以下の例のように、サブジェクト情報を初期化します。
 
 ```c
 strncpy(myCert.subject.country, "US", CTC_NAME_SIZE);
@@ -631,7 +629,7 @@ if (certSz < 0)
 
 これで、バッファ`derCert`にはCA署名付き証明書のDERフォーマットが含まれ、`wc_SignCert()`の戻り値である`certSz`がその全体のサイズとなります。
 証明書のPEMフォーマットが必要な場合は、上記の自己署名の実装例をご参照ください。
-`wc_MakeCert()`と`wc_SignCert()`は、RSA鍵またはECC鍵のいずれかを使用するための関数パラメータを提供していることに注意してください。
+`wc_MakeCert()`と`wc_SignCert()`の引数で渡せるのは、RSA鍵またはECC鍵のいずれかであることに注意してください。
 上記の実装例ではRSA鍵を使用し、ECC鍵パラメータにはNULLを渡しています。
 その他の鍵タイプについては、`wc_MakeCert_ex()`、`wc_SignCert_ex()`、`wc_MakeCertReq_ex()`が`keyType`（例えば`RSA_TYPE`、`ECC_TYPE`、`ED25519_TYPE`、`ED448_TYPE`、`ML_DSA_65_TYPE`、またはSLH-DSAのタイプのいずれか）と`void* key`を引数に取ります。
 
@@ -657,9 +655,7 @@ req.version = 0; /* PKCS #10 CSRs are version 0 */
 デフォルトの`version`である2は、X.509 v3証明書のバージョンです。
 CSRはバージョン0（PKCS #10、RFC 2986）である必要があり、`wc_MakeCertReq()`は`version`フィールドを設定された値のままエンコードするため、上記のように0を設定してください。
 
-次に、以下のようにしてサブジェクト情報を初期化します。
-ただし実際には、ユーザの環境に応じた値を入力します。
-詳細は<https://github.com/wolfSSL/wolfssl-examples/blob/master/certgen/csr_example.c>にも掲載しています。
+続いて、<https://github.com/wolfSSL/wolfssl-examples/blob/master/certgen/csr_example.c>にある以下の例のように、サブジェクト情報を初期化します。
 
 ```c
 strncpy(req.subject.country, "US", CTC_NAME_SIZE);

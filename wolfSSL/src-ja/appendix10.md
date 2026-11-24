@@ -51,7 +51,7 @@ A: プラットフォームに適したデータ型のサイズを設定する�
 wolfSSL は、64ビット型を利用できることで速度面でメリットを得ています。
 プラットフォームの `sizeof(long)` と `sizeof(long long)` の結果と一致するように `SIZEOF_LONG` と `SIZEOF_LONG_LONG` を定義します。
 これは、`settings.h` または `user_settings.h` のカスタム定義に追加できます。
-たとえば、`MY_NEW_PLATFORM` のサンプル定義の下の `settings.h` では次のように示します。
+たとえば、`settings.h`の`MY_NEW_PLATFORM`のサンプル定義の下に、次のように記述します。
 
 
 ```c
@@ -82,7 +82,7 @@ wolfSSLとwolfCryptでは、`word32` と `word16` という2つの追加デー�
 `word32` はコンパイラの32ビット型にマッピングし、`word16` はコンパイラの16ビット型にマッピングする必要があります。
 これらのデフォルトのマッピングがプラットフォームに適していない場合は、`settings.h` または `user_settings.h` で `WOLFSSL_TYPES` を定義し、word32およびword16に独自のカスタムtypedefを割り当てる必要があります。
 
-デフォルトの数学ライブラリであるSP数学ライブラリ（`./wolfcrypt/src/sp_int.c`、`WOLFSSL_SP_MATH_ALL`）は、`sp_int_digit` 型と `sp_int_word` 型を使用します。
+デフォルトの数学ライブラリであるSP Mathライブラリ（`./wolfcrypt/src/sp_int.c`、`WOLFSSL_SP_MATH_ALL`）は、`sp_int_digit` 型と `sp_int_word` 型を使用します。
 これらのサイズは `SP_WORD_SIZE` によって選択されます。
 `SP_WORD_SIZE` はターゲットに応じて決定されますが、必要に応じて `user_settings.h` で32または64に設定することもできます。
 
@@ -268,14 +268,14 @@ A: 標準のメモリ関数が利用できない、あるいはオプション�
 wolfSSL本体はデフォルトで `malloc()` と `free()` の両方を使用します。
 レガシーのヒープ数学ライブラリ（`USE_INTEGER_HEAP_MATH`）を使用する場合、wolfCryptは `realloc()` も使用します。
 
-wolfSSL/wolfCryptは、デフォルトでSP数学ライブラリ（`./wolfcrypt/src/sp_int.c`、`WOLFSSL_SP_MATH_ALL`）を使用します。
+wolfSSL/wolfCryptは、デフォルトでSP Mathライブラリ（`./wolfcrypt/src/sp_int.c`、`WOLFSSL_SP_MATH_ALL`）を使用します。
 このライブラリは定数時間で動作し、デフォルトでは多倍長整数をスタック上に保持します。
 スタックの少ないターゲットでは、`WOLFSSL_SMALL_STACK` を定義すると大きな変数をスタックからヒープに移動できます。
 また、`WOLFSSL_SP_SMALL` を定義するとコードサイズを小さくできます。
-`WOLFSSL_SP_MATH` は、SP数学ライブラリをSPコードが実装している鍵長と曲線に制限します（付録Hを参照）。
+`WOLFSSL_SP_MATH` は、SP MathライブラリをSPコードが実装している鍵長と曲線に制限します（付録Hを参照）。
 レガシーのfastmathライブラリ（`USE_FAST_MATH`、`./wolfcrypt/src/tfm.c`、`--enable-fastmath`）とヒープ数学ライブラリ（`USE_INTEGER_HEAP_MATH`、`./wolfcrypt/src/integer.c`、`--enable-heapmath`）も引き続き使用できます。
 fastmathを使用する場合は、`TFM_TIMING_RESISTANT` も定義してください。
-wolfSSLのTLSレイヤーは依然としていくらかの動的メモリを使用するため、`malloc()` と `free()` は依然として必要です。
+wolfSSLのTLSレイヤーは引き続きある程度の動的メモリを使用するため、`malloc()` と `free()` は必要です。
 
 数学ライブラリ間のリソース使用量（スタック/ヒープ）の比較については、弊社までお問い合わせいただければ、Resource Use ドキュメントをご覧いただけます。
 
@@ -352,7 +352,7 @@ stderrを使用できない、あるいは別の出力ストリームや別の�
 A: wolfSSLで独自の公開鍵実装を使用したい場合です。
 
 wolfSSLでは、SSL/TLSレイヤーが公開鍵操作を行う必要があるときに呼び出される、独自の公開鍵コールバックをユーザーが作成できます。
-ユーザーはオプションで複数のコールバックを定義できます。
+ユーザーは、必要に応じて複数のコールバックを定義できます。
 例えば、次のようなコールバックがあります。
 
 1. ECC 鍵生成、署名、検証、共有秘密コールバック

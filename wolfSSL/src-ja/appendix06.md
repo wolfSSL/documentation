@@ -56,15 +56,15 @@ wolfSSL独自のTLSエラーコードは、-301（`WOLFSSL_FIRST_E`）から-525
 | `NO_PEER_KEY` | -316 | ピアの鍵が存在しない |
 | `NO_PRIVATE_KEY` | -317 | 秘密鍵が存在しない |
 | `RSA_PRIVATE_ERROR` | -318 | RSA秘密鍵操作中のエラー |
-| `NO_DH_PARAMS` | -319 | サーバーがDHパラメータを送信してこない |
+| `NO_DH_PARAMS` | -319 | サーバーにDHパラメータが設定されていない |
 | `BUILD_MSG_ERROR` | -320 | メッセージの作成に失敗 |
 | `BAD_HELLO` | -321 | ClientHelloメッセージが不正 |
 | `DOMAIN_NAME_MISMATCH` | -322 | ピアのサブジェクト名の不一致 |
-| `WANT_READ` | -323 | データ再読み取りが必要 |
+| `WANT_READ` | -323 | 読み取り待ち、再度呼び出す必要がある |
 | `NOT_READY_ERROR` | -324 | ハンドシェイクレイヤーがReadyでない |
 | `IPADDR_MISMATCH` | -325 | ピアのIPアドレスの不一致 |
 | `VERSION_ERROR` | -326 | レコードレイヤーのバージョンエラー |
-| `WANT_WRITE` | -327 | データの再送が必要 |
+| `WANT_WRITE` | -327 | 書き込み待ち、再度呼び出す必要がある |
 | `BUFFER_ERROR` | -328 | 不正な形式のバッファ入力 |
 | `VERIFY_CERT_ERROR` | -329 | 証明書検証エラー |
 | `VERIFY_SIGN_ERROR` | -330 | 署名検証エラー |
@@ -96,7 +96,7 @@ wolfSSL独自のTLSエラーコードは、-301（`WOLFSSL_FIRST_E`）から-525
 | `MONITOR_SETUP_E` | -363 | CRLモニターのセットアップエラー |
 | `THREAD_CREATE_E` | -364 | スレッド作成エラー |
 | `OCSP_NEED_URL` | -365 | OCSPは検索用のURLが必要 |
-| `OCSP_CERT_UNKNOWN` | -366 | OCSPレスポンダーが不明 |
+| `OCSP_CERT_UNKNOWN` | -366 | OCSPレスポンダーが証明書の状態を把握していない |
 | `OCSP_LOOKUP_FAIL` | -367 | OCSP検索が失敗 |
 | `MAX_CHAIN_ERROR` | -368 | 最大チェーン深度を超えた |
 | `COOKIE_ERROR` | -369 | DTLSクッキーエラー |
@@ -112,7 +112,7 @@ wolfSSL独自のTLSエラーコードは、-301（`WOLFSSL_FIRST_E`）から-525
 | `FWRITE_ERROR` | -379 | fwriteエラー |
 | `CACHE_MATCH_ERROR` | -380 | キャッシュヘッダー不一致エラー |
 | `UNKNOWN_SNI_HOST_NAME_E` | -381 | 認識されないホスト名 |
-| `UNKNOWN_MAX_FRAG_LEN_E` | -382 | 認識されない最大フラグメント |
+| `UNKNOWN_MAX_FRAG_LEN_E` | -382 | 認識されない最大フラグメント長 |
 | `KEYUSE_SIGNATURE_E` | -383 | KeyUse digSignatureエラー |
 | `KEYUSE_ENCIPHER_E` | -385 | KeyUse KeyEncipherエラー |
 | `EXTKEYUSE_AUTH_E` | -386 | ExtKeyUse server\|client_auth |
@@ -122,7 +122,7 @@ wolfSSL独自のTLSエラーコードは、-301（`WOLFSSL_FIRST_E`）から-525
 | `SESSION_TICKET_EXPECT_E` | -390 | セッションチケットがない |
 | `SCR_DIFFERENT_CERT_E` | -391 | SCR異なる証明書エラー |
 | `SESSION_SECRET_CB_E` | -392 | セッション秘密CB関数の失敗 |
-| `NO_CHANGE_CIPHER_E` | -393 | Cipher変更前に終了 |
+| `NO_CHANGE_CIPHER_E` | -393 | ChangeCipherSpecより前にFinishedを受信 |
 | `SANITY_MSG_E` | -394 | メッセージ順序のサニティチェックエラー |
 | `DUPLICATE_MSG_E` | -395 | 重複メッセージエラー |
 | `SNI_UNSUPPORTED` | -396 | SSL 3.0はSNIをサポートしていない |
@@ -153,7 +153,7 @@ wolfSSL独自のTLSエラーコードは、-301（`WOLFSSL_FIRST_E`）から-525
 | `BAD_KEY_SHARE_DATA` | -421 | 鍵共有データが無効 |
 | `MISSING_HANDSHAKE_DATA` | -422 | ハンドシェイクメッセージにデータがない |
 | `BAD_BINDER` | -423 | バインダーが一致しない |
-| `EXT_NOT_ALLOWED` | -424 | 拡張子がメッセージで許可されていない |
+| `EXT_NOT_ALLOWED` | -424 | このメッセージでは許可されていない拡張 |
 | `INVALID_PARAMETER` | -425 | セキュリティパラメータが無効 |
 | `MCAST_HIGHWATER_CB_E` | -426 | マルチキャストハイウォーターcbエラー |
 | `ALERT_COUNT_E` | -427 | アラートカウントを超えた |
@@ -354,11 +354,11 @@ wolfCryptのエラーコードは、`wolfssl/wolfcrypt/error-crypt.h`に記載�
 | `BAD_ALIGN_E` | -187 | 操作の不正なアライメント、割り当てなし |
 | `ASN_NO_SIGNER_E` | -188 | ASN署名エラー、証明書を検証するCAの署名者なし |
 | `ASN_CRL_CONFIRM_E` | -189 | ASN CRL署名確認失敗 |
-| `ASN_CRL_NO_SIGNER_E` | -190 | ASN CRL失敗を確認する署名者なし |
+| `ASN_CRL_NO_SIGNER_E` | -190 | ASN CRLの署名を確認する署名者がない |
 | `ASN_OCSP_CONFIRM_E` | -191 | ASN OCSP署名確認失敗 |
 | `BAD_STATE_E` | -192 | 不正な状態操作 |
 | `BAD_PADDING_E` | -193 | 不正なパディング、メッセージ長が不正 |
-| `REQ_ATTRIBUTE_E` | -194 | 証明書リクエスト属性設定エラー |
+| `REQ_ATTRIBUTE_E` | -194 | 証明書署名要求の属性設定エラー |
 | `PKCS7_OID_E` | -195 | PKCS#7、OIDの不一致エラー |
 | `PKCS7_RECIP_E` | -196 | PKCS#7、受信者エラー |
 | `FIPS_NOT_ALLOWED_E` | -197 | FIPSは許可されていません |
@@ -386,7 +386,7 @@ wolfCryptのエラーコードは、`wolfssl/wolfcrypt/error-crypt.h`に記載�
 | `SRP_VERIFY_E` | -219 | SRP証明検証失敗 |
 | `SRP_BAD_KEY_E` | -220 | SRP不正な一時値 |
 | `ASN_NO_SKID` | -221 | ASNサブジェクト鍵識別子なし |
-| `ASN_NO_AKID` | -222 | ASN権限鍵識別子なし |
+| `ASN_NO_AKID` | -222 | ASN機関鍵識別子なし |
 | `ASN_NO_KEYUSAGE` | -223 | ASN鍵用途なし |
 | `SKID_E` | -224 | サブジェクト鍵識別子設定エラー |
 | `AKID_E` | -225 | 権限鍵識別子設定エラー |
@@ -474,13 +474,13 @@ wolfCryptのエラーコードは、`wolfssl/wolfcrypt/error-crypt.h`に記載�
 | `WC_ACCEL_INHIBIT_E` | -1002 | 暗号アクセラレーションが現在抑止されている |
 | `BAD_INDEX_E` | -1003 | 不正なインデックス |
 | `INTERRUPTED_E` | -1004 | 処理が中断された |
-| `MLKEM_PUB_HASH_E` | -1005 | カプセル化解除鍵内のエンコードされた公開鍵が、保存されたハッシュと一致しない |
+| `MLKEM_PUB_HASH_E` | -1005 | デカプセル化鍵内のエンコードされた公開鍵が、保存されたハッシュと一致しない |
 | `BUSY_E` | -1006 | オブジェクトがビジー状態 |
 | `ALREADY_E` | -1007 | 操作はすでに実行済み（例えば、同じ暗号コールバックデバイスIDを二重に登録した場合） |
 | `SEQ_OVERFLOW_E` | -1008 | シーケンスカウンターがオーバーフローする |
 | `PUF_INIT_E` | -1009 | PUF初期化失敗（予約済み） |
 | `PUF_READ_E` | -1010 | PUF SRAMの読み出しが起動時のヘルスチェックに失敗した |
-| `PUF_ENROLL_E` | -1011 | PUFエンロールメント失敗 |
+| `PUF_ENROLL_E` | -1011 | PUF登録失敗 |
 | `PUF_RECONSTRUCT_E` | -1012 | PUF再構成失敗 |
 | `PUF_DERIVE_KEY_E` | -1013 | PUF鍵導出失敗 |
 | `PUF_IDENTITY_E` | -1014 | PUF ID取得失敗 |
@@ -507,7 +507,7 @@ wolfCryptのエラーコードは、`wolfssl/wolfcrypt/error-crypt.h`に記載�
 | `STILL_REFERENCED_E` | -1035 | オブジェクトがまだ参照されている（解放するのは安全でない） |
 | `OBJECT_ORPHANED_E` | -1036 | オブジェクトが孤立している（引き取り可能） |
 | `HWPUF_INIT_E` | -1037 | HWPUF初期化失敗 |
-| `HWPUF_ENROLL_E` | -1038 | HWPUFエンロールメント失敗 |
+| `HWPUF_ENROLL_E` | -1038 | HWPUF登録失敗 |
 | `HWPUF_START_E` | -1039 | HWPUF開始失敗 |
 | `HWPUF_GENERATE_KEY_E` | -1040 | HWPUF鍵生成失敗 |
 | `HWPUF_GET_KEY_E` | -1041 | HWPUF鍵取得失敗 |
@@ -533,7 +533,7 @@ wolfCryptのエラーコードは、`wolfssl/wolfcrypt/error-crypt.h`に記載�
 ### `WANT_READ` (-323)
 
 `WANT_READ`エラーは、ノンブロッキングソケットを使用する場合によく発生します。
-ノンブロッキングソケットを使用する場合において、実際にはエラーではありませんが、エラーとして呼び出し元に返されます。
+ノンブロッキングソケットでは実際のエラーではありませんが、エラーとして呼び出し元に返されます。
 I/Oコールバックからデータを受信する呼び出しが、現在受信可能なデータがないためブロックされる場合、I/Oコールバックは`WOLFSSL_CBIO_ERR_WANT_READ`（-2）を返します。
 wolfSSLはこれを内部的に`WANT_READ`（-323）として記録し、APIの呼び出しは`WOLFSSL_FATAL_ERROR`（-1）を返し、[`wolfSSL_get_error()`](group__Debug.md#function-wolfssl_get_error)は`SSL_ERROR_WANT_READ`（2）を返します。
 アプリケーションは`wolfSSL_get_error()`の戻り値を（-323ではなく）`SSL_ERROR_WANT_READ`と比較し、待機してから後で再度受信を試みてください。

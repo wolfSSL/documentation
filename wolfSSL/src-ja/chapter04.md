@@ -33,7 +33,7 @@ OpenSSL互換関数については、[第13章 OpenSSL互換性](chapter13.md)�
 ### サーバー関数
 
 * [`wolfDTLSv1_server_method()`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS 1.0
-* [`wolfDTLSv1_2_server_method()`](ssl_8h.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
+* [`wolfDTLSv1_2_server_method()`](group__Setup.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
 * [`wolfDTLSv1_3_server_method()`](group__Setup.md#function-wolfdtlsv1_3_server_method) - DTLS 1.3
 * [`wolfDTLS_server_method()`](group__Setup.md#function-wolfdtls_server_method) - ビルドで有効になっている可能な限り新しいDTLSバージョンを使用
 * [`wolfSSLv3_server_method()`](group__Setup.md#function-wolfsslv3_server_method) - SSL 3.0
@@ -65,7 +65,7 @@ wolfSSLは[`wolfSSLv23_server_method()`](group__Setup.md#function-wolfsslv23_ser
 * [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) - TLS 1.3までの可能な限り新しいバージョンを使用（ビルドで有効になっている最も古いバージョンまでダウングレード）
 * `wolfTLS_client_method()` - `wolfSSLv23_client_method()`と同じ
 
-各メソッドには、ヒープヒントを引数に取る`_ex`版もあります（例：[`wolfDTLSv1_2_client_method_ex()`](ssl_8h.md#function-wolfdtlsv1_2_client_method_ex)）。
+各メソッドには、ヒープヒントを引数に取る`_ex`版もあります（例：[`wolfDTLSv1_2_client_method_ex()`](group__Setup.md#function-wolfdtlsv1_2_client_method_ex)）。
 ビルド条件はサーバー関数と同じです。
 
 wolfSSLは[`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method)関数による堅牢なクライアントダウングレードをサポートしています。
@@ -82,7 +82,7 @@ wolfSSLのクライアントとサーバーはどちらも堅牢なバージョ�
 同様に、TLS 1.1への接続も失敗します。
 
 この問題を解決するには、クライアント側で[`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method)関数を使用し、必要に応じてダウングレードすることでサーバーがサポートする最高のプロトコルバージョンをサポートします。
-デフォルトビルドではTLS 1.0とTLS 1.1がコンパイル時に除外されているため、クライアントはTLS 1.2またはTLS 1.3を実行しているサーバーに接続できます。
+デフォルトビルドではTLS 1.0とTLS 1.1がコンパイル時に除外されているため、クライアントが接続できるのはTLS 1.2またはTLS 1.3を実行しているサーバーのみです。
 wolfSSLのビルド時に古いプロトコルバージョンを有効にした場合、クライアントはそれらのバージョン（TLS 1.0とTLS 1.1、および有効にした場合はSSL 3.0）にもダウングレードできます。
 長年安全でないとされているSSL 2.0には、クライアントは決して接続できません。
 
@@ -132,7 +132,7 @@ wolfSSLは、軽量インターネットプロトコル実装をすぐ使える�
 ```
 
 lwIPの焦点は、できるだけ小さなRAM使用量で完全なTCPスタックを提供することです。
-これはまさに、wolfSSLの主なユースケースである組み込みシステムでのSSL/TLSニーズとマッチしています。
+そのためlwIPは組み込みシステムに適しており、これはwolfSSLが最も力を発揮するSSL/TLSの用途とも一致します。
 
 ### TLS拡張機能
 
@@ -258,7 +258,7 @@ NIST Special Publication [SP800-57](https://csrc.nist.gov/publications/detail/sp
 
 > 2つのアルゴリズムは、与えられた鍵サイズ（XとY）に対して、「アルゴリズムを破る」または鍵を決定するために必要な作業量が、与えられたリソースを使用して概ね同じである場合、同等の強度を持つと見なされます。特定の鍵サイズに対するアルゴリズムのセキュリティ強度は、伝統的に、ショートカット攻撃（つまり、最も効率的な攻撃はすべての可能な鍵を試すこと）がない「X」の鍵サイズを持つ対称アルゴリズムに対してすべての鍵を試すのにかかる作業量の観点から説明されています。
 
-以下の表は、[NIST SP800-57](https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-5/final)の表2（56ページ）と表4（59ページ）の両方に基づいており、アルゴリズム間の比較可能なセキュリティ強度と強度測定（NISTが提案するアルゴリズムセキュリティの寿命をセキュリティビット数に基づいて）を示しています。
+以下の表は、[NIST SP800-57](https://csrc.nist.gov/publications/detail/sp/800-57-part-1/rev-5/final)の表2（56ページ）と表4（59ページ）の両方に基づいており、アルゴリズム間で同等のセキュリティ強度と、セキュリティビット数に基づいてNISTが推奨するアルゴリズムの使用可能期間を示しています。
 
 **注意**：次の表では、「L」は有限体暗号（FFC）の公開鍵のサイズ、「N」はFFCの秘密鍵のサイズ、「k」は整数因数分解暗号（IFC）の鍵サイズ、「f」は楕円曲線暗号（ECC）の鍵サイズを示しています。
 
@@ -297,7 +297,7 @@ NIST Special Publication [SP800-57](https://csrc.nist.gov/publications/detail/sp
 
 TLS 1.2以前の各暗号スイートは、鍵交換アルゴリズム、バルク暗号化アルゴリズム、メッセージ認証コードアルゴリズム（MAC）を定義します。
 **鍵交換アルゴリズム**（RSA、DHE、ECDH、ECDHE、PSK）と認証アルゴリズム（RSA、ECDSA、PSK）は、ハンドシェイクプロセス中にクライアントとサーバーがどのように認証するかを決定します。
-**バルク暗号化アルゴリズム**（CBC、GCM、CCMモードのAES、ChaCha20-Poly1305、Camellia、ARIA、SM4、3DES、RC4）（ブロック暗号とストリーム暗号を含む）は、メッセージストリームを暗号化するために使用されます。
+**バルク暗号化アルゴリズム**（ブロック暗号とストリーム暗号。CBC、GCM、CCMモードのAES、ChaCha20-Poly1305、Camellia、ARIA、SM4、3DES、RC4）は、メッセージストリームの暗号化に使用されます。
 **メッセージ認証コード（MAC）アルゴリズム**（MD5、SHA-1、SHA-256、SHA-384、SM3）は、メッセージダイジェストを作成するために使用されるハッシュ関数です。
 TLS 1.3の暗号スイートは、AEADアルゴリズムとハッシュのみを指定します。
 鍵交換（(EC)DHE、ML-KEM、またはそれらのハイブリッド。サポートされているグループ拡張と鍵共有拡張で選択します）と認証は、別途ネゴシエーションされます。
@@ -558,11 +558,11 @@ ML-DSAはデフォルトで無効であり、[`--enable-mldsa`](chapter02.md#--e
 SLH-DSA（Stateless Hash-based Digital Signature Algorithm、FIPS 205）は、SPHINCS+をNISTが標準化したものです。
 その安全性は基盤となるハッシュ関数のみに依存しているため、格子ベースの方式と並ぶ保守的な選択肢となります。
 wolfCryptは12種類のパラメータセットすべてを実装しています。
-wolfSSL 5.9.4では、SLH-DSAを使用してTLS 1.3およびDTLS 1.3のハンドシェイクを認証する機能が追加されました（draft-reddy-tls-slhdsa）。
+wolfSSL 5.9.4では、SLH-DSAを使用してTLS 1.3およびDTLS 1.3のハンドシェイクを認証する機能を追加しました（draft-reddy-tls-slhdsa）。
 [`--enable-slhdsa`](chapter02.md#--enable-slhdsa)で有効にします。
 
 Falconは、署名サイズが小さい格子ベースの署名方式です。
-wolfSSL 5.9.4では、Falcon（レベル1および5）がwolfCryptネイティブの実装として導入され、暗号コールバックのサポートとARM DSP / AArch64 NEONによる高速化が加わり、従来のliboqsへの依存はなくなりました。
+wolfSSL 5.9.4では、Falcon（レベル1および5）をwolfCryptネイティブの実装として導入し、暗号コールバックのサポートとARM DSP / AArch64 NEONによる高速化を加え、従来のliboqsへの依存をなくしました。
 Falconはまだ標準化されていないため、`--enable-experimental`も必要です。
 `--enable-experimental` [`--enable-falcon`](chapter02.md#--enable-falcon)で有効にしてください。
 
@@ -570,9 +570,9 @@ FrodoKEMは、保守的な非構造格子（LWE）ベースの鍵カプセル化
 wolfCryptの実装には、高速版、小型版、スモールスタック版のCコードと、x86_64、AArch64、AArch32、Thumb2向けのアセンブリに加え、ASN.1形式の鍵とX.509証明書のサポートが含まれます。
 FrodoKEMは実験的な実装であるため、`--enable-experimental` [`--enable-frodokem`](chapter02.md#--enable-frodokem)で有効にしてください。
 
-wolfSSL 5.9.4は、ポスト量子アルゴリズムのみを使用するTLS 1.3ビルドもサポートしています。
+wolfSSL 5.9.4は、耐量子アルゴリズムのみを使用するTLS 1.3ビルドもサポートしています。
 このビルドでは、鍵交換にML-KEM、認証にML-DSAまたはSLH-DSAを使用し、RSA、ECC、DHは使用しません。
-詳しくは、[付録I ポスト量子暗号の実験](appendix09.md)をご参照ください。
+詳しくは、[付録I 耐量子暗号の評価](appendix09.md)をご参照ください。
 
 ### ECC サポート
 
@@ -610,7 +610,7 @@ make check
 ./examples/client/client -A ./certs/ca-ecc-cert.pem
 ```
 
-ここで（`-A`）はサーバーを検証するためのCA証明書です。
+ここで`-A`には、サーバーの検証に使用するCA証明書を指定します。
 `./certs/ca-ecc-cert.pem`は、`./certs/server-ecc.pem`を発行したECC CA証明書です。
 
 ### PKCS サポート
@@ -684,14 +684,14 @@ RFCに従って、デフォルトでは署名者の空セットを持つ縮退�
 
 ##### PKCS #7 コールバック
 
-PKCS7バンドルが解析された後、ユーザーが鍵を選択できるようにするための追加のコールバックとサポート関数が追加されました。
+PKCS7バンドルが解析された後、ユーザーが鍵を選択できるようにするためのコールバックとサポート関数を追加しました。
 CEKをアンラップするには、`wc_PKCS7_SetWrapCEKCb()` を使用します。
 このコールバックはKARIおよびKEKRIバンドルの場合に呼び出されます。
 keyIDまたはSKIDは、KARIの場合、オリジネータ鍵と共にwolfSSLからユーザーに渡されます。
 ユーザーがKEKでCEKをアンラップした後、使用する復号された鍵をwolfSSLに戻す必要があります。
 この実装例は、[wolfssl-examples リポジトリ](https://github.com/wolfssl/wolfssl-examples)内の `signedData-EncryptionFirmwareCB.c` で公開しています。
 
-PKCS7 バンドルの復号のための追加のコールバックが追加されました。
+PKCS7 バンドルの復号のためのコールバックも追加しました。
 復号コールバック関数を設定するには、`wc_PKCS7_SetDecodeEncryptedCb()` を使用します。
 ユーザー定義のコンテキストを設定するには、`wc_PKCS7_SetDecodeEncryptedCtx()` を使用する必要があります。
 このコールバックは、`wc_PKCS7_DecodeEncryptedData()` の呼び出し時に実行されます。
@@ -714,10 +714,10 @@ autoconfで行う場合は、 `./configure --enable-pkcs7 CFLAGS=-DNO_PKCS7_STRE
 **注意**：[`wc_PKCS7_VerifySignedData_ex`](group__PKCS7.md#function-wc_pkcs7_verifysigneddata_ex) を呼び出す場合、引数`pkiMsgFoot`は完全なバッファであることが想定されています。
 内部構造は1つのバッファのストリーミングのみをサポートしており、この場合は`pkiMsgHead`になります。
 
-##### PKCS #7 エンロールメントとポスト量子暗号のサポート
+##### PKCS #7による証明書の登録と耐量子暗号のサポート
 
 wolfSSL 5.9.4では、証明書のみを含む縮退SignedDataと、eContentを持たない（署名属性のみの）SignedDataをエンコードできるようになりました。
-これらは、ESTやSCEPによる証明書のエンロールメント（登録）で使用される形式です。
+これらは、ESTやSCEPによる証明書の登録で使用される形式です。
 また、複数の証明書のデコードに関する修正も含まれています。
 SignedDataのML-DSA（FIPS 204）による署名と検証は、RFC 9882に準拠しています。
 
@@ -874,11 +874,11 @@ wolfSSL_CTX_set_cipher_list(ctx, "ECDHE-RSA-AES128-GCM-SHA256");
 TLS 1.3の暗号スイートには`"TLS13-AES128-GCM-SHA256"`のような名前を使用します。
 `"AES128-SHA"`のような静的RSA鍵交換の暗号スイートは、wolfSSLを`WOLFSSL_STATIC_RSA`付きでビルドした場合にのみ使用できます。
 
-### ポスト量子暗号
+### 耐量子暗号
 
-wolfSSLのすべてのポスト量子暗号アルゴリズム（ML-KEM、ML-DSA、SLH-DSA、Falcon、FrodoKEM、LMS/HSS、XMSS/XMSS^MT）は、現在ではwolfCryptのネイティブ実装となっています。
+wolfSSLのすべての耐量子暗号アルゴリズム（ML-KEM、ML-DSA、SLH-DSA、Falcon、FrodoKEM、LMS/HSS、XMSS/XMSS^MT）は、現在ではwolfCryptのネイティブ実装となっています。
 以前のOpen Quantum Safeのliboqsライブラリとの統合は削除されました。
-詳細は、本ドキュメントの[付録I ポスト量子暗号の実験](appendix09.md)をご覧ください。
+詳細は、本ドキュメントの[付録I 耐量子暗号の評価](appendix09.md)をご覧ください。
 
 ## ハードウェアによる支援機構の活用
 
@@ -922,7 +922,7 @@ ARMプロセッサでは、ビルドオプション[`--enable-armasm`](chapter02
 
 ### 単精度（SP）演算のアセンブリ実装
 
-[`--enable-sp-asm`](chapter02.md#--enable-sp-asm)オプション（`--enable-sp`も有効になります）は、x86_64、AArch64、32ビットARM、ARM Thumb、Cortex-M（Thumb-2）、64ビットRISC-V上で、RSA、DH、ECC演算のSP math実装向けに手作業で最適化したアセンブリを有効にします。
+[`--enable-sp-asm`](chapter02.md#--enable-sp-asm)オプション（`--enable-sp`も有効になります）は、x86_64、AArch64、32ビットARM、ARM Thumb、Cortex-M（Thumb-2）、64ビットRISC-V上で、RSA、DH、ECC演算のSP Math実装向けに手作業で最適化したアセンブリを有効にします。
 詳細は、第2章の[`--enable-sp-math-all`](chapter02.md#--enable-sp-math-all)およびそれに続くオプションをご参照ください。
 
 ### 暗号コールバックとPKCS #11
@@ -973,7 +973,8 @@ NITROX Vを使用すると、wolfSSLはRNG、AES-CBC、AES-GCM、3DES、RC4、HM
 ビルド手順の詳細は、wolfSSLリポジトリの`README-async.md`および`wolfcrypt/src/port/cavium`にあるREADME.mdをご参照ください。
 
 旧世代のNITROX IIIは、ライセンスされたcavium/softwareディレクトリを指定した[`--with-cavium=PATH`](chapter02.md#--with-cavium)オプションで有効にします。
-Caviumはライブラリをビルドしないため、wolfSSLは `cavium_common.o` ファイルを取り込み、これによってこの移植性に関するlibtool警告が表示されます。
+Caviumはライブラリをビルドしないため、wolfSSLは `cavium_common.o` ファイルを取り込みます。
+その結果、移植性に関するlibtoolの警告が表示されます。
 `HAVE_CAVIUM` の定義をご参照ください。
 
 ### Espressif ESP32
@@ -1086,20 +1087,21 @@ wolfSSLスニファーでのウォッチコールバックは、`WOLFSSL_SNIFFER
 
 ## 静的バッファ確保オプション
 
-wolfSSLでは、**動的**メモリ管理が提供されていることを前提に処理が記述されています。
+wolfSSLはデフォルトで、**動的**メモリ管理が提供されている環境を想定しています。
 すなわち、`malloc`/`free`関数でバッファを確保/解放できることを前提としています。
 しかし、wolfSSLが内部で使用している暗号化ライブラリwolfCryptでは、動的メモリを使用しない設定も可能です。
-これは動的メモリ管理機能を提供していない環境や、あるいは安全面の制約で動的メモリ管理機能の使用が制限されている環境では好ましいと言えます。
+これは、動的メモリ管理機能を提供していない環境や、安全性の観点から動的メモリの使用が禁止されている環境で役立ちます。
 
 ### 静的バッファ確保の基本操作
 
 先に説明した「動的メモリ管理」はバッファを「指定されたサイズ（可変長）」に動的に切り出して提供する管理方法です。
 バッファの使用効率は高いですが処理が比較的複雑です。
 一方、wolfSSLが提供する「静的バッファ確保機能」は、あらかじめ（静的に）用意した何種類かのバッファの中から、要求したサイズに近いものを検索して提供するメモリ管理機能のことを言います。
-バッファの要求元には要求サイズ以上の大きさを持ったメモリブロックが割り当てられることがあります（そのため使用効率が低下します）が、バッファの確保と解放は`malloc`/`free`と同様に行え、割り当て処理は単純で済みます。
+バッファの要求元には要求サイズ以上の大きさを持ったメモリブロックが割り当てられることがあります（そのため使用効率が低下します）。
+メモリ管理の精密さでは劣りますが、処理は単純です。
 まとめると、任意サイズのメモリブロックを動的に確保する動的メモリ確保を模擬した機能となっています。
 
-静的バッファ確保機能の使用は、wolfSSLにとって動的メモリ機能と等価に使用されます。
+wolfSSLでは、静的バッファ確保機能を、API上は動的メモリと同じように使用できます。
 この機能はwolfSSLがメモリの確保/解放を`XMALLOC`/`XFREE`関数呼び出しに抽象化してあることで実現できています。
 一旦、静的バッファ確保機能が設定されると、以降wolfSSLは内部で使用するバッファや他の構造体の確保に静的バッファ確保機能を使用します。
 この機能は`WOLFSSL_CTX`に対して設定されるため、そのコンテキストオブジェクトが存在する間は有効であり続けます。
@@ -1141,7 +1143,7 @@ $ ./configure --enable-staticmemory
 静的バッファ確保機能は、デフォルトでは、ヒープヒントとしてNULLが渡された場合に標準関数の`malloc()`にフォールバックする実装となっています。
 ヒープヒントが渡され、それに関連付けられたメモリが枯渇した場合にはエラーとなります。
 環境に動的メモリ管理機能が提供されていない場合には、リンクエラーとなります。
-したがって、必要に応じてこの機能を無効化する為に**WOLFSSL_NO_MALLOC**マクロも定義します。
+したがって、必要に応じてこの機能を無効化するために**WOLFSSL_NO_MALLOC**マクロも定義します。
 
 ```c
 /* user_settings.h */
@@ -1201,7 +1203,7 @@ int wolfSSL_CTX_load_static_memory(
 
 * 引数**buf**,**sz**には、それぞれヒープに使用するバッファのアドレスとそのサイズを指定します。設定するバッファサイズの決定に関する情報については、「高度な静的バッファサイズの計算」節と「メモリパディングの計算」節をご参照ください。
 
-* 引数**flag**には、一般用途あるいはI/O用を指定する用途と静的バッファの確保状況のトラッキングを行うかどうかのフラグを組み合わせて指定します。一般用途を指定する場合には、`0`あるいは`WOLFMEM_GENERAL`を指定します。I/O用として指定する場合には、`WOLFMEM_IO_POOL`あるいは`WOLFMEM_IO_POOL_FIXED`を指定します。静的バッファの確保状況のトラッキングを行う場合には、用途を指定する値に`WOLFMEM_TRACK_STATS`をORで加えて指定します。
+* 引数**flag**には、バッファの用途（一般用またはI/O用）を表す値と、静的バッファの確保状況を記録するかどうかのフラグを組み合わせて指定します。一般用途を指定する場合には、`0`あるいは`WOLFMEM_GENERAL`を指定します。I/O用として指定する場合には、`WOLFMEM_IO_POOL`あるいは`WOLFMEM_IO_POOL_FIXED`を指定します。静的バッファの確保状況のトラッキングを行う場合には、用途を指定する値に`WOLFMEM_TRACK_STATS`をORで加えて指定します。
 
 * 引数**max**は、引数flagで指定したバッファの用途に関係します。バッファの用途が一般用の場合には、生成する`WOLFSSL`オブジェクトの最大同時生成数（同時に存在できるオブジェクト数）を設定することになります。制限を行う必要がなければ0を指定します。0以外の制限値を指定した場合には、その後の`wolfSSL_new()`の呼び出しで、生成する`WOLFSSL`オブジェクトの同時オブジェクト数が設定値を超える際には生成が失敗することになります。
 
@@ -1321,7 +1323,7 @@ unsigned char memory[MAX];
 // カスタム設定で使用できるバッファサイズを計算
 usableSize = wolfSSL_StaticBufferSz_ex(5, customSizes, customDist,
                                        memory, MAX, WOLFMEM_GENERAL);
-printf("使用可能なバッファサイズ: %d バイト\n", usableSize);
+printf("Usable buffer size: %d bytes\n", usableSize);
 
 if (usableSize > 0) {
     // カスタムバケット設定で静的メモリをロード
@@ -1340,7 +1342,7 @@ if (usableSize > 0) {
 
 // パディングオーバーヘッドを計算
 int paddingSize = wolfSSL_MemoryPaddingSz();
-printf("バケットごとのメモリパディング: %d バイト\n", paddingSize);
+printf("Memory padding per bucket: %d bytes\n", paddingSize);
 ```
 
 #### グローバルヒープヒントの設定
@@ -1353,7 +1355,7 @@ printf("バケットごとのメモリパディング: %d バイト\n", paddingS
 
 ゲッター関数`void* wolfSSL_GetGlobalHeapHint(void)`を使用して、現在設定されているグローバルヒープヒントを取得できます。
 
-この機能は、wolfSSLバージョン5.7.0より後のバージョンで追加されました。
+この機能は、wolfSSLバージョン5.7.0より後のバージョンで追加しました。
 
 #### デバッグメモリコールバック
 
@@ -1437,7 +1439,7 @@ ML-DSAまたはFrodoKEMを含むビルドでは、より大きなバケットが
 * **WOLFMEM_MAX_BUCKETS**は、バケットの最大数を示しています。デフォルト値は**WOLFMEM_DEF_BUCKETS**（デフォルトのリストに含まれる値の数）であり、9種類のサイズのバケットを使用することを意味しています。
 * **WOLFMEM_BUCKETS**では、各バケット内のブロックのバイト数を小さいものから順にコンマ区切りで指定しています。この定義は一般用バッファに適用されます。
 
-* **WOLFMEM_DIST**では、各バケットに含まれる同一サイズのブロックの数を`WOLFMEM_BUCKETS`の各ブロックに対応するように、それらの個数をコンマ区切りで指定しています。この定義は一般用バッファに適用されます。
+* **WOLFMEM_DIST**では、各バケットに含まれるブロックの個数を、`WOLFMEM_BUCKETS`のサイズと同じ順にコンマ区切りで指定しています。この定義は一般用バッファに適用されます。
 
 上記の例でいえば、ブロックサイズ64バイトのバケットが最小のサイズであり、そのバケットには49個のメモリブロックを用意することになります。
 次に大きいバケットはブロックサイズ128バイトで10個のメモリブロックを用意することを意味します。
@@ -1500,12 +1502,12 @@ wolfSSLは**zlib**ライブラリによるデータ圧縮をサポートして�
 [`--with-libz[=PATH]`](chapter02.md#--with-libzpath) configureオプションで有効にします（configureはzlibを自動的には検出しません）。
 他の方法でビルドしている場合は定数`HAVE_LIBZ`を定義し、zlib.hへのパスをインクルードに含めてください。
 
-圧縮は特定の暗号では標準でオフになっています。
+圧縮は、どの暗号でもデフォルトではオフになっています。
 オンにするには、SSL接続または受け入れの前に[`wolfSSL_set_compression()`](group__Setup.md#function-wolfssl_set_compression)関数をお使いください。
 圧縮が使用されるためには、クライアントとサーバーの両方で圧縮がオンになっている必要があります。
 
 送信する前にデータを圧縮すると、送信されて受信されるメッセージの実際のサイズが減少します。
-しかし、圧縮によって保存されたデータは、著しく低速なネットワーク以外では、通常、生のデータを送信するよりも分析に時間がかかることに注意してください。
+しかし、著しく低速なネットワークを除けば、通常は圧縮処理にかかる時間のほうが、データをそのまま送信する時間よりも長くなることに注意してください。
 
 **注意**：TLS 1.3ではレコード圧縮が廃止されました（RFC 8446ではnull圧縮方式のみが許可されています）。
 また、TLS 1.2以前でも圧縮の使用は推奨されません。
@@ -1584,7 +1586,7 @@ wolfSSL_CTX_load_verify_locations(ctx, caCert, 0);
 ```
 
 クライアント検証をオンにしてその動作を制御するには、[`wolfSSL_CTX_set_verify()`](group__Setup.md#function-wolfssl_ctx_set_verify)関数を使用します。
-次の例では、`SSL_VERIFY_PEER`はサーバーからクライアントへの証明書要求をオンにします。
+次の例では、`SSL_VERIFY_PEER`はサーバーからクライアントへのCertificateRequestをオンにします。
 `SSL_VERIFY_FAIL_IF_NO_PEER_CERT`はクライアントがサーバー側で検証する証明書を提示しない場合に処理を失敗するようにサーバーに指示します。
 [`wolfSSL_CTX_set_verify()`](group__Setup.md#function-wolfssl_ctx_set_verify)のその他のオプションには、`SSL_VERIFY_NONE`および`SSL_VERIFY_CLIENT_ONCE`があります。
 
@@ -1667,13 +1669,13 @@ wolfSSLで短縮HMACを有効にするには、次のようにします。
 
 ## wolfSSLのタイミング耐性
 
-wolfSSLは、潜在的にタイミング情報を漏らす可能性のある比較操作を行うときに一定の時間を保証する関数`ConstantCompare`を提供します。
+wolfSSLは、タイミング情報を漏らす可能性のある比較を行うときに、処理時間を一定に保つ関数`ConstantCompare`を提供します。
 このAPIは、タイミングベースのサイドチャネル攻撃を阻止するために、wolfSSLのTLSレベルと暗号レベルの両方で使用されます。
 
 wolfSSLのECC実装には、ECCアルゴリズムでタイミング耐性を有効にするために、`ECC_TIMING_RESISTANT`を定義しています。
 同様に、fastmathライブラリにはRSAアルゴリズムのタイミング耐性のために、`TFM_TIMING_RESISTANT`を定義しています。
 関数`exptmod`はタイミング耐性のあるMontgomeryラダーを使用します。
-デフォルトのSP数学ライブラリ（`sp_int.c`）は、`WC_NO_HARDEN`または`WC_NO_CACHE_RESISTANT`が定義されていない限り、タイミング耐性とキャッシュ耐性を備えています。
+デフォルトのSP Mathライブラリ（`sp_int.c`）は、`WC_NO_HARDEN`または`WC_NO_CACHE_RESISTANT`が定義されていない限り、タイミング耐性とキャッシュ耐性を備えています。
 `--disable-harden`を指定すると、これらが定義されます。
 
 [`--disable-harden`](chapter02.md#--disable-harden)もご参照ください。
@@ -1689,7 +1691,7 @@ wolfSSLのECC実装には、ECCアルゴリズムでタイミング耐性を有�
 
 wolfSSLは、アプリケーションプログラミングインターフェース（API）のサブセットに対して、固定アプリケーションバイナリインターフェース（ABI）を提供します。
 固定ABIはwolfSSL v4.3.0で導入され、これに含まれる関数はwolfSSLのヘッダーで`WOLFSSL_ABI`とマークされています。
-これらの関数は、wolfSSLのすべての将来のリリースで互換性があります。
+これらの関数は、今後のwolfSSLのすべてのリリースで互換性が保たれます。
 wolfSSL 5.9.4時点で、以下の関数が`WOLFSSL_ABI`とマークされています。
 
 `<wolfssl/ssl.h>`の関数：

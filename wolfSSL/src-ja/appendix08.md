@@ -40,7 +40,7 @@ SP アセンブリマクロ（`WOLFSSL_SP_*_ASM`）を使用するには、SP �
 `--enable-sp-asm` がデフォルトで有効になるのは、x86-64 と AArch64 で制限付きの `--enable-sp-math` を選択した場合のみです。
 デフォルトの数学ライブラリは `sp_int.c`（`WOLFSSL_SP_MATH_ALL`）です。
 
-## B. SP 数学ライブラリ（公開鍵暗号）
+## B. SP Mathライブラリ（公開鍵暗号）
 
 | アーキテクチャ | 対応アルゴリズム | user_settings.h マクロ | configure オプション |
 |---|---|---|---|
@@ -88,7 +88,7 @@ RSA-4096、P-384、P-521 は追加する必要があります。
 #define WOLFSSL_HAVE_SP_DH
 #define WOLFSSL_HAVE_SP_ECC
 
-/* オプション: 制限付きSP数学（以下で有効にしたサイズと曲線のみ） */
+/* オプション: 制限付きSP Math（以下で有効にしたサイズと曲線のみ） */
 /* #define WOLFSSL_SP_MATH */
 
 /* オプション: アセンブリ（いずれか1つを選択） */
