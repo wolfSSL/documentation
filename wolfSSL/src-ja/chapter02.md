@@ -2762,7 +2762,7 @@ maxq10xxに使用しているTLSバージョンを知らせます。
 
 #### WOLFSSL_STATIC_EPHEMERAL
 
-固定（「静的」）のエフェメラル(EC)DH鍵を、[`wolfSSL_CTX_set_ephemeral_key()`](group__CertsKeys.md#function-wolfssl_ctx_set_ephemeral_key)または`wolfSSL_set_ephemeral_key()`で読み込めるようにします。
+固定（「静的」）のエフェメラル(EC)DH鍵を、[`wolfSSL_CTX_set_ephemeral_key()`](ssl_8h.md#function-wolfssl_ctx_set_ephemeral_key)または`wolfSSL_set_ephemeral_key()`で読み込めるようにします。
 これにより、スニファーはエフェメラル鍵交換を使用するトラフィックを復号化できます。
 1つのエフェメラル鍵を複数の接続で再利用すると前方秘匿性が失われるため、テスト、検査、またはデバッグの目的にのみ使用してください。
 `--enable-sniffer`により自動的に設定されます。

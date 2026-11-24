@@ -33,7 +33,7 @@ OpenSSL互換関数については、[第13章 OpenSSL互換性](chapter13.md)�
 ### サーバー関数
 
 * [`wolfDTLSv1_server_method()`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS 1.0
-* [`wolfDTLSv1_2_server_method()`](group__Setup.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
+* [`wolfDTLSv1_2_server_method()`](ssl_8h.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
 * [`wolfDTLSv1_3_server_method()`](group__Setup.md#function-wolfdtlsv1_3_server_method) - DTLS 1.3
 * [`wolfDTLS_server_method()`](group__Setup.md#function-wolfdtls_server_method) - ビルドで有効になっている可能な限り新しいDTLSバージョンを使用
 * [`wolfSSLv3_server_method()`](group__Setup.md#function-wolfsslv3_server_method) - SSL 3.0
@@ -65,7 +65,7 @@ wolfSSLは[`wolfSSLv23_server_method()`](group__Setup.md#function-wolfsslv23_ser
 * [`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method) - TLS 1.3までの可能な限り新しいバージョンを使用（ビルドで有効になっている最も古いバージョンまでダウングレード）
 * `wolfTLS_client_method()` - `wolfSSLv23_client_method()`と同じ
 
-各メソッドには、ヒープヒントを引数に取る`_ex`版もあります（例：[`wolfDTLSv1_2_client_method_ex()`](group__Setup.md#function-wolfdtlsv1_2_client_method_ex)）。
+各メソッドには、ヒープヒントを引数に取る`_ex`版もあります（例：[`wolfDTLSv1_2_client_method_ex()`](ssl_8h.md#function-wolfdtlsv1_2_client_method_ex)）。
 ビルド条件はサーバー関数と同じです。
 
 wolfSSLは[`wolfSSLv23_client_method()`](group__Setup.md#function-wolfsslv23_client_method)関数による堅牢なクライアントダウングレードをサポートしています。

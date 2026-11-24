@@ -330,7 +330,7 @@ EchoServer:
 * [`wolfSSLv23_server_method();`](group__Setup.md#function-wolfsslv23_server_method) - 双方がサポートする最高バージョンで接続を受け入れ（デフォルトのビルドではTLS 1.3またはTLS 1.2）
 * `wolfTLS_server_method();` - `wolfSSLv23_server_method()`と同じ
 * [`wolfDTLSv1_server_method();`](group__Setup.md#function-wolfdtlsv1_server_method) - DTLS 1.0（`--enable-oldtls`）
-* [`wolfDTLSv1_2_server_method();`](group__Setup.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
+* [`wolfDTLSv1_2_server_method();`](ssl_8h.md#function-wolfdtlsv1_2_server_method) - DTLS 1.2
 * [`wolfDTLSv1_3_server_method();`](group__Setup.md#function-wolfdtlsv1_3_server_method) - DTLS 1.3
 * [`wolfDTLS_server_method();`](group__Setup.md#function-wolfdtls_server_method) - 双方がサポートする最高バージョンのDTLSで接続を受け入れ
 
