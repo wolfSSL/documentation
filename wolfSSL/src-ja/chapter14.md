@@ -2,13 +2,12 @@
 
 ## オープンソース
 
-wolfSSL、wolfCrypt、wolfMQTT、wolfTPM、wolfBoot、wolfSentryは、無料でダウンロードできるソフトウェアです。
-ユーザーがGPLv2ライセンスに準拠する限り、ユーザーのニーズに合わせて変更を加えることができます。
-GPLv2ライセンスは、gnu.org のWebサイト (<https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>) で確認できます。
-
-wolfSSHは無料でダウンロードできるソフトウェアです。
+wolfSSL、wolfCrypt、wolfSSH、wolfMQTT、wolfTPM、wolfBoot、wolfSentryは、無料でダウンロードできるソフトウェアです。
 ユーザーがGPLv3ライセンスに準拠する限り、ユーザーのニーズに合わせて変更を加えることができます。
 GPLv3ライセンスは、gnu.org のWebサイト (<https://www.gnu.org/licenses/gpl.html>) で確認できます。
+
+wolfSSLを特定のプロジェクト（例えばMariaDB、OpenVPN、Fetchmail、Cisco SystemsのU-Bootなど）と組み合わせて使用する場合は、代わりにGPLv2の下で使用できることがあります。
+対象プロジェクトの完全な一覧は、wolfSSLソースの`LICENSING`ファイルに記載されています。
 
 ## 商用ライセンス
 
@@ -20,7 +19,7 @@ wolfSSLとwolfCryptの商用ライセンスは、最終製品またはSKUごと�
 wolfMQTT、wolfSSH、wolfTPM、wolfBoot、wolfSentry の商用ライセンスもご用意しています。
 [info@wolfssl.jp](mailto:info@wolfssl.jp)までお問い合わせください。
 
-## FIPS 140-2/3 検証
+## FIPS 140-3 検証
 
 wolfSSLは現在、組み込みFIPS認証のリーダーです。
 現在アクティブなFIPS認証と検証オプションの詳細については、[FIPS 140のFAQ](https://wolfssl.jp/fips-faq/) をご覧いただくか、[info@wolfssl.jp](mailto:info@wolfssl.jp) までお問い合わせください。
