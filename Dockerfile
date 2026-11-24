@@ -24,10 +24,12 @@ FROM pandoc/latex:latest-ubuntu AS builder
 RUN apt-get -y update
 # mkdocs is used for the HTML manuals
 # Doxygen to convert the Doxygen docs
-# The Noto fonts are needed by our PDF generator
+# The Noto fonts are needed by our PDF generator, fonts-noto-cjk for the
+# Japanese manuals
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends mkdocs doxygen git make patch ca-certificates fonts-noto-core fonts-noto-mono fonts-noto-cjk
-# The LaTeX packages our PDF headers use beyond the minimal TeX Live
-RUN tlmgr update --self && tlmgr install titlesec tocloft fvextra listings fancyhdr
+# The LaTeX packages our PDF headers use beyond the minimal TeX Live, xecjk
+# is needed for the Japanese (DOC_LANG=JA) PDFs
+RUN tlmgr update --self && tlmgr install titlesec tocloft fvextra listings fancyhdr xecjk
 COPY --from=doxybook2 /usr/local/bin/doxybook2 /usr/local/bin/doxybook2
 RUN doxybook2 --version
 
@@ -36,32 +38,36 @@ WORKDIR /src/wolfssl
 COPY . .
 
 # Build wolfSSL PDF
+# DOC_LANG=JA builds the Japanese manual from src-ja
 FROM builder AS wolfssl-stage1
 ARG MANPATH
 ARG PDFFILE
 ARG V
+ARG DOC_LANG
 ARG WOLFCOSE_REF=main
 ARG WOLFTPM_REF=master
 WORKDIR /src/wolfssl/${MANPATH}
-RUN make pdf V=${V} WOLFCOSE_REF=${WOLFCOSE_REF} WOLFTPM_REF=${WOLFTPM_REF}
+RUN make pdf V=${V} DOC_LANG=${DOC_LANG} WOLFCOSE_REF=${WOLFCOSE_REF} WOLFTPM_REF=${WOLFTPM_REF}
 
 # Build wolfSSL HTML
 FROM wolfssl-stage1 AS wolfssl-stage2
 ARG MANPATH
 ARG PDFFILE
 ARG V
+ARG DOC_LANG
 WORKDIR /src/wolfssl/${MANPATH}
 RUN if [ "${MANPATH}" = wolfCOSE ]; then \
-        WOLFCOSE_REF="$(git -C wolfcose rev-parse HEAD)" make html V=${V}; \
+        WOLFCOSE_REF="$(git -C wolfcose rev-parse HEAD)" make html V=${V} DOC_LANG=${DOC_LANG}; \
     elif [ "${MANPATH}" = wolfTPM ]; then \
-        WOLFTPM_REF="$(git -C wolftpm rev-parse HEAD)" make html V=${V}; \
+        WOLFTPM_REF="$(git -C wolftpm rev-parse HEAD)" make html V=${V} DOC_LANG=${DOC_LANG}; \
     else \
-        make html V=${V}; \
+        make html V=${V} DOC_LANG=${DOC_LANG}; \
     fi
 
 # Build both wolfSSL HTML and PDF
 FROM scratch AS manual
 ARG MANPATH
 ARG PDFFILE
+ARG HTMLDIR=${MANPATH}-html
 COPY --from=wolfssl-stage1 /src/wolfssl/${MANPATH}/${PDFFILE} ${PDFFILE}
-COPY --from=wolfssl-stage2 /src/wolfssl/${MANPATH}/html ${MANPATH}-html
+COPY --from=wolfssl-stage2 /src/wolfssl/${MANPATH}/html ${HTMLDIR}
