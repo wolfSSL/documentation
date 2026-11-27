@@ -7,8 +7,8 @@ The following functions are used to set up the user authentication callback func
 void wolfSSH_SetUserAuth(WOLFSSH_CTX* ctx , WS_CallbackUserAuth
 cb );
 ```
-The callback function is set on the wolfSSL CTX object that is used to create the wolfSSH session objects. All sessions using this CTX will use the same callback
-function. This context is not to be confused with the callback function’s context.
+The callback function is set on the wolfSSH CTX object that is used to create the wolfSSH session objects. All sessions using this CTX will use the same callback
+function. This context is not to be confused with the callback function's context.
 
 ##  Setting the User Authentication Callback Context Data
 ```
@@ -20,19 +20,45 @@ Each wolfSSH session may have its own user authentication context data or share 
 ```
 void* wolfSSH_GetUserAuthCtx(WOLFSSH* ssh );
 ```
-This returns the pointer to the user authentication context data stored in the provided wolfSSH session. This is not to be confused with the wolfSSH’s context data used to create the session.
+This returns the pointer to the user authentication context data stored in the provided wolfSSH session. This is not to be confused with the wolfSSH's context data used to create the session.
 
-## Setting the Keyboard Authentication Prompts Callback Function
+## Setting the Keyboard-Interactive Prompts
+
+There is no separate callback for the keyboard-interactive prompts. The server
+calls the user authentication callback with the `authType`
+`WOLFSSH_USERAUTH_KEYBOARD_SETUP` to get the prompts to send to the client, as
+described in the previous chapter. Keyboard-interactive authentication requires
+a build with `--enable-keyboard-interactive` (`WOLFSSH_KEYBOARD_INTERACTIVE`).
+
+## Setting the Allowed Authentication Types Callback Function
 ```
-void wolfSSH_SetKeyboardAuthPrompts(WOLFSSH_CTX* ctx, WS_CallbackKeyboardAuthPrompts cb);
+void wolfSSH_SetUserAuthTypes(WOLFSSH_CTX* ctx, WS_CallbackUserAuthTypes cb);
 ```
 
-The server needs to specify the prompts that are to be given to the client so
-that it can authenticate in Keyboard-Interactive mode. This callback allows the
-server to set the prompts ready to send to the client.
+The optional callback returns the set of authentication types, as a bit mask of
+the `WOLFSSH_USERAUTH_*` type constants, that the server lists to the client as
+able to continue. Without it, the server lists password, public key, and, when
+built in, keyboard-interactive.
 
-Without this set, Keyboard-Interactive mode will be disabled on the server, even
-if attempts are made to explicitly enable it.
+## Setting the User Authentication Result Callback Function
+```
+void wolfSSH_SetUserAuthResult(WOLFSSH_CTX* ctx, WS_CallbackUserAuthResult cb);
+void wolfSSH_SetUserAuthResultCtx(WOLFSSH* ssh, void* userAuthResultCtx);
+```
+
+The optional callback is told the result of the library's check of a public
+key user authentication signature. When it is told of a success, returning a
+value other than `WS_SUCCESS` turns the attempt into a failure.
+
+## Setting the Maximum Authentication Attempts
+```
+int wolfSSH_CTX_SetMaxAuthAttempts(WOLFSSH_CTX* ctx, int value);
+int wolfSSH_SetMaxAuthAttempts(WOLFSSH* ssh, int value);
+```
+
+The server disconnects a client after this many failed user authentication
+attempts. The default is `DEFAULT_MAX_AUTH_ATTEMPTS` (6). A value of 0 or less
+restores the default.
 
 ##  Example Echo Server User Authentication
 
